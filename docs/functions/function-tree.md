@@ -32,6 +32,7 @@
 | 模块 ID | 模块名称 | 业务域边界 | 状态 |
 |---|---|---|---|
 | M97 | schema emit infrastructure | lab-management-system-shared V*.sql → {schema.sql, schema.dbml, schema.ts} + pg 借链 | 规划 |
+| M98 | frontend 接线层 | 4-backend 切换 + apiclient + Next.js API routes（自身作后端） | 规划 |
 
 ---
 
@@ -61,9 +62,43 @@
 
 ---
 
+## M98 frontend 接线层
+
+| 功能 ID | 功能名称 | 闭环定义 | 状态 |
+|---|---|---|---|
+| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 规划 |
+| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getBaseUrl() 上自动跑 | 规划 |
+| M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 规划 |
+
+### M98.F01 运行时后端切换
+
+| 子项 ID | 名称 | 类型 | 说明 | 状态 |
+|---|---|---|---|---|
+| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 规划 |
+| M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 规划 |
+
+### M98.F02 http-client 注入
+
+| 子项 ID | 名称 | 类型 | 说明 | 状态 |
+|---|---|---|---|---|
+| M98.F02.I01 | axios 拦截器 | 接口 | src/api/http-client.ts 的 installHttpClient；注入 baseURL + Authorization | 规划 |
+
+### M98.F03 Next.js API routes
+
+| 子项 ID | 名称 | 类型 | 说明 | 状态 |
+|---|---|---|---|---|
+| M98.F03.I01 | POST /api/auth/login | 接口 | demo：返 mock token + 3 租户；真路径接 pg | 规划 |
+| M98.F03.I02 | GET /api/auth/me | 接口 | 当面用户 + tenants[] + currentTenantId | 规划 |
+| M98.F03.I03 | POST /api/auth/logout | 接口 | 204 No Content | 规划 |
+| M98.F03.I04 | POST /api/auth/refresh | 接口 | 用 refreshToken 换新 token | 规划 |
+| M98.F03.I05 | POST /api/auth/switch-tenant | 接口 | 校验 tenantId 后换 token；msw 仓的同款语义 | 规划 |
+
+---
+
 ## 维护约定
 
 - 谁改功能，谁改表，同一个 commit。
 - `规划` → `开发中`：必须先有需求文档引用它。
 - `开发中` → `已上线`：L5 会警告它缺设计映射与测试引用。警告不阻断，由人裁量。
 - infra 模块的特殊性：M97 全规划，**没有 UI/data-fn**，所以 fnTest 列故意留空，trace.json 留 `[]`。
+- nextjs-as-backend：M98.F03 的 5 个 API route 是「家族定位要求」的功能，不是产品代码。

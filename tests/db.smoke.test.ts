@@ -60,14 +60,22 @@ describe("DB smoke (PG)", () => {
       return;
     }
 
+    // 清空 target schema，再 replay — emit-schema.mjs 的同款起点。
+    // 不这么做的话上一次 smoke 已经建好的表会让本轮 CREATE TABLE 全部撞名失败。
+    await client.query("DROP SCHEMA IF EXISTS public CASCADE");
+    await client.query("CREATE SCHEMA public");
+
     for (const f of files) {
       const sql = readFileSync(resolve(SHARED_SQL_DIR, f), "utf8");
       try {
+        await client.query("BEGIN");
         await client.query(sql);
+        await client.query("COMMIT");
         appliedCount++;
-      } catch {
-        // smoke 阶段已 apply 过的表重复 execute 会报冲突；这里容忍
-        break;
+      } catch (e) {
+        await client.query("ROLLBACK");
+        // 真迁移中途失败 → abort（与 emit-schema.mjs 一致）
+        throw e;
       }
     }
   });

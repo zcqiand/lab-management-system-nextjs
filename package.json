@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Schema emit + pg runtime lender for the lab-management-system 7-repo family.",
+  "description": "Full-stack frontend + schema emit + pg runtime lender for the lab-management-system 7-repo family.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +14,8 @@
     "lint": "eslint src tests",
     "format": "prettier --write src tests",
     "typecheck": "tsc --noEmit",
+    "gen:shared": "tsx scripts/gen-shared.ts",
+    "prebuild": "npm run gen:shared",
     "borrow:pg": "node scripts/borrow-pg.mjs",
     "borrow:pg:sibling": "node scripts/borrow-from-nextjs-pg.mjs",
     "emit:schema": "node scripts/emit-schema.mjs",
@@ -21,8 +23,11 @@
     "drizzle:pull": "drizzle-kit pull --config=drizzle.config.pg.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.7.9",
     "drizzle-orm": "^0.36.4",
     "next": "^15.1.0",
+    "orval": "^7.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1"

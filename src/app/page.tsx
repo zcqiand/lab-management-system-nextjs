@@ -1,11 +1,18 @@
-// infra-only stub。本仓无产品 UI；页面只是为了让 Next.js build 有 root。
-// 真的「对外状态」由 /api/health 返回（用 sqlite smoke 那张表做一次写入 + 计数）。
+import { BackendSwitcher } from "@/components/app/backend-switcher";
+import { LoginForm } from "@/components/app/login-form";
 
 export default function Page() {
   return (
-    <main className="mx-auto max-w-3xl p-6 font-mono text-sm">
-      <h1>lab-management-system-nextjs</h1>
-      <p>infra-only: SSOT emit + pg runtime lend. See README + scripts/emit-schema.mjs.</p>
+    <main className="mx-auto max-w-2xl space-y-4 p-6 font-mono text-sm">
+      <h1 className="text-xl">lab-management-system-nextjs</h1>
+      <p className="text-xs text-gray-500">
+        4-backend 切换：MSW / ASP.NET Core / Spring Boot / Next.js API（同源本仓）。
+      </p>
+      <BackendSwitcher />
+      <div className="border-t pt-4">
+        <h2 className="text-base mb-2">登录</h2>
+        <LoginForm />
+      </div>
     </main>
   );
 }

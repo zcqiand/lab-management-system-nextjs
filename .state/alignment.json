@@ -2,9 +2,9 @@
   "schema": 1,
   "project": "lab-management-system-nextjs",
   "functions": {
-    "modules": 1,
-    "features": 2,
-    "items": 7
+    "modules": 2,
+    "features": 5,
+    "items": 15
   },
   "warnings_total": 0,
   "warnings": {},
@@ -72,6 +72,90 @@
     },
     "M97.F02.I03": {
       "name": "consumed by shared sync-db",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F01.I01": {
+      "name": "BackendSwitcher 下拉",
+      "status": "规划",
+      "type": "按钮",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": [
+        "src\\components\\app\\backend-switcher.tsx"
+      ]
+    },
+    "M98.F01.I02": {
+      "name": "持久化 baseUrl",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F02.I01": {
+      "name": "axios 拦截器",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F03.I01": {
+      "name": "POST /api/auth/login",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F03.I02": {
+      "name": "GET /api/auth/me",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": [
+        "src\\components\\app\\login-form.tsx"
+      ]
+    },
+    "M98.F03.I03": {
+      "name": "POST /api/auth/logout",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F03.I04": {
+      "name": "POST /api/auth/refresh",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M98.F03.I05": {
+      "name": "POST /api/auth/switch-tenant",
       "status": "规划",
       "type": "接口",
       "requirements": [],

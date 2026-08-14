@@ -8,6 +8,9 @@ coverage/
 # infra-only: emit 产物由 emit-schema.mjs 重出，不入 git
 /generated/
 
+# orval codegen：npm run gen:shared 重出，不入 git
+/src/api/endpoints/
+
 # TypeScript build cache（incidental；L3 typecheck 自动跑后会产）
 tsconfig.tsbuildinfo
 
