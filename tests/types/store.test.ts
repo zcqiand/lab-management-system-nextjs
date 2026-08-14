@@ -36,7 +36,7 @@ describe("types/store store 状态类型（v3）", () => {
     expect(auth.user?.username).toBe("labadmin");
   });
 
-  fnTest(["M01.F03.I01"], "ContractState / ReceiptState / SampleState 结构一致", () => {
+  fnTest(["M02.F01.I01"], "ContractState / ReceiptState / SampleState 结构一致", () => {
     const contracts: ContractState = {
       list: [],
       total: 0,
