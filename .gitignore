@@ -1,0 +1,20 @@
+node_modules/
+.next/
+out/
+coverage/
+.state/trace.json
+.state/gate.json
+
+# infra-only: emit 产物由 emit-schema.mjs 重出，不入 git
+/generated/
+
+# SQLite 数据文件：dev 与 test 共用一个目录
+data/*.db
+data/*.db-journal
+
+# Drizzle 生成产物：迁移 SQL 由 db:generate 重出
+/drizzle/
+
+# 杂
+.DS_Store
+*.log

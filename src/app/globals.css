@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* infra-only: no shadcn tokens, no sonner, no @theme. Tailwind v4 minimal base. */
+@layer base {
+  body {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+}
