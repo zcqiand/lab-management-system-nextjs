@@ -37,8 +37,8 @@ REF react-router → Next.js App Router 文件路由（全部 client components�
 
 | REF 路由 | Next 路由 | 组件来源 |
 | --- | --- | --- |
-| /login | src/app/login/page.tsx | 已有（核对后对齐 REF） |
-| /sso-callback | src/app/sso-callback/page.tsx | features/auth/SsoCallback |
+| /login | 不做本地登录页（委托 saas，见 2.2.1） | — |
+| /sso-callback | 不做（同上） | — |
 | /dashboard | src/app/dashboard/page.tsx | pages/Dashboard |
 | /contracts | src/app/contracts/page.tsx | 已有（核对） |
 | /receipts, /receipt/:id | src/app/receipts/page.tsx, src/app/receipts/[id]/page.tsx | features/receipts |
@@ -51,6 +51,14 @@ REF react-router → Next.js App Router 文件路由（全部 client components�
 - 删除 catch-all `[...path]/page.tsx`（功能页就位后无死链；Wave 6 确认无引用再删）
 - 路由守卫：REF `ProtectedRoute` → App Router 下改为每个页面包 `<Protected>` client 组件（或 layout 级 guard + `usePathname`），行为三态对齐 REF（未登录→login / 角色不符→403 / 放行）
 - `data-fn` / `@entry` 注释锚点随组件原样移植（L5 依赖）
+
+### 2.2.1 认证：不做本地登录页，委托 saas（用户决策 2026-08-14）
+
+REF 的 `Login.tsx` / `SsoCallback.tsx`（用户名密码表单 + 回调页）**不移植**。本仓 `/login` 维持现有「SSO orchestrator」形态：未登录 → `authSsoAuthorize` 拿 authorizeUrl → 直接 `window.location` 跳 saas 身份平台登录页；saas 带 token/code 回 `/login` → 存 token 跳 `/`。即：
+
+- 不出现本仓自有的账号密码表单（REF features/auth/Login.tsx 不进本仓）
+- `/sso-callback` 路由不建（code+state 直接回 `/login` 解析，现有逻辑已覆盖）
+- 功能树上 M01.F05 的「JWT 登录（用户名+密码）」相关子项在本仓保持镜像行但状态不推「已上线」（登录 UI 在 saas 侧）；SSO/会话同步/登出子项按实际落地推
 
 ### 2.3 依赖增量
 
@@ -85,7 +93,7 @@ zustand store（authStore/receiptStore/sampleStore/contractStore/auditStore/flow
 2. **Wave 2 流程线 M03**：receipts + samples + task-assignment + data-entry（含报告预览）+ reports 4 页 + flow-pipeline + audit
 3. **Wave 3 M06 检测能力**：inspection-capability 10 组件
 4. **Wave 4 M04 字典 + M05 汇总 + Dashboard**
-5. **Wave 5 M00/M01/M02 收口**：SSO callback + 动态菜单 + 路由守卫 + contracts 核对
+5. **Wave 5 M00/M01/M02 收口**：SSO orchestrator 链路核对（跳 saas / token 回跳）+ 动态菜单 + 路由守卫 + contracts 核对（Wave 前已按 REF 去掉详情面板）
 6. **Wave 6 收口**：catch-all 清理 + orval 闲置复查 + fnTest 覆盖对齐 + L5 软告警清零 + handoff
 
 ## 6. 风险与对策
