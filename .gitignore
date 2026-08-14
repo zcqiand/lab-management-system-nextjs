@@ -8,7 +8,10 @@ coverage/
 # infra-only: emit 产物由 emit-schema.mjs 重出，不入 git
 /generated/
 
-# SQLite 数据文件：dev 与 test 共用一个目录
+# TypeScript build cache（incidental；L3 typecheck 自动跑后会产）
+tsconfig.tsbuildinfo
+
+# PG 本地连接池临时文件（如有）
 data/*.db
 data/*.db-journal
 
