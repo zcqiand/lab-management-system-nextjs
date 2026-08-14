@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "project": "lab-management-system-nextjs",
+  "functions": {
+    "modules": 1,
+    "features": 2,
+    "items": 7
+  },
+  "warnings_total": 0,
+  "warnings": {},
+  "unreachable_shipped": [],
+  "function_map": {
+    "M97.F01.I01": {
+      "name": "replay V*.sql to lab_dev",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F01.I02": {
+      "name": "pg_dump --schema-only",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F01.I03": {
+      "name": "drizzle-kit pull",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F01.I04": {
+      "name": "v-sql → DBML",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F02.I01": {
+      "name": "pg devDep",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F02.I02": {
+      "name": "borrow-pg sanity",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M97.F02.I03": {
+      "name": "consumed by shared sync-db",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    }
+  }
+}

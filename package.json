@@ -14,10 +14,11 @@
     "lint": "eslint src tests",
     "format": "prettier --write src tests",
     "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
     "borrow:pg": "node scripts/borrow-pg.mjs",
+    "borrow:pg:sibling": "node scripts/borrow-from-nextjs-pg.mjs",
     "emit:schema": "node scripts/emit-schema.mjs",
-    "emit:dbml": "node scripts/v-sql-to-dbml.mjs"
+    "emit:dbml": "node scripts/v-sql-to-dbml.mjs",
+    "drizzle:pull": "drizzle-kit pull --config=drizzle.config.pg.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.36.4",
@@ -28,12 +29,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.0",
     "@types/pg": "^8.11.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "better-sqlite3": "^11.7.0",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.0",

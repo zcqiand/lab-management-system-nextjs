@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 /**
- * infra-only next.config：本仓不渲染产品页面、serverExternalPackages 主要声明 `pg`
- * 是 native binding（被 emit-schema.mjs / borrow-pg.mjs 用），不能被打包进 server bundle。
+ * infra-only next.config。本仓**只用** `pg` 一个驱动（被 sync-db.mjs / emit-schema.mjs /
+ * borrow-pg.mjs / db.smoke.test.ts / src/db/index.ts 共享）。
  *
- * `better-sqlite3` 仍存在但 L4 smoke 仅在 vitest 跑（不进 next build），故不列入。
+ * `pg` 是 native binding，不能被打进 server bundle 的普通产物——Next 默认 external，
+ * 这里显式声明是为升级 next 时第一时间被 regressed 注意到。
  */
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pg"],

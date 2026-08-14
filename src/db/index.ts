@@ -1,41 +1,33 @@
 import "server-only";
-import Database from "better-sqlite3";
-import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pkg from "pg";
 import * as schema from "./schema";
 
 /**
- * Drizzle + SQLite 单例。
+ * DB client — `pg` + drizzle-orm/node-postgres。
  *
- * 同名 globalThis 兜底避免 Next HMR 反复新建 connection。
- * 顶层 import 'server-only'：禁止被 client bundle 拽进去，否则 better-sqlite3 的 native
- * binding 会爆。
+ * 与 saas-identity-platform-nextjs 的差异：saas 用 postgres-js + drizzle-orm/postgres-js；
+ * 本仓用裸 `pg` + drizzle-orm/node-postgres。
+ * 理由：本仓是 infra 角色，db client 主要是**借链出口**（被 ../lab-management-system-shared
+ * 的 sync-db.mjs 与 ../saas-identity-platform-nextjs 的 db.smoke.test.ts 借 require("pg")）。
+ * 统一 driver 避免「借 `pg` 跑 raw query、本仓用 postgres-js 跑 drizzle」的双栈。
  *
- * 数据文件：
- *   - 缺省 ./data/dev.db，.gitignore 屏蔽
- *   - DB_PATH=':memory:' 用于测试，得到一个进程内临时库
- *
- * 改 src/db/schema.ts 后，跑：
- *   npx drizzle-kit generate        # 生成迁移 SQL
- *   npx drizzle-kit migrate         # 应用到 dev.db
- * 启动时不会自动跑迁移 —— 由 `npm run dev` 脚本里的 prerun 钩子或 CI 兜底。
+ * 「server-only」：
+ * - 本模块只允许 Route Handler / Server Action / Server Component 引入
+ * - client component import：build 期会报 'server-only'
+ * - 详见 profiles/nextjs.toml §[stack_rules].forbid + docs/conventions/nextjs.md
  */
+const { Pool } = pkg;
 
-const DB_PATH = process.env.DB_PATH ?? "data/dev.db";
-
-type DbHandle = BetterSQLite3Database<typeof schema>;
-
-declare global {
-  // eslint-disable-next-line no-var
-  var __drizzle: DbHandle | undefined;
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is not set. See docs/conventions/nextjs.md §凭据 (ADR-0009).",
+  );
 }
 
-function open(): DbHandle {
-  const sqlite = new Database(DB_PATH);
-  if (DB_PATH !== ":memory:") {
-    sqlite.pragma("journal_mode = WAL");
-    sqlite.pragma("foreign_keys = ON");
-  }
-  return drizzle(sqlite, { schema });
-}
+const pool = new Pool({ connectionString: DATABASE_URL, max: 10, idleTimeoutMillis: 20_000 });
 
-export const db: DbHandle = globalThis.__drizzle ?? (globalThis.__drizzle = open());
+export const db = drizzle(pool, { schema });
+export type Database = typeof db;
+export { schema };

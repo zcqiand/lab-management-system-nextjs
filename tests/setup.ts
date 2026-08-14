@@ -1,10 +1,6 @@
 /**
- * vitest 全局 setup：跑迁移，把 :memory: 的 SQLite 里建出和 dev 一致的表。
- *
- * 在生产里 dev.db 已经被 `npm run db:migrate` 应用过；测试冷启动时 dev 不存在，靠这里补齐。
- * server-only stub 由 vitest.config.ts 的 resolve.alias 兜住，不依赖这个文件。
+ * vitest 全局 setup：infra-only 仓无需对 sqlite 跑迁移。
+ * 真正的 PG smoke 由 tests/db.smoke.test.ts 在 .beforeAll 里借 pg + 跑 V*.sql 完成。
+ * 本文件存在仅因为 profiles/nextjs.toml 的 scaffold 习惯于此文件名。
  */
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { db } from "@/db";
-
-migrate(db, { migrationsFolder: "./drizzle" });
+export {};
