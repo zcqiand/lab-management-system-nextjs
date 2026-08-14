@@ -27,6 +27,7 @@ function listMigrations() {
 // 状态只关心表结构与索引；不解析 trigger / policy / view 等（lab 当前不用）。
 function parseVFile(sql) {
   const tables = []; // {schema?: string, name, columns: [{name, type, pk, notNull, default, references?}], rawComments: string[]}
+  const renames = []; // {from, to} — DDL ALTER TABLE ... RENAME TO 处理（v0.1.0 起）
   const indexes = []; // {name, table, unique, columns: string[], where?: string}
   const alters = []; // {table, op: 'addColumn'|'dropColumn'|'addConstraint'..., payload: any}
   const comments = []; // {text}
@@ -136,11 +137,20 @@ function parseVFile(sql) {
       i++; continue;
     }
 
+    // ALTER TABLE ... RENAME TO <new>  (v0.1.0 起首次出现：V013 重命名 param_* → inspection_param_*)
+    const renameM = /^ALTER TABLE\s+(?:ONLY\s+)?("?[\w]+"?\.)?"?([\w]+)"?\s+RENAME\s+TO\s+("?[\w]+"?)\s*;?$/i.exec(stripped);
+    if (renameM) {
+      const from = renameM[2];
+      const toRaw = renameM[3].replace(/"/g, "");
+      renames.push({ from, to: toRaw });
+      i++; continue;
+    }
+
     // 其他语句（CREATE TYPE / CREATE EXTENSION / GRANT / 等）—— 单行放过，不入 DBML。
     i++;
   }
 
-  return { tables, indexes, alters, comments };
+  return { tables, indexes, alters, comments, renames };
 }
 
 function toDbml(allFiles) {
@@ -215,7 +225,7 @@ function toDbml(allFiles) {
 
 function main() {
   const files = listMigrations();
-  const agg = { tables: [], indexes: [], alters: [], comments: [] };
+  const agg = { tables: [], indexes: [], alters: [], comments: [], renames: [] };
   for (const f of files) {
     const sql = readFileSync(resolve(MIGRATIONS, f), "utf8");
     const parsed = parseVFile(sql);
@@ -223,7 +233,31 @@ function main() {
     agg.indexes.push(...parsed.indexes);
     agg.alters.push(...parsed.alters);
     agg.comments.push(...parsed.comments.map((c) => `[${f}] ${c}`));
+    agg.renames.push(...(parsed.renames ?? []));
   }
+
+  // 应用 RENAME TO（v0.1.0 起）：改 table.name + index.table + FK references.table + alter table field
+  if (agg.renames.length) {
+    const renameMap = new Map(agg.renames.map((r) => [r.from, r.to]));
+    for (const t of agg.tables) {
+      if (renameMap.has(t.name)) t.name = renameMap.get(t.name);
+    }
+    for (const ix of agg.indexes) {
+      if (renameMap.has(ix.table)) ix.table = renameMap.get(ix.table);
+    }
+    for (const a of agg.alters) {
+      if (renameMap.has(a.table)) a.table = renameMap.get(a.table);
+    }
+    for (const t of agg.tables) {
+      for (const c of t.columns ?? []) {
+        if (c.references && renameMap.has(c.references.table)) {
+          c.references.table = renameMap.get(c.references.table);
+        }
+      }
+    }
+    console.log(`[v-sql-to-dbml] applied ${agg.renames.length} renames: ${agg.renames.map((r) => `${r.from}->${r.to}`).join(", ")}`);
+  }
+
   mkdirSync(OUT, { recursive: true });
   const dbml = toDbml(agg);
   const out = resolve(OUT, "schema.dbml");
