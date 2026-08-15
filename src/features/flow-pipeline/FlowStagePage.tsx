@@ -168,8 +168,9 @@ export function FlowStagePage({
         if (kw) params.keyword = kw;
         if (filter !== "all") params.filter = filter;
         const res = await apiClient.get<PageResp>(API_ROUTES['/receipts'], { params });
-        setList(res.data.items);
-        setTotal(res.data.total);
+        // 防御：非 JSON 响应（如 HTML fallback 页）时 res.data.items 为 undefined
+        setList(Array.isArray(res.data?.items) ? res.data.items : []);
+        setTotal(res.data?.total ?? 0);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "加载失败");
       } finally {
@@ -193,7 +194,7 @@ export function FlowStagePage({
           lastSubmittedBy: operator,
         },
       });
-      setSubmittedList(res.data.items);
+      setSubmittedList(Array.isArray(res.data?.items) ? res.data.items : []);
     } catch {
       setSubmittedList([]);
     }
