@@ -1,24 +1,105 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "71d503cbd683f8c0",
-  "summary": "Wave 4 — M05.F01 试验报告汇总表 代码已落，规划→已上线。1 F + 1 I（M05.F01.I02 已废弃不动）。设计/流程映射表加 M05.F01.I01 行 + 孤儿白名单声明。",
+  "base_sha": "9cf4f2a3c5924190",
+  "summary": "M04.F06-F09 型号/规格/等级/牌号维护 4 码表页落地（移植 REF CategoryDictList）。4 F + 12 I 共 16 子项 规划→已上线；后端 /api/catalog/* 4 路由已就绪（2026-08-15 commit 838f2f8）。",
   "changes": [
     {
-      "id": "M05.F01",
+      "id": "M04.F06",
       "action": "变更",
-      "name": "报告汇总",
-      "reason": "src/features/summary/SummaryPage.tsx + src/app/summary/page.tsx + GET /api/summary + GET /api/report-names 下拉；M03 流程末端读视图"
+      "name": "型号维护",
+      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
     },
     {
-      "id": "M05.F01.I01",
+      "id": "M04.F07",
       "action": "变更",
-      "name": "汇总表",
-      "reason": "SummaryPage data-fn=M05.F01.I01 锚点 + 2 fnTest（默认 ALL 表格有行 + 切换 RN-101 summaryName 更新）"
+      "name": "规格维护",
+      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+    },
+    {
+      "id": "M04.F08",
+      "action": "变更",
+      "name": "等级维护",
+      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+    },
+    {
+      "id": "M04.F09",
+      "action": "变更",
+      "name": "牌号维护",
+      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+    },
+    {
+      "id": "M04.F06.I01",
+      "action": "变更",
+      "name": "型号列表",
+      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
+    },
+    {
+      "id": "M04.F06.I02",
+      "action": "变更",
+      "name": "型号新建/编辑",
+      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
+    },
+    {
+      "id": "M04.F06.I03",
+      "action": "变更",
+      "name": "型号删除",
+      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
+    },
+    {
+      "id": "M04.F07.I01",
+      "action": "变更",
+      "name": "规格列表",
+      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
+    },
+    {
+      "id": "M04.F07.I02",
+      "action": "变更",
+      "name": "规格新建/编辑",
+      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
+    },
+    {
+      "id": "M04.F07.I03",
+      "action": "变更",
+      "name": "规格删除",
+      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
+    },
+    {
+      "id": "M04.F08.I01",
+      "action": "变更",
+      "name": "等级列表",
+      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
+    },
+    {
+      "id": "M04.F08.I02",
+      "action": "变更",
+      "name": "等级新建/编辑",
+      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
+    },
+    {
+      "id": "M04.F08.I03",
+      "action": "变更",
+      "name": "等级删除",
+      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
+    },
+    {
+      "id": "M04.F09.I01",
+      "action": "变更",
+      "name": "牌号列表",
+      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
+    },
+    {
+      "id": "M04.F09.I02",
+      "action": "变更",
+      "name": "牌号新建/编辑",
+      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
+    },
+    {
+      "id": "M04.F09.I03",
+      "action": "变更",
+      "name": "牌号删除",
+      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
     }
   ],
-  "sync_files": [
-    "docs/design/design-function-map.md",
-    "docs/design/flow-function-map.md"
-  ]
+  "sync_files": []
 }

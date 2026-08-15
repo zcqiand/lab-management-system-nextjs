@@ -2,10 +2,7 @@
 // GET /api/catalog/models?inspectionObjectCode= → {items,total}；POST → 201
 
 import { NextRequest } from "next/server";
-import {
-  catalogGet,
-  catalogPost,
-} from "@/lib/catalog-handlers";
+import { catalogGet, catalogPost } from "@/lib/catalog-handlers";
 import { inspectionModels } from "@lab/management-system-msw/fixtures";
 
 export async function GET(req: NextRequest) {

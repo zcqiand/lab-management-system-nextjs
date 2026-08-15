@@ -85,6 +85,18 @@
 | M98.F03.I04 | src/app/api/auth/refresh/route.ts | POST /api/auth/refresh | – | M98.F03.I04 | – | 已上线 |
 | M98.F03.I05 | src/app/api/auth/switch-tenant/route.ts | POST /api/auth/switch-tenant | – | M98.F03.I05 | – | 已上线 |
 | M05.F01.I01 | src/features/summary/SummaryPage.tsx | GET /api/summary?categoryCode= ; GET /api/report-names (下拉) | sample_receipts | M05.F01.I01 | – | 已上线 |
+| M04.F06.I01 | src/features/dicts/CategoryDictList.tsx (endpoint=models) | GET /api/catalog/models?inspectionObjectCode= | inspection_models | M04.F06.I01 | – | 已上线 |
+| M04.F06.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/models ; PUT /api/catalog/models/:code | inspection_models | M04.F06.I02 | – | 已上线 |
+| M04.F06.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/models/:code | inspection_models | M04.F06.I03 | – | 已上线 |
+| M04.F07.I01 | src/features/dicts/CategoryDictList.tsx (endpoint=specs) | GET /api/catalog/specs?inspectionObjectCode= | inspection_specs | M04.F07.I01 | – | 已上线 |
+| M04.F07.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/specs ; PUT /api/catalog/specs/:code | inspection_specs | M04.F07.I02 | – | 已上线 |
+| M04.F07.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/specs/:code | inspection_specs | M04.F07.I03 | – | 已上线 |
+| M04.F08.I01 | src/features/dicts/CategoryDictList.tsx (endpoint=grades) | GET /api/catalog/grades?inspectionObjectCode= | inspection_grades | M04.F08.I01 | – | 已上线 |
+| M04.F08.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/grades ; PUT /api/catalog/grades/:code | inspection_grades | M04.F08.I02 | – | 已上线 |
+| M04.F08.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/grades/:code | inspection_grades | M04.F08.I03 | – | 已上线 |
+| M04.F09.I01 | src/features/dicts/CategoryDictList.tsx (endpoint=brands) | GET /api/catalog/brands?inspectionObjectCode= | inspection_brands | M04.F09.I01 | – | 已上线 |
+| M04.F09.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/brands ; PUT /api/catalog/brands/:code | inspection_brands | M04.F09.I02 | – | 已上线 |
+| M04.F09.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/brands/:code | inspection_brands | M04.F09.I03 | – | 已上线 |
 
 ## 约定
 

@@ -913,122 +913,202 @@
     },
     "M04.F06.I01": {
       "name": "型号列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表"
+      ],
+      "entry": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
     },
     "M04.F06.I02": {
       "name": "型号新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）"
+      ],
       "entry": []
     },
     "M04.F06.I03": {
       "name": "型号删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗"
+      ],
       "entry": []
     },
     "M04.F07.I01": {
       "name": "规格列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：渲染标题不炸"
+      ],
+      "entry": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
     },
     "M04.F07.I02": {
       "name": "规格新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗"
+      ],
       "entry": []
     },
     "M04.F07.I03": {
       "name": "规格删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗"
+      ],
       "entry": []
     },
     "M04.F08.I01": {
       "name": "等级列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：渲染标题不炸"
+      ],
+      "entry": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
     },
     "M04.F08.I02": {
       "name": "等级新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗"
+      ],
       "entry": []
     },
     "M04.F08.I03": {
       "name": "等级删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗"
+      ],
       "entry": []
     },
     "M04.F09.I01": {
       "name": "牌号列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：牌号种子行渲染（fixtures 真数据穿透）"
+      ],
+      "entry": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
     },
     "M04.F09.I02": {
       "name": "牌号新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：新建按钮开弹窗"
+      ],
       "entry": []
     },
     "M04.F09.I03": {
       "name": "牌号删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：行内删除按钮开确认弹窗"
+      ],
       "entry": []
     },
     "M05.F01.I01": {
