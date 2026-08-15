@@ -60,6 +60,14 @@ export const API_ROUTES = {
   "/receipts/flow": "/api/receipts/flow",
   "/report-names": "/api/report-names",
   "/samples": "/api/samples",
+  "/standard-parameters": "/api/inspection/links/standard-parameter",
   "/summary": "/api/summary",
   "/test-records": "/api/test-records",
+  // —— Task 8 追加（SampleManagerModal 四码表 + ReportPreviewModal 机构信息）——
+  // msw 暂无 /api/org-info handler：组件 catch 兜底为 null（REF 同行为）。
+  "/models": "/api/catalog/models",
+  "/specifications": "/api/catalog/specs",
+  "/grades": "/api/catalog/grades",
+  "/brands": "/api/catalog/brands",
+  "/org-info": "/api/org-info",
 } as const;

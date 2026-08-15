@@ -41,6 +41,10 @@ export default defineConfig({
       },
       {
         resolve: { alias: resolveAlias },
+        // tsconfig 的 jsx:"preserve" 是给 next/swc 的；vitest 4（vite 8/rolldown oxc
+        // 转译链）不认 preserve——.tsx 里的 JSX 会 "Unexpected JSX expression"。
+        // 这里显式给 oxc 转译器 automatic runtime（react/jsx-runtime）。
+        oxc: { jsx: { runtime: "automatic" } },
         test: {
           name: "jsdom",
           environment: "jsdom",
