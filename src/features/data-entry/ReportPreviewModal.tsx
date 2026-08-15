@@ -5,11 +5,6 @@ import generatedReportNames from "@/data/generated/inspection-report-name.json";
 import { assembleReport, flattenForDocx, ensureAllDocxTagsFromBuffer } from "./reportTemplateData";
 import { SampleExtFieldsModal } from "./SampleExtFieldsModal";
 
-// REF（vite）用 import.meta.glob 把 data/templates/*.docx 发布成静态资源 URL。
-// Next.js 移植：本仓 data/templates 目前只有 inject manifests（Task 10 随 docx 资产补齐），
-// 先给空表——pickTemplateUrl 返回 null 时组件走「暂无报告模板」分支（与 REF 无模板类别同路径）。
-const TEMPLATE_URLS: Record<string, string> = {};
-
 /** 报告编号(RN) → 模板文件名（来自 generated/inspection-report-name.json 的 templatePath）。
  *  30 个 RN 全部已注入占位符并具备 templatePath。 */
 const REPORT_NAME_TEMPLATE: Record<string, string> = Object.fromEntries(
@@ -18,11 +13,15 @@ const REPORT_NAME_TEMPLATE: Record<string, string> = Object.fromEntries(
     .map((r) => [r.code, r.templatePath as string]),
 );
 
-function pickTemplateUrl(categoryCode: string): string | null {
+/** 报告编号(RN) → public/templates 下的模板 URL。
+ *  REF（vite）用 import.meta.glob 把 data/templates/*.docx 发布成静态资源；
+ *  Next.js 移植：30 个 docx 已镜像到 public/templates/（与 templatePath 一一对应），
+ *  直接按文件名构 URL，无需 glob 查找表。无 templatePath 的类别返回 null →
+ *  组件走「暂无报告模板」分支。
+ *  导出供测试断言 URL 直构行为（tests/features/data-entry/reportTemplateUrl.test.ts）。 */
+export function pickTemplateUrl(categoryCode: string): string | null {
   const fname = REPORT_NAME_TEMPLATE[categoryCode];
-  if (!fname) return null;
-  const hit = Object.entries(TEMPLATE_URLS).find(([p]) => p.endsWith("/" + fname));
-  return hit?.[1] ?? null;
+  return fname ? `/templates/${encodeURIComponent(fname)}` : null;
 }
 
 interface Props {
