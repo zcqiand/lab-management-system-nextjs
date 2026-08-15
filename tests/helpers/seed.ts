@@ -87,6 +87,24 @@ function num(v: string | null, dflt: number): number {
   return Number.isFinite(n) && n > 0 ? n : dflt;
 }
 
+// ————————————————————————————————————————————————
+// Task 11 扩展（reports 4 阶段页 + audit）：
+//   - POST /api/receipts/flow：lab-msw 返回裸数组（组件 runFlow 期望 res.data.results）
+//     且 withdraw 是 no-op。这里对同一 sampleReceipts fixtures 数组重实现完整语义：
+//     submit（前进一阶 + lastSubmittedBy + issuance 补 issuedAt）/ return（后退一阶）/
+//     withdraw（后退一阶 + 清 lastSubmittedBy，仅限本人提交的），flowHistory 同步 push。
+//     语义参考 lab-msw src/handlers-extra.ts reportFlowExtraHandlers + REF 类型注释
+//     （withdraw=提交人主动收回——msw 仓标了 no-op 债，测试穿透需要真流转）。
+//   - GET /api/audit-logs：lab-msw 无该 handler。从 fixtures 的 flowHistory 派生审计
+//     条目（type='flow'，操作对象=委托书编号），支持 REF auditStore 的分页 + type/keyword
+//     过滤参数形状（dateFrom/dateTo 宽松忽略——种子时间线集中，无按日过滤断言需求）。
+// ————————————————————————————————————————————————
+
+/** flow 状态流转语义（与 lab-msw handlers-extra nextStatus/prevStatus 一致，含 completed 终态） */
+const FLOW_ORDER_FULL = [
+  'receiving', 'task_assignment', 'data_entry', 'review', 'approval', 'issuance', 'archived', 'completed',
+] as const;
+
 /**
  * 安装 REF 形状适配 handler：
  *  - dictCrud 表（report-names / standards / parameters / param-interfaces）：裸数组 → {items,total}
@@ -195,6 +213,112 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
         );
         items = items.filter((t) => sids.has(t.sampleId));
       }
+      return HttpResponse.json(
+        pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), 20)),
+      );
+    }),
+
+    // —— POST /receipts/flow：REF 形状 {results} + 完整流转语义（Task 11）——
+    // lab-msw 返回裸数组且 withdraw no-op；组件 runFlow 读 res.data.results。
+    // 对同一 sampleReceipts fixtures 原地流转，flowHistory push（数据同源）。
+    http.post("*/api/receipts/flow", async ({ request }) => {
+      const body = (await request.json()) as {
+        ids: string[];
+        action: "submit" | "return" | "withdraw";
+        operator: string;
+        reason?: string;
+      };
+      const now = new Date().toISOString();
+      const results = body.ids.map((id) => {
+        const r = sampleReceipts.find((x) => x.id === id) as
+          | { id: string; commissionCode?: string; flowStatus: string; lastSubmittedBy?: string | null; issuedAt?: string | null; flowHistory?: unknown[]; updatedAt?: string }
+          | undefined;
+        if (!r) return { id, ok: false, message: "Receipt not found" };
+        const idx = FLOW_ORDER_FULL.indexOf(r.flowStatus as (typeof FLOW_ORDER_FULL)[number]);
+        if (idx < 0) return { id, ok: false, message: `Unknown flowStatus: ${r.flowStatus}` };
+        const to =
+          body.action === "submit"
+            ? FLOW_ORDER_FULL[idx + 1]
+            : FLOW_ORDER_FULL[idx - 1];
+        if (!to) {
+          return {
+            id,
+            ok: false,
+            message:
+              body.action === "submit" ? "Already at final stage" : "Already at first stage",
+          };
+        }
+        // withdraw 仅限本人最近提交的单据（提交人主动收回）
+        if (body.action === "withdraw" && r.lastSubmittedBy !== body.operator) {
+          return { id, ok: false, message: "只能撤回本人提交的单据" };
+        }
+        const from = r.flowStatus;
+        r.flowStatus = to;
+        if (body.action === "submit") {
+          r.lastSubmittedBy = body.operator;
+          if (to === "issuance") r.issuedAt = now;
+        } else if (body.action === "withdraw") {
+          r.lastSubmittedBy = null;
+        }
+        (r.flowHistory ??= []).push({
+          action: body.action,
+          from,
+          to,
+          operator: body.operator,
+          at: now,
+          reason: body.reason,
+        });
+        r.updatedAt = now;
+        return { id, ok: true, flowStatus: r.flowStatus };
+      });
+      return HttpResponse.json({ results });
+    }),
+
+    // —— GET /audit-logs：从 flowHistory 派生审计条目（Task 11；lab-msw 无此端点）——
+    // 组件 catch 兜底是 error 提示而非崩溃，但列表页 smoke 取「空数据也正常渲染」
+    // 之外再给一条真实数据路径：每条 flowHistory 生成 type='flow' 的条目。
+    http.get("*/api/audit-logs", ({ request }) => {
+      const url = new URL(request.url);
+      const type = url.searchParams.get("type");
+      const keyword = url.searchParams.get("keyword") ?? "";
+      const entries: Array<{
+        id: string; type: string; action: string; operator: string;
+        target: string; targetId?: string; detail?: string; at: string; ip?: string;
+      }> = [];
+      for (const r of sampleReceipts) {
+        const rec = r as {
+          id: string; commissionCode?: string; flowHistory?: Array<{
+            action: string; from: string; to: string; operator: string; at: string; reason?: string;
+          }>;
+        };
+        for (const [i, h] of (rec.flowHistory ?? []).entries()) {
+          const actionLabel =
+            h.action === "submit" ? "提交" : h.action === "return" ? "退回" : "撤回";
+          entries.push({
+            id: `audit-${rec.id}-${i}`,
+            type: "flow",
+            action: `${actionLabel}（${h.from} → ${h.to}）`,
+            operator: h.operator,
+            target: rec.commissionCode ?? rec.id,
+            targetId: rec.id,
+            detail: h.reason,
+            at: h.at,
+          });
+        }
+      }
+      let items = entries;
+      if (type) items = items.filter((e) => e.type === type);
+      if (keyword) {
+        items = items.filter(
+          (e) =>
+            e.action.includes(keyword) ||
+            e.operator.includes(keyword) ||
+            e.target.includes(keyword) ||
+            (e.detail ?? "").includes(keyword),
+        );
+      }
+      // 时间倒序（最新在前，符合审计日志惯例）
+      items = [...items].sort((a, b) => b.at.localeCompare(a.at));
       return HttpResponse.json(
         pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), 20)),
       );
