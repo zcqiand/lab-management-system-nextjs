@@ -44,6 +44,14 @@ import {
   paramInterfaces,
   paramInterfaceLinks,
   contracts,
+  inspectionSpecialties,
+  inspectionObjects,
+  inspectionObjectStandards,
+  inspectionObjectParameters,
+  inspectionSpecialtyObjects,
+  inspectionObjectReportNames,
+  inspectionCalculationRules,
+  technicalRequirements,
 } from "@lab/management-system-msw/fixtures";
 import { mockResult, requirementFor } from "@/features/data-entry/reportTemplateSeed";
 import { computeCementFlexural, computeCementCompress } from "@/features/data-entry/models/cement-strength";
@@ -60,6 +68,9 @@ const SNAPSHOTTED: Array<{ arr: unknown[]; snapshot: unknown[] }> = [
   sampleReceipts, samples, testRecords, inspectionReportNames, inspectionParameters,
   inspectionStandards, inspectionStandardParameters, inspectionReportNameStandards,
   inspectionReportNameParameters, paramInterfaces, paramInterfaceLinks, contracts,
+  inspectionSpecialties, inspectionObjects, inspectionObjectStandards,
+  inspectionObjectParameters, inspectionSpecialtyObjects, inspectionObjectReportNames,
+  inspectionCalculationRules, technicalRequirements,
 ].map((arr) => ({ arr: arr as unknown[], snapshot: structuredClone(arr) }));
 
 /** 把 fixtures 恢复到模块加载时的快照（引用不变，内容重置）。 */
@@ -85,6 +96,140 @@ function pageOf<T>(items: T[], page: number, pageSize: number) {
 function num(v: string | null, dflt: number): number {
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? n : dflt;
+}
+
+// ———— Task 13：M06 主表 / junction 适配 helper（dictCrud 裸数组 → REF 形状）————
+
+/** M06 主表：补 id=code（REF 组件 rowId 读 id 列；msw dictCrud 以 code 为主键），
+ * 支持 keyword（code/name includes）+ REF 过滤参数语义：
+ *  - 有同名列的行直接按列过滤（objects.inspectionSpecialtyCode）；
+ *  - 无同名列的（standards/parameters 按专项/项目/标准过滤）经 junction 表反查——
+ *    REF 语义：standards?inspectionObjectCode=… 经 inspection-object-standards，
+ *    standards?inspectionSpecialtyCode=… 经 specialty-object + object-standard 两跳，
+ *    parameters 同理（object → object-parameter / standard-parameter）。 */
+function wrapDict(
+  rows: Array<Record<string, unknown>>,
+  request: Request,
+  junctions?: {
+    /** 本表自身的 code 列名 */
+    selfCodeKey?: string;
+    /** 过滤参数 → 反查路径（junction 数组 + 两端列名；可两跳） */
+    reverse?: Record<string, Array<{ link: Array<Record<string, unknown>>; from: string; to: string }>>;
+    /** 聚合列（老 shared lab-handlers 语义，backup/lab-management-system-shared
+     * mocks/runtime/handlers/lab-handlers.ts）：本行 code 经 junction 关联的对端
+     * code（names 给了则映射成名称，查不到回退 code）去重后以全角逗号 join。
+     * names Map 在 handler 闭包里现算，保证测试中新增行也拿到新名。 */
+    aggregate?: Array<{
+      as: string;
+      link: Array<Record<string, unknown>>;
+      selfCol: string;
+      otherCol: string;
+      names?: Map<string, string>;
+    }>;
+  },
+) {
+  const selfCodeKey = junctions?.selfCodeKey ?? "code";
+  const url = new URL(request.url);
+  const withId: Array<Record<string, unknown>> = rows.map((r) => ({
+    ...r,
+    id: String(r["id"] ?? r[selfCodeKey]),
+  }));
+  let items = withId;
+  const kw = url.searchParams.get("keyword") ?? "";
+  if (kw)
+    items = items.filter(
+      (r) => String(r["code"] ?? "").includes(kw) || String(r["name"] ?? "").includes(kw),
+    );
+  for (const key of [
+    "inspectionSpecialtyCode",
+    "inspectionObjectCode",
+    "inspectionStandardCode",
+    "inspectionParameterCode",
+  ]) {
+    const v = url.searchParams.get(key);
+    if (!v) continue;
+    if (items.length > 0 && key in (items[0] as Record<string, unknown>)) {
+      // 主表自带该列（objects.inspectionSpecialtyCode）→ 直接过滤
+      items = items.filter((r) => r[key] === v);
+    } else if (junctions?.reverse?.[key]) {
+      // 经 junction 反查：沿 from→to 逐跳收集允许的 code 集合
+      let allowed: Set<string> | null = null;
+      for (const hop of junctions.reverse[key]) {
+        const next = new Set(
+          hop.link
+            .filter((l) => allowed === null || allowed.has(String(l[hop.from] ?? "")))
+            .map((l) => String(l[hop.to] ?? ""))
+            .filter(Boolean),
+        );
+        allowed = next;
+      }
+      items = allowed ? items.filter((r) => allowed!.has(String(r[selfCodeKey] ?? ""))) : items;
+    }
+    // 无列也无反查配置 → 不过滤（调用方保证语义）
+  }
+  const paged = pageOf(
+    items,
+    num(url.searchParams.get("page"), 1),
+    num(url.searchParams.get("pageSize"), items.length || 1),
+  );
+  if (!junctions?.aggregate?.length) return HttpResponse.json(paged);
+  return HttpResponse.json({
+    ...paged,
+    items: paged.items.map((r) => {
+      const out: Record<string, unknown> = { ...r };
+      for (const a of junctions.aggregate!) {
+        out[a.as] = [
+          ...new Set(
+            a.link
+              .filter((l) => String(l[a.selfCol] ?? "") === String(r[selfCodeKey] ?? ""))
+              .map((l) => {
+                const code = String(l[a.otherCol] ?? "");
+                return a.names?.get(code) ?? code;
+              })
+              .filter(Boolean),
+          ),
+        ].join("，");
+      }
+      return out;
+    }),
+  });
+}
+
+/** M06 junction：支持 query 参数 → 列精确匹配（键=query 参数名=列名）。 */
+function wrapLinks(
+  rows: Array<Record<string, unknown>>,
+  request: Request,
+  filterKeys: Record<string, string>,
+) {
+  const url = new URL(request.url);
+  let items: Array<Record<string, unknown>> = rows;
+  for (const [param, col] of Object.entries(filterKeys)) {
+    const v = url.searchParams.get(param);
+    if (v) items = items.filter((r) => r[col] === v);
+  }
+  return HttpResponse.json({ items, total: items.length });
+}
+
+/** M06 junction DELETE：REF 组件发 query 参数（apiClient.delete(url, { params })），
+ * lab-msw handler 读 request body。这里把 query 参数镜像成 body 按 handlers 同款
+ * 键匹配语义原地删除（含 extraFields 键如 role）。 */
+function linkDelete(arr: Array<Record<string, unknown>>) {
+  return async ({ request }: { request: Request }) => {
+    const url = new URL(request.url);
+    const keys = Array.from(url.searchParams.keys());
+    let idx = -1;
+    for (let i = 0; i < arr.length; i++) {
+      const row = arr[i];
+      if (!row) continue;
+      const hit = keys.every((k) => String(row[k] ?? "") === url.searchParams.get(k));
+      if (hit) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx >= 0) arr.splice(idx, 1);
+    return new HttpResponse(null, { status: 204 });
+  };
 }
 
 // ————————————————————————————————————————————————
@@ -114,19 +259,13 @@ const FLOW_ORDER_FULL = [
  *  - /test-records：+ receiptId（经 receipt→samples 归集 sampleIds）
  */
 export function installShapeAdapters(server: { use: (...h: unknown[]) => void }): void {
-  const wrap = (arr: unknown[], request: Request) => {
-    const url = new URL(request.url);
-    return HttpResponse.json(
-      pageOf(arr, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), arr.length || 1)),
-    );
-  };
-
   server.use(
     // —— dictCrud 主表（msw 裸数组 → REF {items}）——
-    http.get("*/api/report-names", ({ request }) => wrap(inspectionReportNames, request)),
-    http.get("*/api/inspection/standards", ({ request }) => wrap(inspectionStandards, request)),
-    http.get("*/api/inspection/parameters", ({ request }) => wrap(inspectionParameters, request)),
-    http.get("*/api/param-interfaces", ({ request }) => wrap(paramInterfaces, request)),
+    // Task 13：report-names/param-interfaces 走 wrapDict（补 id=code + keyword 过滤）；
+    // standards/parameters 的 wrapDict（含 junction 反查）在下方 Task 13 段注册——
+    // 同 URL 后注册者胜（msw use() 头插），此处不重复注册。
+    http.get("*/api/report-names", ({ request }) => wrapDict(inspectionReportNames as unknown as Array<Record<string, unknown>>, request)),
+    http.get("*/api/param-interfaces", ({ request }) => wrapDict(paramInterfaces as unknown as Array<Record<string, unknown>>, request)),
 
     // —— 链接 GET（msw 裸数组 → REF {items}）——
     http.get("*/api/report-names/links/standard", ({ request }) => {
@@ -156,10 +295,16 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
     }),
     http.get("*/api/param-interfaces/links", ({ request }) => {
       const url = new URL(request.url);
+      // Task 13 Step 3：补 REF 过滤参数族（paramInterfaceCode / reportNameCode，
+      // 见 backup shared lab-handlers.ts paramInterfaceLinkHandlers GET）。原先只支持
+      // parameterCode；无这些参数的既有调用行为不变。
       const code = url.searchParams.get("parameterCode");
-      const items: unknown[] = code
-        ? paramInterfaceLinks.filter((l) => (l as { inspectionParameterCode: string }).inspectionParameterCode === code)
-        : paramInterfaceLinks;
+      const pic = url.searchParams.get("paramInterfaceCode");
+      const rn = url.searchParams.get("reportNameCode");
+      let items: unknown[] = paramInterfaceLinks;
+      if (code) items = items.filter((l) => (l as { inspectionParameterCode: string }).inspectionParameterCode === code);
+      if (pic) items = items.filter((l) => (l as { paramInterfaceCode: string }).paramInterfaceCode === pic);
+      if (rn) items = items.filter((l) => (l as { reportNameCode?: string }).reportNameCode === rn);
       return HttpResponse.json({ items, total: items.length });
     }),
 
@@ -274,9 +419,290 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       return HttpResponse.json({ results });
     }),
 
+    // ———— Task 13 扩展（M06 检测能力 10 组件）————
+    // lab-msw dictCrud/junction GET 返回裸数组且不支持 REF 的过滤参数族
+    // （keyword / inspectionSpecialtyCode / inspectionObjectCode / inspectionStandardCode /
+    //   testingStandardCode / judgmentStandardCode / reportNameCode / paramInterfaceCode）。
+    // 这里对同一 fixtures 数组重实现 REF 语义：裸数组 → {items,total} + 全过滤参数。
+    // 主表路由（/api/inspection/specialties 等）REF 组件按 `/:id` PUT/DELETE，msw dictCrud
+    // 按 `/:code`——seed 行无 id 列，组件行 id 取 code 语义（rowId 读 (item as {id}).id，
+    // 适配层在 wrap 时补 id=code，PUT/DELETE `/:code` 天然命中 msw handler）。
+    // 计算规则 / 技术要求 msw 主键是复合键，REF 组件 PUT/DELETE `/:id`——在 wrap 时
+    // 补 id（`cr-${objectCode}-${parameterCode}` / `tr-${objectCode}-${parameterCode}-${std}`），
+    // 并拦截 PUT/DELETE `/:id` 反查复合键转发 fixtures 原地写。
+    http.get("*/api/inspection/specialties", ({ request }) =>
+      wrapDict(inspectionSpecialties as unknown as Array<Record<string, unknown>>, request)),
+    http.get("*/api/inspection/objects", ({ request }) =>
+      wrapDict(inspectionObjects as unknown as Array<Record<string, unknown>>, request, {
+        // 聚合列（老 shared 语义）：parameterNames（经 object-parameter，名称）+ standardCodes（经 object-standard）
+        aggregate: [
+          {
+            as: "parameterNames",
+            link: inspectionObjectParameters as unknown as Array<Record<string, unknown>>,
+            selfCol: "inspectionObjectCode",
+            otherCol: "inspectionParameterCode",
+            names: new Map(
+              (inspectionParameters as unknown as Array<{ code: string; name: string }>).map((p) => [
+                String(p.code),
+                String(p.name),
+              ]),
+            ),
+          },
+          {
+            as: "standardCodes",
+            link: inspectionObjectStandards as unknown as Array<Record<string, unknown>>,
+            selfCol: "inspectionObjectCode",
+            otherCol: "inspectionStandardCode",
+          },
+        ],
+      })),
+    // standards 有 status 列（active/superseded/draft），REF 状态列直读；
+    // 按专项/项目过滤经 junction 反查（REF 语义）
+    http.get("*/api/inspection/standards", ({ request }) =>
+      wrapDict(inspectionStandards as unknown as Array<Record<string, unknown>>, request, {
+        reverse: {
+          inspectionSpecialtyCode: [
+            {
+              link: inspectionSpecialtyObjects as unknown as Array<Record<string, unknown>>,
+              from: "inspectionSpecialtyCode",
+              to: "inspectionObjectCode",
+            },
+            {
+              link: inspectionObjectStandards as unknown as Array<Record<string, unknown>>,
+              from: "inspectionObjectCode",
+              to: "inspectionStandardCode",
+            },
+          ],
+          inspectionObjectCode: [
+            {
+              link: inspectionObjectStandards as unknown as Array<Record<string, unknown>>,
+              from: "inspectionObjectCode",
+              to: "inspectionStandardCode",
+            },
+          ],
+        },
+        // 聚合列（老 shared 语义）：parameterNames（经 standard-parameter，名称）
+        aggregate: [
+          {
+            as: "parameterNames",
+            link: inspectionStandardParameters as unknown as Array<Record<string, unknown>>,
+            selfCol: "inspectionStandardCode",
+            otherCol: "inspectionParameterCode",
+            names: new Map(
+              (inspectionParameters as unknown as Array<{ code: string; name: string }>).map((p) => [
+                String(p.code),
+                String(p.name),
+              ]),
+            ),
+          },
+        ],
+      })),
+
+    // parameters 按专项/项目过滤经 junction 反查；按标准过滤经 standard-parameter 反查
+    http.get("*/api/inspection/parameters", ({ request }) =>
+      wrapDict(inspectionParameters as unknown as Array<Record<string, unknown>>, request, {
+        reverse: {
+          inspectionSpecialtyCode: [
+            {
+              link: inspectionSpecialtyObjects as unknown as Array<Record<string, unknown>>,
+              from: "inspectionSpecialtyCode",
+              to: "inspectionObjectCode",
+            },
+            {
+              link: inspectionObjectParameters as unknown as Array<Record<string, unknown>>,
+              from: "inspectionObjectCode",
+              to: "inspectionParameterCode",
+            },
+          ],
+          inspectionObjectCode: [
+            {
+              link: inspectionObjectParameters as unknown as Array<Record<string, unknown>>,
+              from: "inspectionObjectCode",
+              to: "inspectionParameterCode",
+            },
+          ],
+          inspectionStandardCode: [
+            {
+              link: inspectionStandardParameters as unknown as Array<Record<string, unknown>>,
+              from: "inspectionStandardCode",
+              to: "inspectionParameterCode",
+            },
+          ],
+        },
+        // 聚合列（老 shared 语义）：objectNames（经 object-parameter 反查，名称）+ standardCodes（经 standard-parameter）
+        aggregate: [
+          {
+            as: "objectNames",
+            link: inspectionObjectParameters as unknown as Array<Record<string, unknown>>,
+            selfCol: "inspectionParameterCode",
+            otherCol: "inspectionObjectCode",
+            names: new Map(
+              (inspectionObjects as unknown as Array<{ code: string; name: string }>).map((o) => [
+                String(o.code),
+                String(o.name),
+              ]),
+            ),
+          },
+          {
+            as: "standardCodes",
+            link: inspectionStandardParameters as unknown as Array<Record<string, unknown>>,
+            selfCol: "inspectionParameterCode",
+            otherCol: "inspectionStandardCode",
+          },
+        ],
+      })),
+
+    // —— junction GET（4 类 + report-name 3 类 + param-interface links，裸数组 → {items,total} + 过滤参数）——
+    http.get("*/api/inspection/links/specialty-object", ({ request }) =>
+      wrapLinks(inspectionSpecialtyObjects as unknown as Array<Record<string, unknown>>, request, {
+        inspectionSpecialtyCode: "inspectionSpecialtyCode",
+      })),
+    http.get("*/api/inspection/links/object-standard", ({ request }) =>
+      wrapLinks(inspectionObjectStandards as unknown as Array<Record<string, unknown>>, request, {
+        inspectionObjectCode: "inspectionObjectCode",
+        role: "role",
+      })),
+    http.get("*/api/inspection/links/object-parameter", ({ request }) =>
+      wrapLinks(inspectionObjectParameters as unknown as Array<Record<string, unknown>>, request, {
+        inspectionObjectCode: "inspectionObjectCode",
+        inspectionParameterCode: "inspectionParameterCode",
+      })),
+    http.get("*/api/report-names/links/object", ({ request }) =>
+      wrapLinks(inspectionObjectReportNames as unknown as Array<Record<string, unknown>>, request, {
+        reportNameCode: "reportNameCode",
+        inspectionObjectCode: "inspectionObjectCode",
+      })),
+
+    // —— junction DELETE：REF 组件发 query 参数，msw handler 读 body——query → 键匹配原地删除
+    http.delete("*/api/inspection/links/specialty-object", linkDelete(inspectionSpecialtyObjects as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/inspection/links/object-standard", linkDelete(inspectionObjectStandards as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/inspection/links/object-parameter", linkDelete(inspectionObjectParameters as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/report-names/links/object", linkDelete(inspectionObjectReportNames as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/report-names/links/standard", linkDelete(inspectionReportNameStandards as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/report-names/links/parameter", linkDelete(inspectionReportNameParameters as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/param-interfaces/links", linkDelete(paramInterfaceLinks as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/inspection/links/standard-parameter", linkDelete(inspectionStandardParameters as unknown as Array<Record<string, unknown>>)),
+
+    // —— 计算规则 GET：+ testingStandardCode 过滤（msw 只支持 object/parameter）——
+    http.get("*/api/calculation-rules", ({ request }) => {
+      const url = new URL(request.url);
+      const std = url.searchParams.get("testingStandardCode");
+      let items = (inspectionCalculationRules as unknown as Array<Record<string, unknown>>)
+        .map((r): Record<string, unknown> => ({ ...r, id: String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) }));
+      if (std) items = items.filter((r) => r["testingStandardCode"] === std);
+      return HttpResponse.json(pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), items.length || 1)));
+    }),
+    // 计算规则 PUT/DELETE /:id → 复合键转发（REF 组件以 id 调用，msw 是复合键路由）
+    http.put("*/api/calculation-rules/:id", async ({ params, request }) => {
+      const row = (inspectionCalculationRules as unknown as Array<Record<string, unknown>>)
+        .find((r) => String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) === params.id);
+      if (!row) return HttpResponse.json({ message: "CalculationRule not found" }, { status: 404 });
+      Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
+      return HttpResponse.json(row);
+    }),
+    http.delete("*/api/calculation-rules/:id", ({ params }) => {
+      const arr = inspectionCalculationRules as unknown as Array<Record<string, unknown>>;
+      const i = arr.findIndex((r) => String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) === params.id);
+      if (i < 0) return HttpResponse.json({ message: "CalculationRule not found" }, { status: 404 });
+      arr.splice(i, 1);
+      return new HttpResponse(null, { status: 204 });
+    }),
+
+    // —— 技术要求 GET：+ judgmentStandardCode 过滤（msw 只支持 object/parameter）——
+    http.get("*/api/technical-requirements", ({ request }) => {
+      const url = new URL(request.url);
+      const std = url.searchParams.get("judgmentStandardCode");
+      let items = (technicalRequirements as unknown as Array<Record<string, unknown>>)
+        .map((r): Record<string, unknown> => ({ ...r, id: String(r["id"] ?? `tr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}-${r["judgmentStandardCode"]}`) }));
+      if (std) items = items.filter((r) => r["judgmentStandardCode"] === std);
+      return HttpResponse.json(pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), items.length || 1)));
+    }),
+    http.put("*/api/technical-requirements/:id", async ({ params, request }) => {
+      const row = (technicalRequirements as unknown as Array<Record<string, unknown>>)
+        .find((r) => String(r.id ?? `tr-${r.inspectionObjectCode}-${r.inspectionParameterCode}-${r.judgmentStandardCode}`) === params.id);
+      if (!row) return HttpResponse.json({ message: "TechnicalRequirement not found" }, { status: 404 });
+      Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
+      return HttpResponse.json(row);
+    }),
+    http.delete("*/api/technical-requirements/:id", ({ params }) => {
+      const arr = technicalRequirements as unknown as Array<Record<string, unknown>>;
+      const i = arr.findIndex((r) => String(r.id ?? `tr-${r.inspectionObjectCode}-${r.inspectionParameterCode}-${r.judgmentStandardCode}`) === params.id);
+      if (i < 0) return HttpResponse.json({ message: "TechnicalRequirement not found" }, { status: 404 });
+      arr.splice(i, 1);
+      return new HttpResponse(null, { status: 204 });
+    }),
+
     // —— GET /audit-logs：从 flowHistory 派生审计条目（Task 11；lab-msw 无此端点）——
     // 组件 catch 兜底是 error 提示而非崩溃，但列表页 smoke 取「空数据也正常渲染」
     // 之外再给一条真实数据路径：每条 flowHistory 生成 type='flow' 的条目。
+    // ---- Task 13 Step 3（M06.F08 参数界面 REF 语义）----
+    // msw dictCrud 以 code 为主键（POST 无 id/isOfficial 形状、PUT/DELETE /:code、
+    // links POST 204 裸 push）；REF 组件/测试按 /:id（id=`pi-${code}`）调用，且
+    // REF shared lab-handlers.ts paramInterfaceHandlers/paramInterfaceLinkHandlers 有：
+    //   POST 校验 + 重复 400；DELETE 内置（isOfficial）不可删 400；
+    //   links POST 确定性 id + 重复 400 + 201。
+    // 这里对同一 paramInterfaces / paramInterfaceLinks fixtures 原地实现 REF 语义。
+    http.post("*/api/param-interfaces", async ({ request }) => {
+      const body = (await request.json()) as Record<string, unknown>;
+      if (!body["code"] || !body["name"] || !body["componentPath"])
+        return HttpResponse.json({ message: "code/name/componentPath 必填" }, { status: 400 });
+      if ((paramInterfaces as unknown as Array<{ code?: string }>).some((r) => r.code === body["code"]))
+        return HttpResponse.json({ message: "参数界面编码已存在" }, { status: 400 });
+      const now = new Date().toISOString();
+      const row = {
+        id: `pi-${String(body["code"])}`,
+        code: body["code"],
+        name: body["name"],
+        componentPath: body["componentPath"],
+        config: body["config"] ?? null,
+        description: body["description"] ?? "",
+        sortOrder: body["sortOrder"] ?? 999999,
+        isOfficial: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      paramInterfaces.push(row as unknown as (typeof paramInterfaces)[number]);
+      return HttpResponse.json(row, { status: 201 });
+    }),
+    http.put("*/api/param-interfaces/:id", async ({ params, request }) => {
+      const arr = paramInterfaces as unknown as Array<Record<string, unknown>>;
+      const row = arr.find((r) => r["id"] === params.id || r["code"] === params.id);
+      if (!row) return HttpResponse.json({ message: "ParamInterface not found" }, { status: 404 });
+      Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
+      return HttpResponse.json(row);
+    }),
+    http.delete("*/api/param-interfaces/:id", ({ params }) => {
+      const arr = paramInterfaces as unknown as Array<Record<string, unknown>>;
+      const i = arr.findIndex((r) => r["id"] === params.id || r["code"] === params.id);
+      if (i < 0) return HttpResponse.json({ message: "参数界面不存在" }, { status: 404 });
+      if (arr[i]!["isOfficial"])
+        return HttpResponse.json({ message: "内置模型不可删除" }, { status: 400 });
+      arr.splice(i, 1);
+      return new HttpResponse(null, { status: 204 });
+    }),
+    http.post("*/api/param-interfaces/links", async ({ request }) => {
+      const body = (await request.json()) as Record<string, unknown>;
+      if (!body["inspectionParameterCode"] || !body["paramInterfaceCode"])
+        return HttpResponse.json({ message: "inspectionParameterCode/paramInterfaceCode 必填" }, { status: 400 });
+      const id = body["reportNameCode"]
+        ? `pi-param-${String(body["paramInterfaceCode"])}-${String(body["inspectionParameterCode"])}-${String(body["reportNameCode"])}`
+        : `pi-param-${String(body["paramInterfaceCode"])}-${String(body["inspectionParameterCode"])}`;
+      const arr = paramInterfaceLinks as unknown as Array<Record<string, unknown>>;
+      if (arr.some((r) => r["id"] === id))
+        return HttpResponse.json({ message: "关联已存在" }, { status: 400 });
+      const now = new Date().toISOString();
+      const row = {
+        id,
+        inspectionParameterCode: body["inspectionParameterCode"],
+        paramInterfaceCode: body["paramInterfaceCode"],
+        reportNameCode: body["reportNameCode"],
+        createdAt: now,
+        updatedAt: now,
+      };
+      arr.push(row as unknown as Record<string, unknown>);
+      return HttpResponse.json(row, { status: 201 });
+    }),
+
     http.get("*/api/audit-logs", ({ request }) => {
       const url = new URL(request.url);
       const type = url.searchParams.get("type");
