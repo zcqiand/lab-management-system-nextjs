@@ -1,614 +1,284 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "beb58680f86ef50c",
-  "summary": "功能树镜像 REF（fix round 1：按 check_align 裁决放弃非 BASE 行）。目标树 = 本仓 M97/M98 段原样 + BASE 26 个 F 级原样 + REF 树中挂在这 26 个 F 级下的 101 个 I 级子项（父 F ∈ BASE，_is_i_expansion 合法扩充）。排除 15 个 BASE 外 F 级及其全部 I 级（M01.F01-F03 / M02.F02-F04 / M03.F04 / M04.F01-F05 / M04.F10-F12）。状态规则：REF 已上线/开发中→本仓「规划」（落地后逐波推）；REF 已废弃→照抄「已废弃」；本仓 M02.F01 已上线保持。full-feature-parity Task 6 fix1。",
+  "base_sha": "b98453a8b65ebd93",
+  "summary": "Wave 2（T8-T11）M03 全链路落地 + T8 合同页对齐：M03.F01/F02/F03/F05/F06/F07/F08/F09 的 F 级与 I 级（I05 已废弃不动）+ M02.F01.I01-I03（I04 已废弃不动）规划→已上线。每条 ID 均有组件 data-fn/@entry 锚点 + tests/features fnTest 挂载（理由列逐一给锚点）。",
   "changes": [
     {
-      "id": "M01.F04.I01",
-      "action": "新增",
-      "name": "RBAC 角色权限",
-      "reason": "REF 已废弃行照抄"
-    },
-    {
-      "id": "M01.F04.I02",
-      "action": "新增",
-      "name": "路由守卫",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F04.I03",
-      "action": "新增",
-      "name": "权限指令",
-      "reason": "REF 已废弃行照抄"
-    },
-    {
-      "id": "M01.F04.I04",
-      "action": "新增",
-      "name": "动态菜单",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F05.I01",
-      "action": "新增",
-      "name": "JWT 登录",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F05.I02",
-      "action": "新增",
-      "name": "Token 校验",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F05.I03",
-      "action": "新增",
-      "name": "SSO 统一登录",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F05.I04",
-      "action": "新增",
-      "name": "身份会话同步",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M01.F05.I05",
-      "action": "新增",
-      "name": "登出",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
       "id": "M02.F01.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "合同列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "T8 合同页 src/app/contracts/page.tsx data-fn 行锚 + tests/types/store.test.ts fnTest"
     },
     {
       "id": "M02.F01.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "合同新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/app/contracts/page.tsx 新建/编辑 Dialog data-fn=M02.F01.I02"
     },
     {
       "id": "M02.F01.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "合同删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M02.F01.I04",
-      "action": "新增",
-      "name": "合同汇总",
-      "reason": "REF 已废弃行照抄"
+      "reason": "src/app/contracts/page.tsx 行内删除按钮 data-fn=M02.F01.I03"
     },
     {
       "id": "M03.F01.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/receipts/ReceiptList.tsx 列表页 + receiptStore.dom.test fnTest"
     },
     {
       "id": "M03.F01.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单新建",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReceiptList 新建（M03.F01.I02 按钮锚）+ SampleFormModal.dom.test"
     },
     {
       "id": "M03.F01.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReceiptList.tsx ReceiptRowActions 编辑按钮 data-fn=M03.F01.I03"
     },
     {
       "id": "M03.F01.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M03.F01.I05",
-      "action": "新增",
-      "name": "接样单详情",
-      "reason": "REF 已废弃行照抄"
+      "reason": "ReceiptList.tsx ReceiptRowActions 删除按钮 data-fn=M03.F01.I04"
     },
     {
       "id": "M03.F01.I06",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReceiptList.tsx FlowStagePage filterDataFn=M03.F01.I06 三态过滤器"
     },
     {
       "id": "M03.F01.I07",
-      "action": "新增",
+      "action": "变更",
       "name": "接样单 ext 字段补录",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/data-entry/SampleExtFieldsModal.tsx data-fn=M03.F01.I07 + extFieldsRender.test"
     },
     {
       "id": "M03.F02.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "任务分配",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/task-assignment/TaskAssignmentPage.tsx + TaskAssignmentCancel.dom.test fnTest"
     },
     {
       "id": "M03.F02.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "任务编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "TaskAssignmentPage.tsx 安排弹窗 assignee/plannedTestDate（I02 锚）"
     },
     {
       "id": "M03.F02.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "任务取消（清空分配）",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "TaskAssignmentCancel.dom.test.tsx 取消/清空分配用例（I03 锚）"
     },
     {
       "id": "M03.F02.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "任务分配三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "TaskAssignmentPage 三态过滤器 filterDataFn=M03.F02.I04"
     },
     {
       "id": "M03.F03.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "数据录入页面",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/data-entry/DataEntryPage.tsx 双栏录入页 + FlowStagePage.dom.test"
     },
     {
       "id": "M03.F03.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "检测数据保存",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "DataEntryPage 保存（I02 锚）+ DataEntryActions.dom.test fnTest"
     },
     {
       "id": "M03.F03.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "检测项编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "DataEntryPage 检测项编辑（I03 锚）+ dataEntryModelDispatch.dom.test"
     },
     {
       "id": "M03.F03.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "检测项删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M03.F03.I05",
-      "action": "新增",
-      "name": "自动评定",
-      "reason": "REF 已废弃行照抄"
+      "reason": "DataEntryPage 删除样品/记录级联（I04 锚）+ DataEntryActions.dom.test"
     },
     {
       "id": "M03.F03.I06",
-      "action": "新增",
+      "action": "变更",
       "name": "人工改判",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "DataEntryPage.tsx:571 footer 人工改判 select data-fn=M03.F03.I06 + DataEntryActions.dom.test"
     },
     {
       "id": "M03.F03.I07",
-      "action": "新增",
+      "action": "变更",
       "name": "数据录入三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "DataEntryPage.tsx:659 filterDataFn=M03.F03.I07 三态过滤器 + FlowStagePage.dom.test"
     },
     {
       "id": "M03.F05.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "报告审核页面",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/reports/ReportReviewPage.tsx + reportStagePages.dom.test fnTest"
     },
     {
       "id": "M03.F05.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "报告查看",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportReviewPage/FlowStagePage 查看（I02 锚）+ ReceiptDetailPageFn.dom.test"
     },
     {
       "id": "M03.F05.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "审核操作",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportReviewPage 审核通过/驳回（I03 锚）+ reportStagePages.dom.test"
     },
     {
       "id": "M03.F05.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "报告审核三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportReviewPage 三态过滤器 filterDataFn=M03.F05.I04"
     },
     {
       "id": "M03.F06.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "报告批准页面",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/reports/ReportApprovePage.tsx + reportStagePages.dom.test fnTest"
     },
     {
       "id": "M03.F06.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "报告查看",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportApprovePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
     },
     {
       "id": "M03.F06.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "批准操作",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportApprovePage 批准操作（I03 锚）+ reportStagePages.dom.test"
     },
     {
       "id": "M03.F06.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "报告批准三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportApprovePage 三态过滤器 filterDataFn=M03.F06.I04"
     },
     {
       "id": "M03.F07.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "报告发放页面",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/reports/ReportIssuePage.tsx + reportStagePages.dom.test fnTest"
     },
     {
       "id": "M03.F07.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "报告查看",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportIssuePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
     },
     {
       "id": "M03.F07.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "发放操作",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportIssuePage 发放操作（I03 锚）+ reportStagePages.dom.test"
     },
     {
       "id": "M03.F07.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "报告发放三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportIssuePage 三态过滤器 filterDataFn=M03.F07.I04"
     },
     {
       "id": "M03.F08.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "报告归档页面",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/reports/ReportArchivePage.tsx + reportStagePages.dom.test fnTest"
     },
     {
       "id": "M03.F08.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "报告查看",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportArchivePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
     },
     {
       "id": "M03.F08.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "归档操作",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportArchivePage 归档操作（I03 锚）+ reportStagePages.dom.test"
     },
     {
       "id": "M03.F08.I04",
-      "action": "新增",
+      "action": "变更",
       "name": "报告归档三态过滤器",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReportArchivePage 三态过滤器 filterDataFn=M03.F08.I04"
     },
     {
       "id": "M03.F09.I01",
-      "action": "新增",
+      "action": "变更",
       "name": "查看按钮",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "src/features/receipts/ReceiptDetailPage.tsx 查看按钮 + ReceiptDetailPageFn.dom.test"
     },
     {
       "id": "M03.F09.I02",
-      "action": "新增",
+      "action": "变更",
       "name": "详情页",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReceiptDetailPage 详情页 + detailLabels.dom.test"
     },
     {
       "id": "M03.F09.I03",
-      "action": "新增",
+      "action": "变更",
       "name": "报告预览（详情页）",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "reason": "ReceiptDetailPage 报告预览（I03 锚）+ reportTemplateUrl.test"
     },
     {
-      "id": "M04.F06.I01",
-      "action": "新增",
-      "name": "型号列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F01",
+      "action": "变更",
+      "name": "接样管理",
+      "reason": "F 级汇总行：I01-I04/I06/I07 全部落地（receipts 全链路），随子项推已上线"
     },
     {
-      "id": "M04.F06.I02",
-      "action": "新增",
-      "name": "型号新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F02",
+      "action": "变更",
+      "name": "任务分配",
+      "reason": "F 级汇总行：I01-I04 全部落地（task-assignment），随子项推已上线"
     },
     {
-      "id": "M04.F06.I03",
-      "action": "新增",
-      "name": "型号删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F03",
+      "action": "变更",
+      "name": "数据录入",
+      "reason": "F 级汇总行：I01-I04/I06/I07 全部落地（data-entry），随子项推已上线"
     },
     {
-      "id": "M04.F07.I01",
-      "action": "新增",
-      "name": "规格列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F05",
+      "action": "变更",
+      "name": "报告审核",
+      "reason": "F 级汇总行：I01/I03/I04 落地（ReportReviewPage），随子项推已上线"
     },
     {
-      "id": "M04.F07.I02",
-      "action": "新增",
-      "name": "规格新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F06",
+      "action": "变更",
+      "name": "报告批准",
+      "reason": "F 级汇总行：I01/I03/I04 落地（ReportApprovePage），随子项推已上线"
     },
     {
-      "id": "M04.F07.I03",
-      "action": "新增",
-      "name": "规格删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F07",
+      "action": "变更",
+      "name": "报告发放",
+      "reason": "F 级汇总行：I01/I03/I04 落地（ReportIssuePage），随子项推已上线"
     },
     {
-      "id": "M04.F08.I01",
-      "action": "新增",
-      "name": "等级列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
+      "id": "M03.F08",
+      "action": "变更",
+      "name": "报告归档",
+      "reason": "F 级汇总行：I01/I03/I04 落地（ReportArchivePage），随子项推已上线"
     },
     {
-      "id": "M04.F08.I02",
-      "action": "新增",
-      "name": "等级新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M04.F08.I03",
-      "action": "新增",
-      "name": "等级删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M04.F09.I01",
-      "action": "新增",
-      "name": "牌号列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M04.F09.I02",
-      "action": "新增",
-      "name": "牌号新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M04.F09.I03",
-      "action": "新增",
-      "name": "牌号删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M05.F01.I01",
-      "action": "新增",
-      "name": "汇总表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M05.F01.I02",
-      "action": "新增",
-      "name": "汇总类型",
-      "reason": "REF 已废弃行照抄"
-    },
-    {
-      "id": "M06.F01.I01",
-      "action": "新增",
-      "name": "检测专项列表",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F01.I02",
-      "action": "新增",
-      "name": "检测专项新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F01.I03",
-      "action": "新增",
-      "name": "检测专项删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I01",
-      "action": "新增",
-      "name": "检测项目列表",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F02.I02",
-      "action": "新增",
-      "name": "检测项目新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I03",
-      "action": "新增",
-      "name": "检测项目删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I04",
-      "action": "新增",
-      "name": "关联检测依据",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I05",
-      "action": "新增",
-      "name": "关联判定依据",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I06",
-      "action": "新增",
-      "name": "关联检测参数",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F02.I07",
-      "action": "新增",
-      "name": "关联检测专项",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F03.I01",
-      "action": "新增",
-      "name": "检测参数列表",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F03.I02",
-      "action": "新增",
-      "name": "检测参数新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F03.I03",
-      "action": "新增",
-      "name": "检测参数删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F04.I01",
-      "action": "新增",
-      "name": "检测标准列表",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F04.I02",
-      "action": "新增",
-      "name": "检测标准新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F04.I03",
-      "action": "新增",
-      "name": "检测标准删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F04.I04",
-      "action": "新增",
-      "name": "关联检测参数",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F05.I01",
-      "action": "新增",
-      "name": "计算规则列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F05.I02",
-      "action": "新增",
-      "name": "计算规则新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F05.I03",
-      "action": "新增",
-      "name": "计算规则删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F06.I01",
-      "action": "新增",
-      "name": "技术要求列表",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F06.I02",
-      "action": "新增",
-      "name": "技术要求新建/编辑",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F06.I03",
-      "action": "新增",
-      "name": "技术要求删除",
-      "reason": "REF 已上线，本仓初始「规划」（落地后逐波推）"
-    },
-    {
-      "id": "M06.F07.I01",
-      "action": "新增",
-      "name": "报告名称列表",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I02",
-      "action": "新增",
-      "name": "报告名称新建/编辑",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I03",
-      "action": "新增",
-      "name": "报告名称删除",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I04",
-      "action": "新增",
-      "name": "关联检测项目",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I05",
-      "action": "新增",
-      "name": "关联检测依据",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I06",
-      "action": "新增",
-      "name": "关联判定依据",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F07.I07",
-      "action": "新增",
-      "name": "关联检测参数",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F07.I08",
-      "action": "新增",
-      "name": "扩展属性维护",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F08.I01",
-      "action": "新增",
-      "name": "参数界面列表",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F08.I02",
-      "action": "新增",
-      "name": "参数界面新建/编辑",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F08.I03",
-      "action": "新增",
-      "name": "参数界面删除",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F08.I04",
-      "action": "新增",
-      "name": "关联检测参数",
-      "reason": "REF 开发中，本仓初始「规划」"
-    },
-    {
-      "id": "M06.F08.I05",
-      "action": "新增",
-      "name": "参数界面预览",
-      "reason": "REF 规划行镜像"
-    },
-    {
-      "id": "M06.F08.I06",
-      "action": "新增",
-      "name": "参数界面预览弹窗",
-      "reason": "REF 规划行镜像"
+      "id": "M03.F09",
+      "action": "变更",
+      "name": "接样单详情",
+      "reason": "F 级汇总行：I01-I03 全部落地（ReceiptDetailPage），随子项推已上线"
     }
   ],
   "sync_files": []

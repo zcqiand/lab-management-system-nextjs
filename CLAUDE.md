@@ -8,9 +8,9 @@
 
 1. **前端（lab 家族产品之一）**：消费 `../lab-management-system-shared/generated/openapi/openapi.yaml`，
    通过 apiclient (`src/api/`) + 4-backend 切换（msw/aspnetcore/springboot/nextjs）跨后端。
-   UI 极简：BackendSwitcher + LoginForm 演示能力。
-2. **后端（nextjs 自作）**：`src/app/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个 M00 auth 路由。
-   切换到 'nextjs' 模式时，前端 apiclient 命中本仓 API routes。
+   UI 包含：AppShell + SidebarNav（菜单来自 saas）+ M01 合同管理页面。
+2. **后端（nextjs 自作）**：`src/app/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个 M00 auth 路由 + `/api/contracts/*` 业务路由。
+   切换到 'nextjs' 模式时，前端 apiclient 命中本仓 API routes。业务路由数据来自 `@lab/management-system-msw/fixtures`（in-memory）。
 3. **infra 副作用**：`scripts/{emit-schema, borrow-pg, borrow-from-nextjs-pg, v-sql-to-dbml}.mjs` 与
    `generated/` 输出。被 `../lab-management-system-shared/scripts/sync-db.mjs` 借 `pg` driver。
 
@@ -22,11 +22,10 @@ orval client = `axios`（不走 react-query；服务端组件也可调）。
 
 ## 3. 禁止事项
 
-- **禁业务**：禁手写 M01..M06 业务页 / 业务组件；现有 UI 仅 BackendSwitcher + LoginForm 演示用，**不**进产品功能树。
 - **禁手写 DDL**：`shared/sql/migrations/V*.sql` 是真源。
 - **禁提交 `generated/`**：`generated/{schema.sql, schema.dbml, schema.ts}` 与 `src/api/endpoints/` 均 gitignored；跑 `npm run gen:shared` / `node scripts/emit-schema.mjs` 重出。
 - **禁 `pg` 升 dependencies**：必须留 `devDependencies`（sync-db.mjs 的借链不能进消费方 runtime bundle）。
-- **禁先改代码后改 function tree**：M97/M98 的扩/缩必须走 `/tree-change`。
+- **禁先改代码后改 function tree**：M01 起业务页也要走 `/tree-change` 翻状态再 commit。
 - npm 依赖一律走 `registry.npmmirror.com`。
 
 ## 4. 指向别处
