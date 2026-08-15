@@ -1033,13 +1033,22 @@
     },
     "M05.F01.I01": {
       "name": "汇总表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）"
+      ],
+      "entry": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
     },
     "M05.F01.I02": {
       "name": "汇总类型",

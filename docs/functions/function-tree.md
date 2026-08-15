@@ -67,7 +67,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M04.F07 | 规格维护 | InspectionSpec 实体码表维护，列表按检测专项过滤 | 接口 | 规划 |
 | M04.F08 | 等级维护 | InspectionGrade 实体码表维护，列表按检测专项过滤 | 接口 | 规划 |
 | M04.F09 | 牌号维护 | InspectionBrand 实体码表维护，列表按检测专项过滤 | 接口 | 规划 |
-| M05.F01 | 报告汇总 | 按报告类别输出试验报告汇总表 | 查询 | 规划 |
+| M05.F01 | 报告汇总 | 按报告类别输出试验报告汇总表 | 查询 | 已上线 |
 | M06.F01 | 检测专项 | InspectionSpecialty CRUD（检测能力字典根） | 接口 | 已上线 |
 | M06.F02 | 检测项目 | InspectionObject CRUD + 专项/参数关联 | 接口 | 已上线 |
 | M06.F03 | 检测参数 | InspectionParameter CRUD + 标准/参数关联 | 接口 | 已上线 |
@@ -264,7 +264,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M05.F01.I01 | 汇总表 | 接口 | 按报告名称（InspectionReportName）输出试验报告汇总表，报告名称下拉框选择汇总口径 | 规划 |
+| M05.F01.I01 | 汇总表 | 接口 | 按报告名称（InspectionReportName）输出试验报告汇总表，报告名称下拉框选择汇总口径 | 已上线 |
 | M05.F01.I02 | 汇总类型 | 接口 | 三种 summaryType（material/concrete/connection）列定义各异 | 已废弃 |
 
 
