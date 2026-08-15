@@ -1053,7 +1053,7 @@
     },
     "M06.F01.I01": {
       "name": "检测专项列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1069,7 +1069,7 @@
     },
     "M06.F01.I02": {
       "name": "检测专项新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1087,7 +1087,7 @@
     },
     "M06.F01.I03": {
       "name": "检测专项删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1103,7 +1103,7 @@
     },
     "M06.F02.I01": {
       "name": "检测项目列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1121,7 +1121,7 @@
     },
     "M06.F02.I02": {
       "name": "检测项目新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1151,7 +1151,7 @@
     },
     "M06.F02.I04": {
       "name": "关联检测依据",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1169,7 +1169,7 @@
     },
     "M06.F02.I05": {
       "name": "关联判定依据",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1187,7 +1187,7 @@
     },
     "M06.F02.I06": {
       "name": "关联检测参数",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1210,7 +1210,7 @@
     },
     "M06.F02.I07": {
       "name": "关联检测专项",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1226,7 +1226,7 @@
     },
     "M06.F03.I01": {
       "name": "检测参数列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1242,7 +1242,7 @@
     },
     "M06.F03.I02": {
       "name": "检测参数新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1259,7 +1259,7 @@
     },
     "M06.F03.I03": {
       "name": "检测参数删除",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1275,7 +1275,7 @@
     },
     "M06.F04.I01": {
       "name": "检测标准列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1291,7 +1291,7 @@
     },
     "M06.F04.I02": {
       "name": "检测标准新建/编辑",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1321,7 +1321,7 @@
     },
     "M06.F04.I04": {
       "name": "关联检测参数",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1338,7 +1338,7 @@
     },
     "M06.F05.I01": {
       "name": "计算规则列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1393,7 +1393,7 @@
     },
     "M06.F06.I01": {
       "name": "技术要求列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1436,7 +1436,7 @@
     },
     "M06.F07.I01": {
       "name": "报告名称列表",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1529,7 +1529,7 @@
     },
     "M06.F07.I08": {
       "name": "扩展属性维护",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1588,7 +1588,7 @@
     },
     "M06.F08.I04": {
       "name": "关联检测参数",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1710,7 +1710,7 @@
     },
     "M98.F01.I01": {
       "name": "BackendSwitcher 下拉",
-      "status": "规划",
+      "status": "已上线",
       "type": "按钮",
       "requirements": [],
       "flows": [
@@ -1719,14 +1719,16 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendSwitcher 渲染 4-backend 下拉，选 msw→aspnetcore 立即切换"
+      ],
       "entry": [
         "src\\components\\app\\backend-switcher.tsx"
       ]
     },
     "M98.F01.I02": {
       "name": "持久化 baseUrl",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1735,12 +1737,14 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::hydrateBackendConfig 持久化 + snapshotBackendConfig 还原"
+      ],
       "entry": []
     },
     "M98.F02.I01": {
       "name": "axios 拦截器",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1749,12 +1753,14 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::installHttpClient 是函数且注册到全局 axios 拦截器不抛"
+      ],
       "entry": []
     },
     "M98.F03.I01": {
       "name": "POST /api/auth/login",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1763,12 +1769,14 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回 mock token + 3 租户"
+      ],
       "entry": []
     },
     "M98.F03.I02": {
       "name": "GET /api/auth/me",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1777,14 +1785,16 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId"
+      ],
       "entry": [
         "src\\components\\app\\login-form.tsx"
       ]
     },
     "M98.F03.I03": {
       "name": "POST /api/auth/logout",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1793,12 +1803,14 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/logout 返回 204"
+      ],
       "entry": []
     },
     "M98.F03.I04": {
       "name": "POST /api/auth/refresh",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1807,12 +1819,14 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 用 refreshToken 换新 token"
+      ],
       "entry": []
     },
     "M98.F03.I05": {
       "name": "POST /api/auth/switch-tenant",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -1821,7 +1835,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 校验 tenantId 后换 token"
+      ],
       "entry": []
     }
   }

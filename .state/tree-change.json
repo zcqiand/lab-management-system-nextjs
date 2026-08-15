@@ -1,285 +1,246 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "b98453a8b65ebd93",
-  "summary": "Wave 2（T8-T11）M03 全链路落地 + T8 合同页对齐：M03.F01/F02/F03/F05/F06/F07/F08/F09 的 F 级与 I 级（I05 已废弃不动）+ M02.F01.I01-I03（I04 已废弃不动）规划→已上线。每条 ID 均有组件 data-fn/@entry 锚点 + tests/features fnTest 挂载（理由列逐一给锚点）。",
+  "base_sha": "5a6249fea7220179",
+  "summary": "Wave 3 — M98 接线层 + M06 检测能力 代码已落，批量 规划→已上线。M98 11 行（3 F + 8 I）+ M06 29 行（11 F + 18 I 子项具 data-fn 或 fnTest）。设计/流程映射表已填，孤儿白名单已声明 M98 + M06 字典子域为合法孤儿。",
   "changes": [
     {
-      "id": "M02.F01.I01",
+      "id": "M98.F01",
       "action": "变更",
-      "name": "合同列表",
-      "reason": "T8 合同页 src/app/contracts/page.tsx data-fn 行锚 + tests/types/store.test.ts fnTest"
+      "name": "运行时后端切换（4-backend）",
+      "reason": "src/api/backend-config.ts singleton + src/components/app/backend-switcher.tsx 下拉 + localStorage 持久化；M98 infra 切面"
     },
     {
-      "id": "M02.F01.I02",
+      "id": "M98.F02",
       "action": "变更",
-      "name": "合同新建/编辑",
-      "reason": "src/app/contracts/page.tsx 新建/编辑 Dialog data-fn=M02.F01.I02"
+      "name": "http-client 注入",
+      "reason": "src/api/http-client.ts axios 拦截器（baseURL + Bearer token + 401 → onUnauthorized）；infra 副作用"
     },
     {
-      "id": "M02.F01.I03",
+      "id": "M98.F03",
       "action": "变更",
-      "name": "合同删除",
-      "reason": "src/app/contracts/page.tsx 行内删除按钮 data-fn=M02.F01.I03"
+      "name": "Next.js API routes（自身作后端）",
+      "reason": "src/app/api/auth/{login,me,logout,refresh,switch-tenant}/route.ts 5 路由 + auth/sso/{authorize,callback} 2 路由 + saas/me/menus 1 路由"
     },
     {
-      "id": "M03.F01.I01",
+      "id": "M98.F01.I01",
       "action": "变更",
-      "name": "接样单列表",
-      "reason": "src/features/receipts/ReceiptList.tsx 列表页 + receiptStore.dom.test fnTest"
+      "name": "BackendSwitcher 下拉",
+      "reason": "src/components/app/backend-switcher.tsx data-fn=M98.F01.I01 锚点 + 4-backend 选择 UI"
     },
     {
-      "id": "M03.F01.I02",
+      "id": "M98.F01.I02",
       "action": "变更",
-      "name": "接样单新建",
-      "reason": "ReceiptList 新建（M03.F01.I02 按钮锚）+ SampleFormModal.dom.test"
+      "name": "持久化 baseUrl",
+      "reason": "src/api/backend-config.ts hydrateBackendConfig/snapshotBackendConfig + localStorage[lab.backend]"
     },
     {
-      "id": "M03.F01.I03",
+      "id": "M98.F02.I01",
       "action": "变更",
-      "name": "接样单编辑",
-      "reason": "ReceiptList.tsx ReceiptRowActions 编辑按钮 data-fn=M03.F01.I03"
+      "name": "axios 拦截器",
+      "reason": "src/api/http-client.ts installHttpClient（baseURL 注入 + Authorization + 401 → onUnauthorized）"
     },
     {
-      "id": "M03.F01.I04",
+      "id": "M98.F03.I01",
       "action": "变更",
-      "name": "接样单删除",
-      "reason": "ReceiptList.tsx ReceiptRowActions 删除按钮 data-fn=M03.F01.I04"
+      "name": "POST /api/auth/login",
+      "reason": "src/app/api/auth/login/route.ts demo mock token"
     },
     {
-      "id": "M03.F01.I06",
+      "id": "M98.F03.I02",
       "action": "变更",
-      "name": "接样单三态过滤器",
-      "reason": "ReceiptList.tsx FlowStagePage filterDataFn=M03.F01.I06 三态过滤器"
+      "name": "GET /api/auth/me",
+      "reason": "src/app/api/auth/me/route.ts 当前用户+tenants+currentTenantId"
     },
     {
-      "id": "M03.F01.I07",
+      "id": "M98.F03.I03",
       "action": "变更",
-      "name": "接样单 ext 字段补录",
-      "reason": "src/features/data-entry/SampleExtFieldsModal.tsx data-fn=M03.F01.I07 + extFieldsRender.test"
+      "name": "POST /api/auth/logout",
+      "reason": "src/app/api/auth/logout/route.ts 204"
     },
     {
-      "id": "M03.F02.I01",
+      "id": "M98.F03.I04",
       "action": "变更",
-      "name": "任务分配",
-      "reason": "src/features/task-assignment/TaskAssignmentPage.tsx + TaskAssignmentCancel.dom.test fnTest"
+      "name": "POST /api/auth/refresh",
+      "reason": "src/app/api/auth/refresh/route.ts refresh token"
     },
     {
-      "id": "M03.F02.I02",
+      "id": "M98.F03.I05",
       "action": "变更",
-      "name": "任务编辑",
-      "reason": "TaskAssignmentPage.tsx 安排弹窗 assignee/plannedTestDate（I02 锚）"
+      "name": "POST /api/auth/switch-tenant",
+      "reason": "src/app/api/auth/switch-tenant/route.ts 换 token"
     },
     {
-      "id": "M03.F02.I03",
+      "id": "M06.F01",
       "action": "变更",
-      "name": "任务取消（清空分配）",
-      "reason": "TaskAssignmentCancel.dom.test.tsx 取消/清空分配用例（I03 锚）"
+      "name": "检测专项",
+      "reason": "src/features/inspection-capability/InspectionCapabilityPage.tsx specialties + 4 DOM test 覆盖"
     },
     {
-      "id": "M03.F02.I04",
+      "id": "M06.F02",
       "action": "变更",
-      "name": "任务分配三态过滤器",
-      "reason": "TaskAssignmentPage 三态过滤器 filterDataFn=M03.F02.I04"
+      "name": "检测项目",
+      "reason": "src/features/inspection-capability/InspectionCapabilityPage.tsx objects + AssociationManager 关联"
     },
     {
-      "id": "M03.F03.I01",
+      "id": "M06.F03",
       "action": "变更",
-      "name": "数据录入页面",
-      "reason": "src/features/data-entry/DataEntryPage.tsx 双栏录入页 + FlowStagePage.dom.test"
+      "name": "检测参数",
+      "reason": "src/features/inspection-capability/InspectionCapabilityPage.tsx parameters"
     },
     {
-      "id": "M03.F03.I02",
+      "id": "M06.F04",
       "action": "变更",
-      "name": "检测数据保存",
-      "reason": "DataEntryPage 保存（I02 锚）+ DataEntryActions.dom.test fnTest"
+      "name": "检测标准",
+      "reason": "src/features/inspection-capability/InspectionCapabilityPage.tsx standards"
     },
     {
-      "id": "M03.F03.I03",
+      "id": "M06.F05",
       "action": "变更",
-      "name": "检测项编辑",
-      "reason": "DataEntryPage 检测项编辑（I03 锚）+ dataEntryModelDispatch.dom.test"
+      "name": "计算规则",
+      "reason": "src/features/inspection-capability/CalculationRuleList.tsx + TwoLevelObjectStandardTree"
     },
     {
-      "id": "M03.F03.I04",
+      "id": "M06.F06",
       "action": "变更",
-      "name": "检测项删除",
-      "reason": "DataEntryPage 删除样品/记录级联（I04 锚）+ DataEntryActions.dom.test"
+      "name": "技术要求",
+      "reason": "src/features/inspection-capability/TechnicalRequirementList.tsx"
     },
     {
-      "id": "M03.F03.I06",
+      "id": "M06.F07",
       "action": "变更",
-      "name": "人工改判",
-      "reason": "DataEntryPage.tsx:571 footer 人工改判 select data-fn=M03.F03.I06 + DataEntryActions.dom.test"
+      "name": "报告名称",
+      "reason": "src/features/inspection-capability/ReportNameList.tsx 含 extFields + 关联计数"
     },
     {
-      "id": "M03.F03.I07",
+      "id": "M06.F08",
       "action": "变更",
-      "name": "数据录入三态过滤器",
-      "reason": "DataEntryPage.tsx:659 filterDataFn=M03.F03.I07 三态过滤器 + FlowStagePage.dom.test"
+      "name": "参数界面",
+      "reason": "src/features/inspection-capability/ParamInterfaceList.tsx + ParamInterfacePreviewModal"
     },
     {
-      "id": "M03.F05.I01",
+      "id": "M06.F01.I01",
       "action": "变更",
-      "name": "报告审核页面",
-      "reason": "src/features/reports/ReportReviewPage.tsx + reportStagePages.dom.test fnTest"
+      "name": "检测专项列表",
+      "reason": "tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx fnTest=M06.F01.I01"
     },
     {
-      "id": "M03.F05.I02",
+      "id": "M06.F01.I02",
       "action": "变更",
-      "name": "报告查看",
-      "reason": "ReportReviewPage/FlowStagePage 查看（I02 锚）+ ReceiptDetailPageFn.dom.test"
+      "name": "检测专项新建/编辑",
+      "reason": "InspectionCapabilityPage specialties 新建/编辑 data-fn=M06.F01.I02 + 2 fnTest"
     },
     {
-      "id": "M03.F05.I03",
+      "id": "M06.F01.I03",
       "action": "变更",
-      "name": "审核操作",
-      "reason": "ReportReviewPage 审核通过/驳回（I03 锚）+ reportStagePages.dom.test"
+      "name": "检测专项删除",
+      "reason": "InspectionCapabilityPage specialties 删除 data-fn=M06.F01.I03 + 1 fnTest（含引用保护）"
     },
     {
-      "id": "M03.F05.I04",
+      "id": "M06.F02.I01",
       "action": "变更",
-      "name": "报告审核三态过滤器",
-      "reason": "ReportReviewPage 三态过滤器 filterDataFn=M03.F05.I04"
+      "name": "检测项目列表",
+      "reason": "InspectionCapabilityPage objects data-fn=M06.F02.I01 + fnTest 按专项过滤"
     },
     {
-      "id": "M03.F06.I01",
+      "id": "M06.F02.I02",
       "action": "变更",
-      "name": "报告批准页面",
-      "reason": "src/features/reports/ReportApprovePage.tsx + reportStagePages.dom.test fnTest"
+      "name": "检测项目新建/编辑",
+      "reason": "InspectionCapabilityPage objects 新建/编辑 data-fn=M06.F02.I02 + 1 fnTest"
     },
     {
-      "id": "M03.F06.I02",
+      "id": "M06.F02.I04",
       "action": "变更",
-      "name": "报告查看",
-      "reason": "ReportApprovePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
+      "name": "关联检测依据",
+      "reason": "AssociationManager role=TESTING data-fn=M06.F02.I04 + 1 fnTest"
     },
     {
-      "id": "M03.F06.I03",
+      "id": "M06.F02.I05",
       "action": "变更",
-      "name": "批准操作",
-      "reason": "ReportApprovePage 批准操作（I03 锚）+ reportStagePages.dom.test"
+      "name": "关联判定依据",
+      "reason": "AssociationManager role=JUDGMENT fnTest=M06.F02.I05"
     },
     {
-      "id": "M03.F06.I04",
+      "id": "M06.F02.I06",
       "action": "变更",
-      "name": "报告批准三态过滤器",
-      "reason": "ReportApprovePage 三态过滤器 filterDataFn=M03.F06.I04"
+      "name": "关联检测参数",
+      "reason": "AssociationManager object↔parameter data-fn=M06.F02.I06 + 3 fnTest"
     },
     {
-      "id": "M03.F07.I01",
+      "id": "M06.F02.I07",
       "action": "变更",
-      "name": "报告发放页面",
-      "reason": "src/features/reports/ReportIssuePage.tsx + reportStagePages.dom.test fnTest"
+      "name": "关联检测专项",
+      "reason": "InspectionCapabilityFormModal specialty↔object 锚 @entry=M06.F02.I07 + 1 fnTest"
     },
     {
-      "id": "M03.F07.I02",
+      "id": "M06.F03.I01",
       "action": "变更",
-      "name": "报告查看",
-      "reason": "ReportIssuePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
+      "name": "检测参数列表",
+      "reason": "InspectionCapabilityPage parameters + fnTest 列表"
     },
     {
-      "id": "M03.F07.I03",
+      "id": "M06.F03.I02",
       "action": "变更",
-      "name": "发放操作",
-      "reason": "ReportIssuePage 发放操作（I03 锚）+ reportStagePages.dom.test"
+      "name": "检测参数新建/编辑",
+      "reason": "InspectionCapabilityPage parameters data-fn=M06.F03.I02 + 1 fnTest"
     },
     {
-      "id": "M03.F07.I04",
+      "id": "M06.F03.I03",
       "action": "变更",
-      "name": "报告发放三态过滤器",
-      "reason": "ReportIssuePage 三态过滤器 filterDataFn=M03.F07.I04"
+      "name": "检测参数删除",
+      "reason": "InspectionCapabilityPage parameters data-fn=M06.F03.I03 + 1 fnTest（被引用保护）"
     },
     {
-      "id": "M03.F08.I01",
+      "id": "M06.F04.I01",
       "action": "变更",
-      "name": "报告归档页面",
-      "reason": "src/features/reports/ReportArchivePage.tsx + reportStagePages.dom.test fnTest"
+      "name": "检测标准列表",
+      "reason": "InspectionCapabilityPage standards + fnTest 列表"
     },
     {
-      "id": "M03.F08.I02",
+      "id": "M06.F04.I02",
       "action": "变更",
-      "name": "报告查看",
-      "reason": "ReportArchivePage 报告查看（I02 锚）+ FlowStagePage.dom.test"
+      "name": "检测标准新建/编辑",
+      "reason": "InspectionCapabilityPage standards data-fn=M06.F04.I02 + 1 fnTest"
     },
     {
-      "id": "M03.F08.I03",
+      "id": "M06.F04.I04",
       "action": "变更",
-      "name": "归档操作",
-      "reason": "ReportArchivePage 归档操作（I03 锚）+ reportStagePages.dom.test"
+      "name": "关联检测参数",
+      "reason": "AssociationManager standard↔parameter data-fn=M06.F04.I04 + 1 fnTest"
     },
     {
-      "id": "M03.F08.I04",
+      "id": "M06.F05.I01",
       "action": "变更",
-      "name": "报告归档三态过滤器",
-      "reason": "ReportArchivePage 三态过滤器 filterDataFn=M03.F08.I04"
+      "name": "计算规则列表",
+      "reason": "CalculationRuleList + TwoLevelObjectStandardTree data-fn=M06.F05.I01 + 6 fnTest"
     },
     {
-      "id": "M03.F09.I01",
+      "id": "M06.F06.I01",
       "action": "变更",
-      "name": "查看按钮",
-      "reason": "src/features/receipts/ReceiptDetailPage.tsx 查看按钮 + ReceiptDetailPageFn.dom.test"
+      "name": "技术要求列表",
+      "reason": "TechnicalRequirementList data-fn=M06.F06.I01 + 1 fnTest"
     },
     {
-      "id": "M03.F09.I02",
+      "id": "M06.F07.I01",
       "action": "变更",
-      "name": "详情页",
-      "reason": "ReceiptDetailPage 详情页 + detailLabels.dom.test"
+      "name": "报告名称列表",
+      "reason": "ReportNameList data-fn=M06.F07.I01 + 1 fnTest（含聚合）"
     },
     {
-      "id": "M03.F09.I03",
+      "id": "M06.F07.I08",
       "action": "变更",
-      "name": "报告预览（详情页）",
-      "reason": "ReceiptDetailPage 报告预览（I03 锚）+ reportTemplateUrl.test"
+      "name": "扩展属性维护",
+      "reason": "ReportNameList extFields 编辑器 data-fn=M06.F07.I08 + 1 fnTest"
     },
     {
-      "id": "M03.F01",
+      "id": "M06.F08.I04",
       "action": "变更",
-      "name": "接样管理",
-      "reason": "F 级汇总行：I01-I04/I06/I07 全部落地（receipts 全链路），随子项推已上线"
-    },
-    {
-      "id": "M03.F02",
-      "action": "变更",
-      "name": "任务分配",
-      "reason": "F 级汇总行：I01-I04 全部落地（task-assignment），随子项推已上线"
-    },
-    {
-      "id": "M03.F03",
-      "action": "变更",
-      "name": "数据录入",
-      "reason": "F 级汇总行：I01-I04/I06/I07 全部落地（data-entry），随子项推已上线"
-    },
-    {
-      "id": "M03.F05",
-      "action": "变更",
-      "name": "报告审核",
-      "reason": "F 级汇总行：I01/I03/I04 落地（ReportReviewPage），随子项推已上线"
-    },
-    {
-      "id": "M03.F06",
-      "action": "变更",
-      "name": "报告批准",
-      "reason": "F 级汇总行：I01/I03/I04 落地（ReportApprovePage），随子项推已上线"
-    },
-    {
-      "id": "M03.F07",
-      "action": "变更",
-      "name": "报告发放",
-      "reason": "F 级汇总行：I01/I03/I04 落地（ReportIssuePage），随子项推已上线"
-    },
-    {
-      "id": "M03.F08",
-      "action": "变更",
-      "name": "报告归档",
-      "reason": "F 级汇总行：I01/I03/I04 落地（ReportArchivePage），随子项推已上线"
-    },
-    {
-      "id": "M03.F09",
-      "action": "变更",
-      "name": "接样单详情",
-      "reason": "F 级汇总行：I01-I03 全部落地（ReceiptDetailPage），随子项推已上线"
+      "name": "关联检测参数",
+      "reason": "ParamInterfaceList 关联参数页签 data-fn=M06.F08.I04 + fnTest"
     }
   ],
-  "sync_files": []
+  "sync_files": [
+    "docs/design/design-function-map.md",
+    "docs/design/flow-function-map.md"
+  ]
 }

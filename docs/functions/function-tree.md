@@ -68,14 +68,14 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M04.F08 | 等级维护 | InspectionGrade 实体码表维护，列表按检测专项过滤 | 接口 | 规划 |
 | M04.F09 | 牌号维护 | InspectionBrand 实体码表维护，列表按检测专项过滤 | 接口 | 规划 |
 | M05.F01 | 报告汇总 | 按报告类别输出试验报告汇总表 | 查询 | 规划 |
-| M06.F01 | 检测专项 | InspectionSpecialty CRUD（检测能力字典根） | 接口 | 规划 |
-| M06.F02 | 检测项目 | InspectionObject CRUD + 专项/参数关联 | 接口 | 规划 |
-| M06.F03 | 检测参数 | InspectionParameter CRUD + 标准/参数关联 | 接口 | 规划 |
-| M06.F04 | 检测标准 | InspectionStandard CRUD（含状态：active/superseded/draft） | 接口 | 规划 |
-| M06.F05 | 计算规则 | CalculationRule 维护（复合主键，算法类型 + 公式） | 接口 | 规划 |
-| M06.F06 | 技术要求 | TechnicalRequirement 维护，按四维度匹配；brand/model/grade/spec 改为 FK 引用实体 | 接口 | 规划 |
-| M06.F07 | 报告名称 | InspectionReportName CRUD + extFields 模板 + 关联标准/参数 | 接口 | 规划 |
-| M06.F08 | 参数界面 | ParamInterface 维护 + 参数↔界面 link | 接口 | 规划 |
+| M06.F01 | 检测专项 | InspectionSpecialty CRUD（检测能力字典根） | 接口 | 已上线 |
+| M06.F02 | 检测项目 | InspectionObject CRUD + 专项/参数关联 | 接口 | 已上线 |
+| M06.F03 | 检测参数 | InspectionParameter CRUD + 标准/参数关联 | 接口 | 已上线 |
+| M06.F04 | 检测标准 | InspectionStandard CRUD（含状态：active/superseded/draft） | 接口 | 已上线 |
+| M06.F05 | 计算规则 | CalculationRule 维护（复合主键，算法类型 + 公式） | 接口 | 已上线 |
+| M06.F06 | 技术要求 | TechnicalRequirement 维护，按四维度匹配；brand/model/grade/spec 改为 FK 引用实体 | 接口 | 已上线 |
+| M06.F07 | 报告名称 | InspectionReportName CRUD + extFields 模板 + 关联标准/参数 | 接口 | 已上线 |
+| M06.F08 | 参数界面 | ParamInterface 维护 + 参数↔界面 link | 接口 | 已上线 |
 
 ---
 
@@ -109,32 +109,32 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 闭环定义 | 状态 |
 |---|---|---|---|
-| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 规划 |
-| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getBaseUrl() 上自动跑 | 规划 |
-| M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 规划 |
+| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 已上线 |
+| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getBaseUrl() 上自动跑 | 已上线 |
+| M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 已上线 |
 
 ### M98.F01 运行时后端切换
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 规划 |
-| M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 规划 |
+| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 已上线 |
+| M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 已上线 |
 
 ### M98.F02 http-client 注入
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M98.F02.I01 | axios 拦截器 | 接口 | src/api/http-client.ts 的 installHttpClient；注入 baseURL + Authorization | 规划 |
+| M98.F02.I01 | axios 拦截器 | 接口 | src/api/http-client.ts 的 installHttpClient；注入 baseURL + Authorization | 已上线 |
 
 ### M98.F03 Next.js API routes
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M98.F03.I01 | POST /api/auth/login | 接口 | demo：返 mock token + 3 租户；真路径接 pg | 规划 |
-| M98.F03.I02 | GET /api/auth/me | 接口 | 当面用户 + tenants[] + currentTenantId | 规划 |
-| M98.F03.I03 | POST /api/auth/logout | 接口 | 204 No Content | 规划 |
-| M98.F03.I04 | POST /api/auth/refresh | 接口 | 用 refreshToken 换新 token | 规划 |
-| M98.F03.I05 | POST /api/auth/switch-tenant | 接口 | 校验 tenantId 后换 token；msw 仓的同款语义 | 规划 |
+| M98.F03.I01 | POST /api/auth/login | 接口 | demo：返 mock token + 3 租户；真路径接 pg | 已上线 |
+| M98.F03.I02 | GET /api/auth/me | 接口 | 当面用户 + tenants[] + currentTenantId | 已上线 |
+| M98.F03.I03 | POST /api/auth/logout | 接口 | 204 No Content | 已上线 |
+| M98.F03.I04 | POST /api/auth/refresh | 接口 | 用 refreshToken 换新 token | 已上线 |
+| M98.F03.I05 | POST /api/auth/switch-tenant | 接口 | 校验 tenantId 后换 token；msw 仓的同款语义 | 已上线 |
 
 
 ## BASE I 级（REF 镜像，父 F ∈ BASE）
@@ -270,61 +270,61 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F01.I01 | 检测专项列表 | 接口 | 按官方顺序展示专项、来源和启用状态 | 规划 |
-| M06.F01.I02 | 检测专项新建/编辑 | 接口 | 维护自定义专项和官方专项本地配置，官方来源字段只读 | 规划 |
-| M06.F01.I03 | 检测专项删除 | 接口 | 删除自定义且未被引用的专项，保护官方及已引用专项 | 规划 |
+| M06.F01.I01 | 检测专项列表 | 接口 | 按官方顺序展示专项、来源和启用状态 | 已上线 |
+| M06.F01.I02 | 检测专项新建/编辑 | 接口 | 维护自定义专项和官方专项本地配置，官方来源字段只读 | 已上线 |
+| M06.F01.I03 | 检测专项删除 | 接口 | 删除自定义且未被引用的专项，保护官方及已引用专项 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F02.I01 | 检测项目列表 | 接口 | 按专项展示项目、官方来源行、资质标记和准备状态 | 规划 |
-| M06.F02.I02 | 检测项目新建/编辑 | 接口 | 维护项目本地配置，官方来源字段只读 | 规划 |
+| M06.F02.I01 | 检测项目列表 | 接口 | 按专项展示项目、官方来源行、资质标记和准备状态 | 已上线 |
+| M06.F02.I02 | 检测项目新建/编辑 | 接口 | 维护项目本地配置，官方来源字段只读 | 已上线 |
 | M06.F02.I03 | 检测项目删除 | 接口 | 删除自定义且未被引用的项目，保护官方及已引用项目 | 规划 |
-| M06.F02.I04 | 关联检测依据 | 接口 | 维护 role=TESTING 的项目检测依据标准 | 规划 |
-| M06.F02.I05 | 关联判定依据 | 接口 | 维护 role=JUDGMENT 的项目判定依据标准 | 规划 |
-| M06.F02.I06 | 关联检测参数 | 接口 | 维护项目参数多对多及资质必备/可选；prefilter 已上线（先选检测项目→过滤参数，UX 见 REQ-2026-011） | 规划 |
-| M06.F02.I07 | 关联检测专项 | 接口 | 维护 InspectionSpecialtyObject 多对多 | 规划 |
+| M06.F02.I04 | 关联检测依据 | 接口 | 维护 role=TESTING 的项目检测依据标准 | 已上线 |
+| M06.F02.I05 | 关联判定依据 | 接口 | 维护 role=JUDGMENT 的项目判定依据标准 | 已上线 |
+| M06.F02.I06 | 关联检测参数 | 接口 | 维护项目参数多对多及资质必备/可选；prefilter 已上线（先选检测项目→过滤参数，UX 见 REQ-2026-011） | 已上线 |
+| M06.F02.I07 | 关联检测专项 | 接口 | 维护 InspectionSpecialtyObject 多对多 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F03.I01 | 检测参数列表 | 接口 | 展示参数原名、规范名、方法、单位和来源 | 规划 |
-| M06.F03.I02 | 检测参数新建/编辑 | 接口 | 维护自定义参数和官方参数本地配置，官方来源字段只读 | 规划 |
-| M06.F03.I03 | 检测参数删除 | 接口 | 删除自定义且未被关联的参数，保护官方及已引用参数 | 规划 |
+| M06.F03.I01 | 检测参数列表 | 接口 | 展示参数原名、规范名、方法、单位和来源 | 已上线 |
+| M06.F03.I02 | 检测参数新建/编辑 | 接口 | 维护自定义参数和官方参数本地配置，官方来源字段只读 | 已上线 |
+| M06.F03.I03 | 检测参数删除 | 接口 | 删除自定义且未被关联的参数，保护官方及已引用参数 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F04.I01 | 检测标准列表 | 接口 | 展示标准编号、名称、版本、来源和核验状态 | 规划 |
-| M06.F04.I02 | 检测标准新建/编辑 | 接口 | 维护标准元数据和本地配置，不覆盖来源原文 | 规划 |
+| M06.F04.I01 | 检测标准列表 | 接口 | 展示标准编号、名称、版本、来源和核验状态 | 已上线 |
+| M06.F04.I02 | 检测标准新建/编辑 | 接口 | 维护标准元数据和本地配置，不覆盖来源原文 | 已上线 |
 | M06.F04.I03 | 检测标准删除 | 接口 | 删除自定义且未被引用的标准，保护已引用标准 | 规划 |
-| M06.F04.I04 | 关联检测参数 | 接口 | 维护标准参数多对多及条款、方法、单位、试验规则；prefilter 弹窗（先选检测项目→过滤参数）见 REQ-2026-011 | 规划 |
+| M06.F04.I04 | 关联检测参数 | 接口 | 维护标准参数多对多及条款、方法、单位、试验规则；prefilter 弹窗（先选检测项目→过滤参数）见 REQ-2026-011 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F05.I01 | 计算规则列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：算法类型/试件数/备注 | 规划 |
+| M06.F05.I01 | 计算规则列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：算法类型/试件数/备注 | 已上线 |
 | M06.F05.I02 | 计算规则新建/编辑 | 接口 | 维护原始数据到检测结果的算法和适用条件 | 规划 |
 | M06.F05.I03 | 计算规则删除 | 接口 | 删除未被检测数据引用的计算规则 | 规划 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F06.I01 | 技术要求列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：判定模式/限值/备注 | 规划 |
+| M06.F06.I01 | 技术要求列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：判定模式/限值/备注 | 已上线 |
 | M06.F06.I02 | 技术要求新建/编辑 | 接口 | 维护单项评定条件、限值、表达式、来源和判定模式 | 规划 |
 | M06.F06.I03 | 技术要求删除 | 接口 | 删除未被检测结果引用的技术要求 | 规划 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F07.I01 | 报告名称列表 | 接口 | 展示 code/name/description/排序，按 sortOrder 排序，含关联项目/标准/参数计数 | 规划 |
+| M06.F07.I01 | 报告名称列表 | 接口 | 展示 code/name/description/排序，按 sortOrder 排序，含关联项目/标准/参数计数 | 已上线 |
 | M06.F07.I02 | 报告名称新建/编辑 | 接口 | 维护 code/name/sortOrder/description | 规划 |
 | M06.F07.I03 | 报告名称删除 | 接口 | 删除保护：被关联项目/标准/参数引用时拒绝 | 规划 |
 | M06.F07.I04 | 关联检测项目 | 接口 | 维护 InspectionObjectReportName 中间表 | 规划 |
 | M06.F07.I05 | 关联检测依据 | 接口 | 维护 InspectionReportNameStandard role=TESTING | 规划 |
 | M06.F07.I06 | 关联判定依据 | 接口 | 维护 InspectionReportNameStandard role=JUDGMENT | 规划 |
 | M06.F07.I07 | 关联检测参数 | 接口 | 维护 InspectionReportNameParameter 中间表；prefilter 弹窗（先选检测项目→过滤参数）+ 参数清单行追加「· 对象名」，见 REQ-2026-012 | 规划 |
-| M06.F07.I08 | 扩展属性维护 | 接口 | 维护 InspectionReportName.extFields 列表（key/label/type/required/tag/source/options）；预览前若样品 ext 未覆盖对应 key，会自动弹 SampleExtFieldsModal（M03.F01.I07）让用户补录 | 规划 |
+| M06.F07.I08 | 扩展属性维护 | 接口 | 维护 InspectionReportName.extFields 列表（key/label/type/required/tag/source/options）；预览前若样品 ext 未覆盖对应 key，会自动弹 SampleExtFieldsModal（M03.F01.I07）让用户补录 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
@@ -332,7 +332,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F08.I01 | 参数界面列表 | 接口 | 展示 code/name/componentPath/关联参数，按 sortOrder 排序 | 规划 |
 | M06.F08.I02 | 参数界面新建/编辑 | 接口 | 维护 code/name/componentPath(模型 key)/config(JSON)/sortOrder/description | 规划 |
 | M06.F08.I03 | 参数界面删除 | 接口 | 删除保护：isOfficial 内置模型（17 个：default / concrete-compress / concrete-permeability / cement-flexural / cement-compress / rebar-welding-tensile / rebar-welding-bend / rebar-mech-tensile / rebar-mech-yield / rebar-mech-elongation / particle-gradation / rebar-mech-yield-ratio / rebar-mech-connection-tensile / mortar-compress / soil-compaction / soil-compaction-degree-sand / soil-compaction-degree-ring）拒绝 | 规划 |
-| M06.F08.I04 | 关联检测参数 | 接口 | 维护 InspectionParameterParamInterface 中间表（参数↔界面 M:N，支持 reportNameCode 报告作用域） | 规划 |
+| M06.F08.I04 | 关联检测参数 | 接口 | 维护 InspectionParameterParamInterface 中间表（参数↔界面 M:N，支持 reportNameCode 报告作用域） | 已上线 |
 | M06.F08.I05 | 参数界面预览 | 接口 | 列表行按钮：按绑定 componentPath 渲染该录入卡只读预览（mock 单样品 + 示例技术要求） | 规划 |
 | M06.F08.I06 | 参数界面预览弹窗 | 接口 | 模态：渲染注册的参数录入卡组件只读模式，供配置时查看录入卡样式 | 规划 |
 
