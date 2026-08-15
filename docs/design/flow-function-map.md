@@ -54,6 +54,7 @@ flowchart LR
 | M98.F03.I03 | POST /api/auth/logout 走侧栏登出按钮（M01.F05.I05） |
 | M98.F03.I04 | POST /api/auth/refresh 走 axios 拦截器（M98.F02.I01） |
 | M98.F03.I05 | POST /api/auth/switch-tenant 给 M00.F02（登录选租户）提供后端 |
+| M05.F01.I01 | 试验报告汇总表：按报告名称（categoryCode）聚合 sample_receipts，是流程末端读视图（不参与状态流转） |
 | M06.F05.I01 | 计算规则维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
 | M06.F05.I02 | 同上（计算规则新建/编辑） |
 | M06.F05.I03 | 同上（计算规则删除） |

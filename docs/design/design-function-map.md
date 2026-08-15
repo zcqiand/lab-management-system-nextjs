@@ -84,6 +84,7 @@
 | M98.F03.I03 | src/app/api/auth/logout/route.ts | POST /api/auth/logout | – | M98.F03.I03 | – | 已上线 |
 | M98.F03.I04 | src/app/api/auth/refresh/route.ts | POST /api/auth/refresh | – | M98.F03.I04 | – | 已上线 |
 | M98.F03.I05 | src/app/api/auth/switch-tenant/route.ts | POST /api/auth/switch-tenant | – | M98.F03.I05 | – | 已上线 |
+| M05.F01.I01 | src/features/summary/SummaryPage.tsx | GET /api/summary?categoryCode= ; GET /api/report-names (下拉) | sample_receipts | M05.F01.I01 | – | 已上线 |
 
 ## 约定
 
