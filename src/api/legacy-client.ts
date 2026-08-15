@@ -70,4 +70,12 @@ export const API_ROUTES = {
   "/grades": "/api/catalog/grades",
   "/brands": "/api/catalog/brands",
   "/org-info": "/api/org-info",
+  // —— Task 13 追加（M06 检测能力 10 组件）——
+  // 4 主表 CRUD + 4 类 junction link。msw dictCrud 裸数组 → {items} 由
+  // tests/helpers/seed.ts installShapeAdapters 包（同 Wave 2 前作模式）。
+  "/inspection-specialties": "/api/inspection/specialties",
+  "/inspection-specialty-objects": "/api/inspection/links/specialty-object",
+  "/inspection-object-standards": "/api/inspection/links/object-standard",
+  "/inspection-object-parameters": "/api/inspection/links/object-parameter",
+  "/inspection-object-report-names": "/api/report-names/links/object",
 } as const;

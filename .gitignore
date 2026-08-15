@@ -4,6 +4,7 @@ out/
 coverage/
 .state/trace.json
 .state/gate.json
+.env*.local
 
 # infra-only: emit 产物由 emit-schema.mjs 重出，不入 git
 /generated/

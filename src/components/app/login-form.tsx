@@ -11,7 +11,7 @@ import { useBackend } from "@/state/backend-context";
 export function LoginForm() {
   const { backend, baseUrl } = useBackend();
   const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("demo123");
+  const [password, setPassword] = useState("dev123456");
   const [result, setResult] = useState<string>("");
 
   async function onLogin() {

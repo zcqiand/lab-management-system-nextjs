@@ -27,6 +27,11 @@ export default defineConfig({
     projects: [
       {
         resolve: { alias: resolveAlias },
+        // node 环境的纯逻辑测试也可能 import .tsx 组件源文件（如
+        // concretePermeability.test.ts → ConcretePermeabilityCard.tsx 取纯函数），
+        // 同样需要 oxc JSX 转译（与 jsdom project 同款，见下）。
+        // 必须放 project 级（test 外层）——vitest 4 每个 project 自建 vite server。
+        oxc: { jsx: { runtime: "automatic" } },
         test: {
           name: "node",
           environment: "node",
@@ -41,9 +46,9 @@ export default defineConfig({
       },
       {
         resolve: { alias: resolveAlias },
-        // tsconfig 的 jsx:"preserve" 是给 next/swc 的；vitest 4（vite 8/rolldown oxc
-        // 转译链）不认 preserve——.tsx 里的 JSX 会 "Unexpected JSX expression"。
-        // 这里显式给 oxc 转译器 automatic runtime（react/jsx-runtime）。
+        // jsdom project 需要自己的 oxc 声明：vitest 4 组装 project vite server 时
+        // 只从顶层 oxc 转发 `{ target }`（jsx 字段会被 cli-api 重建覆盖丢掉），
+        // project 级的 oxc 才会进该 project 的 vite:oxc transform 插件。
         oxc: { jsx: { runtime: "automatic" } },
         test: {
           name: "jsdom",
