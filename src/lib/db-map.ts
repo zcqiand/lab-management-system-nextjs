@@ -4,6 +4,13 @@
 
 export const TENANT = "TENANT-001";
 
+// 已知边界（carried ruling，Task 2 评审 Minor 1）：toCamel 与 toSnake 对
+// 「下划线+数字」（a_1b）与「连续下划线」（a__b）不对称——
+//   toCamel("a_1b") === "a1b"，而 toSnake("a1b") === "a1b"（回不去 a_1b）；
+//   toCamel("a__b") === "aB"，而 toSnake("a_b")  === "a_b"（再转一次才变 a__b 的逆不可达）。
+// 当前 25 张表列名实测零触发（全部常规 snake_case，无数字段/连续下划线），
+// 若未来 DDL 新增此类列名需同步升级这对转换器。
+
 export function toCamel(s: string): string {
   return s.replace(/_([a-z0-9])/g, (_, c: string) => c.toUpperCase());
 }

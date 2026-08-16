@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { toCamel, rowToDto, dtoToRow } from "@/lib/db-map";
+import * as dq from "@/lib/db-queries";
 
 describe("row↔DTO 映射", () => {
   it("toCamel: snake → camel", () => {
@@ -16,5 +17,10 @@ describe("row↔DTO 映射", () => {
     expect(dtoToRow({ contractCode: "C-1", flowHistory: [] })).toEqual({
       contract_code: "C-1", flow_history: [],
     });
+  });
+  it("db-queries re-export 通路：6 键齐备（carried ruling，Task 2 Minor 2）", () => {
+    for (const k of ["TENANT", "toCamel", "toSnake", "rowToDto", "dtoToRow", "PG_TABLES"]) {
+      expect(dq).toHaveProperty(k);
+    }
   });
 });

@@ -1,0 +1,64 @@
+// tests/api/receipts-pg.test.ts — 直调 db-queries（不经 HTTP），对 lab_dev 断言。
+// 前置：npm run seed:db。pg 不可达时整组 skip（模式同 db.smoke.test.ts）。
+// DATABASE_URL 的引导在 tests/setup.ts（静态 import 被提升，本文件里设 env 太晚）。
+import { describe, it, expect, beforeAll } from "vitest";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
+import { listReceiptsDb, getReceiptDb, applyFlowActionDb, TENANT } from "@/lib/db-queries";
+
+const hasPg = (() => {
+  try {
+    const req = createRequire(resolve(process.cwd(), "package.json"));
+    req("postgres");
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+describe("receipts 三态流转（pg）", () => {
+  beforeAll(function (this: { skip(): void } & Record<string, unknown>) {
+    if (!hasPg) this.skip();
+  });
+
+  it("not_yet: 停在 receiving 的单据", async () => {
+    const r = await listReceiptsDb({ filter: "not_yet", flowStatus: "receiving", page: 1, pageSize: 20 });
+    expect(r.total).toBeGreaterThan(0);
+    for (const it of r.items) expect(it.flowStatus).toBe("receiving");
+  });
+  it("submitted: 已从 receiving 提交走的单据", async () => {
+    const r = await listReceiptsDb({ filter: "submitted", flowStatus: "receiving", page: 1, pageSize: 20 });
+    expect(r.total).toBeGreaterThan(0);
+    for (const it of r.items) {
+      expect(it.flowStatus).not.toBe("receiving");
+      expect((it.flowHistory as any[]).some((h) => h.action === "submit" && h.from === "receiving")).toBe(true);
+    }
+  });
+  it("flowStatus 直滤 + tenant 隔离", async () => {
+    const r = await listReceiptsDb({ flowStatus: "review", page: 1, pageSize: 1000 });
+    expect(r.total).toBeGreaterThan(0);
+    for (const it of r.items) {
+      expect(it.flowStatus).toBe("review");
+      expect(it.tenantId).toBe(TENANT);
+    }
+  });
+  it("applyFlowActionDb: submit 前进一阶并 append history", async () => {
+    const list = await listReceiptsDb({ filter: "not_yet", flowStatus: "receiving", page: 1, pageSize: 1 });
+    const id = String(list.items[0]!.id);
+    const res = await applyFlowActionDb(id, "submit", "tester");
+    expect(res.ok).toBe(true);
+    const after = await getReceiptDb(id);
+    expect(after!.flowStatus).toBe("task_assignment");
+    expect(after!.lastSubmittedBy).toBe("tester");
+    const hist = after!.flowHistory as any[];
+    expect(hist[hist.length - 1]!.action).toBe("submit");
+    // 还原（撤回 = 回退 + 清 lastSubmittedBy）
+    await applyFlowActionDb(id, "withdraw", "tester");
+  });
+  it("withdraw 仅限本人", async () => {
+    const list = await listReceiptsDb({ filter: "not_yet", flowStatus: "receiving", page: 1, pageSize: 1 });
+    const id = String(list.items[0]!.id);
+    const res = await applyFlowActionDb(id, "withdraw", "someone-else");
+    expect(res.ok).toBe(false);
+  });
+});
