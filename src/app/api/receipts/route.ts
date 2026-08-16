@@ -1,71 +1,59 @@
-// GET  /api/receipts?page=&pageSize=&flowStatus=&contractId=&categoryCode=&lastSubmittedBy=&keyword=&filter=
+// GET  /api/receipts?page=&pageSize=&flowStatus=&contractId=&categoryCode=&lastSubmittedBy=&keyword=&filter=&operator=
 //      -> {items,page,pageSize,total}（REF 形状；测试适配层 installShapeAdapters 同款过滤语义）
 // POST /api/receipts -> SampleReceipt（201）
 //
-// 数据源：@lab/management-system-msw/fixtures sampleReceipts（in-memory）。
+// 数据源：lab_dev.sample_receipts（src/lib/db-queries.ts；Task 6 接线）。
 // filter（FlowStagePage 三态）语义相对 flowStatus 环节（与 lab-msw handler 同款）：
 //   not_yet   = 停在本环节待提交（无 flowStatus 时=无流转记录的新单）
 //   submitted = 已从本环节 submit 至下一环节（history 有 submit from 本环节且当前不在本环节）；
 //               无 flowStatus 时=有流转记录且记录了提交人
+// keyword 命中 commissionCode/reportCode/receivedBy 三字段（SQL ilike）；
+// operator = receivedBy 或 testOperator 等值。FK null 出库保持 null（不转回 ''）。
 
 import { NextRequest, NextResponse } from "next/server";
-import { sampleReceipts, pageOf, qp, num, NOW, TENANT } from "@/lib/api-helpers";
+import { qp, num, NOW, TENANT } from "@/lib/api-helpers";
+import {
+  listReceiptsDb,
+  createReceiptDb,
+  isDbUnavailable,
+} from "@/lib/db-queries";
+
+function dbUnavailable() {
+  return NextResponse.json(
+    { code: "DB_UNAVAILABLE", message: "检查 DATABASE_URL / npm run seed:db" },
+    { status: 503 },
+  );
+}
 
 export async function GET(req: NextRequest) {
-  const url = qp(req);
-  const flowStatus = url.get("flowStatus");
-  const contractId = url.get("contractId");
-  const categoryCode = url.get("categoryCode");
-  const lastSubmittedBy = url.get("lastSubmittedBy");
-  const operator = url.get("operator") ?? "";
-  const filter = url.get("filter");
-  const keyword = url.get("keyword") ?? "";
-  let items = sampleReceipts.filter((r) => r.tenantId === TENANT);
-  if (filter === "not_yet") {
-    items = flowStatus
-      ? items.filter((r) => r.flowStatus === flowStatus)
-      : items.filter((r) => (r.flowHistory ?? []).length === 0);
-  } else if (filter === "submitted") {
-    items = flowStatus
-      ? items.filter(
-          (r) =>
-            r.flowStatus !== flowStatus &&
-            (r.flowHistory ?? []).some(
-              (h: { action?: string; from?: string }) =>
-                h.action === "submit" && h.from === flowStatus,
-            ),
-        )
-      : items.filter((r) => (r.flowHistory ?? []).length > 0 && !!r.lastSubmittedBy);
-  } else if (flowStatus) {
-    items = items.filter((r) => r.flowStatus === flowStatus);
-  }
-  if (contractId) items = items.filter((r) => r.contractId === contractId);
-  if (categoryCode) items = items.filter((r) => r.categoryCode === categoryCode);
-  if (lastSubmittedBy) items = items.filter((r) => r.lastSubmittedBy === lastSubmittedBy);
-  // 语义对齐 db-queries listReceiptsDb：operator = receivedBy 或 testOperator 等值
-  if (operator)
-    items = items.filter(
-      (r) =>
-        (r.receivedBy ?? "") === operator || (r.testOperator ?? "") === operator,
-    );
-  if (keyword)
-    items = items.filter((r) => {
-      const rec = r as { commissionCode?: string; reportCode?: string; receivedBy?: string };
-      return (
-        (rec.commissionCode ?? "").includes(keyword) ||
-        (rec.reportCode ?? "").includes(keyword) ||
-        (rec.receivedBy ?? "").includes(keyword)
-      );
+  try {
+    const url = qp(req);
+    const data = await listReceiptsDb({
+      flowStatus: url.get("flowStatus") ?? undefined,
+      contractId: url.get("contractId") ?? undefined,
+      categoryCode: url.get("categoryCode") ?? undefined,
+      lastSubmittedBy: url.get("lastSubmittedBy") ?? undefined,
+      operator: url.get("operator") ?? undefined,
+      keyword: url.get("keyword") ?? "",
+      filter: url.get("filter") ?? undefined,
+      page: num(url.get("page"), 1),
+      pageSize: num(url.get("pageSize"), 20),
     });
-  return NextResponse.json(
-    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), 20)),
-  );
+    return NextResponse.json(data);
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
+}
+
+function newId() {
+  return `RECEIPT-${Date.now().toString(36)}`;
 }
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const now = NOW();
   const newReceipt = {
-    id: `RECEIPT-${Date.now().toString(36)}`,
     contractId: String(body.contractId ?? ""),
     commissionCode: String(body.commissionCode ?? ""),
     commissionDate: String(body.commissionDate ?? ""),
@@ -75,11 +63,18 @@ export async function POST(req: NextRequest) {
     testCategory: String(body.testCategory ?? ""),
     flowStatus: "receiving",
     flowHistory: [],
-    createdAt: NOW(),
-    updatedAt: NOW(),
-    tenantId: TENANT,
     ...body,
+    // defaults 之后的 body 覆盖保留（msw 版同款），但固定列不可覆写：
+    id: newId(),
+    createdAt: now,
+    updatedAt: now,
+    tenantId: TENANT,
   };
-  sampleReceipts.push(newReceipt as never);
-  return NextResponse.json(newReceipt, { status: 201 });
+  try {
+    const created = (await createReceiptDb(newReceipt)) as Record<string, unknown>;
+    return NextResponse.json(created, { status: 201 });
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }

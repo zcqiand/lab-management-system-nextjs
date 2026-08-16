@@ -262,3 +262,32 @@ export async function deleteReceiptDb(id: string): Promise<boolean> {
     .returning({ id: t.id });
   return deleted.length > 0;
 }
+
+/**
+ * INSERT（route 侧组好含 id/tenantId 的完整 DTO；id 生成保留路由 newId 模式）。
+ * 列过滤到 schema 已知列（未知键静默丢弃，同 putReceiptDb）；必填列缺失或
+ * FK 违反（contract_id / category_code restrict）由数据库抛错，路由层兜底。
+ */
+export async function createReceiptDb(dto: Row): Promise<Row> {
+  const t = schema.sampleReceipts;
+  const values: Row = {};
+  for (const [k, v] of Object.entries(dto)) {
+    if (k in t) values[k] = v;
+  }
+  const rows = await db
+    .insert(t)
+    .values(values as never)
+    .returning();
+  return receiptToDto(rows[0] as Row);
+}
+
+/** 连接类错误判定（路由层 503 兜底用；postgres-js 的连接错误带 code 属性）。 */
+export function isDbUnavailable(e: unknown): boolean {
+  const err = e as { code?: string; message?: string } | null | undefined;
+  if (!err) return false;
+  if (err.code && ["ECONNREFUSED", "ENOTFOUND", "ETIMEDOUT", "EAI_AGAIN"].includes(err.code))
+    return true;
+  return /ECONNREFUSED|ENOTFOUND|ETIMEDOUT|connect ECONNREFUSED|DATABASE_URL is not set/i.test(
+    String(err.message ?? ""),
+  );
+}
