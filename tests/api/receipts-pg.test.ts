@@ -61,4 +61,30 @@ describe("receipts 三态流转（pg）", () => {
     const res = await applyFlowActionDb(id, "withdraw", "someone-else");
     expect(res.ok).toBe(false);
   });
+  it("return 不清空 lastSubmittedBy，withdraw 还原", async () => {
+    const list = await listReceiptsDb({ filter: "not_yet", flowStatus: "receiving", page: 1, pageSize: 1 });
+    const id = String(list.items[0]!.id);
+    // submit ×2 → receiving → data_entry，记录提交人
+    const s1 = await applyFlowActionDb(id, "submit", "tester");
+    expect(s1.ok).toBe(true);
+    const s2 = await applyFlowActionDb(id, "submit", "tester");
+    expect(s2.ok).toBe(true);
+    let after = await getReceiptDb(id);
+    expect(after!.flowStatus).toBe("data_entry");
+    expect(after!.lastSubmittedBy).toBe("tester");
+    // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
+    const ret = await applyFlowActionDb(id, "return", "reviewer", "材料不齐");
+    expect(ret.ok).toBe(true);
+    if (ret.ok) expect(ret.flowStatus).toBe("task_assignment");
+    after = await getReceiptDb(id);
+    expect(after!.lastSubmittedBy).toBe("tester");
+    const hist = after!.flowHistory as any[];
+    expect(hist[hist.length - 1]!.action).toBe("return");
+    // withdraw → 后退一阶 + 清 lastSubmittedBy，还原数据（回到 receiving）
+    const w = await applyFlowActionDb(id, "withdraw", "tester");
+    expect(w.ok).toBe(true);
+    after = await getReceiptDb(id);
+    expect(after!.lastSubmittedBy).toBeNull();
+    expect(after!.flowStatus).toBe("receiving");
+  });
 });

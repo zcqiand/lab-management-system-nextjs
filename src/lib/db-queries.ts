@@ -89,10 +89,13 @@ export async function listReceiptsDb(q: ListReceiptsQuery): Promise<{
       dsql`(${t.receivedBy} = ${q.operator} or ${t.testOperator} = ${q.operator})`,
     );
   if (q.keyword) {
-    const k = `%${q.keyword.toLowerCase()}%`;
+    // 字段集对齐 msw 版 route（commissionCode/reportCode/receivedBy 三字段）；
+    // ilike 是纯增强（不改变 msw 区分大小写匹配的结果集语义边界）
+    const k = `%${q.keyword}%`;
     conds.push(
-      dsql`(lower(${t.commissionCode}) like ${k}
-        or lower(coalesce(${t.projectName}, '')) like ${k})`,
+      dsql`(${t.commissionCode} ilike ${k}
+        or ${t.reportCode} ilike ${k}
+        or ${t.receivedBy} ilike ${k})`,
     );
   }
   const where = and(...conds);
@@ -208,7 +211,12 @@ export async function applyFlowActionDb(
       .update(t)
       .set({
         flowStatus: to as never,
-        lastSubmittedBy: action === "submit" ? operator : null,
+        lastSubmittedBy:
+          action === "submit"
+            ? operator
+            : action === "withdraw"
+              ? null
+              : (r.lastSubmittedBy as never),
         issuedAt:
           action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
         flowHistory: hist as never,

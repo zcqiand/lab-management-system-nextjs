@@ -42,7 +42,12 @@ export async function GET(req: NextRequest) {
   if (contractId) items = items.filter((r) => r.contractId === contractId);
   if (categoryCode) items = items.filter((r) => r.categoryCode === categoryCode);
   if (lastSubmittedBy) items = items.filter((r) => r.lastSubmittedBy === lastSubmittedBy);
-  void operator;
+  // 语义对齐 db-queries listReceiptsDb：operator = receivedBy 或 testOperator 等值
+  if (operator)
+    items = items.filter(
+      (r) =>
+        (r.receivedBy ?? "") === operator || (r.testOperator ?? "") === operator,
+    );
   if (keyword)
     items = items.filter((r) => {
       const rec = r as { commissionCode?: string; reportCode?: string; receivedBy?: string };
