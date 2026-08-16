@@ -186,11 +186,31 @@ function buildRow(table: string, row: Record<string, unknown>): Record<string, u
 }
 
 async function insertTable(table: string, rows: Array<Record<string, unknown>>) {
+  const jsonb = JSONB_COLUMNS[table];
   for (const row of rows) {
     const cols = buildRow(table, row);
     const keys = Object.keys(cols);
-    // postgres-js v3 无 sql.join；用 unsafe(text, params) 一次成型。
-    // 文本传 jsonb 串，PG 侧按目标列自动 cast。
+    // postgres-js v3 两条插入路径（2026-08-16 Task 4 实测踩坑）：
+    //   普通表：unsafe(text, params) 一次成型（文本参数 OK，快路径）。
+    //   含 jsonb 列的表：unsafe 的参数即使写 $n::jsonb 也**双编码**成 jsonb
+    //   字符串标量（"[]" 而非 []，jsonb_array_length 报 22023）——unsafe 把
+    //   参数按 unknown literal 包装。tagged 模板才正确：postgres-js 对 JS
+    //   数组/对象自行 JSON 序列化（mapToDriverValue 链路）。
+    //   v3 无 sql.join，用手动 sql 片段 concat 拼 values 列表。
+    if (jsonb && keys.some((k) => jsonb.has(k))) {
+      const colList = keys.map((k) => `"${k}"`).join(", ");
+      let values: ReturnType<typeof sql> = sql``;
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i]!;
+        // buildRow 已把 jsonb 列 stringify（unsafe 时代的遗产）；tagged 路径
+        // 需要 JS 值让 postgres-js 自行序列化 → parse 回来。
+        const v = jsonb.has(k) && typeof cols[k] === "string" ? JSON.parse(cols[k] as string) : cols[k];
+        const piece = sql`${v}`;
+        values = i === 0 ? piece : sql`${values}, ${piece}`;
+      }
+      await sql`insert into ${sql.unsafe(`"${table}"`)} (${sql.unsafe(colList)}) values (${values})`;
+      continue;
+    }
     const text = `insert into "${table}" (${keys.map((k) => `"${k}"`).join(", ")})
       values (${keys.map((_, i) => `$${i + 1}`).join(", ")})`;
     await sql.unsafe(text, keys.map((k) => cols[k]));
