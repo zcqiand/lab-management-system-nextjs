@@ -91,6 +91,33 @@ flowchart TD
 |---|---|---|---|---|---|
 | A01 | 审核驳回 | 审核员 | 报告数据不合格 | flowStatus → `data_entered`，保留 test_records | M03.F05.I03 |
 | A02 | 批准驳回 | 批准人 | 报告签发前需改 | flowStatus → `data_entered`，保留 test_records | M03.F06.I03 |
+
+---
+
+## FLOW-03 认证流程（JWT 登录 / SSO 回调 / 登出）
+
+```mermaid
+flowchart LR
+    S01[未登录访问 /console/*] --> S02{有无 token?}
+    S02 -- 无 --> S03[路由守卫: router.replace /login]
+    S02 -- 有 --> S04[进业务页]
+    S03 --> S05[login-form: POST /api/auth/login]
+    S03 --> S06[SSO: 跳 saas 拿 token 回 /login]
+    S05 --> S07[写 token + 拉 /auth/permissions]
+    S06 --> S07
+    S07 --> S04
+    S04 --> S08[侧栏 LogOut: authStore.logout → /login]
+```
+
+| 步骤 | 名称 | 角色 | 触发条件 | 操作 | 支撑功能子项 |
+|---|---|---|---|---|---|
+| B01 | 路由守卫 | — | 进 (console)/* 但无 token | router.replace('/login') | M01.F04.I02 |
+| B02 | 动态菜单 | — | 进业务页 | 拉 /api/auth/menus?appId=app-lab 渲染侧栏 | M01.F04.I04 |
+| B03 | JWT 登录 | 用户 | 在 /login 提交用户名密码 | POST /api/auth/login → 写 token | M01.F05.I01 |
+| B04 | Token 校验 | 拦截器 | 任何 API 请求 | 注入 Authorization: Bearer | M01.F05.I02 |
+| B05 | SSO 统一登录 | 用户 | 在 /login 走 SSO 入口 | 跳 saas /login 拿 token 回 /login | M01.F05.I03 |
+| B06 | 会话同步 | — | SSO 回调拿到 token+user | 写 token + 拉 /auth/permissions 入 user | M01.F05.I04 |
+| B07 | 登出 | 用户 | 点侧栏 LogOut | authStore.logout 清 token → /login | M01.F05.I05 |
 | A03 | 任务清空 | 任务分配员 | 分配有误 | assignee=null；sample_receipt 保留 | M03.F02.I03 |
 
 ### 评审时问这四个问题
