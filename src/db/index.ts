@@ -1,24 +1,15 @@
 import "server-only";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pkg from "pg";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "./schema";
 
-/**
- * DB client — `pg` + drizzle-orm/node-postgres。
- *
- * 与 saas-identity-platform-nextjs 的差异：saas 用 postgres-js + drizzle-orm/postgres-js；
- * 本仓用裸 `pg` + drizzle-orm/node-postgres。
- * 理由：本仓是 infra 角色，db client 主要是**借链出口**（被 ../lab-management-system-shared
- * 的 sync-db.mjs 与 ../saas-identity-platform-nextjs 的 db.smoke.test.ts 借 require("pg")）。
- * 统一 driver 避免「借 `pg` 跑 raw query、本仓用 postgres-js 跑 drizzle」的双栈。
- *
- * 「server-only」：
- * - 本模块只允许 Route Handler / Server Action / Server Component 引入
- * - client component import：build 期会报 'server-only'
- * - 详见 profiles/nextjs.toml §[stack_rules].forbid + docs/conventions/nextjs.md
- */
-const { Pool } = pkg;
-
+// DB client — postgres-js + drizzle-orm（对齐 saas-identity-platform-nextjs/src/db/index.ts）。
+//
+// 「server-only」：只允许 Route Handler / Server Action / Server Component 引入；
+// vitest 由 tests/server-only.stub.ts alias 兜底。
+// pg（node-postgres）不再被 src/ 运行时引用，但仍留 devDependencies：
+// sync-db.mjs / borrow-pg.mjs 的借链走的是本仓 node_modules 顶层的 pg
+//（drizzle-orm 的 pg 只是 optional peer，npm 不会自动安装，物理包由 devDep 保证）。
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
   throw new Error(
@@ -26,8 +17,12 @@ if (!DATABASE_URL) {
   );
 }
 
-const pool = new Pool({ connectionString: DATABASE_URL, max: 10, idleTimeoutMillis: 20_000 });
+const client = postgres(DATABASE_URL, {
+  max: 10,
+  idle_timeout: 20,
+  connect_timeout: 10,
+});
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(client, { schema });
 export type Database = typeof db;
 export { schema };

@@ -20,7 +20,8 @@
     "borrow:pg:sibling": "node scripts/borrow-from-nextjs-pg.mjs",
     "emit:schema": "node scripts/emit-schema.mjs",
     "emit:dbml": "node scripts/v-sql-to-dbml.mjs",
-    "drizzle:pull": "drizzle-kit pull --config=drizzle.config.pg.ts"
+    "drizzle:pull": "drizzle-kit pull --config=drizzle.config.pg.ts",
+    "seed:db": "tsx scripts/seed-db.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -34,6 +35,7 @@
     "next": "^15.1.0",
     "orval": "^7.5.0",
     "pizzip": "^3.2.0",
+    "postgres": "^3.4.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1",
@@ -61,7 +63,7 @@
     "jsdom": "^25.0.1",
     "lucide-react": "^1.31.0",
     "msw": "^2.15.0",
-    "pg": "^8.13.1",
+    "pg": "^8.23.0",
     "prettier": "^3.4.0",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.6.0",
