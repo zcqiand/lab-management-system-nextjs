@@ -25,4 +25,4 @@ export interface DateRangeFilter {
 }
 
 export type { ExtFieldDef } from './ext-field-def';
-export type { ParamInterfaceRow, ParamInterfaceLink } from './param-interface';
+export type { ParamInterfaceRow, ParamInterfaceLink } from './inspection-param-interface';

@@ -130,7 +130,7 @@ export function EntryModal({
           API_ROUTES['/inspection-technical-requirements'],
           { params: { page: 1, pageSize: 500 } },
         ),
-        apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/param-interfaces'], {
+        apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/inspection-param-interfaces'], {
           params: { page: 1, pageSize: 500 },
         }),
         apiClient.get<{ items: ParamInterfaceLink[] }>(

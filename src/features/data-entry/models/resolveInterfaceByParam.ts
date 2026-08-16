@@ -20,7 +20,7 @@ export function resolveInterfaceByParam(
   const byCode = new Map(interfaces.map((i) => [i.code, i]))
   const byParam = new Map<string, ParamInterfaceLink[]>()
   for (const l of links) {
-    if (!byCode.has(l.paramInterfaceCode)) continue
+    if (!byCode.has(l.inspectionParamInterfaceCode)) continue
     const arr = byParam.get(l.inspectionParameterCode) ?? []
     arr.push(l)
     byParam.set(l.inspectionParameterCode, arr)
@@ -33,13 +33,13 @@ export function resolveInterfaceByParam(
     const pool = scoped.length ? scoped : generic
     if (pool.length === 0) continue
     const best = pool
-      .map((l) => byCode.get(l.paramInterfaceCode))
+      .map((l) => byCode.get(l.inspectionParamInterfaceCode))
       .filter((i): i is ParamInterfaceRow => !!i)
       .sort((a, b) => a.sortOrder - b.sortOrder)[0]
     if (best) {
       // 链接上的 config（如 gravel/sampleRows）优先，参数本身 config 作 fallback
       const linkConfig = pool.find(
-        (l) => byCode.get(l.paramInterfaceCode)?.code === best.code,
+        (l) => byCode.get(l.inspectionParamInterfaceCode)?.code === best.code,
       )?.config
       const config = linkConfig ?? best.config
       out[paramCode] = { componentPath: best.componentPath, config }

@@ -6,7 +6,7 @@ import { apiClient, API_ROUTES } from "@/api/legacy-client";
 test("API_ROUTES 映射的列表端点全部可达", async () => {
   const gets = [
     "/inspection-calculation-rules", "/inspection-objects", "/inspection-parameters",
-    "/inspection-standards", "/inspection-technical-requirements", "/param-interfaces",
+    "/inspection-standards", "/inspection-technical-requirements", "/inspection-param-interfaces",
     "/report-names", "/receipts", "/samples", "/test-records", "/summary",
   ] as const;
   for (const legacy of gets) {

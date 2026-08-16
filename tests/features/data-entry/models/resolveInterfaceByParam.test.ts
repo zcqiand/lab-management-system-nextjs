@@ -9,13 +9,13 @@ const interfaces = [
 
 describe('resolveInterfaceByParam', () => {
   it('一个参数绑一个界面 → 返回其 componentPath + config', () => {
-    const r = resolveInterfaceByParam(interfaces, [{ inspectionParameterCode: 'IP-1', paramInterfaceCode: 'cc' }])
+    const r = resolveInterfaceByParam(interfaces, [{ inspectionParameterCode: 'IP-1', inspectionParamInterfaceCode: 'cc' }])
     expect(r['IP-1']).toEqual({ componentPath: 'concrete-compress', config: { specimenCount: 3, area: 22500 } })
   })
   it('一个参数绑多个 → 取 sortOrder 最小的界面', () => {
     const r = resolveInterfaceByParam(interfaces, [
-      { inspectionParameterCode: 'IP-1', paramInterfaceCode: 'cc100' },
-      { inspectionParameterCode: 'IP-1', paramInterfaceCode: 'cc' },
+      { inspectionParameterCode: 'IP-1', inspectionParamInterfaceCode: 'cc100' },
+      { inspectionParameterCode: 'IP-1', inspectionParamInterfaceCode: 'cc' },
     ])
     expect(r['IP-1']!.componentPath).toBe('concrete-compress')
     expect((r['IP-1']!.config as { area: number }).area).toBe(22500) // cc (sortOrder 5) 胜出
@@ -25,7 +25,7 @@ describe('resolveInterfaceByParam', () => {
     expect(r['IP-9']).toBeUndefined()
   })
   it('link 指向不存在的界面 → 忽略', () => {
-    const r = resolveInterfaceByParam(interfaces, [{ inspectionParameterCode: 'IP-1', paramInterfaceCode: 'ghost' }])
+    const r = resolveInterfaceByParam(interfaces, [{ inspectionParameterCode: 'IP-1', inspectionParamInterfaceCode: 'ghost' }])
     expect(r['IP-1']).toBeUndefined()
   })
 })
@@ -37,9 +37,9 @@ describe('resolveInterfaceByParam 报告作用域', () => {
     { code: 'conn', componentPath: 'rebar-mech-numeric', sortOrder: 9, config: { formulaKey: 'tensile_strength', connection: true } },
   ]
   const links = [
-    { inspectionParameterCode: 'IP-0087', paramInterfaceCode: 'weld' }, // 通用（无作用域）= 焊接兜底
-    { inspectionParameterCode: 'IP-0087', paramInterfaceCode: 'mech', reportNameCode: 'RN-102-1' },
-    { inspectionParameterCode: 'IP-0087', paramInterfaceCode: 'conn', reportNameCode: 'RN-102-2' },
+    { inspectionParameterCode: 'IP-0087', inspectionParamInterfaceCode: 'weld' }, // 通用（无作用域）= 焊接兜底
+    { inspectionParameterCode: 'IP-0087', inspectionParamInterfaceCode: 'mech', reportNameCode: 'RN-102-1' },
+    { inspectionParameterCode: 'IP-0087', inspectionParamInterfaceCode: 'conn', reportNameCode: 'RN-102-2' },
   ]
   it('力学性能报告(RN-102-1) → 力学卡', () => {
     const r = resolveInterfaceByParam(ifaces, links, 'RN-102-1')

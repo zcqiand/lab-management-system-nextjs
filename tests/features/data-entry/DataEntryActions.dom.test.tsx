@@ -46,7 +46,7 @@ beforeEach(() => {
     http.get('*/api/test-records*', () =>
       HttpResponse.json({ items: [], total: 0 }),
     ),
-    http.get('*/api/param-interfaces/links*', () =>
+    http.get('*/api/inspection-param-interfaces/links*', () =>
       HttpResponse.json({ items: [] }),
     ),
     http.get('*/api/calculation-rules*', () =>

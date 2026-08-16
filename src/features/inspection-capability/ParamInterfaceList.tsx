@@ -2,12 +2,12 @@
 import { useEffect, useState } from 'react'
 // REF src/features/inspection-capability/ParamInterfaceList.tsx 移植。
 // 差异：apiClient → @/api/legacy-client + API_ROUTES（link 端点映射到
-// /api/param-interfaces/links）。
+// /api/inspection-param-interfaces/links）。
 import { apiClient, API_ROUTES } from '@/api/legacy-client'
 import { AssociationManager } from './AssociationManager'
 import { ParamInterfacePreviewModal } from './ParamInterfacePreviewModal'
 
-interface ParamInterface {
+interface InspectionParamInterface {
   id: string
   code: string
   name: string
@@ -20,7 +20,7 @@ interface ParamInterface {
 }
 
 interface ParamInterfaceParameterLink {
-  paramInterfaceCode: string
+  inspectionParamInterfaceCode: string
   inspectionParameterCode: string
 }
 interface InspectionParameter {
@@ -65,7 +65,7 @@ function AggregateList({ items, emptyText }: { items: string[]; emptyText: strin
 }
 
 export function ParamInterfaceList() {
-  const [rows, setRows] = useState<ParamInterface[]>([])
+  const [rows, setRows] = useState<InspectionParamInterface[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -78,12 +78,12 @@ export function ParamInterfaceList() {
   // 聚合列数据：参数界面 → 参数编码集，以及参数编码→名称
   const [paramByPi, setParamByPi] = useState<Record<string, string[]>>({})
   const [paramNameByCode, setParamNameByCode] = useState<Record<string, string>>({})
-  const [previewRow, setPreviewRow] = useState<ParamInterface | null>(null)
+  const [previewRow, setPreviewRow] = useState<InspectionParamInterface | null>(null)
 
   const load = () => {
     setLoading(true)
     apiClient
-      .get<{ items: ParamInterface[]; total: number }>(API_ROUTES['/param-interfaces'], {
+      .get<{ items: InspectionParamInterface[]; total: number }>(API_ROUTES['/inspection-param-interfaces'], {
         params: { page, pageSize: String(PAGE_SIZE) },
       })
       .then((res) => {
@@ -105,7 +105,7 @@ export function ParamInterfaceList() {
     ]).then(([paramRes, paramMasterRes]) => {
       const paramMap: Record<string, string[]> = {}
       for (const link of paramRes.data?.items ?? []) {
-        const pk = link.paramInterfaceCode ?? ''
+        const pk = link.inspectionParamInterfaceCode ?? ''
         const arr = paramMap[pk] ?? []
         if (link.inspectionParameterCode && !arr.includes(link.inspectionParameterCode)) arr.push(link.inspectionParameterCode)
         paramMap[pk] = arr
@@ -128,7 +128,7 @@ export function ParamInterfaceList() {
     setError(null)
     setFormOpen(true)
   }
-  const openEdit = (row: ParamInterface) => {
+  const openEdit = (row: InspectionParamInterface) => {
     setEditId(row.id)
     setSavedCode(row.code)
     setForm({
@@ -165,9 +165,9 @@ export function ParamInterfaceList() {
     }
     try {
       if (editId) {
-        await apiClient.put(`${API_ROUTES['/param-interfaces']}/${editId}`, payload)
+        await apiClient.put(`${API_ROUTES['/inspection-param-interfaces']}/${editId}`, payload)
       } else {
-        await apiClient.post(API_ROUTES['/param-interfaces'], payload)
+        await apiClient.post(API_ROUTES['/inspection-param-interfaces'], payload)
       }
       // 首次保存后允许跳转关联页签
       setSavedCode(form.code || null)
@@ -180,7 +180,7 @@ export function ParamInterfaceList() {
 
   const remove = async (id: string) => {
     try {
-      await apiClient.delete(`${API_ROUTES['/param-interfaces']}/${id}`)
+      await apiClient.delete(`${API_ROUTES['/inspection-param-interfaces']}/${id}`)
       load()
     } catch (err: unknown) {
       setError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '删除失败')
@@ -368,13 +368,14 @@ export function ParamInterfaceList() {
                 <AssociationManager
                   ariaLabel={`${savedCode} 关联检测参数`}
                   endpoint="/inspection-parameter-param-interfaces"
-                  parentParam="paramInterfaceCode"
+                  parentParam="inspectionParamInterfaceCode"
                   parentCode={savedCode}
                   targetLabel="检测参数"
                   targetEndpoint="/inspection-parameters"
                   targetParam="inspectionParameterCode"
                   targetValueKey="code"
                   targetTextKey="name"
+                  targetExtraTextKey="unit" // 显示 name · unit（如「凝结时间 · min」）
                   prefilter={{
                     label: '检测项目',
                     endpoint: '/inspection-objects',

@@ -1688,7 +1688,7 @@
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 paramInterfaceCode 全部存在于 param-interface.json",
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 inspectionParamInterfaceCode 全部存在于 inspection-param-interface.json",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了非默认录入卡",

@@ -79,7 +79,7 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
         apiClient.get<{ items: InspectionStandard[] }>(API_ROUTES['/inspection-standards'], { params: { page: '1', pageSize: '500' } }),
         apiClient.get<{ items: InspectionStandardParameter[] }>(API_ROUTES['/inspection-standard-parameters'], { params: { page: '1', pageSize: '500' } }),
         apiClient.get<{ items: InspectionTechnicalRequirement[] }>(API_ROUTES['/inspection-technical-requirements'], { params: { page: '1', pageSize: '500' } }),
-        apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/param-interfaces'], { params: { page: 1, pageSize: 500 } }),
+        apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/inspection-param-interfaces'], { params: { page: 1, pageSize: 500 } }),
         apiClient.get<{ items: ParamInterfaceLink[] }>(API_ROUTES['/inspection-parameter-param-interfaces'], { params: { pageSize: 10000 } }),
         apiClient.get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], { params: { page: '1', pageSize: '200' } }),
         apiClient.get<SampleReceipt>(`${API_ROUTES['/receipts']}/${receiptId}`),

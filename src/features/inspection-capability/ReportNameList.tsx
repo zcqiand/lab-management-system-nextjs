@@ -507,8 +507,8 @@ export function ReportNameList() {
                   targetEndpoint="/inspection-standards"
                   targetParam="inspectionStandardCode"
                   targetValueKey="code"
-                  targetTextKey="code"
-                  targetExtraTextKey="name"
+                  targetTextKey="name"
+                  targetExtraTextKey="code" // 显示 name · code（如「通用硅酸盐水泥 · GB 175-2023」）
                   extraFields={[
                     {
                       name: "role",
@@ -516,7 +516,7 @@ export function ReportNameList() {
                       type: "select",
                       options: ["TESTING", "JUDGMENT"],
                       valueLabels: { TESTING: "检测依据", JUDGMENT: "判定依据" },
-                      rowPrefix: { TESTING: "【检测依据】", JUDGMENT: "【判定依据】" },
+                      groupBy: true, // 按 role 分组显示（"检测依据" / "判定依据" 各自一段）
                     },
                   ]}
                   fnId="M06.F07.I05"
@@ -536,6 +536,7 @@ export function ReportNameList() {
                   targetParam="inspectionParameterCode"
                   targetValueKey="code"
                   targetTextKey="name"
+                  targetExtraTextKey="unit" // 显示 name · unit（如「凝结时间 · min」）
                   prefilter={{
                     label: "检测项目",
                     endpoint: "/inspection-objects",

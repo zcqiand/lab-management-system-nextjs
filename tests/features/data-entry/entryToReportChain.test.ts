@@ -10,8 +10,8 @@ import { resolveInterfaceByParam } from "@/features/data-entry/models/resolveInt
 import { MODEL_REGISTRY } from "@/features/data-entry/models/registry";
 import reportNames from "@/data/generated/inspection-report-name.json";
 import rnParams from "@/data/generated/inspection-report-name-parameter.json";
-import paramInterfaces from "@/data/generated/param-interface.json";
-import paramInterfaceLinks from "@/data/generated/inspection-parameter-param-interface.json";
+import inspectionParamInterfaces from "@/data/generated/inspection-param-interface.json";
+import inspectionParamInterfaceLinks from "@/data/generated/inspection-parameter-param-interface.json";
 import type { SampleReceipt, Sample, TestRecord } from "@/types/api";
 import type { OrgInfo } from "@/types/api";
 import type { ParamInterfaceRow, ParamInterfaceLink } from "@/types/common";
@@ -70,11 +70,11 @@ describe("录入卡 → 报告模板 取数链路", () => {
 
   fnTest(
     ["M06.F08.I04"],
-    "参数界面关联的 paramInterfaceCode 全部存在于 param-interface.json",
+    "参数界面关联的 inspectionParamInterfaceCode 全部存在于 inspection-param-interface.json",
     () => {
-      const codes = new Set((paramInterfaces as ParamInterfaceRow[]).map((p) => p.code));
-      const dangling = (paramInterfaceLinks as ParamInterfaceLink[]).filter(
-        (l) => !codes.has(l.paramInterfaceCode),
+      const codes = new Set((inspectionParamInterfaces as ParamInterfaceRow[]).map((p) => p.code));
+      const dangling = (inspectionParamInterfaceLinks as ParamInterfaceLink[]).filter(
+        (l) => !codes.has(l.inspectionParamInterfaceCode),
       );
       // 历史 bug：4 条关联把 componentPath('rebar-mech-numeric') 当成了 code，
       // resolveInterfaceByParam 会静默丢弃 → 录入页悄悄回退默认四格卡。
@@ -83,7 +83,7 @@ describe("录入卡 → 报告模板 取数链路", () => {
   );
 
   fnTest(["M06.F08.I04"], "每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件", () => {
-    const missing = (paramInterfaces as ParamInterfaceRow[])
+    const missing = (inspectionParamInterfaces as ParamInterfaceRow[])
       .map((p) => p.componentPath)
       .filter((cp) => !(cp in MODEL_REGISTRY));
     expect(missing).toEqual([]);
@@ -157,8 +157,8 @@ describe("录入卡 → 报告模板 取数链路", () => {
   });
 
   fnTest(["M06.F08.I04"], "模板 record:/srecord: 引用的参数都绑定了非默认录入卡", () => {
-    const interfaces = paramInterfaces as ParamInterfaceRow[];
-    const links = paramInterfaceLinks as ParamInterfaceLink[];
+    const interfaces = inspectionParamInterfaces as ParamInterfaceRow[];
+    const links = inspectionParamInterfaceLinks as ParamInterfaceLink[];
     // 结构化取数（record:/srecord:）只有在参数绑了会输出 JSON 的卡时才成立；
     // 回退到 DefaultParamCard 就是纯文本，模板路径必然取空。
     const cases: Array<[string, string]> = [

@@ -17,6 +17,12 @@ interface ExtraField {
   options?: string[];
   valueLabels?: Record<string, string>; // 枚举值 → 中文呈现（值仍存英文枚举）
   rowPrefix?: Record<string, string>; // 枚举值 → 行内前缀（如【检测依据】/*），有则不再显示后缀
+  /**
+   * 是否按此字段值分组渲染（替代 rowPrefix）
+   * - 设 true：用 valueLabels[role] 作为组标题（如"检测依据"），组内行不再有前缀
+   * - 适用于 role 字段（JUDGMENT/TESTING 分组），比行内前缀更可读
+   */
+  groupBy?: boolean;
 }
 
 /**
@@ -249,42 +255,107 @@ export function AssociationManager(props: Props) {
       )}
       <ul className="text-sm divide-y">
         {rows.length === 0 && <li className="px-1 py-2 text-gray-400">暂无关联</li>}
-        {rows.map((r) => {
-          const code = r[targetParam] ?? '';
-          // 行优先显示目标可读名称（如检测参数名），找不到再回退到 code
-          const target = targets.find((t) => t[targetValueKey] === code);
-          const display = target?.[targetTextKey] ?? code;
-          const extraText = targetExtraTextKey ? target?.[targetExtraTextKey] : undefined;
-          return (
-            <li
-              key={code + extraFields.map((f) => r[f.name] ?? "").join("#")}
-              className="flex items-center justify-between px-1 py-2"
-            >
-              <span>
-                {extraFields
-                  .filter((f) => f.rowPrefix)
-                  .map((f) => f.rowPrefix?.[r[f.name] ?? ""] ?? "")
-                  .join("")}
-                {display}
-                {extraText && extraText !== display ? ` · ${extraText}` : ""}
-                {showParameterObjects && (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
-                {extraFields
-                  .filter((f) => !f.rowPrefix)
-                  .map((f) => ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`)
-                  .join("")}
-              </span>
-              <button
-                type="button"
-                aria-label={`移除 ${code}`}
-                disabled={busy}
-                onClick={() => remove(code, r)}
-                className="text-red-600 hover:underline disabled:opacity-40"
+        {(() => {
+          // 找出第一个声明 groupBy 的字段（通常只一个：role）
+          const groupingField = extraFields.find((f) => f.groupBy);
+          if (groupingField) {
+            // 按 groupingField 值聚合行；空值排到最后
+            const groups = new Map<string, Array<Record<string, string>>>();
+            for (const r of rows) {
+              const k = r[groupingField.name] ?? "";
+              const arr = groups.get(k) ?? [];
+              arr.push(r);
+              groups.set(k, arr);
+            }
+            const orderedKeys = [...groups.keys()].sort((a, b) => {
+              if (!a) return 1;
+              if (!b) return -1;
+              return a.localeCompare(b);
+            });
+            const out: React.ReactNode[] = [];
+            for (const key of orderedKeys) {
+              if (key) {
+                out.push(
+                  <li
+                    key={`__hdr_${key}`}
+                    className="px-1 pt-3 pb-1 text-xs font-semibold text-gray-700 bg-gray-50 border-b"
+                    data-group-hdr={key}
+                  >
+                    {groupingField.valueLabels?.[key] ?? key}
+                  </li>,
+                );
+              }
+              for (const r of groups.get(key) ?? []) {
+                const code = r[targetParam] ?? "";
+                const target = targets.find((t) => t[targetValueKey] === code);
+                const display = target?.[targetTextKey] ?? code;
+                const extraText = targetExtraTextKey ? target?.[targetExtraTextKey] : undefined;
+                out.push(
+                  <li
+                    key={code + extraFields.map((f) => r[f.name] ?? "").join("#")}
+                    className="flex items-center justify-between px-1 py-2"
+                  >
+                    <span>
+                      {display}
+                      {extraText && extraText !== display ? ` · ${extraText}` : ""}
+                      {showParameterObjects && (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
+                      {extraFields
+                        .filter((f) => !f.rowPrefix && !f.groupBy)
+                        .map((f) => ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`)
+                        .join("")}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={`移除 ${code}`}
+                      disabled={busy}
+                      onClick={() => remove(code, r)}
+                      className="text-red-600 hover:underline disabled:opacity-40"
+                    >
+                      移除
+                    </button>
+                  </li>,
+                );
+              }
+            }
+            return out;
+          }
+          // 非分组模式保持原 rowPrefix 行为
+          return rows.map((r) => {
+            const code = r[targetParam] ?? "";
+            const target = targets.find((t) => t[targetValueKey] === code);
+            const display = target?.[targetTextKey] ?? code;
+            const extraText = targetExtraTextKey ? target?.[targetExtraTextKey] : undefined;
+            return (
+              <li
+                key={code + extraFields.map((f) => r[f.name] ?? "").join("#")}
+                className="flex items-center justify-between px-1 py-2"
               >
-                移除
-              </button>
-            </li>
-          );
-        })}
+                <span>
+                  {extraFields
+                    .filter((f) => f.rowPrefix)
+                    .map((f) => f.rowPrefix?.[r[f.name] ?? ""] ?? "")
+                    .join("")}
+                  {display}
+                  {extraText && extraText !== display ? ` · ${extraText}` : ""}
+                  {showParameterObjects && (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
+                  {extraFields
+                    .filter((f) => !f.rowPrefix)
+                    .map((f) => ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`)
+                    .join("")}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`移除 ${code}`}
+                  disabled={busy}
+                  onClick={() => remove(code, r)}
+                  className="text-red-600 hover:underline disabled:opacity-40"
+                >
+                  移除
+                </button>
+              </li>
+            );
+          });
+        })()}
       </ul>
       <div className="flex flex-wrap items-end gap-2">
         {prefilter && (

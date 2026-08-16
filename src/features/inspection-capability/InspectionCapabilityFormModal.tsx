@@ -356,6 +356,7 @@ export function InspectionCapabilityFormModal({
             targetParam="inspectionStandardCode"
             targetValueKey="code"
             targetTextKey="name"
+            targetExtraTextKey="code" // 显示 name · code（「通用硅酸盐水泥 · GB 175-2023」）
             extraFields={[
               {
                 name: "role",
@@ -363,7 +364,7 @@ export function InspectionCapabilityFormModal({
                 type: "select",
                 options: ["TESTING", "JUDGMENT"],
                 valueLabels: { TESTING: "检测依据", JUDGMENT: "判定依据" },
-                rowPrefix: { TESTING: "【检测依据】", JUDGMENT: "【判定依据】" },
+                groupBy: true, // 按 role 分组显示（"检测依据" / "判定依据" 各自一段）
               },
             ]}
             fnId="M06.F02.I04"
@@ -383,6 +384,7 @@ export function InspectionCapabilityFormModal({
             targetParam="inspectionParameterCode"
             targetValueKey="code"
             targetTextKey="name"
+            targetExtraTextKey="unit" // 显示 name · unit（「凝结时间 · min」）
             extraFields={[
               {
                 name: "qualificationLevel",
@@ -408,6 +410,7 @@ export function InspectionCapabilityFormModal({
             targetParam="inspectionParameterCode"
             targetValueKey="code"
             targetTextKey="name"
+            targetExtraTextKey="unit" // 显示 name · unit
             prefilter={{
               label: "检测项目",
               endpoint: "/inspection-objects",
