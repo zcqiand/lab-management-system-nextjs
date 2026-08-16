@@ -1,34 +1,43 @@
-// M06.F08 参数界面：GET/PUT/DELETE /api/inspection-param-interfaces/:id（id 或 code 皆可命中；
-// DELETE 内置（isOfficial）不可删 400——REF 语义）
+// M06.F08 参数界面：list + create。
+// GET  /api/inspection-param-interfaces → {items,total,page,pageSize}（msw dictCrud 同款：补 id=code）
+// POST /api/inspection-param-interfaces → 201（新建模型卡）
+//
+// 详情 GET/PUT/DELETE 走 /api/inspection-param-interfaces/[id]（/:id 命中 code 或 id）。
+// 本文件原本误把详情 handler 放在 list 路径下，导致 ReceiptDetail.tsx 的 Promise.all
+// 在 /inspection-param-interfaces?page=1&pageSize=500 处 500 → catch 吞掉 → setSamples
+// 从未执行 → /receipts/[id] 详情页 样品信息 整段空白。
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { inspectionParamInterfaces } from "@lab/management-system-msw/fixtures";
-import { notFound, badRequest, noContent, NOW } from "@/lib/api-helpers";
+import { pageOf, num, NOW, qp } from "@/lib/api-helpers";
 
-function findRow(id: string): Record<string, unknown> | undefined {
-  return (inspectionParamInterfaces as unknown as Record<string, unknown>[]).find(
-    (r) => r["id"] === id || r["code"] === id,
+export async function GET(req: NextRequest) {
+  const url = qp(req);
+  const items = (inspectionParamInterfaces as unknown as Record<string, unknown>[]).map((e) => ({
+    ...e,
+    id: String(e["id"] ?? e["code"]),
+  }));
+  return NextResponse.json(
+    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length || 1)),
   );
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const row = findRow(params.id);
-  if (!row) return notFound("InspectionParamInterface not found");
-  return Response.json(row);
-}
-
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const row = findRow(params.id);
-  if (!row) return notFound("InspectionParamInterface not found");
-  Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
-  return Response.json(row);
-}
-
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
-  const i = arr.findIndex((r) => r["id"] === params.id || r["code"] === params.id);
-  if (i < 0) return notFound("参数界面不存在");
-  if (arr[i]!["isOfficial"]) return badRequest("内置模型不可删除");
-  arr.splice(i, 1);
-  return noContent();
+export async function POST(req: NextRequest) {
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const code = String(body["code"] ?? "").trim();
+  if (!code) return NextResponse.json({ code: "BAD_REQUEST", message: "code 必填" }, { status: 400 });
+  const now = NOW();
+  const row = {
+    code,
+    name: String(body["name"] ?? ""),
+    componentPath: String(body["componentPath"] ?? ""),
+    description: String(body["description"] ?? ""),
+    isOfficial: Boolean(body["isOfficial"] ?? false),
+    sortOrder: Number(body["sortOrder"] ?? 0),
+    config: body["config"] ?? {},
+    createdAt: now,
+    updatedAt: now,
+  };
+  (inspectionParamInterfaces as unknown as Record<string, unknown>[]).push(row);
+  return NextResponse.json({ ...row, id: code }, { status: 201 });
 }

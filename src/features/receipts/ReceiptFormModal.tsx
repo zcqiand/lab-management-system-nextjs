@@ -176,18 +176,18 @@ export function ReceiptFormModal({
     Promise.all(
       selected.map((code) =>
         apiClient
-          .get<{ items: { standardCode: string; parameterCode: string }[] }>(
+          .get<{ items: { inspectionStandardCode: string; inspectionParameterCode: string }[] }>(
             API_ROUTES['/standard-parameters'],
             {
               params: { standardCode: code, page: 1, pageSize: 200 },
             },
           )
           .then((r) => r.data.items)
-          .catch(() => [] as { standardCode: string; parameterCode: string }[]),
+          .catch(() => [] as { inspectionStandardCode: string; inspectionParameterCode: string }[]),
       ),
     ).then((results) => {
       const set = new Set<string>()
-      results.forEach((items) => items.forEach((i) => set.add(i.parameterCode)))
+      results.forEach((items) => items.forEach((i) => set.add(i.inspectionParameterCode)))
       setSelectedParamCodes(set)
     })
   }, [judgmentBasis, testingBasis])

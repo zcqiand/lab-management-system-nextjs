@@ -7,6 +7,11 @@
 //
 // 跳过条件：pg 未装。
 // 这条测试**本身就是 infra 验收证据之一**——如果它跑通，shared/sync-db.mjs 借链也通。
+//
+// Schema 选择：用独立 schema `lab_smoke` 而非 `public`，避免 DROP/CREATE 公共 schema
+// 时把 seed-db 灌好的业务数据销毁（receipts-pg 等测试需要 public schema 已有数据才能跑）。
+// 2026-08-16 修复：原版每次跑都 DROP SCHEMA public CASCADE + replay，同 vitest session
+// 里后跑的 PG 测试因 schema 空而全炸；改用 lab_smoke 隔离后 smoke 自洁，public 不动。
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createRequire } from "node:module";
@@ -33,6 +38,7 @@ try {
 }
 
 const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_dev";
+const SMOKE_SCHEMA = "lab_smoke";
 
 describe("DB smoke (PG)", () => {
   if (!pgModule) {
@@ -60,10 +66,10 @@ describe("DB smoke (PG)", () => {
       return;
     }
 
-    // 清空 target schema，再 replay — emit-schema.mjs 的同款起点。
-    // 不这么做的话上一次 smoke 已经建好的表会让本轮 CREATE TABLE 全部撞名失败。
-    await client.query("DROP SCHEMA IF EXISTS public CASCADE");
-    await client.query("CREATE SCHEMA public");
+    // 用独立 schema 隔离（见文件头注释）。DROP/CREATE lab_smoke 不影响 public。
+    await client.query(`DROP SCHEMA IF EXISTS "${SMOKE_SCHEMA}" CASCADE`);
+    await client.query(`CREATE SCHEMA "${SMOKE_SCHEMA}"`);
+    await client.query(`SET search_path TO "${SMOKE_SCHEMA}"`);
 
     for (const f of files) {
       const sql = readFileSync(resolve(SHARED_SQL_DIR, f), "utf8");
@@ -99,15 +105,17 @@ describe("DB smoke (PG)", () => {
   it("has ≥24 tables after migrations", async () => {
     if (!client) return;
     const { rows } = await client.query(
-      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name",
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = $1 ORDER BY table_name`,
+      [SMOKE_SCHEMA],
     );
     expect(rows.length).toBeGreaterThanOrEqual(24);
   });
 
-  it("tenant_id column exists on ≥1 public table (V012 emit)", async () => {
+  it("tenant_id column exists on ≥1 table (V012 emit)", async () => {
     if (!client) return;
     const { rows } = await client.query(
-      "SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND column_name='tenant_id' LIMIT 1",
+      `SELECT 1 FROM information_schema.columns WHERE table_schema = $1 AND column_name='tenant_id' LIMIT 1`,
+      [SMOKE_SCHEMA],
     );
     expect(rows.length).toBeGreaterThanOrEqual(1);
   });

@@ -16,6 +16,14 @@ const hasPg = (() => {
   }
 })();
 
+// flowHistory jsonb 元素的最小形状（db-queries 侧类型是 unknown[]）
+interface FlowHistoryEntry {
+  action: string;
+  from?: string;
+  to?: string;
+  operator?: string;
+}
+
 describe("receipts 三态流转（pg）", () => {
   beforeAll(function (this: { skip(): void } & Record<string, unknown>) {
     if (!hasPg) this.skip();
@@ -31,7 +39,7 @@ describe("receipts 三态流转（pg）", () => {
     expect(r.total).toBeGreaterThan(0);
     for (const it of r.items) {
       expect(it.flowStatus).not.toBe("receiving");
-      expect((it.flowHistory as any[]).some((h) => h.action === "submit" && h.from === "receiving")).toBe(true);
+      expect((it.flowHistory as FlowHistoryEntry[]).some((h) => h.action === "submit" && h.from === "receiving")).toBe(true);
     }
   });
   it("flowStatus 直滤 + tenant 隔离", async () => {
@@ -50,7 +58,7 @@ describe("receipts 三态流转（pg）", () => {
     const after = await getReceiptDb(id);
     expect(after!.flowStatus).toBe("task_assignment");
     expect(after!.lastSubmittedBy).toBe("tester");
-    const hist = after!.flowHistory as any[];
+    const hist = after!.flowHistory as FlowHistoryEntry[];
     expect(hist[hist.length - 1]!.action).toBe("submit");
     // 还原（撤回 = 回退 + 清 lastSubmittedBy）
     await applyFlowActionDb(id, "withdraw", "tester");
@@ -78,7 +86,7 @@ describe("receipts 三态流转（pg）", () => {
     if (ret.ok) expect(ret.flowStatus).toBe("task_assignment");
     after = await getReceiptDb(id);
     expect(after!.lastSubmittedBy).toBe("tester");
-    const hist = after!.flowHistory as any[];
+    const hist = after!.flowHistory as FlowHistoryEntry[];
     expect(hist[hist.length - 1]!.action).toBe("return");
     // withdraw → 后退一阶 + 清 lastSubmittedBy，还原数据（回到 receiving）
     const w = await applyFlowActionDb(id, "withdraw", "tester");
