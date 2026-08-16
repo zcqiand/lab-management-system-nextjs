@@ -83,6 +83,12 @@ function standardRow(code: string): DictRow {
 }
 function synthesizeMissingDicts() {
   const std = new Set(inspectionStandards.map((r) => String(r.code)));
+  const before = [
+    inspectionBrands.length,
+    inspectionModels.length,
+    inspectionSpecs.length,
+    inspectionGrades.length,
+  ];
   const dicts: Array<[DictRow[], Set<string>]> = [
     [inspectionBrands, new Set(inspectionBrands.map((r) => String(r.code)))],
     [inspectionModels, new Set(inspectionModels.map((r) => String(r.code)))],
@@ -118,7 +124,7 @@ function synthesizeMissingDicts() {
       addStd.push(standardRow(String(t)));
     }
   }
-  return { addStd };
+  return { addStd, before };
 }
 
 // fixture 键 → 列名不一致的改写（toSnake 之后仍对不上 DB 列名的键）。
@@ -215,31 +221,63 @@ const NON_INT_TO_REMARK: Record<string, Record<string, string>> = {
   inspection_technical_requirements: { min_value: "minValue", max_value: "maxValue" },
 };
 
-// 就地按复合键去重（保首行）。PLAN 里表名是 snake_case，这里按 fixture 数组操作。
-function dedupe(rows: Array<Record<string, unknown>>, keys: string[]): number {
-  const seen = new Set<string>();
-  let dropped = 0;
+// 就地按复合键去重。PLAN 里表名是 snake_case，这里按 fixture 数组操作。
+// 保留策略：非空字段数最多的行胜（keep-first 会丢掉后行补全的 brand/grade/spec
+// 变体信息；同键变体行往往是后行更全）。平局时保首行（稳定）。
+function dedupe(
+  rows: Array<Record<string, unknown>>,
+  keys: string[],
+  table: string,
+): number {
+  const fullness = (r: Record<string, unknown>) =>
+    Object.values(r).filter((v) => v !== undefined && v !== null && v !== "").length;
+  const best = new Map<string, number>();
+  const dropped = new Set<number>();
   for (let i = 0; i < rows.length; i++) {
     const k = keys.map((key) => String(rows[i][key])).join(" ");
-    if (seen.has(k)) {
-      rows.splice(i, 1);
-      i--;
-      dropped++;
-    } else seen.add(k);
+    const cur = best.get(k);
+    if (cur === undefined) {
+      best.set(k, i);
+      continue;
+    }
+    if (fullness(rows[i]) > fullness(rows[cur])) {
+      dropped.add(cur);
+      best.set(k, i);
+    } else {
+      dropped.add(i);
+    }
   }
-  return dropped;
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (dropped.has(i)) rows.splice(i, 1);
+  }
+  if (dropped.size > 0) {
+    console.warn(
+      `dedupe ${table}: dropped ${dropped.size} variant rows (PK granularity)`,
+    );
+  }
+  return dropped.size;
 }
 
 async function main() {
-  const { addStd } = synthesizeMissingDicts();
-  inspectionStandards.push(...(addStd as typeof inspectionStandards));
+  // 顺序：先 dedupe 再 synthesize。反过来（旧序）会让 synthesize 扫到随后被
+  // dedupe 丢弃的 tech_req 变体行，合成只被死行引用的孤儿字典行（评审 Finding 1）。
   // 4 张复合 PK 表的 fixtures 粒度比 DDL 粗（tech_req 同 obj+param+std 下还有
-  // brand/grade/spec 变体行；objStd/pil 同理）。灌库前按 PK 去重（保留首行），
-  // 对账基线用去重后行数。msw fixtures 本身不动。
-  dedupe(technicalRequirements, ["inspectionObjectCode", "inspectionParameterCode", "judgmentStandardCode"]);
-  dedupe(inspectionObjectStandards, ["inspectionObjectCode", "inspectionStandardCode", "role"]);
-  dedupe(inspectionCalculationRules, ["inspectionObjectCode", "inspectionParameterCode"]);
-  dedupe(inspectionParamInterfaceLinks, ["inspectionParameterCode", "inspectionParamInterfaceCode"]);
+  // brand/grade/spec 变体行；objStd/pil 同理）。灌库前按 PK 去重（保留最全行，
+  // dropped 数打 warn — 评审 Finding 2），对账基线用去重后行数。msw fixtures 本身不动。
+  dedupe(technicalRequirements, ["inspectionObjectCode", "inspectionParameterCode", "judgmentStandardCode"], "inspection_technical_requirements");
+  dedupe(inspectionObjectStandards, ["inspectionObjectCode", "inspectionStandardCode", "role"], "inspection_object_standards");
+  dedupe(inspectionCalculationRules, ["inspectionObjectCode", "inspectionParameterCode"], "inspection_calculation_rules");
+  dedupe(inspectionParamInterfaceLinks, ["inspectionParameterCode", "inspectionParamInterfaceCode"], "inspection_param_interface_links");
+  const { addStd, before } = synthesizeMissingDicts();
+  const synth: Array<[string, number]> = [
+    ["inspection_brands", inspectionBrands.length - before[0]],
+    ["inspection_models", inspectionModels.length - before[1]],
+    ["inspection_specs", inspectionSpecs.length - before[2]],
+    ["inspection_grades", inspectionGrades.length - before[3]],
+    ["inspection_standards", addStd.length],
+  ];
+  for (const [t, n] of synth) console.log(`synthesize ${t}: +${n} rows`);
+  inspectionStandards.push(...(addStd as typeof inspectionStandards));
   const allTables = PLAN.map(([t]) => t);
   await sql`truncate table ${sql.unsafe(allTables.map((t) => `"${t}"`).join(", "))} restart identity cascade`;
   for (const [table, rows] of PLAN) {
