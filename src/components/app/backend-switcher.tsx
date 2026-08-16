@@ -42,7 +42,9 @@ export function BackendSwitcher() {
   }
 
   return (
-    <div className="border rounded p-2 text-sm bg-white">
+    // text-slate-900 显式声明：本组件嵌在深色侧边栏（bg-slate-900 text-white）里，
+    // bg-white 白底若不重设字色会继承 text-white -> 白底白字不可见。
+    <div className="border rounded p-2 text-sm bg-white text-slate-900">
       <div className="flex items-center gap-2">
         <span className="font-mono text-xs">backend:</span>
         <strong data-testid="backend-switcher-trigger" data-fn="M98.F01.I01">

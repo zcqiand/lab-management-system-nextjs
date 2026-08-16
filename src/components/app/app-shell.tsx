@@ -11,7 +11,7 @@
 import Link from "next/link";
 import { LogOut, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SidebarNav, useSaasMenus } from "@/components/app/sidebar-nav";
+import { SidebarNav, useSaasApp, useSaasMenus } from "@/components/app/sidebar-nav";
 import { BackendSwitcher } from "@/components/app/backend-switcher";
 import { useAuth } from "@/state/auth-context";
 import { useBackend } from "@/state/backend-context";
@@ -22,19 +22,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { token, clearToken } = useAuth();
   const { backend } = useBackend();
   const { data: menus } = useSaasMenus();
+  // 应用名来自 saas 公共应用目录（/api/v1/apps/<code> 反代），不写死在客户端
+  const { app } = useSaasApp();
 
   return (
     <div className="min-h-screen flex bg-slate-50">
       <SidebarNav
         menus={menus}
         appCode={APP_CODE}
+        appName={app?.name}
         footerExtras={<BackendSwitcher />}
         version={`lab-management-system-nextjs · 接线层 · appCode=${APP_CODE}`}
       />
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-14 bg-white border-b flex items-center px-6 gap-4">
-          <h1 className="text-base font-semibold">Lab Operational Console</h1>
+          <h1 className="text-base font-semibold" data-testid="appshell-app-name">
+            {app?.name ?? "Lab Operational Console"}
+          </h1>
           <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
+            <span className="font-mono">
+              应用=<span className="text-slate-900 font-medium">{app?.name ?? APP_CODE}</span>
+            </span>
             <span className="font-mono">
               backend=<span className="text-slate-900 font-medium">{backend}</span>
             </span>

@@ -76,6 +76,8 @@ interface SidebarNavProps {
   /** 从 /api/saas/me/menus?appCode= 拉到的本仓菜单树（顶层节点数组） */
   menus: MenuNode[] | null;
   appCode: string;
+  /** saas 注册的应用名（/api/saas/app 拉取）；缺省回退 Lab-Management */
+  appName?: string | null;
   /** Sidebar 底部主操作（如登出按钮） */
   footerAction?: React.ReactNode;
   /** 次要操作（如后端模式切换器） */
@@ -86,6 +88,7 @@ interface SidebarNavProps {
 export function SidebarNav({
   menus,
   appCode,
+  appName,
   footerAction,
   footerExtras,
   version = "lab-management-system-nextjs · 接线层",
@@ -105,7 +108,9 @@ export function SidebarNav({
             L
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold leading-tight truncate">Lab-Management</h1>
+            <h1 className="text-sm font-bold leading-tight truncate" data-testid="sidebar-app-name">
+              {appName ?? "Lab-Management"}
+            </h1>
             <p className="text-xs text-white/50 truncate">appCode = {appCode}</p>
           </div>
         </div>
@@ -249,6 +254,47 @@ export function useSaasMenus(): {
   }, []);
 
   return { data, loading, error };
+}
+
+/** 客户端 hook：拉 /api/saas/app?appCode=<code>（saas 公共应用目录）。
+ *  应用名不写死在客户端，由 saas 注册信息驱动；不可达时回退 null（调用方显示占位）。 */
+export function useSaasApp(): {
+  app: { code: string; name: string; description?: string; icon?: string } | null;
+  loading: boolean;
+  error: string | null;
+} {
+  const [app, setApp] = useState<{
+    code: string;
+    name: string;
+    description?: string;
+    icon?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch(`/api/saas/app?appCode=${encodeURIComponent(APP_CODE)}`, {
+      cache: "no-store",
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d: { code: string; name: string }) => {
+        if (cancelled) return;
+        setApp(d);
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError((err as Error).message ?? String(err));
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { app, loading, error };
 }
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
