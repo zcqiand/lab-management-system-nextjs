@@ -130,7 +130,7 @@
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致"
       ],
       "entry": [
-        "src\\app\\contracts\\page.tsx"
+        "src\\app\\(console)\\contracts\\page.tsx"
       ]
     },
     "M02.F01.I02": {
@@ -149,7 +149,7 @@
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新"
       ],
       "entry": [
-        "src\\app\\contracts\\page.tsx"
+        "src\\app\\(console)\\contracts\\page.tsx"
       ]
     },
     "M02.F01.I03": {
@@ -167,7 +167,7 @@
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id"
       ],
       "entry": [
-        "src\\app\\contracts\\page.tsx"
+        "src\\app\\(console)\\contracts\\page.tsx"
       ]
     },
     "M02.F01.I04": {
