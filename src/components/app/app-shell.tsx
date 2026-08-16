@@ -56,6 +56,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="outline"
                 size="sm"
+                data-fn="M01.F05.I05"
+                data-testid="logout-button"
                 onClick={() => {
                   clearToken();
                   window.location.href = "/login";

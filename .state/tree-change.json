@@ -1,104 +1,50 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "9cf4f2a3c5924190",
-  "summary": "M04.F06-F09 型号/规格/等级/牌号维护 4 码表页落地（移植 REF CategoryDictList）。4 F + 12 I 共 16 子项 规划→已上线；后端 /api/catalog/* 4 路由已就绪（2026-08-15 commit 838f2f8）。",
+  "base_sha": "b368a6f5903b0534",
+  "summary": "M01.F04/F05 认证管理集成层落地：7 个 I 子项 规划→已上线。layout 守卫 + sidebar 动态菜单 + login-form JWT 提交 + apiClient Bearer 拦截器 + /login SSO orchestrator + authStore.acceptSsoSession + app-shell 登出按钮全部就绪，需把现有代码的 data-fn / @entry 从 M98 demo ID 切到正式 ID。",
   "changes": [
     {
-      "id": "M04.F06",
+      "id": "M01.F04.I02",
       "action": "变更",
-      "name": "型号维护",
-      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+      "name": "路由守卫",
+      "reason": "规划→已上线：src/app/(console)/layout.tsx useEffect 检查 token, 无 token → router.replace('/login'); /api/** 与 /login 留组外不守卫"
     },
     {
-      "id": "M04.F07",
+      "id": "M01.F04.I04",
       "action": "变更",
-      "name": "规格维护",
-      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+      "name": "动态菜单",
+      "reason": "规划→已上线：src/components/app/sidebar-nav.tsx 拉 /api/auth/menus?appId=app-lab 按权限码显隐;分组无可见子项则隐藏"
     },
     {
-      "id": "M04.F08",
+      "id": "M01.F05.I01",
       "action": "变更",
-      "name": "等级维护",
-      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+      "name": "JWT 登录",
+      "reason": "规划→已上线：src/components/app/login-form.tsx onLogin → POST /api/auth/login → 拿 token 存 authStore;msw mock 层签发 JWT"
     },
     {
-      "id": "M04.F09",
+      "id": "M01.F05.I02",
       "action": "变更",
-      "name": "牌号维护",
-      "reason": "规划→已上线：移植 REF CategoryDictList 通用码表页（左侧检测项目树 + 右侧列表 + CRUD），后端 /api/catalog/* 已就绪"
+      "name": "Token 校验",
+      "reason": "规划→已上线：src/api/legacy-client.ts apiClient + identityClient request interceptor 注入 Bearer;response interceptor 401 跳 /login"
     },
     {
-      "id": "M04.F06.I01",
+      "id": "M01.F05.I03",
       "action": "变更",
-      "name": "型号列表",
-      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
+      "name": "SSO 统一登录",
+      "reason": "规划→已上线：src/app/login/page.tsx 调 /api/auth/sso/authorize 拿 authorizeUrl → window.location;回调 URL 带 code+state 走 /api/auth/sso/callback 换 token"
     },
     {
-      "id": "M04.F06.I02",
+      "id": "M01.F05.I04",
       "action": "变更",
-      "name": "型号新建/编辑",
-      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
+      "name": "身份会话同步",
+      "reason": "规划→已上线：src/state/authStore.ts acceptSsoSession 用身份平台 token+user 建会话,并从 /api/auth/permissions 拉权限集"
     },
     {
-      "id": "M04.F06.I03",
+      "id": "M01.F05.I05",
       "action": "变更",
-      "name": "型号删除",
-      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
-    },
-    {
-      "id": "M04.F07.I01",
-      "action": "变更",
-      "name": "规格列表",
-      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
-    },
-    {
-      "id": "M04.F07.I02",
-      "action": "变更",
-      "name": "规格新建/编辑",
-      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
-    },
-    {
-      "id": "M04.F07.I03",
-      "action": "变更",
-      "name": "规格删除",
-      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
-    },
-    {
-      "id": "M04.F08.I01",
-      "action": "变更",
-      "name": "等级列表",
-      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
-    },
-    {
-      "id": "M04.F08.I02",
-      "action": "变更",
-      "name": "等级新建/编辑",
-      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
-    },
-    {
-      "id": "M04.F08.I03",
-      "action": "变更",
-      "name": "等级删除",
-      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
-    },
-    {
-      "id": "M04.F09.I01",
-      "action": "变更",
-      "name": "牌号列表",
-      "reason": "规划→已上线：左侧检测项目树 + 右侧列表（REF 同款；拖拽 sortOrder 持久化本轮不做，与 REF 现状一致）"
-    },
-    {
-      "id": "M04.F09.I02",
-      "action": "变更",
-      "name": "牌号新建/编辑",
-      "reason": "规划→已上线：新建/编辑弹窗（检测项目 + 名称 + 备注）"
-    },
-    {
-      "id": "M04.F09.I03",
-      "action": "变更",
-      "name": "牌号删除",
-      "reason": "规划→已上线：删除确认（引用保护后端 M04.F05 技术要求侧实现）"
+      "name": "登出",
+      "reason": "规划→已上线：src/components/app/app-shell.tsx 侧边栏底部 LogOut 按钮 → authStore.logout 清 token/user → router.replace('/login')"
     }
   ],
   "sync_files": []

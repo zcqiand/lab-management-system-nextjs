@@ -153,6 +153,8 @@ export function SidebarNav({
         effectiveCollapsed ? "w-14" : "w-60",
       )}
       data-collapsed={effectiveCollapsed}
+      data-fn="M01.F04.I04"
+      data-testid="sidebar-nav"
       aria-label="主导航"
     >
       <div className={cn("flex items-center py-4 border-b border-white/10", effectiveCollapsed ? "px-2 justify-center" : "px-5")}>

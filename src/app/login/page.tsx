@@ -90,7 +90,11 @@ export default function LoginPage() {
   }, [backend, baseUrl, router, setToken, token]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 p-4">
+    <div
+      className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 p-4"
+      data-fn="M01.F05.I03"
+      data-testid="login-page-sso-orchestrator"
+    >
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-2">
           <CardTitle className="text-lg">实验室管理系统-Next.js</CardTitle>

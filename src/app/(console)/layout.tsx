@@ -36,7 +36,11 @@ export default function ConsoleLayout({
   // hydrate 完成前 token 是 null（避免 SSR/CSR mismatch）
   if (!hydrated || !token) {
     return (
-      <main className="min-h-screen flex items-center justify-center text-sm text-slate-500">
+      <main
+        data-fn="M01.F04.I02"
+        data-testid="console-layout-guard"
+        className="min-h-screen flex items-center justify-center text-sm text-slate-500"
+      >
         未登录，跳 /login 中...
       </main>
     );

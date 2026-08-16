@@ -50,7 +50,7 @@ export function LoginForm() {
       <button
         onClick={onLogin}
         data-testid="login-submit"
-        data-fn="M98.F03.I02"
+        data-fn="M01.F05.I01"
         className="border rounded px-3 py-1 text-sm"
       >
         登录（POST /api/auth/login）

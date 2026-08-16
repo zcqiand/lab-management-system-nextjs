@@ -143,18 +143,18 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M01.F04.I01 | RBAC 角色权限 | 接口 | admin（全部权限）/ technician（受限权限）两级角色 | 已废弃 |
-| M01.F04.I02 | 路由守卫 | 接口 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 规划 |
+| M01.F04.I02 | 路由守卫 | 接口 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
 | M01.F04.I03 | 权限指令 | 接口 | 按权限码动态渲染/卸载 UI 元素；无权限元素从 DOM 移除 | 已废弃 |
-| M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=app-lab 下发，按权限码显隐；分组无可见子项则隐藏 | 规划 |
+| M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=app-lab 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M01.F05.I01 | JWT 登录 | 接口 | 用户名+密码登录，MSW mock 层签发 JWT token | 规划 |
-| M01.F05.I02 | Token 校验 | 接口 | 请求拦截器注入 Bearer token，token 失效跳转登录 | 规划 |
-| M01.F05.I03 | SSO 统一登录 | 接口 | 授权码流：跳转身份平台授权端点→回调换 token→建立会话；state 校验防 CSRF | 规划 |
-| M01.F05.I04 | 身份会话同步 | 接口 | 用身份平台 token+user 建会话，并从 /auth/permissions 拉取权限集（机构=租户 1:1） | 规划 |
-| M01.F05.I05 | 登出 | 接口 | Layout 侧边栏底部展示当前用户 + 退出按钮：点击调 authStore.logout() 清 token/user 并跳 /login | 规划 |
+| M01.F05.I01 | JWT 登录 | 接口 | 用户名+密码登录，MSW mock 层签发 JWT token | 已上线 |
+| M01.F05.I02 | Token 校验 | 接口 | 请求拦截器注入 Bearer token，token 失效跳转登录 | 已上线 |
+| M01.F05.I03 | SSO 统一登录 | 接口 | 授权码流：跳转身份平台授权端点→回调换 token→建立会话；state 校验防 CSRF | 已上线 |
+| M01.F05.I04 | 身份会话同步 | 接口 | 用身份平台 token+user 建会话，并从 /auth/permissions 拉取权限集（机构=租户 1:1） | 已上线 |
+| M01.F05.I05 | 登出 | 接口 | Layout 侧边栏底部展示当前用户 + 退出按钮：点击调 authStore.logout() 清 token/user 并跳 /login | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |

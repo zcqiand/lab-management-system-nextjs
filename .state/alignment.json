@@ -6,8 +6,26 @@
     "features": 31,
     "items": 116
   },
-  "warnings_total": 0,
-  "warnings": {},
+  "warnings_total": 13,
+  "warnings": {
+    "已上线但无设计映射": [
+      "M01.F04.I02",
+      "M01.F04.I04",
+      "M01.F05.I01",
+      "M01.F05.I02",
+      "M01.F05.I03",
+      "M01.F05.I04",
+      "M01.F05.I05"
+    ],
+    "已上线但不在任何流程且非孤儿白名单": [
+      "M01.F04.I02",
+      "M01.F04.I04",
+      "M01.F05.I01",
+      "M01.F05.I02",
+      "M01.F05.I03",
+      "M01.F05.I04"
+    ]
+  },
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -22,12 +40,13 @@
     },
     "M01.F04.I02": {
       "name": "路由守卫",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [],
       "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：SUBMIT 转换正确",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：终态 approved 不可逆",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::完整正向流程：draft → submitted → testing → review → approved",
@@ -38,7 +57,9 @@
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）"
       ],
-      "entry": []
+      "entry": [
+        "src\\app\\(console)\\layout.tsx"
+      ]
     },
     "M01.F04.I03": {
       "name": "权限指令",
@@ -52,68 +73,91 @@
     },
     "M01.F04.I04": {
       "name": "动态菜单",
-      "status": "规划",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
-    },
-    "M01.F05.I01": {
-      "name": "JWT 登录",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [],
       "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04"
+      ],
+      "entry": [
+        "src\\components\\app\\sidebar-nav.tsx"
+      ]
+    },
+    "M01.F05.I01": {
+      "name": "JWT 登录",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 返回 token + user",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造",
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造"
       ],
-      "entry": []
+      "entry": [
+        "src\\components\\app\\login-form.tsx"
+      ]
     },
     "M01.F05.I02": {
       "name": "Token 校验",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer"
+      ],
+      "entry": [
+        "src\\api\\legacy-client.ts"
+      ]
     },
     "M01.F05.I03": {
       "name": "SSO 统一登录",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）"
+      ],
+      "entry": [
+        "src\\app\\login\\page.tsx"
+      ]
     },
     "M01.F05.I04": {
       "name": "身份会话同步",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪"
+      ],
+      "entry": [
+        "src\\state\\authStore.ts"
+      ]
     },
     "M01.F05.I05": {
       "name": "登出",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [
         "docs\\design\\flow-function-map.md"
       ],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05"
+      ],
+      "entry": [
+        "src\\components\\app\\app-shell.tsx"
+      ]
     },
     "M02.F01.I01": {
       "name": "合同列表",
@@ -1877,9 +1921,7 @@
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId"
       ],
-      "entry": [
-        "src\\components\\app\\login-form.tsx"
-      ]
+      "entry": []
     },
     "M98.F03.I03": {
       "name": "POST /api/auth/logout",

@@ -58,6 +58,9 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
+      // @entry M01.F05.I04
+      //   SSO 回调（/login?code=&state=）拿到 token+user 后建会话：写 token，
+      //   拉 /auth/permissions 拿权限集并入 user，标记 authenticated。
       acceptSsoSession: async (token, user) => {
         setToken(token)
         try {
