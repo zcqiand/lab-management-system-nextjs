@@ -1,50 +1,14 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "b368a6f5903b0534",
-  "summary": "M01.F04/F05 认证管理集成层落地：7 个 I 子项 规划→已上线。layout 守卫 + sidebar 动态菜单 + login-form JWT 提交 + apiClient Bearer 拦截器 + /login SSO orchestrator + authStore.acceptSsoSession + app-shell 登出按钮全部就绪，需把现有代码的 data-fn / @entry 从 M98 demo ID 切到正式 ID。",
+  "base_sha": "5f9781daaba25bcd",
+  "summary": "M98 M 级行状态漏标修正：F01/F02/F03 + 全部 11 条 I 级子项均已上线（BackendSwitcher / http-client 注入 / 5 个 API routes），唯 M 级总行（L45）仍是「规划」。翻为已上线与子项一致（react/vue 仓 M98 M 级行同期已翻）。",
   "changes": [
     {
-      "id": "M01.F04.I02",
+      "id": "M98",
       "action": "变更",
-      "name": "路由守卫",
-      "reason": "规划→已上线：src/app/(console)/layout.tsx useEffect 检查 token, 无 token → router.replace('/login'); /api/** 与 /login 留组外不守卫"
-    },
-    {
-      "id": "M01.F04.I04",
-      "action": "变更",
-      "name": "动态菜单",
-      "reason": "规划→已上线：src/components/app/sidebar-nav.tsx 拉 /api/auth/menus?appId=app-lab 按权限码显隐;分组无可见子项则隐藏"
-    },
-    {
-      "id": "M01.F05.I01",
-      "action": "变更",
-      "name": "JWT 登录",
-      "reason": "规划→已上线：src/components/app/login-form.tsx onLogin → POST /api/auth/login → 拿 token 存 authStore;msw mock 层签发 JWT"
-    },
-    {
-      "id": "M01.F05.I02",
-      "action": "变更",
-      "name": "Token 校验",
-      "reason": "规划→已上线：src/api/legacy-client.ts apiClient + identityClient request interceptor 注入 Bearer;response interceptor 401 跳 /login"
-    },
-    {
-      "id": "M01.F05.I03",
-      "action": "变更",
-      "name": "SSO 统一登录",
-      "reason": "规划→已上线：src/app/login/page.tsx 调 /api/auth/sso/authorize 拿 authorizeUrl → window.location;回调 URL 带 code+state 走 /api/auth/sso/callback 换 token"
-    },
-    {
-      "id": "M01.F05.I04",
-      "action": "变更",
-      "name": "身份会话同步",
-      "reason": "规划→已上线：src/state/authStore.ts acceptSsoSession 用身份平台 token+user 建会话,并从 /api/auth/permissions 拉权限集"
-    },
-    {
-      "id": "M01.F05.I05",
-      "action": "变更",
-      "name": "登出",
-      "reason": "规划→已上线：src/components/app/app-shell.tsx 侧边栏底部 LogOut 按钮 → authStore.logout 清 token/user → router.replace('/login')"
+      "name": "frontend 接线层",
+      "reason": "规划→已上线：M98.F01/F02/F03 与 11 条 I 级子项全部已上线（见 L108-135 各行）；M 级行漏翻，本批对齐 react/vue 仓同款状态"
     }
   ],
   "sync_files": []

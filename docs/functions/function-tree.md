@@ -42,7 +42,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M05 | 数据统计 | 报告汇总表（按报告名称） | 规划 |
 | M06 | 检测能力 | 检测专项/项目/参数/标准/计算规则/技术要求/报告名称/参数界面 | 规划 |
 | M97 | schema emit infrastructure | lab-management-system-shared V*.sql → {schema.sql, schema.dbml, schema.ts} + pg 借链 | 规划 |
-| M98 | frontend 接线层 | 4-backend 切换 + apiclient + Next.js API routes（自身作后端） | 规划 |
+| M98 | frontend 接线层 | 4-backend 切换 + apiclient + Next.js API routes（自身作后端） | 已上线 |
 
 ---
 
