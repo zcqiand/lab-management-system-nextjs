@@ -1,25 +1,16 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "Wave 4 代码/提案双轨收口（M05.F01 / M05.F01.I01 翻 已上线）",
+  "current_task": "2026-08-18 M98 M 级行漏标修正（commit d4394f7），gate 0 软告警",
   "done": [
-    "/tree-change --approve Wave 4 提案 .state/tree-change.json (base=71d503cbd) — 一次令牌",
-    "docs/functions/function-tree.md:70 + 267 把 M05.F01 / M05.F01.I01 从 规划 改 已上线，对齐代码 HEAD 8f9dd4c",
-    "commit 15102aa feat(nextjs): Wave 4 tree-change 收口 — push origin",
-    "设计/流程映射表 design-function-map.md:87 / flow-function-map.md:57 早已记 已上线，未动",
-    "gate L0..L5 重跑 156 功能 0 软告警 (exit 0)"
+    "tree-change（已批）：M98 M 级行 规划→已上线——F01/F02/F03 + 11 条 I 级子项早已上线唯 M 行漏翻；gate L0-L5 全绿 0 软告警",
+    "react/vue 仓已按本仓认证模型收口（砍表单+选租户页），本仓无需改动"
   ],
-  "next": "Wave 4 之后加 Wave 5 时，(1) 先写 .state/tree-change.json approved=false；(2) 务必走 /tree-change skill 拿批准令牌再动 docs/functions/function-tree.md。先代码后抹 tree-change 是 CLAUDE.md 红线。",
+  "next": "下批无紧急欠账。可选：① M00.F01/F02（GET /auth/me 会话 / switch-tenant）M98.F03.I02/I05 后端已有路由，前端无消费方——若要做先走 tree-change ② data-entry Soil 两张卡（SoilCompaction/Degree）补卡级测试（react/vue 都有，本仓缺）",
   "open_questions": [
-    "Wave 4 与 Wave 3 间隔约 2 个月，期间有 22 个跨 commit 推进（5940239 → 8f9dd4c → 15102aa）。是否要 dot 补交中间这 22 个 commit 的 tree-change 提案？接受：代码 + tree 事实一致；拒绝：22 个提案重复劳动。",
-    "M97/M98 (frontend 接线) tree 状态是否要补走提案链？"
+    "M00 前端消费方要不要做（nextjs 树 M00.F01/F02 仍规划）：等 saas 侧租户下发链路定了再动"
   ],
   "dont": [
-    "不要 approved=true 手动写进 .state/tree-change.json —— pre_tool_use_guard.py 会拦 模型无权批准自己的变更。必须 echo y | python scripts/tree_change.py -p X --approve，wall 拿到令牌才能动 function-tree.md",
-    "不要忘同步设计/流程映射表 —— function-tree.md 翻 已上线 后 design/flow-function-map.md 表头要相应加一行；L5 检查会看到 已上线但无设计映射 软告警",
-    "不要跳过对提案 base_sha 过远的检查 —— 提案语义是 这批改动已具备落地条件，不是 代码必须停在 base。看到 base 远落后 HEAD 不一定是错。git fetch + git log origin/master | grep base_sha 验证 base 之后所有 commit 是 该提案下的完成项"
-  ],
-  "last_gate_passed_at": "2026-08-15T21:30+08:00",
-  "active_branch": "master",
-  "ahead_of_origin": "0"
+    "无"
+  ]
 }
