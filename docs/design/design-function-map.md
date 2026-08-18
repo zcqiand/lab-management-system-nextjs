@@ -69,12 +69,19 @@
 | M06.F05.I02 | src/features/inspection-capability/TwoLevelObjectStandardTree.tsx (行内新建/编辑) | POST /api/inspection-calculation-rules ; PUT 同/:id | inspection_calculation_rule | M06.F05.I02 | – | 已上线 |
 | M06.F05.I03 | src/features/inspection-capability/TwoLevelObjectStandardTree.tsx (行内删除) | DELETE /api/inspection-calculation-rules/:id | inspection_calculation_rule | M06.F05.I03 | – | 已上线 |
 | M06.F06.I01 | src/features/inspection-capability/TechnicalRequirementList.tsx | GET /api/inspection-technical-requirements | inspection_technical_requirement | M06.F06.I01 | – | 已上线 |
+| M06.F06.I02 | src/features/inspection-capability/TwoLevelObjectStandardTree.tsx (行内新建/编辑) | POST /api/inspection-technical-requirements ; PUT 同/:id | inspection_technical_requirement | M06.F06.I02 | – | 已上线 |
+| M06.F06.I03 | src/features/inspection-capability/TwoLevelObjectStandardTree.tsx (行内删除) | DELETE /api/inspection-technical-requirements/:id | inspection_technical_requirement | M06.F06.I03 | – | 已上线 |
 | M06.F07.I01 | src/features/inspection-capability/ReportNameList.tsx | GET /api/inspection-report-names | inspection_report_name | M06.F07.I01 | – | 已上线 |
 | M06.F07.I02 | src/features/inspection-capability/ReportNameList.tsx (新建/编辑) | POST /api/inspection-report-names ; PUT 同/:id | inspection_report_name | M06.F07.I02 | – | 已上线 |
 | M06.F07.I03 | src/features/inspection-capability/ReportNameList.tsx (行内删除) | DELETE /api/inspection-report-names/:id | inspection_report_name | M06.F07.I03 | – | 已上线 |
+| M06.F07.I04 | src/features/inspection-capability/ReportNameList.tsx (编辑弹窗 objects 页签) | POST /api/inspection-report-names/links/object ; DELETE 同 | inspection_object_report_name | M06.F07.I04 | – | 已上线 |
+| M06.F07.I05 | src/features/inspection-capability/ReportNameList.tsx (编辑弹窗 standards 页签 role=TESTING) | POST /api/inspection-report-names/links/standard ; DELETE 同 | inspection_report_name_standard | M06.F07.I05 | – | 已上线 |
+| M06.F07.I06 | src/features/inspection-capability/ReportNameList.tsx (编辑弹窗 standards 页签 role=JUDGMENT) | POST /api/inspection-report-names/links/standard ; DELETE 同 | inspection_report_name_standard | M06.F07.I06 | – | 已上线 |
+| M06.F07.I07 | src/features/inspection-capability/ReportNameList.tsx (编辑弹窗 parameters 页签) | POST /api/inspection-report-names/links/parameter ; DELETE 同 | inspection_report_name_parameter | M06.F07.I07 | – | 已上线 |
 | M06.F07.I08 | src/features/inspection-capability/ReportNameList.tsx (extFields 编辑器) | PATCH /api/inspection-report-names/:id (extFields JSON) | inspection_report_name | M06.F07.I08 | – | 已上线 |
 | M06.F08.I01 | src/features/inspection-capability/ParamInterfaceList.tsx | GET /api/param-interfaces | inspection_param_interface | M06.F08.I01 | – | 已上线 |
 | M06.F08.I02 | src/features/inspection-capability/ParamInterfaceList.tsx (新建/编辑) | POST /api/param-interfaces ; PUT 同/:id | inspection_param_interface | M06.F08.I02 | – | 已上线 |
+| M06.F08.I03 | src/features/inspection-capability/ParamInterfaceList.tsx (行内删除) | DELETE /api/param-interfaces/:id | inspection_param_interface | M06.F08.I03 | – | 已上线 |
 | M06.F08.I04 | src/features/inspection-capability/ParamInterfaceList.tsx (关联参数页签) | POST /api/inspection-parameter-param-interfaces ; DELETE 同 | inspection_parameter_param_interface | M06.F08.I04 | – | 已上线 |
 | M06.F08.I05 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (列表行预览按钮) | – (本地渲染) | inspection_param_interface | M06.F08.I05 | – | 已上线 |
 | M06.F08.I06 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (弹窗) | – (本地渲染) | inspection_param_interface | M06.F08.I06 | – | 已上线 |

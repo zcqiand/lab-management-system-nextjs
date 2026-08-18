@@ -1,20 +1,98 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "7f3ad48fe6296819",
-  "summary": "M03.F03 新增 2 条 I 级子项：I08 检测记录列表 API（GET /api/test-records）+ I09 创建检测记录 API（POST /api/test-records）。背景：b22a4d0（springboot B9.3 仓间联动）在 src/app/api/test-records/route.ts 加了 @entry 锚点，但沿用了 springboot 侧编号（GET→I06/POST→I08），nextjs 树从未登记 I08+，且本仓 I06 已被「人工改判」占用，造成 L5 悬空引用 + 语义错标。本批补登记 I08/I09 并同步修正锚点，L5 转绿。",
+  "base_sha": "106cd8db319fb082",
+  "summary": "M06 维护面 15 条 I 级 规划→已上线：代码实际在 7b4f417（M06 检测能力大批次）+ b0d1409（param-interfaces 更名 V013 对齐 wip）已实现并接线页面，但树状态从未翻绿——本批补 14 例 fnTest（maintenance.dom.test.tsx）验证 wip 健康后统一翻状态，软告警保持 0。",
   "changes": [
     {
-      "id": "M03.F03.I08",
-      "action": "新增",
-      "name": "检测记录列表 API",
-      "reason": "GET /api/test-records?sampleId=&receiptId=&page=&pageSize= 已实现（src/app/api/test-records/route.ts），receiptId 经 receipt→samples 归集；springboot 对称端点为 M03.F03.I06（列表），本仓 I06 已被人工改判占用，顺延用 I08；@entry 锚点从误标的 I06 改正"
+      "id": "M06.F05.I02",
+      "action": "变更",
+      "name": "计算规则新建/编辑",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
     },
     {
-      "id": "M03.F03.I09",
-      "action": "新增",
-      "name": "创建检测记录 API",
-      "reason": "POST /api/test-records 已实现（同文件）；springboot 对称端点为 M03.F03.I08（创建），本仓顺延用 I09；修正原悬空锚点 I08→I09"
+      "id": "M06.F05.I03",
+      "action": "变更",
+      "name": "计算规则删除",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F06.I02",
+      "action": "变更",
+      "name": "技术要求新建/编辑",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F06.I03",
+      "action": "变更",
+      "name": "技术要求删除",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I02",
+      "action": "变更",
+      "name": "报告名称新建/编辑",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I03",
+      "action": "变更",
+      "name": "报告名称删除",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I04",
+      "action": "变更",
+      "name": "关联检测项目",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I05",
+      "action": "变更",
+      "name": "关联检测依据",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I06",
+      "action": "变更",
+      "name": "关联判定依据",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F07.I07",
+      "action": "变更",
+      "name": "关联检测参数",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F08.I01",
+      "action": "变更",
+      "name": "参数界面列表",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F08.I02",
+      "action": "变更",
+      "name": "参数界面新建/编辑",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F08.I03",
+      "action": "变更",
+      "name": "参数界面删除",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F08.I05",
+      "action": "变更",
+      "name": "参数界面预览",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+    },
+    {
+      "id": "M06.F08.I06",
+      "action": "变更",
+      "name": "参数界面预览弹窗",
+      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
     }
   ],
   "sync_files": [

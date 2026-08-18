@@ -306,37 +306,37 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M06.F05.I01 | 计算规则列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：算法类型/试件数/备注 | 已上线 |
-| M06.F05.I02 | 计算规则新建/编辑 | 接口 | 维护原始数据到检测结果的算法和适用条件 | 规划 |
-| M06.F05.I03 | 计算规则删除 | 接口 | 删除未被检测数据引用的计算规则 | 规划 |
+| M06.F05.I02 | 计算规则新建/编辑 | 接口 | 维护原始数据到检测结果的算法和适用条件 | 已上线 |
+| M06.F05.I03 | 计算规则删除 | 接口 | 删除未被检测数据引用的计算规则 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M06.F06.I01 | 技术要求列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：判定模式/限值/备注 | 已上线 |
-| M06.F06.I02 | 技术要求新建/编辑 | 接口 | 维护单项评定条件、限值、表达式、来源和判定模式 | 规划 |
-| M06.F06.I03 | 技术要求删除 | 接口 | 删除未被检测结果引用的技术要求 | 规划 |
+| M06.F06.I02 | 技术要求新建/编辑 | 接口 | 维护单项评定条件、限值、表达式、来源和判定模式 | 已上线 |
+| M06.F06.I03 | 技术要求删除 | 接口 | 删除未被检测结果引用的技术要求 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M06.F07.I01 | 报告名称列表 | 接口 | 展示 code/name/description/排序，按 sortOrder 排序，含关联项目/标准/参数计数 | 已上线 |
-| M06.F07.I02 | 报告名称新建/编辑 | 接口 | 维护 code/name/sortOrder/description | 规划 |
-| M06.F07.I03 | 报告名称删除 | 接口 | 删除保护：被关联项目/标准/参数引用时拒绝 | 规划 |
-| M06.F07.I04 | 关联检测项目 | 接口 | 维护 InspectionObjectReportName 中间表 | 规划 |
-| M06.F07.I05 | 关联检测依据 | 接口 | 维护 InspectionReportNameStandard role=TESTING | 规划 |
-| M06.F07.I06 | 关联判定依据 | 接口 | 维护 InspectionReportNameStandard role=JUDGMENT | 规划 |
-| M06.F07.I07 | 关联检测参数 | 接口 | 维护 InspectionReportNameParameter 中间表；prefilter 弹窗（先选检测项目→过滤参数）+ 参数清单行追加「· 对象名」，见 REQ-2026-012 | 规划 |
+| M06.F07.I02 | 报告名称新建/编辑 | 接口 | 维护 code/name/sortOrder/description | 已上线 |
+| M06.F07.I03 | 报告名称删除 | 接口 | 删除保护：被关联项目/标准/参数引用时拒绝 | 已上线 |
+| M06.F07.I04 | 关联检测项目 | 接口 | 维护 InspectionObjectReportName 中间表 | 已上线 |
+| M06.F07.I05 | 关联检测依据 | 接口 | 维护 InspectionReportNameStandard role=TESTING | 已上线 |
+| M06.F07.I06 | 关联判定依据 | 接口 | 维护 InspectionReportNameStandard role=JUDGMENT | 已上线 |
+| M06.F07.I07 | 关联检测参数 | 接口 | 维护 InspectionReportNameParameter 中间表；prefilter 弹窗（先选检测项目→过滤参数）+ 参数清单行追加「· 对象名」，见 REQ-2026-012 | 已上线 |
 | M06.F07.I08 | 扩展属性维护 | 接口 | 维护 InspectionReportName.extFields 列表（key/label/type/required/tag/source/options）；预览前若样品 ext 未覆盖对应 key，会自动弹 SampleExtFieldsModal（M03.F01.I07）让用户补录 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F08.I01 | 参数界面列表 | 接口 | 展示 code/name/componentPath/关联参数，按 sortOrder 排序 | 规划 |
-| M06.F08.I02 | 参数界面新建/编辑 | 接口 | 维护 code/name/componentPath(模型 key)/config(JSON)/sortOrder/description | 规划 |
-| M06.F08.I03 | 参数界面删除 | 接口 | 删除保护：isOfficial 内置模型（17 个：default / concrete-compress / concrete-permeability / cement-flexural / cement-compress / rebar-welding-tensile / rebar-welding-bend / rebar-mech-tensile / rebar-mech-yield / rebar-mech-elongation / particle-gradation / rebar-mech-yield-ratio / rebar-mech-connection-tensile / mortar-compress / soil-compaction / soil-compaction-degree-sand / soil-compaction-degree-ring）拒绝 | 规划 |
+| M06.F08.I01 | 参数界面列表 | 接口 | 展示 code/name/componentPath/关联参数，按 sortOrder 排序 | 已上线 |
+| M06.F08.I02 | 参数界面新建/编辑 | 接口 | 维护 code/name/componentPath(模型 key)/config(JSON)/sortOrder/description | 已上线 |
+| M06.F08.I03 | 参数界面删除 | 接口 | 删除保护：isOfficial 内置模型（17 个：default / concrete-compress / concrete-permeability / cement-flexural / cement-compress / rebar-welding-tensile / rebar-welding-bend / rebar-mech-tensile / rebar-mech-yield / rebar-mech-elongation / particle-gradation / rebar-mech-yield-ratio / rebar-mech-connection-tensile / mortar-compress / soil-compaction / soil-compaction-degree-sand / soil-compaction-degree-ring）拒绝 | 已上线 |
 | M06.F08.I04 | 关联检测参数 | 接口 | 维护 InspectionParameterParamInterface 中间表（参数↔界面 M:N，支持 reportNameCode 报告作用域） | 已上线 |
-| M06.F08.I05 | 参数界面预览 | 接口 | 列表行按钮：按绑定 componentPath 渲染该录入卡只读预览（mock 单样品 + 示例技术要求） | 规划 |
-| M06.F08.I06 | 参数界面预览弹窗 | 接口 | 模态：渲染注册的参数录入卡组件只读模式，供配置时查看录入卡样式 | 规划 |
+| M06.F08.I05 | 参数界面预览 | 接口 | 列表行按钮：按绑定 componentPath 渲染该录入卡只读预览（mock 单样品 + 示例技术要求） | 已上线 |
+| M06.F08.I06 | 参数界面预览弹窗 | 接口 | 模态：渲染注册的参数录入卡组件只读模式，供配置时查看录入卡样式 | 已上线 |
 
 ---
 
