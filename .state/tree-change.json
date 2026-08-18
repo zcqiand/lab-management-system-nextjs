@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "5f9781daaba25bcd",
+  "base_sha": "7f3ad48fe6296819",
   "summary": "M98 M 级行状态漏标修正：F01/F02/F03 + 全部 11 条 I 级子项均已上线（BackendSwitcher / http-client 注入 / 5 个 API routes），唯 M 级总行（L45）仍是「规划」。翻为已上线与子项一致（react/vue 仓 M98 M 级行同期已翻）。",
   "changes": [
     {

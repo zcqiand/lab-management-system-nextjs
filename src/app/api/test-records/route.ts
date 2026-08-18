@@ -8,6 +8,7 @@ import { testRecords, getTestRecord, samples } from "@lab/management-system-msw/
 import { pageOf, qp, num, NOW, TENANT } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
+  // @entry M03.F03.I06
   const url = qp(req);
   const sampleId = url.get("sampleId");
   const receiptId = url.get("receiptId");
@@ -23,6 +24,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // @entry M03.F03.I08
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const newRec = {
     id: `TR-${Date.now().toString(36)}`,
