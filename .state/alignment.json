@@ -1543,7 +1543,10 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）",
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationRuleList.tsx"
       ]
@@ -1559,7 +1562,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationRuleList.tsx"
       ]
@@ -1590,7 +1595,10 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I02）",
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
       ]
@@ -1602,7 +1610,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
       ]
@@ -1637,7 +1647,10 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开 5 页签编辑弹窗（基础/项目/标准/参数/扩展属性）",
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
       ]
@@ -1653,7 +1666,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
       ]
@@ -1665,7 +1680,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ],
       "entry": []
     },
     "M06.F07.I05": {
@@ -1675,7 +1692,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ],
       "entry": []
     },
     "M06.F07.I06": {
@@ -1685,8 +1704,12 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ],
+      "entry": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
     },
     "M06.F07.I07": {
       "name": "关联检测参数",
@@ -1695,7 +1718,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
       ]
@@ -1728,7 +1753,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
       ]
@@ -1742,7 +1769,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
       ]
@@ -1754,7 +1783,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
       ]
@@ -1792,7 +1823,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
       ]
@@ -1806,7 +1839,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
       ]

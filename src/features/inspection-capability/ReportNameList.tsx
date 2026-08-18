@@ -521,6 +521,7 @@ export function ReportNameList() {
                   ]}
                   fnId="M06.F07.I05"
                 />
+                {/* @entry M06.F07.I06 判定依据：同一 AssociationManager 的 role=JUDGMENT 分组（上方 fnId=I05 覆盖 TESTING 检测依据） */}
               </div>
             )}
 
