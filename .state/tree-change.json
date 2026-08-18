@@ -2,14 +2,22 @@
   "schema": 1,
   "approved": true,
   "base_sha": "7f3ad48fe6296819",
-  "summary": "M98 M 级行状态漏标修正：F01/F02/F03 + 全部 11 条 I 级子项均已上线（BackendSwitcher / http-client 注入 / 5 个 API routes），唯 M 级总行（L45）仍是「规划」。翻为已上线与子项一致（react/vue 仓 M98 M 级行同期已翻）。",
+  "summary": "M03.F03 新增 2 条 I 级子项：I08 检测记录列表 API（GET /api/test-records）+ I09 创建检测记录 API（POST /api/test-records）。背景：b22a4d0（springboot B9.3 仓间联动）在 src/app/api/test-records/route.ts 加了 @entry 锚点，但沿用了 springboot 侧编号（GET→I06/POST→I08），nextjs 树从未登记 I08+，且本仓 I06 已被「人工改判」占用，造成 L5 悬空引用 + 语义错标。本批补登记 I08/I09 并同步修正锚点，L5 转绿。",
   "changes": [
     {
-      "id": "M98",
-      "action": "变更",
-      "name": "frontend 接线层",
-      "reason": "规划→已上线：M98.F01/F02/F03 与 11 条 I 级子项全部已上线（见 L108-135 各行）；M 级行漏翻，本批对齐 react/vue 仓同款状态"
+      "id": "M03.F03.I08",
+      "action": "新增",
+      "name": "检测记录列表 API",
+      "reason": "GET /api/test-records?sampleId=&receiptId=&page=&pageSize= 已实现（src/app/api/test-records/route.ts），receiptId 经 receipt→samples 归集；springboot 对称端点为 M03.F03.I06（列表），本仓 I06 已被人工改判占用，顺延用 I08；@entry 锚点从误标的 I06 改正"
+    },
+    {
+      "id": "M03.F03.I09",
+      "action": "新增",
+      "name": "创建检测记录 API",
+      "reason": "POST /api/test-records 已实现（同文件）；springboot 对称端点为 M03.F03.I08（创建），本仓顺延用 I09；修正原悬空锚点 I08→I09"
     }
   ],
-  "sync_files": []
+  "sync_files": [
+    "docs/design/design-function-map.md"
+  ]
 }

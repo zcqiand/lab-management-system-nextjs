@@ -27,6 +27,8 @@
 | M03.F03.I04 | src/features/data-entry/* (行内删除) | DELETE /api/test-records/:id | test_records | M03.F03.I04 | – | 已上线 |
 | M03.F03.I06 | src/features/data-entry/* (verdict 改判) | PATCH /api/test-records/:id (verdict) | test_records | M03.F03.I06 | – | 已上线 |
 | M03.F03.I07 | src/app/data-entry/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F03.I07 | – | 已上线 |
+| M03.F03.I08 | src/app/api/test-records/route.ts (GET) | GET /api/test-records?sampleId=&receiptId= | test_records | M03.F03.I08 | – | 已上线 |
+| M03.F03.I09 | src/app/api/test-records/route.ts (POST) | POST /api/test-records | test_records | M03.F03.I09 | – | 已上线 |
 | M03.F05.I01 | src/app/report-review/page.tsx | GET /api/sample-receipts?stage=review | sample_receipts | M03.F05.I01 | – | 已上线 |
 | M03.F05.I02 | src/app/report-review/page.tsx (查看报告) | GET /api/sample-receipts/:id?with=report | sample_receipts | M03.F05.I02 | – | 已上线 |
 | M03.F05.I03 | src/features/reports/* (审核通过/驳回) | PATCH /api/sample-receipts/:id (flowStatus) | sample_receipts + audit_events | M03.F05.I03 | – | 已上线 |

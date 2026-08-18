@@ -4,10 +4,15 @@
   "functions": {
     "modules": 9,
     "features": 31,
-    "items": 116
+    "items": 118
   },
-  "warnings_total": 0,
-  "warnings": {},
+  "warnings_total": 2,
+  "warnings": {
+    "已上线但无测试引用": [
+      "M03.F03.I08",
+      "M03.F03.I09"
+    ]
+  },
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -586,6 +591,34 @@
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    "M03.F03.I08": {
+      "name": "检测记录列表 API",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": [
+        "src\\app\\api\\test-records\\route.ts"
+      ]
+    },
+    "M03.F03.I09": {
+      "name": "创建检测记录 API",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": [
+        "src\\app\\api\\test-records\\route.ts"
       ]
     },
     "M03.F05.I01": {

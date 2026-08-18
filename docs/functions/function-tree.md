@@ -193,6 +193,8 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M03.F03.I05 | 自动评定 | 接口 | 系统按技术要求自动判定合格/不合格（TestRecord 精简后已移除自动评定，改为人工 verdict） | 已废弃 |
 | M03.F03.I06 | 人工改判 | 接口 | 手工修正自动评定结果 | 已上线 |
 | M03.F03.I07 | 数据录入三态过滤器 | 接口 | 全部/未提交/已提交：按 flowStatus 过滤数据录入列表 | 已上线 |
+| M03.F03.I08 | 检测记录列表 API | 接口 | GET /api/test-records?sampleId=&receiptId=&page=&pageSize=（receiptId 经 receipt→samples 归集）；springboot 对称端点为其 I06，本仓 I06 已被人工改判占用故顺延 | 已上线 |
+| M03.F03.I09 | 创建检测记录 API | 接口 | POST /api/test-records → 201；springboot 对称端点为其 I08，本仓顺延 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
