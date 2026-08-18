@@ -12,8 +12,12 @@
 // 时把 seed-db 灌好的业务数据销毁（receipts-pg 等测试需要 public schema 已有数据才能跑）。
 // 2026-08-16 修复：原版每次跑都 DROP SCHEMA public CASCADE + replay，同 vitest session
 // 里后跑的 PG 测试因 schema 空而全炸；改用 lab_smoke 隔离后 smoke 自洁，public 不动。
+//
+// M97 fnTest 挂载：F01.I01（replay 语义）+ F02.I01/I02/I03（pg devDep / 借链可达 /
+// 被 shared sync-db 消费的同款路径）。
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { fnTest } from "./fn";
 import { createRequire } from "node:module";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -98,7 +102,20 @@ describe("DB smoke (PG)", () => {
     expect(rows[0]?.ok).toBe(1);
   });
 
-  it("applied ≥12 migrations from shared", () => {
+  fnTest(["M97.F02.I01", "M97.F02.I02"], "pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）", async () => {
+    if (!client) return;
+    const { rows } = await client.query("SELECT current_database() AS db");
+    expect(rows[0]?.db).toBe("lab_dev");
+  });
+
+  fnTest(["M97.F02.I03"], "借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）", () => {
+    // 本文件顶部的 pgModule 加载就是 sync-db.mjs:36-46 同款路径：
+    // createRequire(本仓 package.json) → require("pg") 命中本仓 devDependencies
+    expect(pgModule).not.toBeNull();
+    expect(typeof pgModule!.Client).toBe("function");
+  });
+
+  fnTest(["M97.F01.I01"], "replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）", () => {
     expect(appliedCount).toBeGreaterThanOrEqual(12);
   });
 

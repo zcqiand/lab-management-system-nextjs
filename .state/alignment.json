@@ -1889,7 +1889,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）"
+      ],
       "entry": []
     },
     "M97.F01.I02": {
@@ -1899,7 +1901,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.sql：≥24 张 CREATE TABLE + 主键/FK 约束（pg_dump 或 pg_catalog fallback 产出）"
+      ],
       "entry": []
     },
     "M97.F01.I03": {
@@ -1909,7 +1913,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts：drizzle-kit pull 产物（pgTable 定义 ≥24 张）"
+      ],
       "entry": []
     },
     "M97.F01.I04": {
@@ -1919,7 +1925,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.dbml：v-sql→DBML 产物（Table 定义 ≥24 + V013 后表名 inspection_ 前缀）"
+      ],
       "entry": []
     },
     "M97.F02.I01": {
@@ -1929,7 +1937,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+      ],
       "entry": []
     },
     "M97.F02.I02": {
@@ -1939,7 +1949,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+      ],
       "entry": []
     },
     "M97.F02.I03": {
@@ -1949,7 +1961,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）"
+      ],
       "entry": []
     },
     "M98.F01.I01": {
