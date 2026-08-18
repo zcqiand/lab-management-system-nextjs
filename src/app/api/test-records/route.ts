@@ -3,11 +3,11 @@
 //      （receiptId 经 receipt→samples 归集 sampleIds——REF 语义）
 // POST /api/test-records → 201
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { testRecords, getTestRecord, samples } from "@lab/management-system-msw/fixtures";
 import { pageOf, qp, num, NOW, TENANT } from "@/lib/api-helpers";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   // @entry M03.F03.I08
   const url = qp(req);
   const sampleId = url.get("sampleId");
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   );
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   // @entry M03.F03.I09
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const newRec = {

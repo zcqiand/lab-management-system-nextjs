@@ -6,13 +6,8 @@
     "features": 31,
     "items": 118
   },
-  "warnings_total": 2,
-  "warnings": {
-    "已上线但无测试引用": [
-      "M03.F03.I08",
-      "M03.F03.I09"
-    ]
-  },
+  "warnings_total": 0,
+  "warnings": {},
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -602,7 +597,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}"
+      ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
       ]
@@ -616,7 +613,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子"
+      ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
       ]
