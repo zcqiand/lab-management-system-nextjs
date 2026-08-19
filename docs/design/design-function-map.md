@@ -113,6 +113,13 @@
 | M01.F05.I03 | src/app/login/page.tsx (SSO orchestrator div) | GET /api/auth/sso/authorize ; POST /api/auth/sso/callback | – | M01.F05.I03 | – | 已上线 |
 | M01.F05.I04 | src/state/authStore.ts (acceptSsoSession) | GET /api/auth/permissions | – | M01.F05.I04 | – | 已上线 |
 | M01.F05.I05 | src/components/app/app-shell.tsx (logout Button) | POST /api/auth/logout | – | M01.F05.I05 | – | 已上线 |
+| M97.F01.I01 | scripts/emit-schema.mjs (replay 段) | node scripts/emit-schema.mjs replay | – (lab_dev) | M97.F01.I01 | – | 已上线 (infra) |
+| M97.F01.I02 | scripts/emit-schema.mjs (catalogDump / pg_dump 段) | node scripts/emit-schema.mjs dump | – (lab_dev) | M97.F01.I02 | – | 已上线 (infra) |
+| M97.F01.I03 | scripts/emit-schema.mjs (drizzle-kit pull 段) + scripts/fix-pulled-schema.mjs | node scripts/emit-schema.mjs pull | – (lab_dev) | M97.F01.I03 | – | 已上线 (infra) |
+| M97.F01.I04 | scripts/emit-schema.mjs (DBML 段) + scripts/v-sql-to-dbml.mjs | node scripts/emit-schema.mjs dbml | – (lab_dev) | M97.F01.I04 | – | 已上线 (infra) |
+| M97.F02.I01 | package.json devDependencies (pg ^8.13.1) | – (借链给 sync-db) | – | M97.F02.I01 | – | 已上线 (infra) |
+| M97.F02.I02 | scripts/borrow-pg.mjs (sanity) | node scripts/borrow-pg.mjs | lab_dev | M97.F02.I02 | – | 已上线 (infra) |
+| M97.F02.I03 | ../lab-management-system-shared/scripts/sync-db.mjs:36-46 (createRequire borrow) | – (消费侧) | lab_dev | M97.F02.I03 | – | 已上线 (infra) |
 
 ## 约定
 

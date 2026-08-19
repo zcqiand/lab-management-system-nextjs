@@ -86,6 +86,13 @@ flowchart LR
 | M04.F09.I01 | 牌号码表维护是 M04 基础数据子域，被接样（M03.F01 样品牌号下拉）读取，但本身不参与流程状态 |
 | M04.F09.I02 | 同上（牌号新建/编辑） |
 | M04.F09.I03 | 同上（牌号删除） |
+| M97.F01.I01 | 发射脚本 replay 段：从 `../lab-management-system-shared/sql/migrations/V*.sql` 在 lab_dev 全量回放，dev 期 schema emit 基建，无 UI 无权限 |
+| M97.F01.I02 | 发射脚本 dump 段：用 catalogDump / pg_dump --schema-only 把 lab_dev 真实表结构输出成 `generated/schema.sql`，dev 期 schema emit 基建 |
+| M97.F01.I03 | 发射脚本 pull 段：跑 drizzle-kit pull 出 TS schema 到 `generated/schema.ts`，再过 `scripts/fix-pulled-schema.mjs` 后处理，dev 期基建 |
+| M97.F01.I04 | 发射脚本 dbml 段 + `scripts/v-sql-to-dbml.mjs`：把表结构翻成 DBML 写 `generated/schema.dbml`，供文档/ER 图消费 |
+| M97.F02.I01 | dev 依赖 `pg ^8.13.1`：必须留 devDependency，sync-db.mjs 借链不能进消费方 runtime bundle（CLAUDE.md §3 硬约束） |
+| M97.F02.I02 | `scripts/borrow-pg.mjs` sanity：验证 pg 借链与 lab_dev 可达，L4 smoke 同款路径 |
+| M97.F02.I03 | `../lab-management-system-shared/scripts/sync-db.mjs:36-46` createRequire 借用本仓 pg 客户端连 lab_dev；infra 副作用 |
 
 ---
 

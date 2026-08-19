@@ -6,27 +6,8 @@
     "features": 31,
     "items": 118
   },
-  "warnings_total": 14,
-  "warnings": {
-    "已上线但无设计映射": [
-      "M97.F01.I01",
-      "M97.F01.I02",
-      "M97.F01.I03",
-      "M97.F01.I04",
-      "M97.F02.I01",
-      "M97.F02.I02",
-      "M97.F02.I03"
-    ],
-    "已上线但不在任何流程且非孤儿白名单": [
-      "M97.F01.I01",
-      "M97.F01.I02",
-      "M97.F01.I03",
-      "M97.F01.I04",
-      "M97.F02.I01",
-      "M97.F02.I02",
-      "M97.F02.I03"
-    ]
-  },
+  "warnings_total": 0,
+  "warnings": {},
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -1906,8 +1887,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）"
       ],
@@ -1918,8 +1903,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.sql：≥24 张 CREATE TABLE + 主键/FK 约束（pg_dump 或 pg_catalog fallback 产出）"
       ],
@@ -1930,8 +1919,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts：drizzle-kit pull 产物（pgTable 定义 ≥24 张）"
       ],
@@ -1942,8 +1935,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.dbml：v-sql→DBML 产物（Table 定义 ≥24 + V013 后表名 inspection_ 前缀）"
       ],
@@ -1954,8 +1951,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
       ],
@@ -1966,8 +1967,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
       ],
@@ -1978,8 +1983,12 @@
       "status": "已上线",
       "type": "接口",
       "requirements": [],
-      "flows": [],
-      "designs": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
       "tests": [
         "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）"
       ],
