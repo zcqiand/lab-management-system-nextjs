@@ -6,8 +6,27 @@
     "features": 31,
     "items": 118
   },
-  "warnings_total": 0,
-  "warnings": {},
+  "warnings_total": 14,
+  "warnings": {
+    "已上线但无设计映射": [
+      "M97.F01.I01",
+      "M97.F01.I02",
+      "M97.F01.I03",
+      "M97.F01.I04",
+      "M97.F02.I01",
+      "M97.F02.I02",
+      "M97.F02.I03"
+    ],
+    "已上线但不在任何流程且非孤儿白名单": [
+      "M97.F01.I01",
+      "M97.F01.I02",
+      "M97.F01.I03",
+      "M97.F01.I04",
+      "M97.F02.I01",
+      "M97.F02.I02",
+      "M97.F02.I03"
+    ]
+  },
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -1884,7 +1903,7 @@
     },
     "M97.F01.I01": {
       "name": "replay V*.sql to lab_dev",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1896,7 +1915,7 @@
     },
     "M97.F01.I02": {
       "name": "pg_dump --schema-only",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1908,7 +1927,7 @@
     },
     "M97.F01.I03": {
       "name": "drizzle-kit pull",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1920,7 +1939,7 @@
     },
     "M97.F01.I04": {
       "name": "v-sql → DBML",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1932,7 +1951,7 @@
     },
     "M97.F02.I01": {
       "name": "pg devDep",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1944,7 +1963,7 @@
     },
     "M97.F02.I02": {
       "name": "borrow-pg sanity",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1956,7 +1975,7 @@
     },
     "M97.F02.I03": {
       "name": "consumed by shared sync-db",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],

@@ -83,25 +83,25 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 闭环定义 | 状态 |
 |---|---|---|---|
-| M97.F01 | emit schema snapshot | 读 shared V*.sql → replay → generated/{schema.sql, schema.dbml, schema.ts} 三件套 | 规划 |
-| M97.F02 | lend pg runtime | 持有 `pg` devDep 供 shared/sync-db.mjs `require("pg")` 借 | 规划 |
+| M97.F01 | emit schema snapshot | 读 shared V*.sql → replay → generated/{schema.sql, schema.dbml, schema.ts} 三件套 | 已上线 |
+| M97.F02 | lend pg runtime | 持有 `pg` devDep 供 shared/sync-db.mjs `require("pg")` 借 | 已上线 |
 
 ### M97.F01 emit schema snapshot
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M97.F01.I01 | replay V*.sql to lab_dev | 接口 | 顺序 execute V001..V<N>，每条一个事务；中途失败回滚 | 规划 |
-| M97.F01.I02 | pg_dump --schema-only | 接口 | 写到 generated/schema.sql；带 `tenant_id` V012 后的列 | 规划 |
-| M97.F01.I03 | drizzle-kit pull | 接口 | 写到 generated/schema.ts；PG dialect | 规划 |
-| M97.F01.I04 | v-sql → DBML | 接口 | 写到 generated/schema.dbml；让 msw / 未来 backend 直接对比 ER | 规划 |
+| M97.F01.I01 | replay V*.sql to lab_dev | 接口 | 顺序 execute V001..V<N>，每条一个事务；中途失败回滚 | 已上线 |
+| M97.F01.I02 | pg_dump --schema-only | 接口 | 写到 generated/schema.sql；带 `tenant_id` V012 后的列 | 已上线 |
+| M97.F01.I03 | drizzle-kit pull | 接口 | 写到 generated/schema.ts；PG dialect | 已上线 |
+| M97.F01.I04 | v-sql → DBML | 接口 | 写到 generated/schema.dbml；让 msw / 未来 backend 直接对比 ER | 已上线 |
 
 ### M97.F02 lend pg runtime
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M97.F02.I01 | pg devDep | 接口 | `pg ^8.13.1` 落到本仓 devDependencies（**不是** dependencies） | 规划 |
-| M97.F02.I02 | borrow-pg sanity | 接口 | `node scripts/borrow-pg.mjs`：验证 `require("pg")` + 联 lab_dev | 规划 |
-| M97.F02.I03 | consumed by shared sync-db | 接口 | `../lab-management-system-shared/scripts/sync-db.mjs:36-46` 借本仓的 pg | 规划 |
+| M97.F02.I01 | pg devDep | 接口 | `pg ^8.13.1` 落到本仓 devDependencies（**不是** dependencies） | 已上线 |
+| M97.F02.I02 | borrow-pg sanity | 接口 | `node scripts/borrow-pg.mjs`：验证 `require("pg")` + 联 lab_dev | 已上线 |
+| M97.F02.I03 | consumed by shared sync-db | 接口 | `../lab-management-system-shared/scripts/sync-db.mjs:36-46` 借本仓的 pg | 已上线 |
 
 ---
 

@@ -1,101 +1,63 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "106cd8db319fb082",
-  "summary": "M06 维护面 15 条 I 级 规划→已上线：代码实际在 7b4f417（M06 检测能力大批次）+ b0d1409（param-interfaces 更名 V013 对齐 wip）已实现并接线页面，但树状态从未翻绿——本批补 14 例 fnTest（maintenance.dom.test.tsx）验证 wip 健康后统一翻状态，软告警保持 0。",
+  "base_sha": "19c19ffd7ccd884b",
+  "summary": "M97 schema emit infrastructure 2 F + 8 I 规划→已上线：基建（emit-schema/borrow-pg/v-sql-to-dbml 脚本 + pg devDep + 借链）早已存在且被 shared sync-db.mjs 消费，本批（7f4cc8d）补 pg_catalog fallback（pg_dump 版本不匹配）+ 安全默认 lab_emit 隔离 + 7 条 fnTest 后收口翻绿。",
   "changes": [
     {
-      "id": "M06.F05.I02",
+      "id": "M97.F01",
       "action": "变更",
-      "name": "计算规则新建/编辑",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "emit schema snapshot",
+      "reason": "emit-schema.mjs replay→schema.{sql,ts,dbml} 三件套链路全通（14 V replay + catalogDump fallback + drizzle pull + dbml）；fnTest 4 条"
     },
     {
-      "id": "M06.F05.I03",
+      "id": "M97.F02",
       "action": "变更",
-      "name": "计算规则删除",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "lend pg runtime",
+      "reason": "pg devDep + borrow-pg.mjs + 被 shared sync-db.mjs 借链消费；fnTest 3 条"
     },
     {
-      "id": "M06.F06.I02",
+      "id": "M97.F01.I01",
       "action": "变更",
-      "name": "技术要求新建/编辑",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "replay V*.sql",
+      "reason": "db.smoke fnTest：每条一事务 14 V 全过"
     },
     {
-      "id": "M06.F06.I03",
+      "id": "M97.F01.I02",
       "action": "变更",
-      "name": "技术要求删除",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "pg_dump --schema-only",
+      "reason": "pg_dump 不可用（服务器 PG16 vs 本机 pgAdmin14 客户端）走 catalogDump 等价输出；emit-artifacts fnTest 校验 25 表+FK"
     },
     {
-      "id": "M06.F07.I02",
+      "id": "M97.F01.I03",
       "action": "变更",
-      "name": "报告名称新建/编辑",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "drizzle-kit pull",
+      "reason": "generated/schema.ts 31KB 25 pgTable；fnTest 校验"
     },
     {
-      "id": "M06.F07.I03",
+      "id": "M97.F01.I04",
       "action": "变更",
-      "name": "报告名称删除",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "v-sql → DBML",
+      "reason": "generated/schema.dbml 25 Table + V013 表名；fnTest 校验"
     },
     {
-      "id": "M06.F07.I04",
+      "id": "M97.F02.I01",
       "action": "变更",
-      "name": "关联检测项目",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "pg devDep",
+      "reason": "package.json devDependencies 已落"
     },
     {
-      "id": "M06.F07.I05",
+      "id": "M97.F02.I02",
       "action": "变更",
-      "name": "关联检测依据",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "borrow-pg sanity",
+      "reason": "node scripts/borrow-pg.mjs SELECT 1 ok"
     },
     {
-      "id": "M06.F07.I06",
+      "id": "M97.F02.I03",
       "action": "变更",
-      "name": "关联判定依据",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F07.I07",
-      "action": "变更",
-      "name": "关联检测参数",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F08.I01",
-      "action": "变更",
-      "name": "参数界面列表",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F08.I02",
-      "action": "变更",
-      "name": "参数界面新建/编辑",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F08.I03",
-      "action": "变更",
-      "name": "参数界面删除",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F08.I05",
-      "action": "变更",
-      "name": "参数界面预览",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
-    },
-    {
-      "id": "M06.F08.I06",
-      "action": "变更",
-      "name": "参数界面预览弹窗",
-      "reason": "7b4f417 已实现（组件 data-fn/@entry 锚点 + 页面接线 + msw shape adapter）；5ce6603 补 fnTest 覆盖；翻已上线与实现/测试对齐"
+      "name": "consumed by shared sync-db",
+      "reason": "shared/sync-db.mjs:36-46 createRequire 借链；db.smoke fnTest 同款路径"
     }
   ],
-  "sync_files": [
-    "docs/design/design-function-map.md"
-  ]
+  "sync_files": []
 }
