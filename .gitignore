@@ -25,3 +25,9 @@ data/*.db-journal
 # 杂
 .DS_Store
 *.log
+
+# Claude 临时文件
+.claude/
+.superpowers/
+CLAUDE.md
+.mcp.json
