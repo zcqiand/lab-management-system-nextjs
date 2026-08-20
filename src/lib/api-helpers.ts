@@ -130,7 +130,13 @@ export function wrapDict(rows: Row[], req: Request, junctions?: DictJunctions) {
   });
 }
 
-/** M06 junction：query 参数 → 列精确匹配（键=query 参数名=列名）。 */
+/** M06 junction：query 参数 → 列精确匹配（键=query 参数名=列名）。
+ *
+ * <p>返 TypeSpec `Page<T>` 4 字段（items / page / pageSize / total）以与
+ * shared openapi.yaml `Page<T>` 一致；SpringBoot / msw 同步返 4 字段，
+ * 本仓不返 4 字段会让跨后端切到 'nextjs' 时收到 2 字段 shape，
+ * 已在 lab-react/lab-vue 的 unwrapListResponse 兼容；本函数顺手补齐 4 字段。
+ */
 export function wrapLinks(rows: Row[], req: Request, filterKeys: Record<string, string>) {
   const url = new URL(req.url);
   let items: Row[] = rows;
@@ -138,7 +144,9 @@ export function wrapLinks(rows: Row[], req: Request, filterKeys: Record<string, 
     const v = url.searchParams.get(param);
     if (v) items = items.filter((r) => r[col] === v);
   }
-  return NextResponse.json({ items, total: items.length });
+  const page = num(url.searchParams.get("page"), 1);
+  const pageSize = num(url.searchParams.get("pageSize"), items.length || 1);
+  return NextResponse.json({ items, total: items.length, page, pageSize });
 }
 
 /** junction DELETE：REF 组件发 query 参数（apiClient.delete(url, { params })），

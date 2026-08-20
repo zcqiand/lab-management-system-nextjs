@@ -1,62 +1,14 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "19c19ffd7ccd884b",
-  "summary": "M97 schema emit infrastructure 2 F + 8 I 规划→已上线：基建（emit-schema/borrow-pg/v-sql-to-dbml 脚本 + pg devDep + 借链）早已存在且被 shared sync-db.mjs 消费，本批（7f4cc8d）补 pg_catalog fallback（pg_dump 版本不匹配）+ 安全默认 lab_emit 隔离 + 7 条 fnTest 后收口翻绿。",
+  "base_sha": "e05d1235c7bf4f5b6af6c9f958d0058f549b8792",
+  "summary": "nextjs LoginPage OAuth 2.0 改造（M01.F05.I03 变更）。删 ?token= shortcut；改 authSsoAuthorize→OAuth 2.0 字段（response_type/client_id/redirect_uri/state）；改 sso/callback 走 grant_type=authorization_code + code + redirect_uri（不再走裸 fetch）；加 state 生成与一次性校验（防 CSRF）。同步 design/flow-function-map 描述。状态 规划→开发中，等 nextjs+vue+springboot+aspnetcore 都跟上后改 已上线。",
   "changes": [
     {
-      "id": "M97.F01",
+      "id": "M01.F05.I03",
       "action": "变更",
-      "name": "emit schema snapshot",
-      "reason": "emit-schema.mjs replay→schema.{sql,ts,dbml} 三件套链路全通（14 V replay + catalogDump fallback + drizzle pull + dbml）；fnTest 4 条"
-    },
-    {
-      "id": "M97.F02",
-      "action": "变更",
-      "name": "lend pg runtime",
-      "reason": "pg devDep + borrow-pg.mjs + 被 shared sync-db.mjs 借链消费；fnTest 3 条"
-    },
-    {
-      "id": "M97.F01.I01",
-      "action": "变更",
-      "name": "replay V*.sql",
-      "reason": "db.smoke fnTest：每条一事务 14 V 全过"
-    },
-    {
-      "id": "M97.F01.I02",
-      "action": "变更",
-      "name": "pg_dump --schema-only",
-      "reason": "pg_dump 不可用（服务器 PG16 vs 本机 pgAdmin14 客户端）走 catalogDump 等价输出；emit-artifacts fnTest 校验 25 表+FK"
-    },
-    {
-      "id": "M97.F01.I03",
-      "action": "变更",
-      "name": "drizzle-kit pull",
-      "reason": "generated/schema.ts 31KB 25 pgTable；fnTest 校验"
-    },
-    {
-      "id": "M97.F01.I04",
-      "action": "变更",
-      "name": "v-sql → DBML",
-      "reason": "generated/schema.dbml 25 Table + V013 表名；fnTest 校验"
-    },
-    {
-      "id": "M97.F02.I01",
-      "action": "变更",
-      "name": "pg devDep",
-      "reason": "package.json devDependencies 已落"
-    },
-    {
-      "id": "M97.F02.I02",
-      "action": "变更",
-      "name": "borrow-pg sanity",
-      "reason": "node scripts/borrow-pg.mjs SELECT 1 ok"
-    },
-    {
-      "id": "M97.F02.I03",
-      "action": "变更",
-      "name": "consumed by shared sync-db",
-      "reason": "shared/sync-db.mjs:36-46 createRequire 借链；db.smoke fnTest 同款路径"
+      "name": "SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护）",
+      "reason": "原实现：(a) URL 带 ?token= 直接存 localStorage 跳业务页（token 经 URL 泄漏 + 首登缺 refreshToken 必抛错，与 React 仓同根因）；(b) authSsoAuthorize 走 {redirect} 自定义字段（不是 OAuth 2.0 redirect_uri）；(c) callback 走裸 fetch({code,state})，缺 grant_type/redirect_uri/client_secret 校验；(d) navigate 在 render 期副作用（虽然 nextjs 没 React 那条 'Cannot update BrowserRouter' 报，但同代码异味）。改后：完全按 OAuth 2.0 RFC 6749；authorize 端点收 response_type=code/client_id=lab/redirect_uri=<callback>/state=<random>（state 走 sessionStorage「lab.sso.state」）；callback body {grant_type:authorization_code, code, redirect_uri}（client_secret 仅后端持）；state 校验失败拒绝 + 清掉让用户重试。镜像 react 仓 LoginPage.tsx 的 OAuth 2.0 改法（react 已落地，nextjs + vue + springboot + aspnetcore 跨仓同步进行中）。"
     }
   ],
   "sync_files": []

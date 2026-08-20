@@ -32,16 +32,16 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：SUBMIT 转换正确",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：终态 approved 不可逆",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::完整正向流程：draft → submitted → testing → review → approved",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::拒绝流程：review → rejected",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::撤回流程：submitted → draft",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::权限守卫端到端：technician 在 review 状态无通过/拒绝按钮",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::重置：任何状态回到 draft",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：SUBMIT 转换正确",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：终态 approved 不可逆",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::完整正向流程：draft → submitted → testing → review → approved",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::拒绝流程：review → rejected",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::撤回流程：submitted → draft",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::权限守卫端到端：technician 在 review 状态无通过/拒绝按钮",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::重置：任何状态回到 draft",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）"
       ],
       "entry": [
         "src\\app\\(console)\\layout.tsx"
@@ -69,7 +69,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04"
       ],
       "entry": [
         "src\\components\\app\\sidebar-nav.tsx"
@@ -87,9 +87,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 返回 token + user",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 返回 token + user",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造"
       ],
       "entry": [
         "src\\components\\app\\login-form.tsx"
@@ -107,14 +107,14 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer"
       ],
       "entry": [
         "src\\api\\legacy-client.ts"
       ]
     },
     "M01.F05.I03": {
-      "name": "SSO 统一登录",
+      "name": "SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护）",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -125,7 +125,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）"
       ],
       "entry": [
         "src\\app\\login\\page.tsx"
@@ -143,7 +143,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪"
       ],
       "entry": [
         "src\\state\\authStore.ts"
@@ -161,7 +161,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05"
       ],
       "entry": [
         "src\\components\\app\\app-shell.tsx"
@@ -179,7 +179,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -197,8 +197,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -216,7 +216,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -244,13 +244,13 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::clearError",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 成功",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 categoryCode 过滤",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 keyword 搜索",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 空列表场景",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 网络错误",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::初始状态"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::clearError",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 categoryCode 过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 keyword 搜索",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 空列表场景",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 网络错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::初始状态"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -268,10 +268,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormObjectLink.dom.test.tsx::新建接样单：选择“检测项目”后展示官方 InspectionObject",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormParamFilter.dom.test.tsx::选水泥报告 → 检测参数收窄到该报告关联参数（骨料参数不再出现）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 失败",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 成功"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormObjectLink.dom.test.tsx::新建接样单：选择“检测项目”后展示官方 InspectionObject",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormParamFilter.dom.test.tsx::选水泥报告 → 检测参数收窄到该报告关联参数（骨料参数不再出现）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 失败",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 成功"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -289,8 +289,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 不存在时 upsert 由 msw 404 → error（REF 语义差异见任务报告）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 成功"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 不存在时 upsert 由 msw 404 → error（REF 语义差异见任务报告）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 成功"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -308,8 +308,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 不存在",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 成功"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 不存在",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 成功"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -337,7 +337,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::接样页：三态过滤器挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::接样页：三态过滤器挂 data-fn"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -355,11 +355,11 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：ext:qualityCertNo 未补录 → 打印 —，无残留 {tag}",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：manifest 含 ext:qualityCertNo 时走 ext 源而非 mock",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext: 命中但 sample 无 ext → 解析失败回退 —（不在此路径渲染）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext:qualityCertNo 取 samples[0].ext[qualityCertNo]",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：ext:qualityCertNo 未补录 → 打印 —，无残留 {tag}",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：manifest 含 ext:qualityCertNo 时走 ext 源而非 mock",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext: 命中但 sample 无 ext → 解析失败回退 —（不在此路径渲染）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext:qualityCertNo 取 samples[0].ext[qualityCertNo]",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变"
       ],
       "entry": [
         "src\\features\\data-entry\\SampleExtFieldsModal.tsx"
@@ -377,7 +377,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
@@ -395,7 +395,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
@@ -413,7 +413,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::已安排的接样单显示「取消任务」按钮 + 点击触发 PUT 清空 assignee"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::已安排的接样单显示「取消任务」按钮 + 点击触发 PUT 清空 assignee"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
@@ -431,7 +431,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
@@ -449,12 +449,12 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::clearError 清除 error",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples keyword 搜索",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples status 过滤",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 成功",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 网络错误后 error 填充",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::初始状态"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::clearError 清除 error",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples keyword 搜索",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples status 过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 网络错误后 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::初始状态"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -472,17 +472,17 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「保存」按钮挂 M03.F03.I02 + 点击触发 PUT",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 提交触发 onSubmit with 表单值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 模式: 标题\"新建样品\"，表单为空",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::edit 模式: 填充 initialValues",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::loading 时保存按钮禁用",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::open=false 不渲染",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: name 为空显示错误",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: projectId 为空显示错误",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::点取消触发 onCancel",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 失败后 error 填充",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 成功后追加到 list"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「保存」按钮挂 M03.F03.I02 + 点击触发 PUT",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 提交触发 onSubmit with 表单值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 模式: 标题\"新建样品\"，表单为空",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::edit 模式: 填充 initialValues",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::loading 时保存按钮禁用",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::open=false 不渲染",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: name 为空显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: projectId 为空显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::点取消触发 onCancel",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 失败后 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 成功后追加到 list"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -500,20 +500,20 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntryModelDispatch.dom.test.tsx::按参数界面关联派发模型",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 保存后切回 S1 看不到 dirty 值（已落库清掉）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 输入破坏荷载 1 试件后切到 S2，S2 不被脏写",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::RC-2024-0705-01-S1 显示 IP-0055 抗压强度参数卡（不再\"无可录入的检测参数\"）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::seedData 后 RC-2024-0705-01 的 testParameters 已迁 IP-0055（无 CON002）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个报告名称都关联了至少一个检测参数",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::砂浆抗压强度走试件轴且强度列 kyqd 有值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 不存在时 error 填充",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 成功后 list 中对应项更新"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntryModelDispatch.dom.test.tsx::按参数界面关联派发模型",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 保存后切回 S1 看不到 dirty 值（已落库清掉）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 输入破坏荷载 1 试件后切到 S2，S2 不被脏写",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::RC-2024-0705-01-S1 显示 IP-0055 抗压强度参数卡（不再\"无可录入的检测参数\"）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::seedData 后 RC-2024-0705-01 的 testParameters 已迁 IP-0055（无 CON002）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个报告名称都关联了至少一个检测参数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::砂浆抗压强度走试件轴且强度列 kyqd 有值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 不存在时 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 成功后 list 中对应项更新"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx",
@@ -534,9 +534,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::侧栏样品卡右上角「×」按钮挂 M03.F03.I04 + 点击弹 ConfirmModal",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 不存在时 error 填充",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::侧栏样品卡右上角「×」按钮挂 M03.F03.I04 + 点击弹 ConfirmModal",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 不存在时 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -564,7 +564,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -582,7 +582,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::数据录入页：三态过滤器挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::数据录入页：三态过滤器挂 data-fn"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -598,7 +598,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}"
       ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
@@ -614,7 +614,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子"
       ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
@@ -632,8 +632,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核页壳 smoke：渲染标题「报告审核」不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核页壳 smoke：渲染标题「报告审核」不炸"
       ],
       "entry": [
         "src\\features\\reports\\ReportReviewPage.tsx"
@@ -651,7 +651,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -669,9 +669,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::flow 适配多阶段连续流转：data_entry → review → approval",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::flow 适配多阶段连续流转：data_entry → review → approval",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -689,7 +689,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\reports\\ReportReviewPage.tsx"
@@ -707,8 +707,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::批准页壳 smoke：渲染标题「报告批准」不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::批准页壳 smoke：渲染标题「报告批准」不炸"
       ],
       "entry": [
         "src\\features\\reports\\ReportApprovePage.tsx"
@@ -726,7 +726,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -744,7 +744,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -762,7 +762,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\reports\\ReportApprovePage.tsx"
@@ -780,8 +780,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::发放页壳 smoke：渲染标题「报告发放」不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::发放页壳 smoke：渲染标题「报告发放」不炸"
       ],
       "entry": [
         "src\\features\\reports\\ReportIssuePage.tsx"
@@ -799,7 +799,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -817,7 +817,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -835,7 +835,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\reports\\ReportIssuePage.tsx"
@@ -853,8 +853,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::归档页壳 smoke：渲染标题「报告归档」不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::归档页壳 smoke：渲染标题「报告归档」不炸"
       ],
       "entry": [
         "src\\features\\reports\\ReportArchivePage.tsx"
@@ -872,7 +872,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -890,7 +890,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\flow-pipeline\\FlowStagePage.tsx"
@@ -908,7 +908,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
         "src\\features\\reports\\ReportArchivePage.tsx"
@@ -926,7 +926,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptDetailPage.tsx"
@@ -944,21 +944,21 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::判定依据 / 检测依据 显示「标准编号 + 标准名称」（不再只显示编码）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::报告类别显示报告简称，不显示原始编码",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数 card 只读：select/输入框 disabled（详情页只读模式）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数显示为 名称(单位)，无 IP- 前缀",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按 receipt.testParameters 过滤（IP-9999 不在白名单 → 不显示）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按参数界面派发：IP-0001 走 default 卡（4 格 + 检测依据 + 标准名称）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：命中报告名称显示简称",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：老 categoryCode 找不到回退显示原编码",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：code 为空显示 —",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 为空只显示名称，不带空括号",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 缺省只显示名称",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：有 unit 显示 名称(单位)",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：未知 code 回退显示 code，无 IP-前缀拼接"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::判定依据 / 检测依据 显示「标准编号 + 标准名称」（不再只显示编码）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::报告类别显示报告简称，不显示原始编码",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数 card 只读：select/输入框 disabled（详情页只读模式）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数显示为 名称(单位)，无 IP- 前缀",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按 receipt.testParameters 过滤（IP-9999 不在白名单 → 不显示）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按参数界面派发：IP-0001 走 default 卡（4 格 + 检测依据 + 标准名称）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：命中报告名称显示简称",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：老 categoryCode 找不到回退显示原编码",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：code 为空显示 —",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 为空只显示名称，不带空括号",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 缺省只显示名称",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：有 unit 显示 名称(单位)",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：未知 code 回退显示 code，无 IP-前缀拼接"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptDetailPage.tsx"
@@ -976,20 +976,20 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：docx 里出现的 {tag} 但 manifest 未登记 → 补成 —（不再打印 undefined）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：忽略 docxtemplater 控制标签 {#rows} / {/rows}",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::全部 30 个带 templatePath 的 RN → URL 指向 public/templates 下真实存在的文件名（encodeURIComponent 往返）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::无模板的类别码 → null（走「暂无报告模板」分支）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::有种子的 RN 码 → 返回 /templates/<文件名> 非空 URL",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::ext.sampleModel 优先于 sample.model（补录覆盖内建）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 全空 → 原 sampleName 不变（避免误覆盖用户输入）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 都有 → 合成三者空格连接",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::sample 内建 model/grade 都有 → 合成 `model grade` 写入 sampleName",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::samples[1..] 不变（合成只对首个样品；其它样品保留 sampleName 原值）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::只填 grade → 合成只含 grade（model 空被 filter 掉）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::空数组：原样返回",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::详情页标题栏有「报告预览」按钮，点击打开预览弹窗",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：docx 里出现的 {tag} 但 manifest 未登记 → 补成 —（不再打印 undefined）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：忽略 docxtemplater 控制标签 {#rows} / {/rows}",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::全部 30 个带 templatePath 的 RN → URL 指向 public/templates 下真实存在的文件名（encodeURIComponent 往返）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::无模板的类别码 → null（走「暂无报告模板」分支）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::有种子的 RN 码 → 返回 /templates/<文件名> 非空 URL",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::ext.sampleModel 优先于 sample.model（补录覆盖内建）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 全空 → 原 sampleName 不变（避免误覆盖用户输入）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 都有 → 合成三者空格连接",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::sample 内建 model/grade 都有 → 合成 `model grade` 写入 sampleName",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::samples[1..] 不变（合成只对首个样品；其它样品保留 sampleName 原值）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::只填 grade → 合成只含 grade（model 空被 filter 掉）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::空数组：原样返回",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::详情页标题栏有「报告预览」按钮，点击打开预览弹窗",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptDetailPage.tsx"
@@ -1007,7 +1007,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表"
       ],
       "entry": [
         "src\\features\\dicts\\CategoryDictList.tsx"
@@ -1025,7 +1025,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）"
       ],
       "entry": []
     },
@@ -1041,7 +1041,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗"
       ],
       "entry": []
     },
@@ -1057,7 +1057,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：渲染标题不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：渲染标题不炸"
       ],
       "entry": [
         "src\\features\\dicts\\CategoryDictList.tsx"
@@ -1075,7 +1075,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗"
       ],
       "entry": []
     },
@@ -1091,7 +1091,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗"
       ],
       "entry": []
     },
@@ -1107,7 +1107,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：渲染标题不炸"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：渲染标题不炸"
       ],
       "entry": [
         "src\\features\\dicts\\CategoryDictList.tsx"
@@ -1125,7 +1125,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗"
       ],
       "entry": []
     },
@@ -1141,7 +1141,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗"
       ],
       "entry": []
     },
@@ -1157,7 +1157,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：牌号种子行渲染（fixtures 真数据穿透）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：牌号种子行渲染（fixtures 真数据穿透）"
       ],
       "entry": [
         "src\\features\\dicts\\CategoryDictList.tsx"
@@ -1175,7 +1175,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：新建按钮开弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：新建按钮开弹窗"
       ],
       "entry": []
     },
@@ -1191,7 +1191,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：行内删除按钮开确认弹窗"
       ],
       "entry": []
     },
@@ -1207,8 +1207,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
@@ -1234,9 +1234,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialty 必备字段与时间戳可构造",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：准备状态 catalogued/under-review/operational/disabled",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：检测标准角色只允许 TESTING/JUDGMENT"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialty 必备字段与时间戳可构造",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：准备状态 catalogued/under-review/operational/disabled",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：检测标准角色只允许 TESTING/JUDGMENT"
       ],
       "entry": []
     },
@@ -1250,9 +1250,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::新建检测专项 启用 复选框默认勾选",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项编辑弹窗预填并提交 PUT",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项页打开“新建专项”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::新建检测专项 启用 复选框默认勾选",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项编辑弹窗预填并提交 PUT",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项页打开“新建专项”弹窗"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1268,7 +1268,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项删除自定义未引用专项成功"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项删除自定义未引用专项成功"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1284,11 +1284,11 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目清单聚合显示检测参数名",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页按检测专项过滤",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObject 携带 sourceProjectNo/sourceProjectName/sourcePage",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionReadinessStatus 联合类型可赋合法值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::类型守卫：InspectionObject 禁止 projectId/InspectionProject/InspectionObjectVariant/InspectionScheme 字段"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目清单聚合显示检测参数名",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页按检测专项过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObject 携带 sourceProjectNo/sourceProjectName/sourcePage",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionReadinessStatus 联合类型可赋合法值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::类型守卫：InspectionObject 禁止 projectId/InspectionProject/InspectionObjectVariant/InspectionScheme 字段"
       ],
       "entry": []
     },
@@ -1302,7 +1302,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1332,9 +1332,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1350,9 +1350,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1368,14 +1368,14 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 列出/添加/移除关联",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：必备参数以 * 呈现",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数关联 资质级别 下拉以中文呈现",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目编辑弹窗出现 关联检测参数 页签",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 不再持有 projectId",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 关系必备字段",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionQualificationLevel 联合类型只接受枚举值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：资质等级 QUALIFIED/RESTRICTED"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 列出/添加/移除关联",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：必备参数以 * 呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数关联 资质级别 下拉以中文呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目编辑弹窗出现 关联检测参数 页签",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 不再持有 projectId",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 关系必备字段",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionQualificationLevel 联合类型只接受枚举值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：资质等级 QUALIFIED/RESTRICTED"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1391,7 +1391,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1407,9 +1407,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数清单分页：可翻到下一页",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页三级级联：选专项→项目→标准后请求带全部参数",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionParameter 保存 rawName/canonicalName/methodText/aliases"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数清单分页：可翻到下一页",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页三级级联：选专项→项目→标准后请求带全部参数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionParameter 保存 rawName/canonicalName/methodText/aliases"
       ],
       "entry": []
     },
@@ -1423,8 +1423,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1440,7 +1440,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数删除被引用时展示错误"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数删除被引用时展示错误"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1456,9 +1456,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准清单状态以中文显示（现行）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页级联下拉：选专项后请求带 inspectionSpecialtyCode",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandard 含 version/status/sourceDocumentId"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准清单状态以中文显示（现行）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页级联下拉：选专项后请求带 inspectionSpecialtyCode",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandard 含 version/status/sourceDocumentId"
       ],
       "entry": []
     },
@@ -1472,7 +1472,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1502,8 +1502,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准编辑弹窗出现 关联检测参数 页签",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardParameter 仅承载标准↔参数多对多关联"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准编辑弹窗出现 关联检测参数 页签",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardParameter 仅承载标准↔参数多对多关联"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1521,12 +1521,12 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::展开检测项目 -> 显示子级检测标准",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::左树渲染检测项目",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::未选标准时右侧显示空态",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算规则：点击标准 -> 用 testingStandardCode 过滤 GET",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::选中检测标准 -> 右侧展示列表 + sortOrder + 拖拽把手",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationRule 至少 object+parameter，可选 testingStandardCode"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::展开检测项目 -> 显示子级检测标准",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::左树渲染检测项目",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::未选标准时右侧显示空态",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算规则：点击标准 -> 用 testingStandardCode 过滤 GET",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::选中检测标准 -> 右侧展示列表 + sortOrder + 拖拽把手",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationRule 至少 object+parameter，可选 testingStandardCode"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationRuleList.tsx"
@@ -1544,8 +1544,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationRuleList.tsx"
@@ -1563,7 +1563,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationRuleList.tsx"
@@ -1581,8 +1581,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::技术要求也复用：filterParam=judgmentStandardCode",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionTechnicalRequirement 必带 judgmentStandardCode+conditions+verificationStatus"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::技术要求也复用：filterParam=judgmentStandardCode",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionTechnicalRequirement 必带 judgmentStandardCode+conditions+verificationStatus"
       ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
@@ -1600,8 +1600,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I02）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I02）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见"
       ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
@@ -1619,7 +1619,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
       ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
@@ -1637,8 +1637,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::RN-101 行聚合显示其检测标准编码与检测参数名",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::RN-101 行聚合显示其检测标准编码与检测参数名",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
@@ -1656,8 +1656,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开 5 页签编辑弹窗（基础/项目/标准/参数/扩展属性）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开 5 页签编辑弹窗（基础/项目/标准/参数/扩展属性）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
@@ -1675,7 +1675,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
@@ -1693,7 +1693,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": []
     },
@@ -1709,7 +1709,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": []
     },
@@ -1725,7 +1725,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
@@ -1743,7 +1743,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ReportNameList.tsx"
@@ -1761,10 +1761,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::列表新增「扩展属性」列展示已有 extFields",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性列存在，编辑弹窗含「扩展属性」页签",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性页签：空表 + + 新增 按钮 / 删除按钮 可见；type=select 时 options 输入可写",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::页签新增「扩展属性」，data-fn=M06.F07.I08"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::列表新增「扩展属性」列展示已有 extFields",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性列存在，编辑弹窗含「扩展属性」页签",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性页签：空表 + + 新增 按钮 / 删除按钮 可见；type=select 时 options 输入可写",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::页签新增「扩展属性」，data-fn=M06.F07.I08"
       ],
       "entry": []
     },
@@ -1780,7 +1780,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
@@ -1798,7 +1798,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
@@ -1816,7 +1816,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
@@ -1832,15 +1832,15 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 inspectionParamInterfaceCode 全部存在于 inspection-param-interface.json",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了非默认录入卡",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 inspectionParamInterfaceCode 全部存在于 inspection-param-interface.json",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了非默认录入卡",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
@@ -1858,7 +1858,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
@@ -1876,7 +1876,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
@@ -1894,7 +1894,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）"
       ],
       "entry": []
     },
@@ -1910,7 +1910,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.sql：≥24 张 CREATE TABLE + 主键/FK 约束（pg_dump 或 pg_catalog fallback 产出）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.sql：≥24 张 CREATE TABLE + 主键/FK 约束（pg_dump 或 pg_catalog fallback 产出）"
       ],
       "entry": []
     },
@@ -1926,7 +1926,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts：drizzle-kit pull 产物（pgTable 定义 ≥24 张）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts：drizzle-kit pull 产物（pgTable 定义 ≥24 张）"
       ],
       "entry": []
     },
@@ -1942,7 +1942,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.dbml：v-sql→DBML 产物（Table 定义 ≥24 + V013 后表名 inspection_ 前缀）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.dbml：v-sql→DBML 产物（Table 定义 ≥24 + V013 后表名 inspection_ 前缀）"
       ],
       "entry": []
     },
@@ -1958,7 +1958,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
       ],
       "entry": []
     },
@@ -1974,7 +1974,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
       ],
       "entry": []
     },
@@ -1990,7 +1990,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）"
       ],
       "entry": []
     },
@@ -2006,7 +2006,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendSwitcher 渲染 4-backend 下拉，选 msw→aspnetcore 立即切换"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendSwitcher 渲染 4-backend 下拉，选 msw→aspnetcore 立即切换"
       ],
       "entry": [
         "src\\components\\app\\backend-switcher.tsx"
@@ -2024,7 +2024,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::hydrateBackendConfig 持久化 + snapshotBackendConfig 还原"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::hydrateBackendConfig 持久化 + snapshotBackendConfig 还原"
       ],
       "entry": []
     },
@@ -2040,7 +2040,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::installHttpClient 是函数且注册到全局 axios 拦截器不抛"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::installHttpClient 是函数且注册到全局 axios 拦截器不抛"
       ],
       "entry": []
     },
@@ -2056,7 +2056,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回 mock token + 3 租户"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回 mock token + 3 租户"
       ],
       "entry": []
     },
@@ -2072,7 +2072,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId"
       ],
       "entry": []
     },
@@ -2088,7 +2088,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/logout 返回 204"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/logout 返回 204"
       ],
       "entry": []
     },
@@ -2104,7 +2104,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 用 refreshToken 换新 token"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 用 refreshToken 换新 token"
       ],
       "entry": []
     },
@@ -2120,7 +2120,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/zcqiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 校验 tenantId 后换 token"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 校验 tenantId 后换 token"
       ],
       "entry": []
     }

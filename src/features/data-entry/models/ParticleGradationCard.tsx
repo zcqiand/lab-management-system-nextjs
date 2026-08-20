@@ -157,7 +157,7 @@ export function ParticleGradationCard({
         })),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 切换样品/落库后重置，避免每次输入被覆盖
+     
   }, [sampleId, record?.result, sieveCount, sampleRows]);
 
   const updatePct = (ri: number, ci: number, v: number) => {
