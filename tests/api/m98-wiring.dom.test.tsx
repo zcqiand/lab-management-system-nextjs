@@ -1,8 +1,6 @@
-// M98 接线层 — 8 子项 fnTest（清零软告警「已上线但无测试引用」）。
+// M98 接线层 — fnTest（ADR-0014 后只保留 F02 + F03）。
 //
 // 覆盖：
-//   F01.I01 BackendSwitcher 下拉
-//   F01.I02 持久化 baseUrl
 //   F02.I01 axios 拦截器
 //   F03.I01 POST /api/auth/login
 //   F03.I02 GET /api/auth/me
@@ -10,20 +8,12 @@
 //   F03.I04 POST /api/auth/refresh
 //   F03.I05 POST /api/auth/switch-tenant
 //
-// F01/F02 走 jsdom（react 渲染 + localStorage + axios interceptor）；
-// F03 走直接 import 路由 handler + 构造 mock Request（不动 nextjs dev server）。
+// F01.I01（BackendSwitcher）+ F01.I02（持久化 baseUrl）已废弃（ADR-0014），
+// 跟随 BackendSwitcher.tsx / backend-context.tsx 一并删除。F03 走直接 import
+// 路由 handler + 构造 mock Request（不动 nextjs dev server）。
+
 import { describe, expect } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { BackendProvider } from "@/state/backend-context";
-import { BackendSwitcher } from "@/components/app/backend-switcher";
 import { installHttpClient } from "@/api/http-client";
-import {
-  hydrateBackendConfig,
-  snapshotBackendConfig,
-  setBackend,
-  getBackend,
-  getBaseUrl,
-} from "@/api/backend-config";
 import { fnTest } from "../fn";
 
 import { POST as loginPOST } from "@/app/api/auth/login/route";
@@ -32,40 +22,7 @@ import { POST as logoutPOST } from "@/app/api/auth/logout/route";
 import { POST as refreshPOST } from "@/app/api/auth/refresh/route";
 import { POST as switchTenantPOST } from "@/app/api/auth/switch-tenant/route";
 
-function mountSwitcher() {
-  return render(
-    <BackendProvider>
-      <BackendSwitcher />
-    </BackendProvider>,
-  );
-}
-
 describe("M98 frontend 接线层", () => {
-  fnTest(["M98.F01.I01"], "BackendSwitcher 渲染 4-backend 下拉，选 msw→aspnetcore 立即切换", () => {
-    const { getByTestId } = mountSwitcher();
-    const trigger = getByTestId("backend-switcher-trigger");
-    expect(trigger.getAttribute("data-fn")).toBe("M98.F01.I01");
-    // 默认折叠；点 switch 展开选项
-    fireEvent.click(screen.getByText("switch"));
-    fireEvent.click(getByTestId("backend-option-aspnetcore"));
-    expect(trigger.textContent).toContain("ASP.NET Core");
-    expect(getBackend()).toBe("aspnetcore");
-  });
-
-  fnTest(["M98.F01.I02"], "hydrateBackendConfig 持久化 + snapshotBackendConfig 还原", () => {
-    hydrateBackendConfig({
-      backend: "springboot",
-      baseUrls: { springboot: "http://lab-sb:9090" },
-    });
-    expect(getBackend()).toBe("springboot");
-    expect(getBaseUrl()).toBe("http://lab-sb:9090");
-    const snap = snapshotBackendConfig();
-    expect(snap.backend).toBe("springboot");
-    expect(snap.baseUrls.springboot).toBe("http://lab-sb:9090");
-    // 复原默认值，避免污染后续测试
-    setBackend("msw");
-  });
-
   fnTest(["M98.F02.I01"], "installHttpClient 是函数且注册到全局 axios 拦截器不抛", async () => {
     // installHttpClient 注册 request 拦截器到全局 axios 单例；多次调用都安全。
     expect(typeof installHttpClient).toBe("function");

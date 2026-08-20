@@ -7,10 +7,10 @@
 **Full-stack 前端 + schema emit infra 仓**。Next.js 技术栈特殊：既是前端，又可通过 API routes 作后端。本仓双角色：
 
 1. **前端（lab 家族产品之一）**：消费 `../lab-management-system-shared/generated/openapi/openapi.yaml`，
-   通过 apiclient (`src/api/`) + 4-backend 切换（msw/aspnetcore/springboot/nextjs）跨后端。
+   通过 apiclient (`src/api/`) 调后端。后端 URL 由 `.env` 的 `NEXT_PUBLIC_API_BASE_URL` 决定（ADR-0014；原 4-backend 运行时切换已废弃）。
    UI 包含：AppShell + SidebarNav（菜单来自 saas）+ M01 合同管理页面。
 2. **后端（nextjs 自作）**：`src/app/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个 M00 auth 路由 + `/api/contracts/*` 业务路由。
-   切换到 'nextjs' 模式时，前端 apiclient 命中本仓 API routes。业务路由数据来自 `@lab/management-system-msw/fixtures`（in-memory）。
+   `NEXT_PUBLIC_API_BASE_URL=""`（默认同源）时，前端 apiclient 命中本仓 API routes。业务路由数据来自 `@lab/management-system-msw/fixtures`（in-memory）。
 3. **infra 副作用**：`scripts/{emit-schema, borrow-pg, borrow-from-nextjs-pg, v-sql-to-dbml}.mjs` 与
    `generated/` 输出。被 `../lab-management-system-shared/scripts/sync-db.mjs` 借 `pg` driver。
 

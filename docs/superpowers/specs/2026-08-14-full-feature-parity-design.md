@@ -13,11 +13,13 @@
 - 功能树从 33 行扩到 194 行（镜像 REF 全树，含已废弃行），已上线 ID 通过 tree-change 分波推进
 - L0–L5 全绿、0 软告警；fnTest 覆盖对齐 REF 的挂 ID 方式
 - 数据层走 4-backend 切换（默认 msw），与既有 M98 接线层兼容
+  > 2026-08-20 增注：M98.F01 运行时切换已废弃（ADR-0014），改走 NEXT_PUBLIC_API_BASE_URL 单 URL 配置；M98.F02（http-client）+ M98.F03（API routes）保留
 
 ### 非目标
 
 - nextjs 自身作后端的 61 条业务路由（本次不做，后续按需逐模块补）
 - aspnetcore / springboot 后端的联调验证（切换能力已有，真后端对齐另立任务）
+  > 2026-08-20 增注：aspnetcore / springboot 后端真联调仍走 .env 切 URL，不再走 UI runtime 切换（ADR-0014）
 - REF 中「已废弃」功能的复活（镜像行保持已废弃状态）
 
 ## 2. 架构决策

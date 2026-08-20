@@ -2,7 +2,7 @@
 // REF api/client.ts 的移植形态：组件代码 import 这里，签名与 REF src/api/client.ts 一致。
 // 路由经 API_ROUTES 映射到 lab-msw 当前 OpenAPI 路由（见计划 M1 表）。
 import axios, { AxiosError, type AxiosInstance } from "axios";
-import { getBaseUrl } from "./backend-config";
+import { getApiBaseUrl } from "./backend-config";
 import { env } from "./env";
 
 let currentToken: string | null = null;
@@ -19,7 +19,7 @@ export const identityClient: AxiosInstance = axios.create({ baseURL: env.IDENTIT
 //   apiClient / identityClient 请求拦截器：注入 Authorization: Bearer <token>
 //   响应拦截器：401 调 unauthorizedHandler（路由守卫跳 /login）
 apiClient.interceptors.request.use((config) => {
-  if (!config.baseURL) config.baseURL = getBaseUrl() || "";
+  if (!config.baseURL) config.baseURL = getApiBaseUrl() || "";
   if (currentToken) config.headers.set("Authorization", `Bearer ${currentToken}`);
   return config;
 });

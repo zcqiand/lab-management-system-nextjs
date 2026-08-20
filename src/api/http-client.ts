@@ -8,7 +8,7 @@
 // 客户端组件发出的 fetch/axios 会自动命中本仓 API routes（src/app/api/.../route.ts）。
 
 import axios, { type AxiosError } from "axios";
-import { getBaseUrl } from "./backend-config";
+import { getApiBaseUrl } from "./backend-config";
 
 export class ApiError extends Error {
   status: number;
@@ -37,7 +37,7 @@ export function toApiError(err: unknown): ApiError {
 export function installHttpClient(getToken: () => string | null): void {
   axios.interceptors.request.use((config) => {
     if (!config.baseURL) {
-      config.baseURL = getBaseUrl();
+      config.baseURL = getApiBaseUrl();
     }
     const token = getToken();
     if (token) {
@@ -64,7 +64,7 @@ export async function apiRequest<T>(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${getBaseUrl()}${path}`, {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, {
     method: options.method ?? "GET",
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,

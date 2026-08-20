@@ -42,11 +42,12 @@
 
 | REF `import.meta.env` | Next.js `process.env` |
 | --- | --- |
-| `VITE_API_BASE_URL` | 删除——baseURL 一律来自 backend-context |
+| `VITE_API_BASE_URL` | ~~删除~~ 2026-08-20 增注：baseURL 改走 `NEXT_PUBLIC_API_BASE_URL`（ADR-0014）；原行描述"backend-context"已废弃 |
 | `VITE_IDENTITY_BASE_URL` | `NEXT_PUBLIC_IDENTITY_BASE_URL` |
 | `VITE_APP_ID` | `NEXT_PUBLIC_APP_ID` |
 | `VITE_SSO_AUTHORIZE_URL` | `NEXT_PUBLIC_SSO_AUTHORIZE_URL` |
 | `VITE_OAUTH_SCOPES` | `NEXT_PUBLIC_OAUTH_SCOPES` |
+| (新增 ADR-0014) | `NEXT_PUBLIC_ENABLE_MSW`（默认 dev=true / prod=false）；`NEXT_PUBLIC_API_MODE`（默认 "msw"，仅 UI 显示） |
 | `VITE_USE_MSW` | `NEXT_PUBLIC_USE_MSW`（默认 true） |
 
 ### M3 数据文件映射
@@ -226,7 +227,7 @@ export const env = {
 // REF api/client.ts 的移植形态：组件代码 import 这里，签名与 REF src/api/client.ts 一致。
 // 路由经 API_ROUTES 映射到 lab-msw 当前 OpenAPI 路由（见计划 M1 表）。
 import axios, { type AxiosInstance } from "axios";
-import { getBaseUrl } from "./backend-config";
+import { getApiBaseUrl } from "./backend-config";  // ADR-0014：旧 getBaseUrl() 已废弃
 import { env } from "./env";
 
 let currentToken: string | null = null;

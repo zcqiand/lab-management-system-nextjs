@@ -1,0 +1,59 @@
+# VPS nginx vhost — lab-management-system-nextjs
+#
+# 这份是「参考模板」,不在 nginx include 路径里。.example 后缀让 nginx
+# 不会把它当真;要装的时候重命名掉(或由 deploy/setup-vps.sh 渲染)。
+#
+# 用法(manual):
+#   1. 复制:cp deploy/nginx-vps.conf.example /etc/nginx/sites-available/YOUR_DOMAIN
+#   2. sed 替换 YOUR_DOMAIN → 你的域名、your-cert.crt/key → 实际 cert 路径
+#   3. 启用:ln -sf /etc/nginx/sites-available/YOUR_DOMAIN /etc/nginx/sites-enabled/
+#   4. 若 Ubuntu 默认页还在:rm /etc/nginx/sites-enabled/default
+#      (避免 default_server on :80 重复;姊妹仓 saas 已装过的 VPS 上这步已做)
+#   5. nginx -t && systemctl reload nginx
+#
+# 这份配置的目的:
+#   - lab.YOUR_DOMAIN 的 HTTP 301 到 HTTPS
+#   - HTTPS 终结在 VPS(持 cert)
+#   - proxy_pass 到本机容器端口 8066(由 docker run -p 127.0.0.1:8066:3000 决定)
+#
+# 注意:与 saas 版不同,不再声明 `listen 80 default_server; return 444;`
+# —— 同一台 VPS 上 saas 的 vhost 已占 default_server,重复声明 nginx -t 直接报错。
+
+server {
+    listen 80;
+    server_name lab.YOUR_DOMAIN;             # 改:你的 lab 子域(或主域)
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name lab.YOUR_DOMAIN;             # 改
+
+    # cert / key 在 VPS 本地,**不入仓**
+    ssl_certificate     /etc/nginx/ssl/your-cert.crt;   # 改
+    ssl_certificate_key /etc/nginx/ssl/your-cert.key;   # 改
+
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # 浏览器一年 HTTPS-only
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    location / {
+        # VPS 暴露端口(容器内 next start 监听 :3000)
+        # 改端口必须同步 deploy/lab-management-system-nextjs.sh 的 -p(saas 坑 15)
+        proxy_pass http://127.0.0.1:8066;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # ⚠️ 不加 Upgrade / Connection 头:要配 map 块否则 unknown variable(saas 坑 11);
+        #   Next.js 生产 serve 不用 WebSocket。
+    }
+}

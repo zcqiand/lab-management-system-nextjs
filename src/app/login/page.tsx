@@ -25,7 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/state/auth-context";
-import { useBackend } from "@/state/backend-context";
+import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
 import {
   authSsoAuthorize,
   authSsoCallback,
@@ -55,7 +55,8 @@ function computeRedirectUri(): string {
 export default function LoginPage() {
   const router = useRouter();
   const { token, setToken } = useAuth();
-  const { backend, baseUrl } = useBackend();
+  const baseUrl = getApiBaseUrl();
+  const apiMode = getApiMode();
   const [status, setStatus] = useState<string>("检查登录态...");
 
   useEffect(() => {
@@ -109,7 +110,7 @@ export default function LoginPage() {
     }
 
     // 3. 调 SSO authorize → 跳 saas
-    setStatus(`未登录，正在跳 saas（backend=${backend}）...`);
+    setStatus(`未登录，正在跳 saas（backend=${apiMode}）...`);
     const csrfState = generateOauthState();
     sessionStorage.setItem(SSO_STATE_STORAGE_KEY, csrfState);
     authSsoAuthorize(
@@ -134,10 +135,10 @@ export default function LoginPage() {
       })
       .catch((err: unknown) => {
         console.error("[lab/login] authSsoAuthorize failed:", err);
-        setStatus(`authorize 调用失败（${backend}）：${(err as Error).message}`);
+        setStatus(`authorize 调用失败（${apiMode}）：${(err as Error).message}`);
         sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
       });
-  }, [backend, baseUrl, router, setToken, token]);
+  }, [apiMode, baseUrl, router, setToken, token]);
 
   return (
     <div
@@ -156,11 +157,11 @@ export default function LoginPage() {
             流程：lab /login → saas /authorize → saas 登录 → 带 code 回 lab /login → lab 后端换 token
           </p>
           <p className="text-xs text-slate-400">
-            demo 后端：<span className="font-medium">{backend}</span> · saas 端口：3000
+            demo 后端：<span className="font-medium">{apiMode}</span> · saas 端口：3000
           </p>
           <div className="pt-2 border-t">
             <a href="/" className="text-blue-600 hover:underline text-xs">
-              返回首页（BackendSwitcher + 旧 LoginForm）
+              返回首页（BackendBadge + 旧 LoginForm）
             </a>
           </div>
         </CardContent>

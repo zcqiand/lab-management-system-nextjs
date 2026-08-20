@@ -12,15 +12,15 @@ import Link from "next/link";
 import { LogOut, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarNav, useSaasApp, useSaasMenus } from "@/components/app/sidebar-nav";
-import { BackendSwitcher } from "@/components/app/backend-switcher";
+import { BackendBadge } from "@/components/app/backend-badge";
 import { useAuth } from "@/state/auth-context";
-import { useBackend } from "@/state/backend-context";
+import { getApiMode } from "@/api/backend-config";
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { token, clearToken } = useAuth();
-  const { backend } = useBackend();
+  const apiMode = getApiMode();
   const { data: menus } = useSaasMenus();
   // 应用名来自 saas 公共应用目录（/api/v1/apps/<code> 反代），不写死在客户端
   const { app } = useSaasApp();
@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         menus={menus}
         appCode={APP_CODE}
         appName={app?.name}
-        footerExtras={<BackendSwitcher />}
+        footerExtras={<BackendBadge />}
         version={`lab-management-system-nextjs · 接线层 · appCode=${APP_CODE}`}
       />
       <main className="flex-1 flex flex-col min-w-0">
@@ -44,7 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               应用=<span className="text-slate-900 font-medium">{app?.name ?? APP_CODE}</span>
             </span>
             <span className="font-mono">
-              backend=<span className="text-slate-900 font-medium">{backend}</span>
+              backend=<span className="text-slate-900 font-medium">{apiMode}</span>
             </span>
             <span className="font-mono">
               token=

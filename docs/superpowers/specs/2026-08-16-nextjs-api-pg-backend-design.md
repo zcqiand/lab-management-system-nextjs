@@ -42,6 +42,7 @@
 
 关键洞察：`/api/*` 路由只在 nextjs 模式被命中（msw 模式拦截在浏览器层，另两个模式打别的服务器），
 所以路由代码**无条件接 pg，无双源开关**。界面 BackendSwitcher 4 选 1 与默认 msw 均不变。
+> 2026-08-20 增注（ADR-0014）：BackendSwitcher UI 已删除；后端 URL 改走 NEXT_PUBLIC_API_BASE_URL，MSW 启动走 NEXT_PUBLIC_ENABLE_MSW；默认 `""` 同源 + msw=true 仍等同"nextjs-as-backend 同源 msw"组合，但切换需改 .env + 重启。
 
 ### 2.2 driver 双轨 → 对齐 saas 单轨声明
 

@@ -1996,7 +1996,7 @@
     },
     "M98.F01.I01": {
       "name": "BackendSwitcher 下拉",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "按钮",
       "requirements": [],
       "flows": [
@@ -2005,16 +2005,12 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendSwitcher 渲染 4-backend 下拉，选 msw→aspnetcore 立即切换"
-      ],
-      "entry": [
-        "src\\components\\app\\backend-switcher.tsx"
-      ]
+      "tests": [],
+      "entry": []
     },
     "M98.F01.I02": {
       "name": "持久化 baseUrl",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -2023,9 +2019,7 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::hydrateBackendConfig 持久化 + snapshotBackendConfig 还原"
-      ],
+      "tests": [],
       "entry": []
     },
     "M98.F02.I01": {

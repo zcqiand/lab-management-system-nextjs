@@ -46,9 +46,9 @@ flowchart LR
 | M02.F01.I01 | 合同管理是上游资源池，所有接样单通过 contractId 引用；本身不参与流程转换 |
 | M02.F01.I02 | 同上（合同新建/编辑） |
 | M02.F01.I03 | 同上（合同删除；与试验流程解耦） |
-| M98.F01.I01 | 运行时后端切换 UI 下拉，是 infra 切面（选择 msw/aspnetcore/springboot/nextjs 之一） |
-| M98.F01.I02 | baseURL 持久化到 localStorage 跨标签同步；infra 状态 |
-| M98.F02.I01 | axios 拦截器在 baseURL = getBaseUrl() 上自动跑；infra 副作用，不参与业务流程 |
+| M98.F01.I01 | ~~运行时后端切换 UI 下拉~~已废弃（ADR-0014） |
+| M98.F01.I02 | ~~baseURL 持久化到 localStorage 跨标签同步~~已废弃（ADR-0014）；baseURL 改由 NEXT_PUBLIC_API_BASE_URL 部署期配置 |
+| M98.F02.I01 | axios 拦截器在 baseURL = getApiBaseUrl() 上自动跑；infra 副作用，不参与业务流程 |
 | M98.F03.I01 | POST /api/auth/login 是 nextjs-backend-mode 下的认证入口；M00 选租户前置 |
 | M98.F03.I02 | GET /api/auth/me 给 M00.F01（当前用户会话）提供数据 |
 | M98.F03.I03 | POST /api/auth/logout 走侧栏登出按钮（M01.F05.I05） |

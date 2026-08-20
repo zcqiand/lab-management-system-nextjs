@@ -25,7 +25,7 @@
 
 **Full-stack 前端 + schema emit infra 仓**。Next.js 特殊：既是前端，又可通过 API routes 作后端。
 
-M97 全规划（infra，**没有 UI/data-fn**），M98 含产品切面（4-backend 切换 + Next.js API routes）。
+M97 全规划（infra，**没有 UI/data-fn**），M98 含产品切面（Next.js API routes + http-client 注入；M98.F01 运行时后端切换已废弃 — ADR-0014，改走 .env 单 URL）。
 M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 级原样 + REF 树中挂在这些 F 级下的 I 级子项（父 F ∈ BASE，check_align 合法扩充）。REF 已上线/开发中行在本仓初始「规划」，落地后逐波 tree-change 推进；REF 已废弃行照抄「已废弃」。
 
 ---
@@ -42,7 +42,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M05 | 数据统计 | 报告汇总表（按报告名称） | 规划 |
 | M06 | 检测能力 | 检测专项/项目/参数/标准/计算规则/技术要求/报告名称/参数界面 | 规划 |
 | M97 | schema emit infrastructure | lab-management-system-shared V*.sql → {schema.sql, schema.dbml, schema.ts} + pg 借链 | 规划 |
-| M98 | frontend 接线层 | 4-backend 切换 + apiclient + Next.js API routes（自身作后端） | 已上线 |
+| M98 | frontend 接线层 | apiclient + Next.js API routes（自身作后端）；M98.F01 4-backend 切换已废弃（ADR-0014），改走 NEXT_PUBLIC_API_BASE_URL | 已上线 |
 
 ---
 
@@ -109,16 +109,18 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 闭环定义 | 状态 |
 |---|---|---|---|
-| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 已上线 |
-| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getBaseUrl() 上自动跑 | 已上线 |
+| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 已废弃 |
+| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getApiBaseUrl() 上自动跑 | 已上线 |
 | M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 已上线 |
 
-### M98.F01 运行时后端切换
+### M98.F01 运行时后端切换（已废弃 — ADR-0014）
+
+> 后端 URL 改用 `NEXT_PUBLIC_API_BASE_URL`（部署期单 URL 配置）。MSW 启动门控改用 `NEXT_PUBLIC_ENABLE_MSW`。详见 [docs/adr/0014](../../../../docs/adr/0014-runtime-backend-switcher-removed.md)。
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 已上线 |
-| M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 已上线 |
+| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 已废弃 |
+| M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 已废弃 |
 
 ### M98.F02 http-client 注入
 

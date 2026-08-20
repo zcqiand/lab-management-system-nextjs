@@ -1,15 +1,44 @@
 {
   "schema": 1,
   "approved": true,
-  "base_sha": "e05d1235c7bf4f5b6af6c9f958d0058f549b8792",
-  "summary": "nextjs LoginPage OAuth 2.0 改造（M01.F05.I03 变更）。删 ?token= shortcut；改 authSsoAuthorize→OAuth 2.0 字段（response_type/client_id/redirect_uri/state）；改 sso/callback 走 grant_type=authorization_code + code + redirect_uri（不再走裸 fetch）；加 state 生成与一次性校验（防 CSRF）。同步 design/flow-function-map 描述。状态 规划→开发中，等 nextjs+vue+springboot+aspnetcore 都跟上后改 已上线。",
+  "base_sha": "bb04deb2a76b870f",
+  "summary": "废弃运行时后端切换（M98.F01 / I01 / I02）。改用 .env 单 URL 配置：NEXT_PUBLIC_API_BASE_URL + NEXT_PUBLIC_ENABLE_MSW + NEXT_PUBLIC_API_MODE。MSW 启动门控从「getBackend() !== 'msw'」改为「isMswEnabled()」。BackendSwitcher UI 删除，改为无交互 BackendBadge 显示当前 mode 标签。详见 ADR-0014。",
   "changes": [
     {
-      "id": "M01.F05.I03",
-      "action": "变更",
-      "name": "SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护）",
-      "reason": "原实现：(a) URL 带 ?token= 直接存 localStorage 跳业务页（token 经 URL 泄漏 + 首登缺 refreshToken 必抛错，与 React 仓同根因）；(b) authSsoAuthorize 走 {redirect} 自定义字段（不是 OAuth 2.0 redirect_uri）；(c) callback 走裸 fetch({code,state})，缺 grant_type/redirect_uri/client_secret 校验；(d) navigate 在 render 期副作用（虽然 nextjs 没 React 那条 'Cannot update BrowserRouter' 报，但同代码异味）。改后：完全按 OAuth 2.0 RFC 6749；authorize 端点收 response_type=code/client_id=lab/redirect_uri=<callback>/state=<random>（state 走 sessionStorage「lab.sso.state」）；callback body {grant_type:authorization_code, code, redirect_uri}（client_secret 仅后端持）；state 校验失败拒绝 + 清掉让用户重试。镜像 react 仓 LoginPage.tsx 的 OAuth 2.0 改法（react 已落地，nextjs + vue + springboot + aspnetcore 跨仓同步进行中）。"
+      "id": "M98.F01",
+      "action": "废弃",
+      "name": "运行时后端切换（4-backend）",
+      "reason": "ADR-0014：runtime 后端切换已删除。改用 NEXT_PUBLIC_API_BASE_URL（部署期单 URL）+ NEXT_PUBLIC_ENABLE_MSW（部署期 MSW 开关）。M98.F02 / M98.F03 保留（描述依然存活的 axios 拦截器与 Next.js API routes）。"
+    },
+    {
+      "id": "M98.F01.I01",
+      "action": "废弃",
+      "name": "BackendSwitcher 下拉",
+      "reason": "ADR-0014：UI 下拉删除。改用 src/components/app/backend-badge.tsx（无交互，仅显示 mode 标签，data-fn 无 M98.F01 锚点）。"
+    },
+    {
+      "id": "M98.F01.I02",
+      "action": "废弃",
+      "name": "持久化 baseUrl",
+      "reason": "ADR-0014：localStorage['lab.backend'] 持久化删除。baseUrl 不再运行时可变，由 .env 部署期决定。sessionStorage['lab.sso.state'] 仍保留（OAuth 2.0 state 防 CSRF，非 backend mode）。"
     }
   ],
-  "sync_files": []
+  "sync_files": [
+    "src/api/backend-config.ts",
+    "src/api/env.ts",
+    "src/state/backend-context.tsx",
+    "src/components/app/backend-switcher.tsx",
+    "src/components/app/backend-badge.tsx",
+    "src/mocks/browser.ts",
+    "src/app/layout.tsx",
+    "src/app/login/page.tsx",
+    "src/components/app/app-shell.tsx",
+    "src/components/app/login-form.tsx",
+    ".env.example",
+    "tests/api/m98-wiring.dom.test.tsx",
+    "tests/infrastructure-anchors.test.ts",
+    "docs/superpowers/specs/2026-08-14-full-feature-parity-design.md",
+    "docs/superpowers/plans/2026-08-14-full-feature-parity.md",
+    "CLAUDE.md"
+  ]
 }

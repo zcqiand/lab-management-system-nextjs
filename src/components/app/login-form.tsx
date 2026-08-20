@@ -1,15 +1,17 @@
 "use client";
 
 // 客户端化包装 /api/auth/login（nextjs 即后端 模式）。
-// 走 apiclient 的 backend-config 拿 baseUrl——'nextjs' 模式时同源，
-// 走本仓 src/app/api/auth/login/route.ts。
+// 走 apiclient 的 backend-config 拿 baseUrl——同源时走本仓 src/app/api/auth/login/route.ts。
+//
+// ADR-0014：runtime backend mode 切换已废弃；baseUrl 由 NEXT_PUBLIC_API_BASE_URL 决定。
 
 import { useState } from "react";
 import { authLogin } from "@/api/endpoints/endpoints";
-import { useBackend } from "@/state/backend-context";
+import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
 
 export function LoginForm() {
-  const { backend, baseUrl } = useBackend();
+  const baseUrl = getApiBaseUrl();
+  const apiMode = getApiMode();
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("dev123456");
   const [result, setResult] = useState<string>("");
@@ -21,10 +23,10 @@ export function LoginForm() {
         { baseURL: baseUrl },
       );
       setResult(
-        `mode=${backend} baseUrl=${JSON.stringify(baseUrl)}\nlogin OK → token=${(res as { token?: string }).token ?? "(no token)"}`,
+        `mode=${apiMode} baseUrl=${JSON.stringify(baseUrl)}\nlogin OK → token=${(res as { token?: string }).token ?? "(no token)"}`,
       );
     } catch (e) {
-      setResult(`mode=${backend} baseUrl=${JSON.stringify(baseUrl)}\nlogin FAIL: ${(e as Error).message}`);
+      setResult(`mode=${apiMode} baseUrl=${JSON.stringify(baseUrl)}\nlogin FAIL: ${(e as Error).message}`);
     }
   }
 
