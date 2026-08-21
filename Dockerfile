@@ -18,6 +18,10 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 
+# 拉 sibling 仓（file: 依赖 + gen:shared 需要 sibling 存在）
+RUN git clone --depth 1 https://github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw \
+ && git clone --depth 1 https://github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
