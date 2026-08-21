@@ -14,8 +14,9 @@ RUN npm config set registry https://registry.npmmirror.com
 
 # better-sqlite3@11 无 Node 24 预编译二进制(prebuild-install: No prebuilt binaries
 # found target=24.x),会回退 node-gyp 源码编译 —— 需要 python3/make/g++
+# + git 装 sibling 仓 (file: 依赖 + gen:shared)
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 make g++ \
+  && apt-get install -y --no-install-recommends python3 make g++ git ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # 拉 sibling 仓（file: 依赖 + gen:shared 需要 sibling 存在）
