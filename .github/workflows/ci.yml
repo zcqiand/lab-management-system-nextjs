@@ -28,6 +28,8 @@ jobs:
       # multi-repo-family.md §2 强制 sibling 引用,不以包依赖 import
       - name: Checkout shared sibling
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
+      - name: Checkout msw sibling
+        run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw
       - name: Install dependencies
         run: npm ci
       # shared-openapi.yaml 生成 src/api/endpoints/(gitignored,见 CLAUDE.md §3)
