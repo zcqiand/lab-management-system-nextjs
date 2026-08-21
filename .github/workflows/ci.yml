@@ -86,5 +86,15 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           # 不传 fingerprint,走 TOFU
           script: |
-            cd /home/deploy/${{ github.event.repository.name }}
-            sh ${{ github.event.repository.name }}.sh "${{ secrets.DOCKER_USERNAME }}" "${{ secrets.DOCKER_PASSWORD }}" "${{ github.ref_name }}"
+            # 自举: 首次部署无 /home/deploy/<repo>/ 时自动建 + 拉 deploy 脚本
+            # lab.env: deploy script 自己会生成随机 AUTH_JWT_SECRET,无需 secret
+            set -e
+            REPO="${{ github.event.repository.name }}"
+            DEPLOY_DIR="/home/deploy/$REPO"
+            mkdir -p "$DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
+            if [ ! -f "$REPO.sh" ]; then
+              curl -fsSL "https://raw.githubusercontent.com/zcqiand/${REPO}/refs/heads/master/deploy/${REPO}.sh" -o "$REPO.sh"
+              chmod +x "$REPO.sh"
+            fi
+            sh "$REPO.sh" "${{ secrets.DOCKER_USERNAME }}" "${{ secrets.DOCKER_PASSWORD }}" "${{ github.ref_name }}"
