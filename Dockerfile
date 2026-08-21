@@ -24,7 +24,11 @@ RUN git clone --depth 1 https://github.com/zcqiand/lab-management-system-msw.git
  && git clone --depth 1 https://github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# 用 npm install 不是 npm ci:package.json 引用 file:../lab-management-system-msw
+# (file path 版本),旧 lockfile 锁了 0.1.0 → npm ci 严格不匹配。
+# npm install 按 package.json + sibling 实际版本安装,自动重写 lockfile。
+# --legacy-peer-deps 兼容某些宽松 peer 依赖。
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 
 COPY . .
 # build 阶段用内存库:next build 收集页面数据时会 import src/db/index.ts(顶层开库),
