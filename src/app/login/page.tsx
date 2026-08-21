@@ -82,6 +82,8 @@ export default function LoginPage() {
           grant_type: "authorization_code",
           code,
           redirect_uri: computeRedirectUri(),
+          // RFC 6749 §4.1.3 + shared 契约四字段：state 原样回传（后端 cookie 校验 CSRF）
+          state: stateParam,
         },
         { baseURL: baseUrl },
       )

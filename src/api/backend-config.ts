@@ -16,7 +16,9 @@
 import { env } from "./env";
 
 export function getApiBaseUrl(): string {
-  return env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5173";
+  // 空串合法（测试同源相对 URL，见 env.ts）：默认值已在 env.ts 落过一次，
+  // 这里再 || 会把空串吞回绝对 URL（msw 相对路径 handler 失配的根因之一）。
+  return env.NEXT_PUBLIC_API_BASE_URL;
 }
 
 export function getApiMode(): string {
