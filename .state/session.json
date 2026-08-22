@@ -1,35 +1,24 @@
 {
-  "schema": 1,
+  "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "B7 + L2 lint cleanup：nextjs 后端 wrapLinks 4-field Page<T>;9 个 pre-existing L2 lint 错误 + 5 个 L3 type 错误清掉",
+  "current_task": "Post-Phase-3 frontend 集成收尾：@lab/management-system-msw 错位 devDeps → deps",
+  "last_session_at": "2026-08-22",
+  "last_session_summary": "@lab/management-system-msw 从 devDependencies 挪到 dependencies（src/app/api/{contracts,inspection-param-interfaces}/{,[id]}route.ts 6 个文件 runtime 真 import）；commit 8a2fde2 + tag v0.3.11-20260822 pushed",
   "done": [
-    "src/lib/api-helpers.ts:wrapLinks 由 2-field {items,total} 升级 4-field {items,total,page,pageSize} 与 TypeSpec Page<T> 对齐;url 解析 page/pageSize 走 num() helper",
-    "src/lib/auth/directory.ts:_username stub 用 void _username; + 注释('Noop 单租户,_username 不参与过滤')",
-    "src/lib/auth/jwt.ts:const ALG='HS256' 实际未用 → 改 HEADER_JSON=`{\"alg\":\"${ALG}\",\"typ\":\"JWT\"}` 真正消费",
-    "src/lib/auth/saas.ts:6 个 NoopSaas* stub 参数 _grantType/_code/_refreshToken/_redirectUri/_saasAccessToken 各加 void + 注释(无需 eslint-disable,符合 nextjs CLAUDE.md §2 硬约束)",
-    "tests/lib/auth/saas.test.ts:5 处 vi import 移除 + sent[i] 非空断言 !",
-    "tests/lib/auth/state-cookie.test.ts / jwt.test.ts / auth-service.test.ts:7 处 split/matches[1] 数组索引非空断言 ! 修 CS2532/CS2345",
-    "src/lib/auth/helpers.ts:match[1] 非空断言",
-    "src/lib/auth/config.ts:explicitTenants[0] 非空断言",
-    "eslint --fix 自动清 33 个 Unused eslint-disable directive warnings(L2 干净)",
-    "nextjs 仓 gate L0-L5 全绿 158 条目 0 软告警 0 warnings"
+    "@lab/management-system-msw 从 devDependencies 挪到 dependencies（gate L0/L1/L2/L3/L4/L5 全绿 exit 0）",
+    "commit 8a2fde2 + tag v0.3.11-20260822 + push origin/master"
   ],
   "next": [
-    "git add -A + commit（src/lib/api-helpers.ts + src/lib/auth/* + tests/lib/auth/*）",
-    "Optional: pre-existing L4 'receipts-pg.test.ts withdraw 还原 lastSubmittedBy' 失败与本 batch 无关,旧工单",
-    "Optional: 33 个 Unused eslint-disable 是 linter --fix 自动清的,后续如有新 disable 指令要带 'no-redeclare' / 'exhaustive-deps' 同行注释说明"
+    "无（本批原子收尾）"
   ],
   "open_questions": [
-    "pre-existing L4 receipts-pg.test.ts 'withdraw 不清空 lastSubmittedBy' 失败 — 与 OAuth/Page<T> 工作无关,需独立 sprint 处理"
+    "src/app/login/page.tsx:81 L3 SsoCallbackRequest.state 缺失 —— ADR-0012 §6 标记为 pre-existing，与本批无关；新 sprint 单独起 issue 追"
   ],
   "dont": [
-    "不要用 eslint-disable 掩盖 lint(CLAUDE.md §2 硬约束 '除非同行注释给出理由')",
-    "不要把 `_` 前缀参数当 'eslint-disable 模板' 重复声明(CLAUDE.md §2 '禁止用 eslint-disable 掩盖' — 用 void _param; + 注释替代)",
-    "不要 catch 后吞掉异常(CLAUDE.md §2 硬约束)",
-    "不要硬编码连接串/密钥(CLAUDE.md §2 硬约束 — 放 .env 或 env var)",
-    "不要让 nextjs 仓直连外部 saas dev 凭据(即便 Profile=default 也是 env)",
-    "不要改 LabJwtSigner.cs 的算法为 RSA 或 ES(ADR-0008 §1 选 HMAC 锁定)",
-    "不要让 dotnet format 触发时本地 Lab.AspNetCore.exe 进程残留(MSB3027=旧进程锁 — taskkill //F //IM)"
+    "不要把 @lab/management-system-msw 拉回 devDependencies —— BFF route handler 是 Next.js runtime 代码段，依赖必须 dependencies",
+    "不要为了'避免 devDep 污染产物'把 msw 包体打入 next build —— transpilePackages 配置已解（不在 transpilePackages 即可）",
+    "不要 catch 后吞掉异常（旧 schema 1 既有约束保留）",
+    "不要硬编码连接串/密钥（旧 schema 1 既有约束保留）"
   ],
   "active_branch": "master"
 }
