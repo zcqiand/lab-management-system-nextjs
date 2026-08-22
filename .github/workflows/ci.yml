@@ -16,6 +16,31 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # generated/schema.ts 是 drizzle-kit pull 产出（gitignored,见 CLAUDE.md §3），
+    # src/db/schema.ts:7 export * from "../../generated/schema"。CI 起 postgres 服务
+    # 跑 migrate + pull schema，再 build/typecheck。DB host/port/credentials 由
+    # services.postgres 自动注入到 DATABASE_URL。
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lab_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
+      PG_HOST: localhost
+      PG_PORT: "5432"
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: lab_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,12 +60,17 @@ jobs:
       # shared-openapi.yaml 生成 src/api/endpoints/(gitignored,见 CLAUDE.md §3)
       - name: gen:shared
         run: npm run gen:shared
-      # DB_PATH=:memory: —— next build 会 import src/db/index.ts(顶层开库),CI 没有 data/ 目录
-      # lab-nextjs 专属;saas-nextjs 用 PostgreSQL,不带这个 env
+      # 把 shared 的 V*.sql 灌到 CI postgres,再建表 drizzle schema
+      # sync-db.mjs 在 sibling 仓 ../lab-management-system-shared/scripts/（CLAUDE.md §4）
+      - name: sync-db (CI postgres)
+        run: node ../lab-management-system-shared/scripts/sync-db.mjs
+      # drizzle-kit pull:从已 migrate 的 CI postgres 拉 schema 到 generated/schema.ts
+      # 这是 src/db/schema.ts:7 export * from "../../generated/schema" 的 SSOT
+      - name: drizzle-kit pull → generated/schema.ts
+        run: npx --no drizzle-kit pull --config=drizzle.config.pg.ts
+      # Build —— next build 会 import src/db/schema.ts,需要 generated/schema.ts 已就位
       - name: Build
         run: npm run build
-        env:
-          DB_PATH: ":memory:"
       - name: L1 format
         run: npx --no prettier --check src tests
       - name: L2 lint
