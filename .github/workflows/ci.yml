@@ -68,6 +68,11 @@ jobs:
       # 这是 src/db/schema.ts:7 export * from "../../generated/schema" 的 SSOT
       - name: drizzle-kit pull → generated/schema.ts
         run: npx --no drizzle-kit pull --config=drizzle.config.pg.ts
+      # drizzle-kit 解析 V009/V012 的 `DEFAULT ''` 会有 bug,产出 `default(').notNull()`
+      # 而不是合法的 `default('').notNull()`。sed 修。
+      # 等待 drizzle-kit 升级修这个再撤补丁。
+      - name: Fix drizzle-kit DEFAULT '' bug
+        run: sed -i "s/default(')\./default('')./g" generated/schema.ts
       # Build —— next build 会 import src/db/schema.ts,需要 generated/schema.ts 已就位
       - name: Build
         run: npm run build
