@@ -29,10 +29,11 @@ interface FlowHistoryEntry {
   operator?: string;
 }
 
-describe("receipts 三态流转（pg）", () => {
+// CI 无种子数据,直接 describe.skipIf 在注册时跳过整块。
+// hasPg 仍是动态探测(vitest module 加载期 try pg),保留 beforeAll 兜底。
+describe.skipIf(skipReason !== undefined)("receipts 三态流转（pg）", () => {
   beforeAll(function (this: { skip(): void } & Record<string, unknown>) {
     if (!hasPg) this.skip();
-    if (skipReason) this.skip();
   });
 
   it("not_yet: 停在 receiving 的单据", async () => {
