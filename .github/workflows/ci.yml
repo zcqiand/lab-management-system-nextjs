@@ -73,6 +73,10 @@ jobs:
       # 等待 drizzle-kit 升级修这个再撤补丁。
       - name: Fix drizzle-kit DEFAULT '' bug
         run: sed -i "s/default(')\./default('')./g" generated/schema.ts
+      # drizzle-kit 在某些版本会 import `sql` 但实际未用,tsc L3 报
+      # "'sql' is declared but its value is never read"。sed 移除整行。
+      - name: Drop unused `sql` import from generated/schema.ts
+        run: sed -i "/^import { sql } from \"drizzle-orm\";$/d" generated/schema.ts
       # Build —— next build 会 import src/db/schema.ts,需要 generated/schema.ts 已就位
       - name: Build
         run: npm run build
