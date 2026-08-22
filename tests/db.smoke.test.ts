@@ -102,10 +102,13 @@ describe("DB smoke (PG)", () => {
     expect(rows[0]?.ok).toBe(1);
   });
 
-  fnTest(["M97.F02.I01", "M97.F02.I02"], "pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）", async () => {
+  fnTest(["M97.F02.I01", "M97.F02.I02"], "pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）", async () => {
     if (!client) return;
     const { rows } = await client.query("SELECT current_database() AS db");
-    expect(rows[0]?.db).toBe("lab_dev");
+    // CI 默认 lab_test,本地默认 lab_dev。两条路径都验「能 SELECT」即可,不绑 DB 名
+    const dbName = rows[0]?.db as string | undefined;
+    expect(typeof dbName).toBe("string");
+    expect(dbName?.length ?? 0).toBeGreaterThan(0);
   });
 
   fnTest(["M97.F02.I03"], "借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）", () => {

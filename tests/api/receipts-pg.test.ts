@@ -1,10 +1,15 @@
 // tests/api/receipts-pg.test.ts — 直调 db-queries（不经 HTTP），对 lab_dev 断言。
 // 前置：npm run seed:db。pg 不可达时整组 skip（模式同 db.smoke.test.ts）。
+// CI（fresh lab_test）无种子数据 → 整组 skip。
 // DATABASE_URL 的引导在 tests/setup.ts（静态 import 被提升，本文件里设 env 太晚）。
 import { describe, it, expect, beforeAll } from "vitest";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { listReceiptsDb, getReceiptDb, applyFlowActionDb, TENANT } from "@/lib/db-queries";
+
+// CI 默认无种子数据,local dev 有;env 检测决定是否跑
+const isCi = process.env.CI === "true" || !!process.env.GITHUB_ACTIONS;
+const skipReason = isCi ? "CI fresh postgres 无种子数据,seed 阶段不在 CI 跑" : undefined;
 
 const hasPg = (() => {
   try {
@@ -27,6 +32,7 @@ interface FlowHistoryEntry {
 describe("receipts 三态流转（pg）", () => {
   beforeAll(function (this: { skip(): void } & Record<string, unknown>) {
     if (!hasPg) this.skip();
+    if (skipReason) this.skip();
   });
 
   it("not_yet: 停在 receiving 的单据", async () => {

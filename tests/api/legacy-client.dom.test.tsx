@@ -1,9 +1,12 @@
 import { expect, test } from "vitest";
 import { apiClient, API_ROUTES } from "@/api/legacy-client";
 
+// CI 没起 msw/BFF,这些端点集成测试需要 server。CI 跳过,local dev 跑。
+const isCi = process.env.CI === "true" || !!process.env.GITHUB_ACTIONS;
+
 // REF UI 依赖的列表端点在 lab-msw 全部可达（M1 映射的集成冒烟）。
 // 失败 = msw 仓缺 handler，先修 msw 再继续移植。
-test("API_ROUTES 映射的列表端点全部可达", async () => {
+test.skipIf(isCi)("API_ROUTES 映射的列表端点全部可达", async () => {
   const gets = [
     "/inspection-calculation-rules", "/inspection-objects", "/inspection-parameters",
     "/inspection-standards", "/inspection-technical-requirements", "/inspection-param-interfaces",
@@ -17,7 +20,7 @@ test("API_ROUTES 映射的列表端点全部可达", async () => {
 
 // 4 条 link 路由（msw 仓已补 GET handler）：带过滤参数各取一个种子 code，
 // 断言 200 + 数组形状 + 过滤字段全部命中。
-test("API_ROUTES 映射的 link 端点全部可达", async () => {
+test.skipIf(isCi)("API_ROUTES 映射的 link 端点全部可达", async () => {
   const cases = [
     {
       legacy: "/inspection-standard-parameters",
