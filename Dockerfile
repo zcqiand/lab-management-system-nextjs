@@ -90,7 +90,7 @@ COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 # sync-db.mjs 路径硬编码 ../lab-management-system-shared/sql/migrations
 # (相对 /app),sibling 仓 git clone 在 builder /app 父目录,运行时容器里没有。
 # 显式 COPY 到容器同绝对路径,sync-db.mjs 不用改。
-COPY --from=builder --chown=node:node /saas-identity-platform-shared/sql/migrations /saas-identity-platform-shared/sql/migrations
+COPY --from=builder --chown=node:node /lab-management-system-shared/sql/migrations /lab-management-system-shared/sql/migrations
 
 # scripts/ 与 package.json(runtime sync-db / seed-db / drizzle 借链用)
 COPY --from=builder --chown=node:node /app/scripts ./scripts
