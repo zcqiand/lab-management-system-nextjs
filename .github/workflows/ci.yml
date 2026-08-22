@@ -98,10 +98,51 @@ jobs:
     concurrency:
       group: deploy-${{ github.event.repository.name }}-${{ github.ref }}
       cancel-in-progress: false
+    # generated/schema.ts 在 .gitignore,git checkout 不带。deploy job 起 postgres service
+    # 跑 sync-db + drizzle-kit pull,产物落 generated/,docker build COPY . . 时已有。
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lab_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
+      PG_HOST: localhost
+      PG_PORT: "5432"
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: lab_test
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false   # 防 GITHUB_TOKEN 泄露到后续 step
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          registry-url: https://registry.npmmirror.com/
+      - name: Checkout shared sibling
+        run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
+      - name: Install dependencies
+        run: npm ci
+      - name: sync-db (CI postgres)
+        run: node ../lab-management-system-shared/scripts/sync-db.mjs
+      - name: drizzle-kit pull → generated/schema.ts
+        run: npx --no drizzle-kit pull --config=drizzle.config.pg.ts
+      # sed 同样修复 drizzle-kit DEFAULT '' / unused sql import bug
+      - name: Fix drizzle-kit DEFAULT '' bug
+        run: sed -i "s/default(')\./default('')./g" generated/schema.ts
+      - name: Drop unused `sql` import from generated/schema.ts
+        run: sed -i -E '/^import \{ sql \} from "drizzle-orm"\s*;?\s*$/d' generated/schema.ts
 
       # secrets 全部建在 Repository 级,不声明 environment
       - name: Login to Docker Hub

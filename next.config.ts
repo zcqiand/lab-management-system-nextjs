@@ -10,8 +10,12 @@ import type { NextConfig } from "next";
  * `transpilePackages: ["@lab/management-system-msw"]` — msw 是 file: 依赖,
  * 仓内 .ts 文件不上 next 默认 transpile → webpack 'Unexpected token' at import type。
  * 强制走 swc-loader 编 msw 的 .ts 文件(与 saas-nextjs 同模式)。
+ *
+ * `output: "standalone"` — Dockerfile runtime stage `COPY .next/standalone ./`
+ * 拿到最小可启动包,镜像 < 200 MB(对比单阶段 full node_modules ~700 MB)。
  */
 const nextConfig: NextConfig = {
+  output: "standalone",
   serverExternalPackages: ["pg"],
   transpilePackages: ["@lab/management-system-msw"],
   experimental: {
