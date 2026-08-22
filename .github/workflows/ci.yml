@@ -166,11 +166,15 @@ jobs:
 
       - name: Pull image and restart container on VPS
         uses: appleboy/ssh-action@v1
+        env:
+          NGINX_DOMAIN: ${{ vars.NGINX_DOMAIN }}
+          NGINX_CERT_BASENAME: ${{ vars.NGINX_CERT_BASENAME }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           # 不传 fingerprint,走 TOFU
+          envs: NGINX_DOMAIN,NGINX_CERT_BASENAME
           script: |
             # 自举: 首次部署无 /home/deploy/<repo>/ 时自动建 + 拉 deploy 脚本
             # lab.env: deploy script 自己会生成随机 AUTH_JWT_SECRET,无需 secret

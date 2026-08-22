@@ -39,11 +39,11 @@ if [ ! -f "$BASE/lab.env" ]; then
   umask 077
   {
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://react-id.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://react-id.xiangru.uk/api}"
+    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
     printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-app-lab}"
-    # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 SQLite)
+    # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
     printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
   } > "$BASE/lab.env"
@@ -60,13 +60,45 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_BASE_URL=' "$BASE/lab.env"; then
   echo "→ append SAAS_BASE_URL to existing $BASE/lab.env"
   umask 077
   {
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://react-id.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://react-id.xiangru.uk/api}"
+    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
     printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-app-lab}"
   } >> "$BASE/lab.env"
 fi
 mkdir -p "$BASE/data"
+
+# nginx vhost 自举（缺时创建,不 reload —— reload 要 root）:
+# 检测 /etc/nginx/sites-enabled/<NGINX_DOMAIN> 是否存在;缺时从 nginx-vps.conf.example
+# 模板渲染,做 symlink。reload 需 sudo,留给手工:
+#   sudo nginx -t && sudo systemctl reload nginx
+NGINX_DOMAIN="${NGINX_DOMAIN:-lab-nextjs.xiangru.uk}"
+NGINX_CERT_BASENAME="${NGINX_CERT_BASENAME:-xiangru-uk}"
+NGINX_SITES_AVAILABLE="/etc/nginx/sites-available"
+NGINX_SITES_ENABLED="/etc/nginx/sites-enabled"
+NGINX_VHOST_FILE="${NGINX_SITES_AVAILABLE}/${NGINX_DOMAIN}"
+NGINX_VHOST_LINK="${NGINX_SITES_ENABLED}/${NGINX_DOMAIN}"
+NGINX_TEMPLATE="${BASE}/nginx-vps.conf.example"
+
+# 拉模板（deploy/ 目录随仓库 deploy 脚本一起,但首次拉时可能不存在,补一下）
+if [ ! -f "${NGINX_TEMPLATE}" ]; then
+  echo "→ fetching nginx-vps.conf.example template"
+  curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"
+fi
+
+if [ -e "${NGINX_VHOST_LINK}" ] || [ -e "${NGINX_VHOST_FILE}" ]; then
+  echo "→ nginx vhost ${NGINX_VHOST_FILE} already exists, skip bootstrap"
+else
+  echo "→ nginx vhost missing, bootstrapping ${NGINX_VHOST_FILE} (domain=${NGINX_DOMAIN} cert=${NGINX_CERT_BASENAME})"
+  umask 022
+  sed \
+    -e "s/lab\.YOUR_DOMAIN/${NGINX_DOMAIN}/g" \
+    -e "s|/etc/nginx/ssl/your-cert.crt|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
+    -e "s|/etc/nginx/ssl/your-cert.key|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.key|g" \
+    "${NGINX_TEMPLATE}" > "${NGINX_VHOST_FILE}"
+  ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}"
+  echo "→ nginx vhost created. To enable: sudo nginx -t && sudo systemctl reload nginx"
+fi
 
 echo "→ image: $IMAGE"
 echo "→ docker login"
