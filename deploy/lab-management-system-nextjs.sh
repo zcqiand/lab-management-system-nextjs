@@ -49,8 +49,8 @@ if [ ! -f "$BASE/lab.env" ]; then
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
+    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-lab-management}"
     # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
     printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
@@ -75,11 +75,18 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_BASE_URL=' "$BASE/lab.env"; then
   echo "→ append SAAS_BASE_URL to existing $BASE/lab.env"
   umask 077
   {
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
+    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
     printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-lab-management}"
   } >> "$BASE/lab.env"
+fi
+# v0.3.44:迁移已知旧默认值。lab.env 已存在且 SAAS_BASE_URL 还是早期脚本的
+# saas-react/react-id 旧默认 -> 原地替换为 saas-nextjs(SSO 供给方切换,
+# /api/auth/sso/authorize 服务端用它拼登录页跳转)。自定义域名不受影响。
+if [ -f "$BASE/lab.env" ] && grep -qE '^(SAAS_BASE_URL|NEXT_PUBLIC_SAAS_BASE_URL)=https://(saas-react|react-id)(\.xiangru\.uk|\.xiangru\.uk/api)$' "$BASE/lab.env"; then
+  echo "-> migrate stale saas-react/react-id defaults to saas-nextjs in $BASE/lab.env"
+  sed -i -E 's#^(SAAS_BASE_URL|NEXT_PUBLIC_SAAS_BASE_URL)=https://(saas-react|react-id)\.xiangru\.uk(/api)?$#\1=https://saas-nextjs.xiangru.uk#' "$BASE/lab.env"
 fi
 mkdir -p "$BASE/data"
 
