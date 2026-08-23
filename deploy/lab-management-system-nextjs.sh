@@ -33,6 +33,9 @@ fi
 # setup-vps.sh 若已生成过则这里跳过。
 # v0.3.0.1:同时写入 SAAS_BASE_URL(server)与 NEXT_PUBLIC_SAAS_BASE_URL(client)。
 # v0.3.34:加 DATABASE_URL(src/db/index.ts 用 postgres-js,容器启动必填)。
+# v0.3.35:NEXT_PUBLIC_APP_ID 对齐 src/api/env.ts:11 真正读的 key(原本写错名
+# NEXT_PUBLIC_SAAS_APP_ID 是死配置);SAAS_OAUTH_CLIENT_ID 在 src/ 0 引用,
+# 删(等 M03.F02 OIDC 真落地时再补)。
 # 必须从 \$DATABASE_URL env 或 ssh-action envs 传入,不允许凭空写默认值
 # —— 默认 URL 会触发对 saas_dev 等生产容器写入,跨域事故。
 # 缺则 fail fast,提示用户用 GitHub Secret 配 \$DATABASE_URL。
@@ -41,7 +44,7 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 if [ ! -f "$BASE/lab.env" ]; then
-  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_BASE_URL + NEXT_PUBLIC_ENABLE_MSW=false)"
+  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_BASE_URL + NEXT_PUBLIC_APP_ID)"
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
@@ -53,8 +56,7 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
-    printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
-    printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-app-lab}"
+    printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-app-lab}"
     # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
     printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
