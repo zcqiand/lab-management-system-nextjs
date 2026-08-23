@@ -48,11 +48,6 @@ if [ ! -f "$BASE/lab.env" ]; then
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
-    printf 'PG_HOST=%s\n' "${PG_HOST:-}"
-    printf 'PG_PORT=%s\n' "${PG_PORT:-}"
-    printf 'PG_USER=%s\n' "${PG_USER:-}"
-    printf 'PG_PASSWORD=%s\n' "${PG_PASSWORD:-}"
-    printf 'PG_DATABASE=%s\n' "${PG_DATABASE:-}"
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
@@ -66,14 +61,7 @@ fi
 if [ -f "$BASE/lab.env" ] && ! grep -q '^DATABASE_URL=' "$BASE/lab.env"; then
   echo "→ append DATABASE_URL to existing $BASE/lab.env"
   umask 077
-  {
-    printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
-    printf 'PG_HOST=%s\n' "${PG_HOST:-}"
-    printf 'PG_PORT=%s\n' "${PG_PORT:-}"
-    printf 'PG_USER=%s\n' "${PG_USER:-}"
-    printf 'PG_PASSWORD=%s\n' "${PG_PASSWORD:-}"
-    printf 'PG_DATABASE=%s\n' "${PG_DATABASE:-}"
-  } >> "$BASE/lab.env"
+  printf 'DATABASE_URL=%s\n' "$DATABASE_URL" >> "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 NEXT_PUBLIC_ENABLE_MSW=false,追加(MSW 必须关)
 if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_ENABLE_MSW=' "$BASE/lab.env"; then
@@ -90,7 +78,7 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_BASE_URL=' "$BASE/lab.env"; then
     printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
-    printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-app-lab}"
+    printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-lab-management}"
   } >> "$BASE/lab.env"
 fi
 mkdir -p "$BASE/data"

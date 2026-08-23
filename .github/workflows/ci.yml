@@ -36,11 +36,6 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
-      PG_HOST: localhost
-      PG_PORT: "5432"
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_DATABASE: lab_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -61,7 +56,8 @@ jobs:
       - name: gen:shared
         run: npm run gen:shared
       # 把 shared 的 V*.sql 灌到 CI postgres,再建表 drizzle schema
-      # sync-db.mjs 在 sibling 仓 ../lab-management-system-shared/scripts/（CLAUDE.md §4）
+      # sync-db.mjs 在 sibling 仓 ../lab-management-system-shared/scripts/(CLAUDE.md §4)。
+      # v0.2.6+ 优先读 DATABASE_URL,sync-db.mjs 内的 PG_* 兜底仅用于兼容老脚本。
       - name: sync-db (CI postgres)
         run: node ../lab-management-system-shared/scripts/sync-db.mjs
       # drizzle-kit pull:从已 migrate 的 CI postgres 拉 schema 到 generated/schema.ts
@@ -116,11 +112,6 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
-      PG_HOST: localhost
-      PG_PORT: "5432"
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_DATABASE: lab_test
     steps:
       - uses: actions/checkout@v4
         with:
@@ -169,18 +160,15 @@ jobs:
         env:
           NGINX_DOMAIN: ${{ vars.NGINX_DOMAIN }}
           NGINX_CERT_BASENAME: ${{ vars.NGINX_CERT_BASENAME }}
+          # 单 Secret:DATABASE_URL 含 host/port/user/password/db 全套
+          # (sync-db.mjs 优先读 DATABASE_URL,PG_* 兜底仅用于老 deploy script 兼容)
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PG_HOST: ${{ secrets.PG_HOST }}
-          PG_PORT: ${{ secrets.PG_PORT }}
-          PG_USER: ${{ secrets.PG_USER }}
-          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-          PG_DATABASE: ${{ secrets.PG_DATABASE }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           # 不传 fingerprint,走 TOFU
-          envs: NGINX_DOMAIN,NGINX_CERT_BASENAME,DATABASE_URL,PG_HOST,PG_PORT,PG_USER,PG_PASSWORD,PG_DATABASE
+          envs: NGINX_DOMAIN,NGINX_CERT_BASENAME,DATABASE_URL
           script: |
             # 自举: 首次部署无 /home/deploy/<repo>/ 时自动建 + 拉 deploy 脚本
             # lab.env: deploy script 自己会生成随机 AUTH_JWT_SECRET,无需 secret
