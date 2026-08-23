@@ -12,6 +12,8 @@ import { defineConfig } from "drizzle-kit";
  * 输出到 generated/；`generated/` 已在 .gitignore 内。
  */
 
+// 优先 DATABASE_URL(单 string,ADR-0009);缺失时回退到 PG_* 拼(兼容 dev 本地与姊妹仓)。
+const DATABASE_URL = process.env.DATABASE_URL;
 const host = process.env.PG_HOST ?? "100.79.128.25";
 const port = Number(process.env.PG_PORT ?? 5432);
 const user = process.env.PG_USER ?? "postgres";
@@ -22,7 +24,9 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./generated",
   dialect: "postgresql",
-  dbCredentials: { host, port, user, password, database, ssl: false },
+  dbCredentials: DATABASE_URL
+    ? { url: DATABASE_URL, ssl: false }
+    : { host, port, user, password, database, ssl: false },
   verbose: false,
   strict: true,
 });
