@@ -1,7 +1,9 @@
 "use client";
 
-// SidebarNav — 拉 saas /api/saas/me/menus，按 NEXT_PUBLIC_LAB_APP_CODE
-// 过滤本仓菜单。菜单数据来自 saas，应用代码来自 env（不写死在客户端）。
+// SidebarNav — 浏览器直连 saas /api/v1/me/menus + /api/v1/apps/[code]
+// （v0.3.47 之前走 lab BFF /api/saas/* proxy，proxy 不转 JWT 在 Phase 6 接 DB
+// 后把 saas 的 401 包成 502；现改浏览器直连，靠 saas-nextjs middleware CORS
+// 放行跨域）。菜单数据来自 saas，应用代码来自 env（不写死在客户端）。
 //
 // 与 saas 仓 SidebarNav 的差异：
 //   - 不引 NavItem props（saas 用硬编码 NavItem[] + lucide 图标）
@@ -36,6 +38,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/state/auth-context";
 
 // 与 saas 的 EffectiveMenuNode 对齐（手写，避免跨仓依赖）
 interface MenuNode {
@@ -359,7 +362,11 @@ function ChevronToggle({ expanded }: { expanded: boolean }) {
   );
 }
 
-/** 客户端 hook：拉 /api/saas/me/menus?appCode=<code> */
+/** 客户端 hook：浏览器直连 saas /api/v1/me/menus?appCode=<code>
+ *  v0.3.47 起走直连（saas middleware CORS 放行跨域），不再经 lab BFF proxy。
+ *  Bearer token 来自 useAuth()（SSO callback 拿到的 saas accessToken，存 localStorage）。
+ *  token 在 auth-context 里 mount 后才 hydrate，所以 deps 用 [token]，!token 时直接
+ *  return 避免拿 null token 打 saas 触发 401。 */
 export function useSaasMenus(): {
   data: MenuNode[] | null;
   loading: boolean;
@@ -368,14 +375,25 @@ export function useSaasMenus(): {
   const [data, setData] = useState<MenuNode[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { token, clearToken } = useAuth();
 
   useEffect(() => {
+    if (!token) return; // auth-context 首次 render token=null，hydrate 后 effect 重跑
     let cancelled = false;
     setLoading(true);
-    fetch(`/api/saas/me/menus?appCode=${encodeURIComponent(APP_CODE)}`, {
+    fetch(`${SAAS_BASE}/api/v1/me/menus?appCode=${encodeURIComponent(APP_CODE)}`, {
       cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(async (r) => {
+        if (r.status === 401) {
+          // token 过期/被吊销：清掉回登录页（mirror apiClient legacy interceptor 模式）
+          clearToken();
+          if (typeof window !== "undefined") window.location.assign("/login");
+          return Promise.reject(401);
+        }
+        return r.ok ? r.json() : Promise.reject(r.status);
+      })
       .then((d: MenuNode[]) => {
         if (cancelled) return;
         setData(d);
@@ -389,13 +407,15 @@ export function useSaasMenus(): {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [token, clearToken]);
 
   return { data, loading, error };
 }
 
-/** 客户端 hook：拉 /api/saas/app?appCode=<code>（saas 公共应用目录）。
- *  应用名不写死在客户端，由 saas 注册信息驱动；不可达时回退 null（调用方显示占位）。 */
+/** 客户端 hook：浏览器直连 saas /api/v1/apps/<code>（saas 公共应用目录，免鉴权）。
+ *  应用名不写死在客户端，由 saas 注册信息驱动；不可达时回退 null（调用方显示占位）。
+ *  /apps/[code] 当前免鉴权，所以即使没 token 也拉；但若 token 存在仍带上（forward-compat，
+ *  万一 saas 把这端点改成鉴权，前端不用再改）。 */
 export function useSaasApp(): {
   app: { code: string; name: string; description?: string; icon?: string } | null;
   loading: boolean;
@@ -409,12 +429,16 @@ export function useSaasApp(): {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(`/api/saas/app?appCode=${encodeURIComponent(APP_CODE)}`, {
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    fetch(`${SAAS_BASE}/api/v1/apps/${encodeURIComponent(APP_CODE)}`, {
       cache: "no-store",
+      headers,
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((d: { code: string; name: string }) => {
@@ -430,9 +454,11 @@ export function useSaasApp(): {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [token]);
 
   return { app, loading, error };
 }
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
+const SAAS_BASE =
+  process.env.NEXT_PUBLIC_SAAS_BASE_URL ?? "http://localhost:3000";
