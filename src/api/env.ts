@@ -7,7 +7,7 @@
 // ADR-0012 v0.3.0：删除 NEXT_PUBLIC_ENABLE_MSW（Service Worker 模式已删除）。
 export const env = {
   IDENTITY_BASE_URL: process.env.NEXT_PUBLIC_IDENTITY_BASE_URL || "/api",
-  APP_ID: process.env.NEXT_PUBLIC_APP_ID || "app-lab",
+  APP_ID: process.env.NEXT_PUBLIC_APP_ID || "lab-management",
   SSO_AUTHORIZE_URL: process.env.NEXT_PUBLIC_SSO_AUTHORIZE_URL || "/sso/authorize",
   OAUTH_SCOPES: process.env.NEXT_PUBLIC_OAUTH_SCOPES || "",
   // 区分「未设」(undefined) 和「空串」(explicit empty) -- 镜像 lab-react readEnv：

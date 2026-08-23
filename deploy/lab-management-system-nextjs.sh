@@ -56,7 +56,7 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
-    printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-app-lab}"
+    printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-lab-management}"
     # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
     printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
