@@ -106,6 +106,11 @@ COPY --from=builder --chown=node:node /lab-management-system-shared/scripts/sync
 COPY --from=builder --chown=node:node /app/scripts ./scripts
 COPY --from=builder --chown=node:node /app/package.json ./package.json
 
+# seed-db.ts import ../src/lib/db-map(toSnake,row↔DTO 纯函数零 import)。
+# standalone 只 trace app 运行时 import 图,scripts/ 不在内 -> 显式 COPY 这一个文件。
+# 整个 src/ 不进 runtime(scripts 不拖业务链,CLAUDE.md §3)。
+COPY --from=builder --chown=node:node /app/src/lib/db-map.ts ./src/lib/db-map.ts
+
 # data/ 占位(docker run -v 挂载点;裸跑不挂卷也不至于炸)
 RUN mkdir -p /data && chown -R node:node /data
 
