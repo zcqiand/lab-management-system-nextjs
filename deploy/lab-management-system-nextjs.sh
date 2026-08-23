@@ -32,12 +32,24 @@ fi
 # 不进 CI 日志/仓库)。重新生成会失效所有登录态,故仅在文件不存在时执行;
 # setup-vps.sh 若已生成过则这里跳过。
 # v0.3.0.1:同时写入 SAAS_BASE_URL(server)与 NEXT_PUBLIC_SAAS_BASE_URL(client)。
-# 这两个值仅在 lab.env 不存在时初始化;已有 env 文件里若没这两行,容器会用
-# Next.js 默认 'http://localhost:3000' → SSO 跳转回 404,务必在 setup 时写入。
+# v0.3.34:加 DATABASE_URL(src/db/index.ts 用 postgres-js,容器启动必填)。
+# 必须从 \$DATABASE_URL env 或 ssh-action envs 传入,不允许凭空写默认值
+# —— 默认 URL 会触发对 saas_dev 等生产容器写入,跨域事故。
+# 缺则 fail fast,提示用户用 GitHub Secret 配 \$DATABASE_URL。
+if [ -z "${DATABASE_URL:-}" ]; then
+  echo "ERROR: DATABASE_URL env is required to bootstrap lab.env (set in GitHub Actions secret DATABASE_URL)" >&2
+  exit 1
+fi
 if [ ! -f "$BASE/lab.env" ]; then
-  echo "→ generate $BASE/lab.env (AUTH_JWT_SECRET + SAAS_BASE_URL + NEXT_PUBLIC_ENABLE_MSW=false)"
+  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_BASE_URL + NEXT_PUBLIC_ENABLE_MSW=false)"
   umask 077
   {
+    printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+    printf 'PG_HOST=%s\n' "${PG_HOST:-}"
+    printf 'PG_PORT=%s\n' "${PG_PORT:-}"
+    printf 'PG_USER=%s\n' "${PG_USER:-}"
+    printf 'PG_PASSWORD=%s\n' "${PG_PASSWORD:-}"
+    printf 'PG_DATABASE=%s\n' "${PG_DATABASE:-}"
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-react.xiangru.uk}"
@@ -47,6 +59,19 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
   } > "$BASE/lab.env"
+fi
+# 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 AUTH_JWT_SECRET)
+if [ -f "$BASE/lab.env" ] && ! grep -q '^DATABASE_URL=' "$BASE/lab.env"; then
+  echo "→ append DATABASE_URL to existing $BASE/lab.env"
+  umask 077
+  {
+    printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+    printf 'PG_HOST=%s\n' "${PG_HOST:-}"
+    printf 'PG_PORT=%s\n' "${PG_PORT:-}"
+    printf 'PG_USER=%s\n' "${PG_USER:-}"
+    printf 'PG_PASSWORD=%s\n' "${PG_PASSWORD:-}"
+    printf 'PG_DATABASE=%s\n' "${PG_DATABASE:-}"
+  } >> "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 NEXT_PUBLIC_ENABLE_MSW=false,追加(MSW 必须关)
 if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_ENABLE_MSW=' "$BASE/lab.env"; then
