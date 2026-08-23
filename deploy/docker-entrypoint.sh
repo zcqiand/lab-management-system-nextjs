@@ -41,7 +41,9 @@ node scripts/sync-db.mjs
 
 if [ "$FIRST" = 1 ]; then
   echo "→ first run: seeding demo data from MSW seeds/*.json"
-  node scripts/seed-db.mjs
+  # scripts/seed-db.ts 是 TypeScript,需要 tsx 跑(已在 devDependencies,全量
+  # node_modules COPY 进来)
+  npx tsx scripts/seed-db.ts
 else
   echo "→ not first run, skipping seed (rows in __schema_migrations: ${ROW_COUNT})"
 fi

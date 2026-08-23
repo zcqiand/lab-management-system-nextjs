@@ -93,8 +93,12 @@ COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 # (相对 /app),sibling 仓 git clone 在 builder /app 父目录,运行时容器里没有。
 # 显式 COPY 到容器同绝对路径,sync-db.mjs 不用改。
 COPY --from=builder --chown=node:node /lab-management-system-shared/sql/migrations /lab-management-system-shared/sql/migrations
+# sync-db.mjs 本身也在 sibling 仓 scripts/。lab-nextjs 自己的仓 scripts/ 没有(仓内禁
+# 业务代码,CLAUDE.md §3)。同样显式 COPY 到容器 /app/scripts/,让 entrypoint 的
+# `node scripts/sync-db.mjs` 相对路径解析能找到。
+COPY --from=builder --chown=node:node /lab-management-system-shared/scripts/sync-db.mjs ./scripts/sync-db.mjs
 
-# scripts/ 与 package.json(runtime sync-db / seed-db / drizzle 借链用)
+# scripts/ 与 package.json(runtime seed-db.ts + drizzle 借链 + gen:shared 等用)
 COPY --from=builder --chown=node:node /app/scripts ./scripts
 COPY --from=builder --chown=node:node /app/package.json ./package.json
 
