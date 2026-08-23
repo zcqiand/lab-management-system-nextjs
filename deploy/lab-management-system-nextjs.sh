@@ -80,24 +80,44 @@ NGINX_VHOST_FILE="${NGINX_SITES_AVAILABLE}/${NGINX_DOMAIN}"
 NGINX_VHOST_LINK="${NGINX_SITES_ENABLED}/${NGINX_DOMAIN}"
 NGINX_TEMPLATE="${BASE}/nginx-vps.conf.example"
 
+echo "→ nginx bootstrap: NGINX_DOMAIN='${NGINX_DOMAIN}' CERT='${NGINX_CERT_BASENAME}'"
+echo "→ nginx vhost target: ${NGINX_VHOST_FILE} (symlink ${NGINX_VHOST_LINK})"
+echo "→ nginx template: ${NGINX_TEMPLATE}"
+
 # 拉模板（deploy/ 目录随仓库 deploy 脚本一起,但首次拉时可能不存在,补一下）
 if [ ! -f "${NGINX_TEMPLATE}" ]; then
-  echo "→ fetching nginx-vps.conf.example template"
-  curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"
+  echo "→ fetching nginx-vps.conf.example template from raw.githubusercontent.com"
+  if ! curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"; then
+    echo "ERROR: failed to fetch nginx template, vhost bootstrap aborts"
+  else
+    echo "→ template fetched ($(wc -l < "${NGINX_TEMPLATE}") lines)"
+  fi
+else
+  echo "→ template already cached at ${NGINX_TEMPLATE}"
 fi
 
-if [ -e "${NGINX_VHOST_LINK}" ] || [ -e "${NGINX_VHOST_FILE}" ]; then
+if [ ! -f "${NGINX_TEMPLATE}" ]; then
+  echo "ERROR: nginx template missing, skipping vhost bootstrap (do 'cp deploy/nginx-vps.conf.example ${BASE}/' manually)"
+elif [ -e "${NGINX_VHOST_LINK}" ] || [ -e "${NGINX_VHOST_FILE}" ]; then
   echo "→ nginx vhost ${NGINX_VHOST_FILE} already exists, skip bootstrap"
 else
-  echo "→ nginx vhost missing, bootstrapping ${NGINX_VHOST_FILE} (domain=${NGINX_DOMAIN} cert=${NGINX_CERT_BASENAME})"
+  echo "→ nginx vhost missing, bootstrapping"
   umask 022
-  sed \
+  if sed \
     -e "s/lab\.YOUR_DOMAIN/${NGINX_DOMAIN}/g" \
     -e "s|/etc/nginx/ssl/your-cert.crt|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
     -e "s|/etc/nginx/ssl/your-cert.key|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.key|g" \
-    "${NGINX_TEMPLATE}" > "${NGINX_VHOST_FILE}"
-  ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}"
-  echo "→ nginx vhost created. To enable: sudo nginx -t && sudo systemctl reload nginx"
+    "${NGINX_TEMPLATE}" > "${NGINX_VHOST_FILE}"; then
+    if ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}"; then
+      echo "→ nginx vhost created at ${NGINX_VHOST_FILE}"
+      echo "→ symlink created at ${NGINX_VHOST_LINK}"
+      echo "→ next: sudo nginx -t && sudo systemctl reload nginx"
+    else
+      echo "ERROR: failed to create symlink ${NGINX_VHOST_LINK}"
+    fi
+  else
+    echo "ERROR: sed failed, vhost not created"
+  fi
 fi
 
 echo "→ image: $IMAGE"

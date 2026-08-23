@@ -183,8 +183,8 @@ jobs:
             DEPLOY_DIR="/home/deploy/$REPO"
             mkdir -p "$DEPLOY_DIR"
             cd "$DEPLOY_DIR"
-            if [ ! -f "$REPO.sh" ]; then
-              curl -fsSL "https://raw.githubusercontent.com/zcqiand/${REPO}/refs/heads/master/deploy/${REPO}.sh" -o "$REPO.sh"
-              chmod +x "$REPO.sh"
-            fi
+            # 每次都拉最新 deploy 脚本与 nginx template(VPS 上 cache 会让 nginx 自举漏改)
+            curl -fsSL "https://raw.githubusercontent.com/zcqiand/${REPO}/refs/heads/master/deploy/${REPO}.sh" -o "$REPO.sh"
+            chmod +x "$REPO.sh"
+            curl -fsSL "https://raw.githubusercontent.com/zcqiand/${REPO}/refs/heads/master/deploy/nginx-vps.conf.example" -o "nginx-vps.conf.example"
             sh "$REPO.sh" "${{ secrets.DOCKER_USERNAME }}" "${{ secrets.DOCKER_PASSWORD }}" "${{ github.ref_name }}"
