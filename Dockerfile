@@ -71,6 +71,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+# DATABASE_URL 由 deploy/ 阶段 lab.env 注入(ADR-0009)。不在 Dockerfile 写死。
+# DB_PATH=/data/lab.db 是历史 SQLite 残留,src/db/index.ts 实际用 postgres-js → DATABASE_URL。
 
 # standalone/server.js 是 Next 生成的入口
 COPY --from=builder --chown=node:node /app/.next/standalone ./
