@@ -71,11 +71,34 @@ describe("M01.F04/F05 认证管理集成层", () => {
 
   // ─────── F05.I03 SSO 统一登录 ───────
   fnTest(["M01.F05.I03"], "GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）", async () => {
-    const req = new Request(
-      "http://localhost/api/auth/sso/authorize?redirect=http%3A%2F%2Flocalhost%2Flogin",
-    );
-    const res = await ssoAuthorizeGET(req as unknown as Parameters<typeof ssoAuthorizeGET>[0]);
-    expect(res.status).toBeLessThan(400);
+    // v0.3.45：authorize 改走真实 OAuth code 流 -- 服务端先 POST saas
+    // /api/v1/oauth/authorize 领 code，再拼 saas 登录页 URL。测试 stub fetch
+    // 模拟 saas 应答（vitest 环境没有真 saas）。
+    const realFetch = globalThis.fetch;
+    const fetchCalls: string[] = [];
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      fetchCalls.push(String(input));
+      return new Response(JSON.stringify({ code: "saas-code-test", state: "state-test" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }) as typeof fetch;
+    try {
+      const req = new Request(
+        "http://localhost/api/auth/sso/authorize?response_type=code&client_id=lab-mgmt&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=state-test",
+      );
+      const res = await ssoAuthorizeGET(req as unknown as Parameters<typeof ssoAuthorizeGET>[0]);
+      expect(res.status).toBeLessThan(400);
+      const data = (await res.json()) as { authorizeUrl?: string; state?: string };
+      expect(data.state).toBe("state-test");
+      expect(data.authorizeUrl).toContain("/login?");
+      expect(data.authorizeUrl).toContain("code=saas-code-test");
+      expect(data.authorizeUrl).toContain("redirect_uri=");
+      // 领 code 走的是 saas 的 OAuth authorize 端点（不是浏览器直跳）
+      expect(fetchCalls[0]).toContain("/api/v1/oauth/authorize");
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 
   // ─────── F05.I04 身份会话同步 ───────

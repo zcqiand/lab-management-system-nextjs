@@ -31,9 +31,9 @@ import {
   authSsoCallback,
 } from "@/api/endpoints/endpoints";
 
-// OAuth 2.0 client_id：lab 在 saas 注册的应用标识。
-// 真部署走部署期注入；当前单仓 demo 硬编码。
-const OAUTH_CLIENT_ID = "lab";
+// OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id，
+// saas seeds apps.json）。真部署走部署期注入；当前单仓 demo 硬编码。
+const OAUTH_CLIENT_ID = "lab-mgmt";
 const SSO_STATE_STORAGE_KEY = "lab.sso.state";
 
 // 生成 OAuth 2.0 state（防 CSRF，RFC 6749 §10.12）
