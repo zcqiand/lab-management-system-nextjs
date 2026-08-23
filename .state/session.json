@@ -1,24 +1,38 @@
 {
   "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "Post-Phase-3 frontend 集成收尾：@lab/management-system-msw 错位 devDeps → deps",
-  "last_session_at": "2026-08-22",
-  "last_session_summary": "@lab/management-system-msw 从 devDependencies 挪到 dependencies（src/app/api/{contracts,inspection-param-interfaces}/{,[id]}route.ts 6 个文件 runtime 真 import）；commit 8a2fde2 + tag v0.3.11-20260822 pushed",
+  "current_task": "saas CORS middleware + lab proxy drop + lab_prod bootstrap from lab_dev snapshot",
+  "last_session_at": "2026-08-24",
+  "last_session_summary": "lab 侧边栏 502 根因是 /api/saas/{me/menus,app} BFF proxy 不转 JWT，把 saas 接 DB 后必返的 401 包成 502。saas v0.7.40 加 middleware CORS 放行跨域，lab 删 proxy + sidebar-nav 改浏览器直连 NEXT_PUBLIC_SAAS_BASE_URL/api/v1/* + Authorization: Bearer <token>。顺手做 lab_prod bootstrap：dump-db.mjs + seed-from-snapshot.mjs 把 lab_dev 24 表 / 4377 行快照灌进空 lab_prod。Commit 587c8e5（proxy drop）+ ff833b1（dump/import/seeds）+ tag v0.3.47/v0.3.48-20260824 pushed",
   "done": [
-    "@lab/management-system-msw 从 devDependencies 挪到 dependencies（gate L0/L1/L2/L3/L4/L5 全绿 exit 0）",
-    "commit 8a2fde2 + tag v0.3.11-20260822 + push origin/master"
+    "src/components/app/sidebar-nav.tsx 重写 useSaasMenus / useSaasApp：fetch 改打 ${SAAS_BASE}/api/v1/{me/menus, apps/<code>} + Authorization: Bearer <token>（useAuth().token；SSO callback 拿到的 saas accessToken，存 localStorage lab.token）；401 → clearToken + /login；useEffect deps [token]，!token 时不 fetch 防 hydration 竞态（auth-context mount 后才 hydrate）",
+    "删 src/app/api/saas/{me/menus, app}/route.ts 两个 BFF proxy handler（连带 src/app/api/saas/ 整个目录）",
+    "tests/components/sidebar-nav.direct.dom.test.tsx 锁 hook 契约（URL / Bearer / hydration 竞态 / 401 redirect；renderHook + AuthProvider wrapper + jsdom fetch mock）",
+    "scripts/dump-db.mjs：PG → src/seeds/*.json 快照（按主键升序，跳过系统表 + 空表，写 _meta.json）",
+    "scripts/seed-from-snapshot.mjs：src/seeds/*.json → PG（TRUNCATE CASCADE + introspect pg_constraint 做 DFS topo-sort 决定 INSERT 顺序；jsonb 列显式 JSON.stringify 兜 pg driver 不能自动转 array-of-object；带 --dry-run）",
+    "src/seeds/* 25 文件进 git：lab_dev 当前快照 24 表 / 4377 行（contracts 3 / sample_receipts 210 / inspection_brands 91 / inspection_parameters 587 / inspection_standards 103 / test_records 150 / …）",
+    "已对 lab_prod 实际执行 TRUNCATE + 灌入 24 表 / 4377 行；SELECT count(*) 抽样验证与 lab_dev 快照一致",
+    "前置 saas v0.7.40 middleware CORS 已先推（部署顺序 CRITICAL —— 颠倒浏览器直接撞 CORS 比 502 还糟）；saas.env 含 SAAS_CORS_ALLOWED_ORIGINS=https://lab-nextjs.xiangru.uk（VPS 已手工补，prod 验过 Allow-Origin 回来）",
+    "gate L0/L1/L2/L3/L4/L5 全绿 exit 0（158 功能条目，2 条软告警 M97.F01.I02/I04 与本批无关）",
+    "commit 587c8e5 + ff833b1 + tag v0.3.47-20260824 + v0.3.48-20260824 + push origin/master"
   ],
   "next": [
-    "无（本批原子收尾）"
+    "lab 镜像还没在 VPS 拉 v0.3.47/v0.3.48 新镜像；saas middleware 已生效（Allow-Origin 实测回来），等 VPS 拉 lab 镜像后浏览器直接走 NEXT_PUBLIC_SAAS_BASE_URL/api/v1/* 即可",
+    "saas deploy 脚本改成 idempotent CORS env append（防后续被运行时手工补的 SAAS_CORS_ALLOWED_ORIGINS 覆盖）—— 跨仓 follow-up，归 saas"
   ],
   "open_questions": [
-    "src/app/login/page.tsx:81 L3 SsoCallbackRequest.state 缺失 —— ADR-0012 §6 标记为 pre-existing，与本批无关；新 sprint 单独起 issue 追"
+    "src/app/login/page.tsx:81 L3 SsoCallbackRequest.state 缺失 —— pre-existing，与本批无关",
+    "NEXT_PUBLIC_SAAS_BASE_URL 默认 http://localhost:3000 是 dev 兜底，prod 须在 build 时显式给到 https://saas-nextjs.xiangru.uk（lab Dockerfile / env 注入路径未覆盖的话容易漏）"
   ],
   "dont": [
-    "不要把 @lab/management-system-msw 拉回 devDependencies —— BFF route handler 是 Next.js runtime 代码段，依赖必须 dependencies",
-    "不要为了'避免 devDep 污染产物'把 msw 包体打入 next build —— transpilePackages 配置已解（不在 transpilePackages 即可）",
-    "不要 catch 后吞掉异常（旧 schema 1 既有约束保留）",
-    "不要硬编码连接串/密钥（旧 schema 1 既有约束保留）"
+    "不要再恢复 src/app/api/saas/* BFF proxy —— Phase 6 接 DB 后必转 JWT，proxy 不转就 502；浏览器直连 + saas middleware CORS 是唯一路径",
+    "不要把 fetch URL 写回 /api/saas/* —— proxy 已删，路由 404",
+    "不要在 useSaasMenus 里省 `if (!token) return` —— auth-context mount 后才 hydrate token，首 render token=null 必返 401",
+    "不要把 scripts/dump-db.mjs 的 snapshot 写进 src/app/ —— 是 infra 工具不是路由",
+    "不要在 seed-from-snapshot.mjs 里去掉 JSON.stringify(jsonb 列) —— pg driver 不会自动转 array-of-object，必须显式",
+    "不要把 @lab/management-system-msw 拉回 devDependencies（BFF route handler 是 runtime 代码段，必须 dependencies）",
+    "不要为了'避免 devDep 污染产物'把 msw 包体打入 next build（transpilePackages 配置已解）",
+    "不要 catch 后吞掉异常 / 硬编码连接串或密钥"
   ],
   "active_branch": "master"
 }
