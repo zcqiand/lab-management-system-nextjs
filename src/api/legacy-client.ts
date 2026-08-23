@@ -49,7 +49,7 @@ export const API_ROUTES = {
   "/auth/permissions": "/api/auth/permissions",
   "/auth/menus": "/api/auth/menus",
   "/contracts": "/api/contracts",
-  "/inspection-calculation-rules": "/api/calculation-rules",
+  "/inspection-calculation-methods": "/api/calculation-methods",
   "/inspection-objects": "/api/inspection/objects",
   "/inspection-parameters": "/api/inspection/parameters",
   "/inspection-parameter-param-interfaces": "/api/inspection-param-interfaces/links",

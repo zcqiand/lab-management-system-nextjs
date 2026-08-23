@@ -40,7 +40,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M03 | 试验过程管理 | 接样 → 任务分配 → 数据录入 → 报告审核 → 批准 → 发放 → 归档 | 规划 |
 | M04 | 基础数据 | 型号/规格/等级/牌号维护 | 规划 |
 | M05 | 数据统计 | 报告汇总表（按报告名称） | 规划 |
-| M06 | 检测能力 | 检测专项/项目/参数/标准/计算规则/技术要求/报告名称/参数界面 | 规划 |
+| M06 | 检测能力 | 检测专项/项目/参数/标准/计算方法/技术要求/报告名称/参数界面 | 规划 |
 | M97 | schema emit infrastructure | lab-management-system-shared V*.sql → {schema.sql, schema.dbml, schema.ts} + pg 借链 | 规划 |
 | M98 | frontend 接线层 | apiclient + Next.js API routes（自身作后端）；M98.F01 4-backend 切换已废弃（ADR-0014），改走 NEXT_PUBLIC_API_BASE_URL | 已上线 |
 
@@ -72,7 +72,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F02 | 检测项目 | InspectionObject CRUD + 专项/参数关联 | 接口 | 已上线 |
 | M06.F03 | 检测参数 | InspectionParameter CRUD + 标准/参数关联 | 接口 | 已上线 |
 | M06.F04 | 检测标准 | InspectionStandard CRUD（含状态：active/superseded/draft） | 接口 | 已上线 |
-| M06.F05 | 计算规则 | CalculationRule 维护（复合主键，算法类型 + 公式） | 接口 | 已上线 |
+| M06.F05 | 计算方法 | CalculationRule 维护（复合主键，算法类型 + 公式） | 接口 | 已上线 |
 | M06.F06 | 技术要求 | TechnicalRequirement 维护，按四维度匹配；brand/model/grade/spec 改为 FK 引用实体 | 接口 | 已上线 |
 | M06.F07 | 报告名称 | InspectionReportName CRUD + extFields 模板 + 关联标准/参数 | 接口 | 已上线 |
 | M06.F08 | 参数界面 | ParamInterface 维护 + 参数↔界面 link | 接口 | 已上线 |
@@ -147,7 +147,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M01.F04.I01 | RBAC 角色权限 | 接口 | admin（全部权限）/ technician（受限权限）两级角色 | 已废弃 |
 | M01.F04.I02 | 路由守卫 | 接口 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
 | M01.F04.I03 | 权限指令 | 接口 | 按权限码动态渲染/卸载 UI 元素；无权限元素从 DOM 移除 | 已废弃 |
-| M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=app-lab 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
+| M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=lab-management 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
@@ -307,9 +307,9 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M06.F05.I01 | 计算规则列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：算法类型/试件数/备注 | 已上线 |
-| M06.F05.I02 | 计算规则新建/编辑 | 接口 | 维护原始数据到检测结果的算法和适用条件 | 已上线 |
-| M06.F05.I03 | 计算规则删除 | 接口 | 删除未被检测数据引用的计算规则 | 已上线 |
+| M06.F05.I01 | 计算方法列表 | 接口 | 2 级树（检测项目→检测标准）+ 右侧列表（拖拽调整 sortOrder）；列：算法类型/试件数/备注 | 已上线 |
+| M06.F05.I02 | 计算方法新建/编辑 | 接口 | 维护原始数据到检测结果的算法和适用条件 | 已上线 |
+| M06.F05.I03 | 计算方法删除 | 接口 | 删除未被检测数据引用的计算方法 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
@@ -349,4 +349,4 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 - `开发中` → `已上线`：L5 会警告它缺设计映射与测试引用。警告不阻断，由人裁量。
 - infra 模块的特殊性：M97 全规划，**没有 UI/data-fn**，所以 fnTest 列故意留空，trace.json 留 `[]`。
 - nextjs-as-backend：M98.F03 的 5 个 API route 是「家族定位要求」的功能，不是产品代码。
-- BASE F 级下的 I 级子项镜像自 REF（backup/lab-management-system），只收父 F ∈ BASE 的行；BASE 外的 15 个 F 级段（老机构/角色/用户管理、人员/设备/设施、报告编制、旧报告类别/模板/标准/参数/技术要求、合同类别/计算规则/试件尺寸）不入本仓树，由 check_align 裁决锁定。
+- BASE F 级下的 I 级子项镜像自 REF（backup/lab-management-system），只收父 F ∈ BASE 的行；BASE 外的 15 个 F 级段（老机构/角色/用户管理、人员/设备/设施、报告编制、旧报告类别/模板/标准/参数/技术要求、合同类别/计算方法/试件尺寸）不入本仓树，由 check_align 裁决锁定。

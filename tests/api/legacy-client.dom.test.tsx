@@ -8,7 +8,7 @@ const isCi = process.env.CI === "true" || !!process.env.GITHUB_ACTIONS;
 // 失败 = msw 仓缺 handler，先修 msw 再继续移植。
 test.skipIf(isCi)("API_ROUTES 映射的列表端点全部可达", async () => {
   const gets = [
-    "/inspection-calculation-rules", "/inspection-objects", "/inspection-parameters",
+    "/inspection-calculation-methods", "/inspection-objects", "/inspection-parameters",
     "/inspection-standards", "/inspection-technical-requirements", "/inspection-param-interfaces",
     "/report-names", "/receipts", "/samples", "/test-records", "/summary",
   ] as const;

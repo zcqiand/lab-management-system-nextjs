@@ -1,10 +1,10 @@
-// M06.F05 计算规则（复合主键 object+parameter；REF 组件以派生 id 调 /:id）。
-// GET  /api/calculation-rules?inspectionObjectCode=&inspectionParameterCode=&testingStandardCode=
+// M06.F05 计算方法（复合主键 object+parameter；REF 组件以派生 id 调 /:id）。
+// GET  /api/calculation-methods?inspectionObjectCode=&inspectionParameterCode=&testingStandardCode=
 //      → {items,page,pageSize,total}（行补 id=cr-<obj>-<param>）
-// POST /api/calculation-rules → 201
+// POST /api/calculation-methods → 201
 
 import { NextRequest, NextResponse } from "next/server";
-import { inspectionCalculationRules } from "@lab/management-system-msw/fixtures";
+import { inspectionCalculationMethods } from "@lab/management-system-msw/fixtures";
 import { pageOf, qp, num, NOW } from "@/lib/api-helpers";
 
 export function ruleId(r: Record<string, unknown>): string {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const obj = url.get("inspectionObjectCode");
   const param = url.get("inspectionParameterCode");
   const std = url.get("testingStandardCode");
-  let items = (inspectionCalculationRules as unknown as Record<string, unknown>[]).map(
+  let items = (inspectionCalculationMethods as unknown as Record<string, unknown>[]).map(
     (r): Record<string, unknown> => ({ ...r, id: ruleId(r) }),
   );
   if (obj) items = items.filter((r) => r["inspectionObjectCode"] === obj);
@@ -34,6 +34,6 @@ export async function POST(req: NextRequest) {
     ...((await req.json().catch(() => ({}))) as object),
   } as Record<string, unknown>;
   entry["id"] = ruleId(entry);
-  inspectionCalculationRules.push(entry as never);
+  inspectionCalculationMethods.push(entry as never);
   return NextResponse.json(entry, { status: 201 });
 }

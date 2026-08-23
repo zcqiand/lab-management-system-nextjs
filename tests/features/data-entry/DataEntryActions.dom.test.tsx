@@ -49,7 +49,7 @@ beforeEach(() => {
     http.get('*/api/inspection-param-interfaces/links*', () =>
       HttpResponse.json({ items: [] }),
     ),
-    http.get('*/api/calculation-rules*', () =>
+    http.get('*/api/calculation-methods*', () =>
       HttpResponse.json({ items: [] }),
     ),
     http.get('*/api/inspection/objects*', () =>

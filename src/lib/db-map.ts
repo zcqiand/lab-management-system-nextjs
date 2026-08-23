@@ -53,7 +53,7 @@ export const PG_TABLES = {
   objectParameters: "inspection_object_parameters",
   objectStandards: "inspection_object_standards",
   standardParameters: "inspection_standard_parameters",
-  calculationRules: "inspection_calculation_rules",
+  calculationMethods: "inspection_calculation_methods",
   reportNames: "inspection_report_names",
   objectReportNames: "inspection_object_report_names",
   reportNameStandards: "inspection_report_name_standards",

@@ -55,9 +55,9 @@ flowchart LR
 | M98.F03.I04 | POST /api/auth/refresh 走 axios 拦截器（M98.F02.I01） |
 | M98.F03.I05 | POST /api/auth/switch-tenant 给 M00.F02（登录选租户）提供后端 |
 | M05.F01.I01 | 试验报告汇总表：按报告名称（categoryCode）聚合 sample_receipts，是流程末端读视图（不参与状态流转） |
-| M06.F05.I01 | 计算规则维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
-| M06.F05.I02 | 同上（计算规则新建/编辑） |
-| M06.F05.I03 | 同上（计算规则删除） |
+| M06.F05.I01 | 计算方法维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
+| M06.F05.I02 | 同上（计算方法新建/编辑） |
+| M06.F05.I03 | 同上（计算方法删除） |
 | M06.F06.I01 | 技术要求维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
 | M06.F06.I02 | 同上（技术要求新建/编辑） |
 | M06.F06.I03 | 同上（技术要求删除） |
@@ -130,7 +130,7 @@ flowchart LR
 | 步骤 | 名称 | 角色 | 触发条件 | 操作 | 支撑功能子项 |
 |---|---|---|---|---|---|
 | B01 | 路由守卫 | — | 进 (console)/* 但无 token | router.replace('/login') | M01.F04.I02 |
-| B02 | 动态菜单 | — | 进业务页 | 拉 /api/auth/menus?appId=app-lab 渲染侧栏 | M01.F04.I04 |
+| B02 | 动态菜单 | — | 进业务页 | 拉 /api/auth/menus?appId=lab-management 渲染侧栏 | M01.F04.I04 |
 | B03 | JWT 登录 | 用户 | 在 /login 提交用户名密码 | POST /api/auth/login → 写 token | M01.F05.I01 |
 | B04 | Token 校验 | 拦截器 | 任何 API 请求 | 注入 Authorization: Bearer | M01.F05.I02 |
 | B05 | SSO 统一登录 | 用户 | 在 /login 走 SSO 入口 | 跳 saas /login 拿 token 回 /login | M01.F05.I03 |

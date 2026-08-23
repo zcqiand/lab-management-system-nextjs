@@ -1,5 +1,5 @@
 /**
- * 计算规则（InspectionCalculationRule）— M06.F05
+ * 计算方法（InspectionCalculationMethod）— M06.F05
  *
  * 按检测项目 + 检测参数 给出原始数据到检测结果的算法；
  * testingStandardCode 可选，限定后表示仅在该检测依据标准下生效。
@@ -13,7 +13,7 @@ export type CalculationAlgorithmType =
   | "formula"
   | "manual";
 
-export interface InspectionCalculationRule {
+export interface InspectionCalculationMethod {
   id: string;
   inspectionObjectCode: string;
   inspectionParameterCode: string;

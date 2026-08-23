@@ -8,7 +8,7 @@ import type {
   InspectionObjectStandard,
   InspectionStandardParameter,
   InspectionSpecialtyObject,
-  InspectionCalculationRule,
+  InspectionCalculationMethod,
   InspectionTechnicalRequirement,
   InspectionStandardRole,
   InspectionQualificationLevel,
@@ -141,8 +141,8 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(rel.inspectionParameterCode).toBe("IP-STE001");
   });
 
-  fnTest(["M06.F05.I01"], "InspectionCalculationRule 至少 object+parameter，可选 testingStandardCode", () => {
-    const rule: InspectionCalculationRule = {
+  fnTest(["M06.F05.I01"], "InspectionCalculationMethod 至少 object+parameter，可选 testingStandardCode", () => {
+    const rule: InspectionCalculationMethod = {
       id: "cr-001",
       inspectionObjectCode: "OBJ-SP01-P03-FINE",
       inspectionParameterCode: "IP-CON002",

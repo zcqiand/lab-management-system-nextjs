@@ -644,7 +644,7 @@ git commit -m "feat(api): contracts/samples/test-records/summary 四域接 lab_d
 curl -s "http://localhost:3000/api/catalog/brands?inspectionObjectCode=cement&pageSize=3" | head -c 300
 curl -s "http://localhost:3000/api/technical-requirements?pageSize=2" | head -c 300
 git add src/lib/ src/app/api/catalog/ src/app/api/technical-requirements/ src/app/api/calculation-rules/
-git commit -m "feat(api): catalog 4 码表 + 技术要求/计算规则接 lab_dev"
+git commit -m "feat(api): catalog 4 码表 + 技术要求/计算方法接 lab_dev"
 ```
 
 ---

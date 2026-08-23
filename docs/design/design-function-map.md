@@ -107,7 +107,7 @@
 | M04.F09.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/brands ; PUT /api/catalog/brands/:code | inspection_brands | M04.F09.I02 | – | 已上线 |
 | M04.F09.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/brands/:code | inspection_brands | M04.F09.I03 | – | 已上线 |
 | M01.F04.I02 | src/app/(console)/layout.tsx (guard main) | router.replace('/login') | – | M01.F04.I02 | – | 已上线 |
-| M01.F04.I04 | src/components/app/sidebar-nav.tsx (aside) | GET /api/auth/menus?appId=app-lab | – | M01.F04.I04 | – | 已上线 |
+| M01.F04.I04 | src/components/app/sidebar-nav.tsx (aside) | GET /api/auth/menus?appId=lab-management | – | M01.F04.I04 | – | 已上线 |
 | M01.F05.I01 | src/components/app/login-form.tsx (submit Button) | POST /api/auth/login | – | M01.F05.I01 | – | 已上线 |
 | M01.F05.I02 | src/api/legacy-client.ts (request interceptor) | Authorization: Bearer &lt;token&gt; | – | M01.F05.I02 | – | 已上线 |
 | M01.F05.I03 | src/app/login/page.tsx (SSO orchestrator div) | GET /api/auth/sso/authorize ; POST /api/auth/sso/callback | – | M01.F05.I03 | – | 已上线 |

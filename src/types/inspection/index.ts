@@ -17,7 +17,7 @@ export type { InspectionSpecialtyObject } from "./inspection-specialty-object";
 export type { InspectionStandardRole } from "./inspection-standard-role";
 export type { InspectionQualificationLevel } from "./inspection-qualification-level";
 export type { InspectionReadinessStatus } from "./inspection-readiness-status";
-export type { InspectionCalculationRule, CalculationAlgorithmType } from "./inspection-calculation-rule";
+export type { InspectionCalculationMethod, CalculationAlgorithmType } from "./inspection-calculation-method";
 export type {
   InspectionTechnicalRequirement,
   RequirementValueType,

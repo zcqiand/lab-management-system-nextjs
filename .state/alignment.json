@@ -6,8 +6,13 @@
     "features": 31,
     "items": 118
   },
-  "warnings_total": 0,
-  "warnings": {},
+  "warnings_total": 2,
+  "warnings": {
+    "已上线但无测试引用": [
+      "M97.F01.I02",
+      "M97.F01.I04"
+    ]
+  },
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
@@ -1510,7 +1515,7 @@
       ]
     },
     "M06.F05.I01": {
-      "name": "计算规则列表",
+      "name": "计算方法列表",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1524,7 +1529,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::展开检测项目 -> 显示子级检测标准",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::左树渲染检测项目",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::未选标准时右侧显示空态",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算规则：点击标准 -> 用 testingStandardCode 过滤 GET",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算方法：点击标准 -> 用 testingStandardCode 过滤 GET",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::选中检测标准 -> 右侧展示列表 + sortOrder + 拖拽把手",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationRule 至少 object+parameter，可选 testingStandardCode"
       ],
@@ -1533,7 +1538,7 @@
       ]
     },
     "M06.F05.I02": {
-      "name": "计算规则新建/编辑",
+      "name": "计算方法新建/编辑",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1552,7 +1557,7 @@
       ]
     },
     "M06.F05.I03": {
-      "name": "计算规则删除",
+      "name": "计算方法删除",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1909,9 +1914,7 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.sql：≥24 张 CREATE TABLE + 主键/FK 约束（pg_dump 或 pg_catalog fallback 产出）"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F01.I03": {
@@ -1941,9 +1944,7 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.dbml：v-sql→DBML 产物（Table 定义 ≥24 + V013 后表名 inspection_ 前缀）"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F02.I01": {
@@ -1958,7 +1959,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）"
       ],
       "entry": []
     },
@@ -1974,7 +1975,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联 lab_dev（require('pg') + SELECT 1）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）"
       ],
       "entry": []
     },

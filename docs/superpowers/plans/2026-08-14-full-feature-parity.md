@@ -213,7 +213,7 @@ git commit -m "test(nextjs): vitest 双环境 — *.dom.test.tsx 走 jsdom+RTL+m
 // REF import.meta.env.VITE_* → Next.js process.env.NEXT_PUBLIC_* 的唯一适配点。
 export const env = {
   IDENTITY_BASE_URL: process.env.NEXT_PUBLIC_IDENTITY_BASE_URL || "/api",
-  APP_ID: process.env.NEXT_PUBLIC_APP_ID || "app-lab",
+  APP_ID: process.env.NEXT_PUBLIC_APP_ID || "lab-management",
   SSO_AUTHORIZE_URL: process.env.NEXT_PUBLIC_SSO_AUTHORIZE_URL || "/sso/authorize",
   OAUTH_SCOPES: process.env.NEXT_PUBLIC_OAUTH_SCOPES || "",
   USE_MSW: process.env.NEXT_PUBLIC_USE_MSW !== "false",
@@ -581,7 +581,7 @@ export { default } from "@/features/receipts/ReceiptListPage";
 
 **Interfaces:**
 - Consumes: Task 3 `API_ROUTES`（6 条 link 路由全在这域）、Task 4 generated JSON
-- Produces: `/inspection` 检测能力主页（二级树 + 关联管理）+ 计算规则/技术要求/报告名称/参数界面 4 个子页
+- Produces: `/inspection` 检测能力主页（二级树 + 关联管理）+ 计算方法/技术要求/报告名称/参数界面 4 个子页
 
 - [ ] Step 1: 拷 10 文件按移植规则改（link 端点全部走 `API_ROUTES`）
 - [ ] Step 2: 按 REF router 的 inspection 路由段建 page.tsx 壳
@@ -630,7 +630,7 @@ export { default } from "@/features/receipts/ReceiptListPage";
 
 **Files:**
 - Create: `src/features/app/Protected.tsx`（REF `src/app/guards/ProtectedRoute.tsx` 的 App Router 形态）
-- Modify: `src/components/app/sidebar-nav.tsx`（菜单源对齐 REF `useMenus.ts`——GET `/auth/menus?appId=app-lab`，分组+权限码显隐）
+- Modify: `src/components/app/sidebar-nav.tsx`（菜单源对齐 REF `useMenus.ts`——GET `/auth/menus?appId=lab-management`，分组+权限码显隐）
 - Create: `src/features/auth/{ssoClient,useMenus}.ts`（REF 同名移植；`ssoClient` 的 `import.meta.env` 全走 `env`）
 - Create: `src/app/forbidden/page.tsx`
 - Test: `tests/app/guards/ProtectedRoute.dom.test.tsx`、`tests/app/layoutMenuFromApi.dom.test.tsx`
