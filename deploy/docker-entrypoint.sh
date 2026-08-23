@@ -21,7 +21,7 @@ FIRST=0
 ROW_COUNT=$(node -e "
   import('pg').then(({Client}) => {
     const c = new Client({connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 5000});
-    c.connect().then(() => c.query(\"SELECT COUNT(*)::int AS n FROM pg_tables WHERE tablename = 'public.__schema_migrations'\"))
+    c.connect().then(() => c.query(\"SELECT COUNT(*)::int AS n FROM pg_tables WHERE schemaname = 'public' AND tablename = '__schema_migrations'\"))
       .then(r => {
         if (r.rows[0].n === 0) { console.log('0'); process.exit(0); }
         return c.query('SELECT COUNT(*)::int AS n FROM public.__schema_migrations');
@@ -37,7 +37,9 @@ if [ "${ROW_COUNT}" = "0" ]; then
 fi
 
 echo "→ sync-db (apply Flyway V*.sql from shared/, tracking __schema_migrations)"
-node scripts/sync-db.mjs
+# --incremental：基于 tracking 表只跑未记录的 V 文件，库非空不 ABORT。
+# 全量模式只用于空库手动重建，容器重启必须走增量（否则库非空即崩溃循环）。
+node scripts/sync-db.mjs --incremental
 
 if [ "$FIRST" = 1 ]; then
   echo "→ first run: seeding demo data from MSW seeds/*.json"
