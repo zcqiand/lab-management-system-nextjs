@@ -73,6 +73,10 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 # DATABASE_URL 由 deploy/ 阶段 lab.env 注入(ADR-0009)。不在 Dockerfile 写死。
 # DB_PATH=/data/lab.db 是历史 SQLite 残留,src/db/index.ts 实际用 postgres-js → DATABASE_URL。
+# sync-db.mjs 在 runtime /app/scripts/,默认算法 MIGRATIONS_DIR=/app/sql/migrations 不存在。
+# Dockerfile 把 sibling migrations 拷到 /lab-management-system-shared/sql/migrations,
+# 这里显式指过去。
+ENV MIGRATIONS_DIR=/lab-management-system-shared/sql/migrations
 
 # standalone/server.js 是 Next 生成的入口
 COPY --from=builder --chown=node:node /app/.next/standalone ./
