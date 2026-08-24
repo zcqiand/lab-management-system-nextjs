@@ -4,7 +4,7 @@
 //
 // 与 saas 仓 AppShell 的差异：
 //   - 不引 TenantProvider（lab-nextjs 没有 tenant 概念，只有 auth-context）
-//   - 菜单从 /api/saas/me/menus 拉（实验室 SaaS 多租户身份平台）
+//   - 菜单从 /api/saas/me/menus 拉（实验室 SaaS 多租户多应用身份平台）
 //   - 内容是 children，由调用方（page.tsx）提供
 //   - 顶部 header 加 token + backend 状态 + 登出按钮
 
@@ -41,7 +41,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </h1>
           <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
             <span className="font-mono">
-              应用=<span className="text-slate-900 font-medium">{app?.name ?? APP_CODE}</span>
+              应用=
+              <span className="text-slate-900 font-medium">{app?.name ?? APP_CODE}</span>
             </span>
             <span className="font-mono">
               backend=<span className="text-slate-900 font-medium">{apiMode}</span>
