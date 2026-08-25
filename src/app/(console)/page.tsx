@@ -6,7 +6,7 @@
 // 选中的菜单码通过 ?menu=<code> 反映到 URL，菜单点击只换 query 不换路径。
 
 import { useSearchParams } from "next/navigation";
-import { useSaasMenus } from "@/components/app/sidebar-nav";
+import { useBackendMenus } from "@/components/app/sidebar-nav";
 import { useAuth } from "@/state/auth-context";
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
@@ -26,7 +26,7 @@ function findByCode(
 function Dashboard() {
   const sp = useSearchParams();
   const selectedMenu = sp.get("menu");
-  const { data: menus } = useSaasMenus();
+  const { data: menus } = useBackendMenus();
   const { token } = useAuth();
 
   const tree = menus ?? [];

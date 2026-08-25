@@ -24,7 +24,9 @@ test.skipIf(isCi)("API_ROUTES 映射的 link 端点全部可达", async () => {
   const cases = [
     {
       legacy: "/inspection-standard-parameters",
-      query: "?standardCode=GB%20175-2023",
+      // 契约 query 参数是 inspectionStandardCode（shared tsp），旧测试写 standardCode
+      // 被 msw handler 忽略 → 返回全量 508 条 → 过滤断言失败（2026-08-25 修）
+      query: "?inspectionStandardCode=GB%20175-2023",
       field: "inspectionStandardCode",
       value: "GB 175-2023",
     },
@@ -50,8 +52,13 @@ test.skipIf(isCi)("API_ROUTES 映射的 link 端点全部可达", async () => {
   for (const { legacy, query, field, value } of cases) {
     const res = await apiClient.get(API_ROUTES[legacy] + query);
     expect(res.status).toBe(200);
-    expect(Array.isArray(res.data)).toBe(true);
-    expect(res.data.length).toBeGreaterThan(0);
-    expect(res.data.every((l: Record<string, string>) => l[field] === value)).toBe(true);
+    // msw 2026-08-24 起返回 {items,page,pageSize,total} 分页包（原裸数组已废）；
+    // 兼容两形状：分页包取 items，裸数组直接用。
+    const rows = Array.isArray(res.data)
+      ? res.data
+      : ((res.data as { items?: unknown[] }).items ?? []);
+    expect(Array.isArray(rows)).toBe(true);
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((l: Record<string, string>) => l[field] === value)).toBe(true);
   }
 });

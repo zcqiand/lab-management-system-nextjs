@@ -7,10 +7,14 @@
 //   2. GET saas /api/v1/me (Bearer accessToken) -> CurrentUser（含 memberships）
 //   3. 映射成 lab 的 LoginResponse：token = saas accessToken（lab 的 API
 //      demo 路由不校验 JWT；接 RBAC 时透传给 saas 侧校验）
+//   4. ADR-0009（2026-08-25）：瞬时持 accessToken 时顺手拉 saas
+//      /api/v1/me/menus 存快照缓存（menu-snapshot.ts，TTL 30min），
+//      供 GET /api/auth/menus 按 sub 读取。失败只 warn 不阻塞登录。
 //
 // 旧 demo 实现（无条件返 mock-jwt-USER-A）已废弃。
 
 import { NextResponse } from "next/server";
+import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
 
 const SAAS_BASE_URL = process.env.SAAS_BASE_URL ?? "http://localhost:3000";
 // 与 authorize 路由同一组 client 配置（apps.clientId/clientSecret 见 saas seeds）
@@ -101,6 +105,11 @@ export async function POST(request: Request) {
     if (res.ok) me = (await res.json()) as SaasMe;
   } catch {
     // /me 不可达：仍完成登录（token 已到手），只是身份信息缺省
+  }
+
+  // 2.5 ADR-0009：瞬时持 accessToken 时拉菜单进快照缓存（失败只 warn）
+  if (me.id) {
+    await cacheMenuSnapshot(me.id, tokenRes.accessToken, SAAS_BASE_URL);
   }
 
   // 3. 映射 lab LoginResponse（旧 demo 契约形状不变，前端 authStore 无感）

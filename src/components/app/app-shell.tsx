@@ -4,14 +4,14 @@
 //
 // 与 saas 仓 AppShell 的差异：
 //   - 不引 TenantProvider（lab-nextjs 没有 tenant 概念，只有 auth-context）
-//   - 菜单从 /api/saas/me/menus 拉（实验室 SaaS 多租户多应用身份平台）
+//   - 菜单从后端 /api/auth/menus 拉（ADR-0009：saas 快照缓存 → demo 兜底）
 //   - 内容是 children，由调用方（page.tsx）提供
 //   - 顶部 header 加 token + backend 状态 + 登出按钮
 
 import Link from "next/link";
 import { LogOut, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SidebarNav, useSaasApp, useSaasMenus } from "@/components/app/sidebar-nav";
+import { SidebarNav, useSaasApp, useBackendMenus } from "@/components/app/sidebar-nav";
 import { BackendBadge } from "@/components/app/backend-badge";
 import { useAuth } from "@/state/auth-context";
 import { getApiMode } from "@/api/backend-config";
@@ -21,7 +21,7 @@ const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { token, clearToken } = useAuth();
   const apiMode = getApiMode();
-  const { data: menus } = useSaasMenus();
+  const { data: menus } = useBackendMenus();
   // 应用名来自 saas 公共应用目录（/api/v1/apps/<code> 反代），不写死在客户端
   const { app } = useSaasApp();
 
@@ -81,12 +81,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 export function MenuStatusBanner() {
-  const { loading, error } = useSaasMenus();
+  const { loading, error } = useBackendMenus();
   if (loading) {
     return (
       <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-xs text-blue-700 flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin" />
-        正在从 saas 拉菜单…
+        正在拉菜单…
       </div>
     );
   }
@@ -94,7 +94,7 @@ export function MenuStatusBanner() {
     return (
       <div className="rounded-md bg-red-50 border border-red-200 p-3 text-xs text-red-700 flex items-center gap-2">
         <AlertCircle className="h-4 w-4" />
-        saas 菜单不可达：{error}
+        菜单接口不可达：{error}
       </div>
     );
   }

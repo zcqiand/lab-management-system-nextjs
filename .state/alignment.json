@@ -74,7 +74,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 回退 FALLBACK_MENUS demo 树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树"
       ],
       "entry": [
         "src\\components\\app\\sidebar-nav.tsx"
@@ -1531,10 +1534,10 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::未选标准时右侧显示空态",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算方法：点击标准 -> 用 testingStandardCode 过滤 GET",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::选中检测标准 -> 右侧展示列表 + sortOrder + 拖拽把手",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationRule 至少 object+parameter，可选 testingStandardCode"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationMethod 至少 object+parameter，可选 testingStandardCode"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationRuleList.tsx"
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
       ]
     },
     "M06.F05.I02": {
@@ -1553,7 +1556,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationRuleList.tsx"
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
       ]
     },
     "M06.F05.I03": {
@@ -1571,7 +1574,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationRuleList.tsx"
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
       ]
     },
     "M06.F06.I01": {

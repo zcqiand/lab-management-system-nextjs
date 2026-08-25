@@ -130,7 +130,7 @@ flowchart LR
 | 步骤 | 名称 | 角色 | 触发条件 | 操作 | 支撑功能子项 |
 |---|---|---|---|---|---|
 | B01 | 路由守卫 | — | 进 (console)/* 但无 token | router.replace('/login') | M01.F04.I02 |
-| B02 | 动态菜单 | — | 进业务页 | 拉 /api/auth/menus?appId=lab-management 渲染侧栏 | M01.F04.I04 |
+| B02 | 动态菜单 | — | 进业务页 | 拉 /api/auth/menus（ADR-0009：SSO callback 快照缓存 saas 菜单，miss 回退 demo）渲染侧栏 | M01.F04.I04 |
 | B03 | JWT 登录 | 用户 | 在 /login 提交用户名密码 | POST /api/auth/login → 写 token | M01.F05.I01 |
 | B04 | Token 校验 | 拦截器 | 任何 API 请求 | 注入 Authorization: Bearer | M01.F05.I02 |
 | B05 | SSO 统一登录 | 用户 | 在 /login 走 SSO 入口 | 跳 saas /login 拿 token 回 /login | M01.F05.I03 |

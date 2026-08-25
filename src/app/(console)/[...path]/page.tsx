@@ -7,7 +7,7 @@
 
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
-import { useSaasMenus, type MenuNode } from "@/components/app/sidebar-nav";
+import { useBackendMenus, type MenuNode } from "@/components/app/sidebar-nav";
 
 function findByPath(tree: MenuNode[], path: string): MenuNode | null {
   for (const n of tree) {
@@ -29,7 +29,7 @@ function findByCode(tree: MenuNode[], code: string): MenuNode | null {
 
 export default function CatchAllPage() {
   const params = useParams<{ path: string[] }>();
-  const { data: menus } = useSaasMenus();
+  const { data: menus } = useBackendMenus();
 
   const path = useMemo(() => {
     if (!params?.path) return "";

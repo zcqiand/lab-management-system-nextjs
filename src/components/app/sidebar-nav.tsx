@@ -1,9 +1,9 @@
 "use client";
 
-// SidebarNav — 浏览器直连 saas /api/v1/me/menus + /api/v1/apps/[code]
-// （v0.3.47 之前走 lab BFF /api/saas/* proxy，proxy 不转 JWT 在 Phase 6 接 DB
-// 后把 saas 的 401 包成 502；现改浏览器直连，靠 saas-nextjs middleware CORS
-// 放行跨域）。菜单数据来自 saas，应用代码来自 env（不写死在客户端）。
+// SidebarNav — 菜单走 lab 后端 GET /api/auth/menus（ADR-0009，2026-08-25 起
+// 取代浏览器直连 saas /api/v1/me/menus：后端 SSO callback 时快照缓存 saas
+// 菜单，miss 回退 demo 树）。应用名仍走 saas 公共目录 /api/v1/apps/[code]
+// （免鉴权），应用代码来自 env（不写死在客户端）。
 //
 // 与 saas 仓 SidebarNav 的差异：
 //   - 不引 NavItem props（saas 用硬编码 NavItem[] + lucide 图标）
@@ -39,6 +39,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/state/auth-context";
+import { authGetMenus } from "@/api/endpoints/endpoints";
+import type { MenuNode as ContractMenuNode } from "@/api/endpoints/endpoints.schemas";
 
 // 与 saas 的 EffectiveMenuNode 对齐（手写，避免跨仓依赖）
 interface MenuNode {
@@ -80,7 +82,7 @@ function Icon({ name }: { name?: string }) {
 }
 
 interface SidebarNavProps {
-  /** 从 /api/saas/me/menus?appCode= 拉到的本仓菜单树（顶层节点数组） */
+  /** 从后端 /api/auth/menus 拉到的本仓菜单树（顶层节点数组，ADR-0009） */
   menus: MenuNode[] | null;
   appCode: string;
   /** saas 注册的应用名（/api/saas/app 拉取）；缺省回退 Lab-Management */
@@ -362,12 +364,14 @@ function ChevronToggle({ expanded }: { expanded: boolean }) {
   );
 }
 
-/** 客户端 hook：浏览器直连 saas /api/v1/me/menus?appCode=<code>
- *  v0.3.47 起走直连（saas middleware CORS 放行跨域），不再经 lab BFF proxy。
- *  Bearer token 来自 useAuth()（SSO callback 拿到的 saas accessToken，存 localStorage）。
- *  token 在 auth-context 里 mount 后才 hydrate，所以 deps 用 [token]，!token 时直接
- *  return 避免拿 null token 打 saas 触发 401。 */
-export function useSaasMenus(): {
+/** 客户端 hook：拉 lab 后端 GET /api/auth/menus（ADR-0009，2026-08-25 起取代
+ *  浏览器直连 saas /api/v1/me/menus）。orval authGetMenus（axios + customFetch），
+ *  Bearer token 来自 useAuth()（SSO callback 拿到的 saas accessToken，后端按
+ *  JWT sub 读快照缓存；miss 回退 demo 菜单，端点永不 5xx）。
+ *  token 在 auth-context 里 mount 后才 hydrate，所以 deps 用 [token]，!token 时
+ *  直接 return 避免无 token 打后端拿 demo 兜底树冒充登录菜单。
+ *  契约 MenuNode{id,label,path?,icon?,children?} 在此适配成本地渲染 MenuNode。 */
+export function useBackendMenus(): {
   data: MenuNode[] | null;
   loading: boolean;
   error: string | null;
@@ -381,27 +385,26 @@ export function useSaasMenus(): {
     if (!token) return; // auth-context 首次 render token=null，hydrate 后 effect 重跑
     let cancelled = false;
     setLoading(true);
-    fetch(`${SAAS_BASE}/api/v1/me/menus?appCode=${encodeURIComponent(APP_CODE)}`, {
-      cache: "no-store",
+    authGetMenus({
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(async (r) => {
-        if (r.status === 401) {
-          // token 过期/被吊销：清掉回登录页（mirror apiClient legacy interceptor 模式）
-          clearToken();
-          if (typeof window !== "undefined") window.location.assign("/login");
-          return Promise.reject(401);
-        }
-        return r.ok ? r.json() : Promise.reject(r.status);
-      })
-      .then((d: MenuNode[]) => {
+      .then((d: ContractMenuNode[]) => {
         if (cancelled) return;
-        setData(d);
+        setData(d.map(adaptContractMenu));
         setLoading(false);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setError((err as Error).message ?? String(err));
+        const status =
+          typeof err === "object" && err !== null && "response" in err
+            ? (err as { response?: { status?: number } }).response?.status
+            : undefined;
+        if (status === 401) {
+          // token 过期/被吊销：清掉回登录页（mirror apiClient legacy interceptor 模式）
+          clearToken();
+          if (typeof window !== "undefined") window.location.assign("/login");
+        }
+        setError(err instanceof Error ? err.message : String(err));
         setLoading(false);
       });
     return () => {
@@ -410,6 +413,23 @@ export function useSaasMenus(): {
   }, [token, clearToken]);
 
   return { data, loading, error };
+}
+
+/** 契约 MenuNode（shared tsp：id/label/path?/icon?/children?）→ 本地渲染 MenuNode。 */
+function adaptContractMenu(node: ContractMenuNode, index: number): MenuNode {
+  const children = node.children ?? [];
+  return {
+    id: node.id,
+    appId: APP_CODE,
+    code: node.id,
+    name: node.label,
+    path: node.path,
+    icon: node.icon,
+    // 契约无 type 字段：有子节点即 group，否则 page
+    type: children.length > 0 ? "group" : "page",
+    sortOrder: index + 1,
+    children: children.map(adaptContractMenu),
+  };
 }
 
 /** 客户端 hook：浏览器直连 saas /api/v1/apps/<code>（saas 公共应用目录，免鉴权）。

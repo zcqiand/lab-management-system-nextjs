@@ -4,7 +4,7 @@
 //
 // 为什么放 layout 不放各 page：App Router 导航时只有共享 layout 子树保持挂载，
 // page 级内容整棵替换。之前每个 page 各自包 <AppShell>，切菜单时 sidebar
-// unmount → remount，菜单重新拉取闪一下（useSaasMenus 无缓存）。
+// unmount → remount，菜单重新拉取闪一下（useBackendMenus 无缓存）。
 // 收敛到 layout 后：切菜单只换右侧 <section> 里的 children，侧栏稳定。
 //
 // 守卫：未登录 → 跳 /login（SSO）。原来 3 个 page 各自的守卫收敛到这里。
