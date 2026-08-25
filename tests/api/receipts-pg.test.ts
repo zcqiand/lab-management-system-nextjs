@@ -31,7 +31,9 @@ interface FlowHistoryEntry {
 
 // CI 无种子数据,直接 describe.skipIf 在注册时跳过整块。
 // hasPg 仍是动态探测(vitest module 加载期 try pg),保留 beforeAll 兜底。
-describe.skipIf(skipReason !== undefined)("receipts 三态流转（pg）", () => {
+// 每个用例都直连远端 lab_dev(每个 it 内 2-4 次 round-trip),单测实测 2-9s,
+// 全量并发争用下贴 10s 默认线会 flaky —— 放宽到 30s。
+describe.skipIf(skipReason !== undefined)("receipts 三态流转（pg）", { timeout: 30_000 }, () => {
   beforeAll(function (this: { skip(): void } & Record<string, unknown>) {
     if (!hasPg) this.skip();
   });
