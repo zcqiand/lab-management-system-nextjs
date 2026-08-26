@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "saas CORS middleware + lab proxy drop + lab_prod bootstrap from lab_dev snapshot",
+  "current_task": "prod SSO 全链验证完成（2026-08-26）：镜像 v0.3.52 已在线上，浏览器直连 saas 配置已烘焙",
   "last_session_at": "2026-08-24",
   "last_session_summary": "lab 侧边栏 502 根因是 /api/saas/{me/menus,app} BFF proxy 不转 JWT，把 saas 接 DB 后必返的 401 包成 502。saas v0.7.40 加 middleware CORS 放行跨域，lab 删 proxy + sidebar-nav 改浏览器直连 NEXT_PUBLIC_SAAS_BASE_URL/api/v1/* + Authorization: Bearer <token>。顺手做 lab_prod bootstrap：dump-db.mjs + seed-from-snapshot.mjs 把 lab_dev 24 表 / 4377 行快照灌进空 lab_prod。Commit 587c8e5（proxy drop）+ ff833b1（dump/import/seeds）+ tag v0.3.47/v0.3.48-20260824 pushed",
   "done": [
@@ -17,12 +17,10 @@
     "commit 587c8e5 + ff833b1 + tag v0.3.47-20260824 + v0.3.48-20260824 + push origin/master"
   ],
   "next": [
-    "lab 镜像还没在 VPS 拉 v0.3.47/v0.3.48 新镜像；saas middleware 已生效（Allow-Origin 实测回来），等 VPS 拉 lab 镜像后浏览器直接走 NEXT_PUBLIC_SAAS_BASE_URL/api/v1/* 即可",
-    "saas deploy 脚本改成 idempotent CORS env append（防后续被运行时手工补的 SAAS_CORS_ALLOWED_ORIGINS 覆盖）—— 跨仓 follow-up，归 saas"
+    "无阻塞项。可选：login/page.tsx:81 SsoCallbackRequest.state L3 缺失（pre-existing）"
   ],
   "open_questions": [
-    "src/app/login/page.tsx:81 L3 SsoCallbackRequest.state 缺失 —— pre-existing，与本批无关",
-    "NEXT_PUBLIC_SAAS_BASE_URL 默认 http://localhost:3000 是 dev 兜底，prod 须在 build 时显式给到 https://saas-nextjs.xiangru.uk（lab Dockerfile / env 注入路径未覆盖的话容易漏）"
+    "NEXT_PUBLIC_SAAS_BASE_URL 已确认烘焙 https://saas-nextjs.xiangru.uk（chunk 277 实测）——原「prod 须显式给到」的担忧已消除"
   ],
   "dont": [
     "不要再恢复 src/app/api/saas/* BFF proxy —— Phase 6 接 DB 后必转 JWT，proxy 不转就 502；浏览器直连 + saas middleware CORS 是唯一路径",
