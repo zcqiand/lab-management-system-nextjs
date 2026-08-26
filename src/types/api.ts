@@ -1,5 +1,5 @@
 /**
- * 业务实体类型定义 barrel（建筑工程建筑工程实验室管理系统 v3）
+ * 业务实体类型定义 barrel（建筑工程实验室管理系统 v3）
  *
  * 领域模型：
  *   资源 Contract / Project → 试验过程 SampleReceipt → Sample → TestRecord

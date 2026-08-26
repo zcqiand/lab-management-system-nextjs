@@ -55,14 +55,15 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     queue.length = 0;
     calls.length = 0;
     // useSaasApp 仍走 fetch（saas 公共目录）；axios mock 只盯 /api/auth/menus
-    fetchMock = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({ code: "lab-management", name: "建筑工程实验室管理系统" }),
-          { status: 200 },
-        ),
-      );
+    fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: "lab-management",
+          name: "建筑工程实验室管理系统",
+        }),
+        { status: 200 },
+      ),
+    );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     localStorage.clear();
   });
