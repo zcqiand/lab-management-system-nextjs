@@ -1,36 +1,32 @@
 {
   "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "prod SSO 全链验证完成（2026-08-26）：镜像 v0.3.52 已在线上，浏览器直连 saas 配置已烘焙",
-  "last_session_at": "2026-08-24",
-  "last_session_summary": "lab 侧边栏 502 根因是 /api/saas/{me/menus,app} BFF proxy 不转 JWT，把 saas 接 DB 后必返的 401 包成 502。saas v0.7.40 加 middleware CORS 放行跨域，lab 删 proxy + sidebar-nav 改浏览器直连 NEXT_PUBLIC_SAAS_BASE_URL/api/v1/* + Authorization: Bearer <token>。顺手做 lab_prod bootstrap：dump-db.mjs + seed-from-snapshot.mjs 把 lab_dev 24 表 / 4377 行快照灌进空 lab_prod。Commit 587c8e5（proxy drop）+ ff833b1（dump/import/seeds）+ tag v0.3.47/v0.3.48-20260824 pushed",
+  "current_task": "fix-pulled-schema 补独立 sql import 清理(v0.3.53)+ shared V015/V017 收敛后 emit 链验证通过",
+  "last_session_at": "2026-08-26",
+  "last_session_summary": "shared 收敛(lab-shared v0.1.7：V015 换 smoke-seed + V017 进 shared)后跑 emit-schema 全链 replay 16 迁移 PASS,终态与旧链等价(schema.sql 内容不变)。过程中暴露 fix-pulled-schema.mjs 盲区:新版 drizzle-kit 把 unused sql 拆成独立第二行 import,老清理逻辑只处理第一个 import 块 -> tsc TS6133 L3 红,补 2b 路径修复。/handoff 二次门禁 --all exit 0(本仓 158 条目,软告警 2 条 M97.F01.I02/I04 预存在与本次无关)",
   "done": [
-    "src/components/app/sidebar-nav.tsx 重写 useSaasMenus / useSaasApp：fetch 改打 ${SAAS_BASE}/api/v1/{me/menus, apps/<code>} + Authorization: Bearer <token>（useAuth().token；SSO callback 拿到的 saas accessToken，存 localStorage lab.token）；401 → clearToken + /login；useEffect deps [token]，!token 时不 fetch 防 hydration 竞态（auth-context mount 后才 hydrate）",
-    "删 src/app/api/saas/{me/menus, app}/route.ts 两个 BFF proxy handler（连带 src/app/api/saas/ 整个目录）",
-    "tests/components/sidebar-nav.direct.dom.test.tsx 锁 hook 契约（URL / Bearer / hydration 竞态 / 401 redirect；renderHook + AuthProvider wrapper + jsdom fetch mock）",
-    "scripts/dump-db.mjs：PG → src/seeds/*.json 快照（按主键升序，跳过系统表 + 空表，写 _meta.json）",
-    "scripts/seed-from-snapshot.mjs：src/seeds/*.json → PG（TRUNCATE CASCADE + introspect pg_constraint 做 DFS topo-sort 决定 INSERT 顺序；jsonb 列显式 JSON.stringify 兜 pg driver 不能自动转 array-of-object；带 --dry-run）",
-    "src/seeds/* 25 文件进 git：lab_dev 当前快照 24 表 / 4377 行（contracts 3 / sample_receipts 210 / inspection_brands 91 / inspection_parameters 587 / inspection_standards 103 / test_records 150 / …）",
-    "已对 lab_prod 实际执行 TRUNCATE + 灌入 24 表 / 4377 行；SELECT count(*) 抽样验证与 lab_dev 快照一致",
-    "前置 saas v0.7.40 middleware CORS 已先推（部署顺序 CRITICAL —— 颠倒浏览器直接撞 CORS 比 502 还糟）；saas.env 含 SAAS_CORS_ALLOWED_ORIGINS=https://lab-nextjs.xiangru.uk（VPS 已手工补，prod 验过 Allow-Origin 回来）",
-    "gate L0/L1/L2/L3/L4/L5 全绿 exit 0（158 功能条目，2 条软告警 M97.F01.I02/I04 与本批无关）",
-    "commit 587c8e5 + ff833b1 + tag v0.3.47-20260824 + v0.3.48-20260824 + push origin/master"
+    "scripts/fix-pulled-schema.mjs 补 2b：unused 时删掉整行独立 `import { sql } from \"drizzle-orm\"`(幂等,老形状仍走原 2 路径)",
+    "emit-schema 实测收敛链：V001-V013(rules) -> V014 旧版 -> V015 smoke -> V017 rename 全 PASS,schema.sql 与旧链产物逐字节相同(新旧链终态等价的实证)",
+    "lab_dev 侧状态核准：flyway V014 checksum 已 repair(-1860597146),V017 待下次 springboot dev 启动自动应用(lab_dev 的 calculation 表届时 rules->methods)",
+    "gate L0/L1/L2/L3/L4/L5 全绿 158 条目;--all 15 项目全绿",
+    "commit a343248 + tag v0.3.53-20260826 + push origin/master"
   ],
   "next": [
-    "无阻塞项。可选：login/page.tsx:81 SsoCallbackRequest.state L3 缺失（pre-existing）"
+    "无阻塞。可选：login/page.tsx:81 SsoCallbackRequest.state L3 缺失(pre-existing)"
   ],
   "open_questions": [
-    "NEXT_PUBLIC_SAAS_BASE_URL 已确认烘焙 https://saas-nextjs.xiangru.uk（chunk 277 实测）——原「prod 须显式给到」的担忧已消除"
+    "emit-schema.mjs 的 drizzleKitPull() 用 spawnSync(\"npx\",...) 在 Windows 下解析不了 npx.cmd(静默 exit 4 被 tail 吞)-- 本次 drizzle-kit pull 是手动补跑的。修法 spawnSync 加 shell:true 或直接调 node_modules/.bin,待下个会话顺手修",
+    "NEXT_PUBLIC_ENABLE_MSW 在 .env.local/.env.production 的清理仍待定(历史遗留)"
   ],
   "dont": [
-    "不要再恢复 src/app/api/saas/* BFF proxy —— Phase 6 接 DB 后必转 JWT，proxy 不转就 502；浏览器直连 + saas middleware CORS 是唯一路径",
-    "不要把 fetch URL 写回 /api/saas/* —— proxy 已删，路由 404",
-    "不要在 useSaasMenus 里省 `if (!token) return` —— auth-context mount 后才 hydrate token，首 render token=null 必返 401",
-    "不要把 scripts/dump-db.mjs 的 snapshot 写进 src/app/ —— 是 infra 工具不是路由",
-    "不要在 seed-from-snapshot.mjs 里去掉 JSON.stringify(jsonb 列) —— pg driver 不会自动转 array-of-object，必须显式",
-    "不要把 @lab/management-system-msw 拉回 devDependencies（BFF route handler 是 runtime 代码段，必须 dependencies）",
-    "不要为了'避免 devDep 污染产物'把 msw 包体打入 next build（transpilePackages 配置已解）",
+    "不要把 generated/ 产物提交进 git -- 已 gitignore,新 clone 靠 drizzle-kit pull 重建",
+    "不要单独跑 drizzle-kit pull 后不跑 node scripts/fix-pulled-schema.mjs -- pull 产物有空串默认值丢引号 + unused sql import 两类缺陷,L3 必红",
+    "不要再恢复 src/app/api/saas/* BFF proxy(浏览器直连 + saas middleware CORS 是唯一路径);不要在 useSaasMenus 里省 `if (!token) return`",
+    "不要在 seed-from-snapshot.mjs 里去掉 JSON.stringify(jsonb 列)",
+    "不要把 @lab/management-system-msw 拉回 devDependencies;不要把 msw 包体打入 next build(transpilePackages 已解)",
     "不要 catch 后吞掉异常 / 硬编码连接串或密钥"
   ],
-  "active_branch": "master"
+  "last_gate_passed_at": "2026-08-26T17:30+08:00",
+  "active_branch": "master",
+  "ahead_of_origin": "0"
 }
