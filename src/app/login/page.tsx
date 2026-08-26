@@ -26,10 +26,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/state/auth-context";
 import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
-import {
-  authSsoAuthorize,
-  authSsoCallback,
-} from "@/api/endpoints/endpoints";
+import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
 
 // OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id，
 // saas seeds apps.json）。真部署走部署期注入；当前单仓 demo 硬编码。
@@ -94,7 +91,12 @@ export default function LoginPage() {
             // 清掉 URL 上的 code/state（防 reload 重复触发）
             url.searchParams.delete("code");
             url.searchParams.delete("state");
-            window.history.replaceState(null, "", url.pathname + (url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""));
+            window.history.replaceState(
+              null,
+              "",
+              url.pathname +
+                (url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""),
+            );
             router.replace(fromParam ?? "/");
           } else {
             setStatus("code 换 token 失败：响应无 token");
@@ -150,20 +152,21 @@ export default function LoginPage() {
     >
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-2">
-          <CardTitle className="text-lg">实验室管理系统-Next.js</CardTitle>
+          <CardTitle className="text-lg">建筑工程实验室管理系统-Next.js</CardTitle>
           <CardDescription>SSO 登录（OAuth 2.0 授权码模式）</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-slate-600">
           <p>{status}</p>
           <p className="text-xs text-slate-400">
-            流程：lab /login → saas /authorize → saas 登录 → 带 code 回 lab /login → lab 后端换 token
+            流程：lab /login → saas /authorize → saas 登录 → 带 code 回 lab /login → lab
+            后端换 token
           </p>
           <p className="text-xs text-slate-400">
             demo 后端：<span className="font-medium">{apiMode}</span> · saas 端口：3000
           </p>
           <div className="pt-2 border-t">
             <a href="/" className="text-blue-600 hover:underline text-xs">
-              返回首页（BackendBadge + 旧 LoginForm）
+              返回首页
             </a>
           </div>
         </CardContent>

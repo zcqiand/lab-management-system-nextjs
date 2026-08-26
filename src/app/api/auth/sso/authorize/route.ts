@@ -8,16 +8,18 @@
 //   1. lab 后端（confidential client）POST saas /api/v1/oauth/authorize
 //      { clientId, redirectUri, responseType:"code", scope, state, tenantId }
 //      -> { code, state }
-//   2. 拼 saas 登录页 `${SAAS_BASE_URL}/login?code&redirect_uri&state`
+//   2. 拼 saas 登录页 `${SAAS_UI_BASE_URL}/login?code&redirect_uri&state`
 //   3. 浏览器去 saas 认证，成功后 saas 302 redirect_uri?code&state 回 lab /login
 //   4. lab /login 验 state -> POST /api/auth/sso/callback 换 lab 自家 JWT
 //
-// 旧版（拼 ?redirect=&state= 捷径）与 saas-nextjs 登录页已删除的旧约定
-// 不匹配 -> 登录后跳 saas 自家首页而非回 lab，已废弃。
+// SAAS_IDP_URL (server-only) 与 SAAS_UI_BASE_URL (client+server) 拆分：
+//   - SAAS_IDP_URL 指向 OAuth IdP（POST /api/v1/oauth/* 端点，saas-nextjs 全栈仓同 origin）
+//   - SAAS_UI_BASE_URL 指向登录 UI 页（/login 渲染端，dev 同 saas-nextjs :3000，prod 同域）
 
 import { NextResponse } from "next/server";
 
-const SAAS_BASE_URL = process.env.SAAS_BASE_URL ?? "http://localhost:3000";
+const SAAS_IDP_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
+const SAAS_UI_BASE_URL = process.env.SAAS_UI_BASE_URL ?? "http://localhost:3000";
 // OAuth client_id：lab 在 saas 注册的应用（apps.client_id，见 saas seeds apps.json）。
 const SAAS_CLIENT_ID = process.env.SAAS_OAUTH_CLIENT_ID ?? "lab-mgmt";
 // dev mock 语义：authorize 端点要求 tenantId（该 tenant 下须有用户）。
@@ -46,11 +48,11 @@ export async function GET(request: Request) {
     );
   }
 
-  // 1. 向 saas 领授权码（服务端对服务端，不经浏览器）
+  // 1. 向 saas IdP 领授权码（服务端对服务端，不经浏览器）
   let code: string;
   try {
     const authorizeRes = await fetch(
-      `${SAAS_BASE_URL}/api/v1/oauth/authorize`,
+      `${SAAS_IDP_URL}/api/v1/oauth/authorize`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -83,14 +85,14 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         code: "SSO_AUTHORIZE_UNREACHABLE",
-        message: `连不上 saas（${SAAS_BASE_URL}）：${(err as Error).message}`,
+        message: `连不上 saas IdP（${SAAS_IDP_URL}）：${(err as Error).message}`,
       },
       { status: 502 },
     );
   }
 
-  // 2. 拼 saas 登录页 URL：code + redirect_uri + state 原样透传
-  const saasUrl = new URL("/login", SAAS_BASE_URL);
+  // 2. 拼 saas 登录页 URL：code + redirect_uri + state 原样透传（用 SAAS_UI_BASE_URL）
+  const saasUrl = new URL("/login", SAAS_UI_BASE_URL);
   saasUrl.searchParams.set("code", code);
   saasUrl.searchParams.set("redirect_uri", redirectUri);
   saasUrl.searchParams.set("state", state);

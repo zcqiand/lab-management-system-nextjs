@@ -44,12 +44,14 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 if [ ! -f "$BASE/lab.env" ]; then
-  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_BASE_URL + NEXT_PUBLIC_APP_ID)"
+  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_IDP_URL + SAAS_UI_BASE_URL + NEXT_PUBLIC_APP_ID)"
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
     printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
+    # Phase 4 env 对称化: SAAS_BASE_URL 拆成 SAAS_IDP_URL (IdP 端点) + SAAS_UI_BASE_URL (登录 UI 页)
+    printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-lab-management}"
     # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
@@ -70,12 +72,13 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_ENABLE_MSW=' "$BASE/lab.env
   printf 'NEXT_PUBLIC_ENABLE_MSW=false\n' >> "$BASE/lab.env"
   printf 'NEXT_PUBLIC_API_BASE_URL=\n' >> "$BASE/lab.env"
 fi
-# 兼容旧 lab.env:已存在但缺 SAAS_BASE_URL,追加(不覆盖 AUTH_JWT_SECRET)
-if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_BASE_URL=' "$BASE/lab.env"; then
-  echo "→ append SAAS_BASE_URL to existing $BASE/lab.env"
+# 兼容旧 lab.env:已存在但缺 SAAS_IDP_URL / SAAS_UI_BASE_URL,追加(不覆盖 AUTH_JWT_SECRET)
+if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_IDP_URL=' "$BASE/lab.env"; then
+  echo "→ append SAAS_IDP_URL / SAAS_UI_BASE_URL to existing $BASE/lab.env"
   umask 077
   {
-    printf 'SAAS_BASE_URL=%s\n' "${SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
     printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-lab-management}"
@@ -87,6 +90,17 @@ fi
 if [ -f "$BASE/lab.env" ] && grep -qE '^(SAAS_BASE_URL|NEXT_PUBLIC_SAAS_BASE_URL)=https://(saas-react|react-id)(\.xiangru\.uk|\.xiangru\.uk/api)$' "$BASE/lab.env"; then
   echo "-> migrate stale saas-react/react-id defaults to saas-nextjs in $BASE/lab.env"
   sed -i -E 's#^(SAAS_BASE_URL|NEXT_PUBLIC_SAAS_BASE_URL)=https://(saas-react|react-id)\.xiangru\.uk(/api)?$#\1=https://saas-nextjs.xiangru.uk#' "$BASE/lab.env"
+fi
+# Phase 4 env 对称化迁移: 旧 SAAS_BASE_URL → SAAS_IDP_URL + SAAS_UI_BASE_URL（同值）
+# 老 lab.env 部署不会自动 rewrite (Phase 2A 已删 DevJwtDecoder, 现在 sso/authorize 502 是这个迁移缺失的连锁反应)
+if [ -f "$BASE/lab.env" ] && grep -q '^SAAS_BASE_URL=' "$BASE/lab.env" && ! grep -q '^SAAS_IDP_URL=' "$BASE/lab.env"; then
+  echo "→ migrate SAAS_BASE_URL → SAAS_IDP_URL + SAAS_UI_BASE_URL in $BASE/lab.env"
+  existing_saas_base=$(grep '^SAAS_BASE_URL=' "$BASE/lab.env" | head -1 | cut -d= -f2-)
+  umask 077
+  # 删 SAAS_BASE_URL, 加 SAAS_IDP_URL + SAAS_UI_BASE_URL (同值)
+  sed -i -E '/^SAAS_BASE_URL=/d' "$BASE/lab.env"
+  printf 'SAAS_IDP_URL=%s\n' "$existing_saas_base" >> "$BASE/lab.env"
+  printf 'SAAS_UI_BASE_URL=%s\n' "$existing_saas_base" >> "$BASE/lab.env"
 fi
 mkdir -p "$BASE/data"
 

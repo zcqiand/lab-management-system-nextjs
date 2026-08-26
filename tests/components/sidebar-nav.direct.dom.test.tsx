@@ -55,9 +55,14 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     queue.length = 0;
     calls.length = 0;
     // useSaasApp 仍走 fetch（saas 公共目录）；axios mock 只盯 /api/auth/menus
-    fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ code: "lab-management", name: "实验室管理系统" }), { status: 200 }),
-    );
+    fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({ code: "lab-management", name: "建筑工程实验室管理系统" }),
+          { status: 200 },
+        ),
+      );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     localStorage.clear();
   });
@@ -76,7 +81,12 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
           id: "overview",
           label: "总览",
           children: [
-            { id: "dashboard", label: "仪表盘", path: "/dashboard", icon: "LayoutDashboard" },
+            {
+              id: "dashboard",
+              label: "仪表盘",
+              path: "/dashboard",
+              icon: "LayoutDashboard",
+            },
           ],
         },
         { id: "solo", label: "独立页", path: "/solo" },
@@ -105,7 +115,9 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
 
     await new Promise((r) => setTimeout(r, 50));
     expect(calls).toEqual([]);
-    expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining("/api/auth/menus"));
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/menus"),
+    );
   });
 
   it("useBackendMenus：401 → clearToken + window.location.assign('/login')", async () => {

@@ -1,6 +1,6 @@
 # lab-management-system-nextjs
 
-实验室管理系统 · Next.js 全栈前端（App Router）。
+建筑工程实验室管理系统 · Next.js 全栈前端（App Router）。
 
 ## 技术栈
 

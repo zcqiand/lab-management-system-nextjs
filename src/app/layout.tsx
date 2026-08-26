@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "lab-management-system-nextjs",
-  description: "实验室管理系统-Next.js — full-stack 前端 + 后端 API routes",
+  description: "建筑工程实验室管理系统-Next.js — full-stack 前端 + 后端 API routes",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
