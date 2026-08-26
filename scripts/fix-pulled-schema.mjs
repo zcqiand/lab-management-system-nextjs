@@ -19,6 +19,8 @@ if (brokenDefaults > 0) {
 }
 
 // 2) import 列表里的 unused sql（仅当文件其余处没用到 sql 时才删）
+//    新版 drizzle-kit 把 sql 拆成独立第二行 `import { sql } from "drizzle-orm"`，
+//    老逻辑只清第一个 import 块内的 sql -- 两条路径都要覆盖（2026-08-26）。
 const withoutImports = src.replace(/import\s*\{[^}]*}\s*from\s*"[^"]*"/g, "");
 const usesSqlBeyondImport = /\bsql[.(`]/.test(withoutImports);
 if (!usesSqlBeyondImport && /(^|\s|,)\s*sql\s*(,|})/.test(src.match(/import\s*\{[^}]*\}/)?.[0] ?? "")) {
@@ -30,6 +32,15 @@ if (!usesSqlBeyondImport && /(^|\s|,)\s*sql\s*(,|})/.test(src.match(/import\s*\{
   if (cleaned !== importBlock) {
     src = src.replace(importBlock, cleaned);
     fixes++;
+  }
+}
+// 2b) 独立整行的 unused sql import（新版 drizzle-kit 产物形状）
+if (!usesSqlBeyondImport) {
+  const standalone = /^import\s*\{\s*sql\s*\}\s*from\s*"drizzle-orm";?\s*\r?\n/gm;
+  const hits = src.match(standalone);
+  if (hits) {
+    src = src.replace(standalone, "");
+    fixes += hits.length;
   }
 }
 
