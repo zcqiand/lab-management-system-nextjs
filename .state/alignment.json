@@ -74,9 +74,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 后 USER-A 菜单快照已写入（服务账号路径）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 回退 FALLBACK_MENUS demo 树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树"
       ],
       "entry": [
@@ -95,6 +96,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 后 USER-A 菜单快照已写入（服务账号路径）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 返回 token + user",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造"

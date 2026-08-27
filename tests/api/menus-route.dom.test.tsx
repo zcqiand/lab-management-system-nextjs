@@ -1,16 +1,16 @@
-// ADR-0009 fnTest — GET /api/auth/menus route：saas 快照缓存 → demo 兜底。
+// ADR-0009 fnTest — GET /api/auth/menus route：saas 快照缓存 → miss 503。
 //
 // 数据链三段（与 lab-springboot AuthService.menus 同语义）：
-//   1. Bearer JWT sub 命中快照缓存 → 返回快照（SSO callback 时 cacheMenuSnapshot 写入）
-//   2. miss（无 token / 无 sub / 过期 / 未缓存）→ 返回 FALLBACK_MENUS demo 树
-//   3. 端点永不 5xx（菜单拉不到不挡 AppShell）
+//   1. Bearer JWT sub 命中快照缓存 → 返回快照（SSO callback / 密码登录时 cacheMenuSnapshot 写入）
+//   2. miss（无 token / 无 sub / 过期 / 未缓存）→ 503 MENUS_UNAVAILABLE
+//      （2026-08-27 起 demo 兜底删除：假树不再下发，前端回退静态菜单）
 // 直接调 route handler（auth.dom.test.tsx 同款模式）；menu-snapshot 缓存单测
 // 覆盖 TTL 与映射。
 
 import { describe, beforeEach, expect } from "vitest";
 import { fnTest } from "../fn";
 
-import { GET as menusGET, FALLBACK_MENUS } from "@/app/api/auth/menus/route";
+import { GET as menusGET } from "@/app/api/auth/menus/route";
 import {
   putMenuSnapshot,
   getMenuSnapshot,
@@ -48,21 +48,19 @@ describe("ADR-0009 /api/auth/menus 快照链", () => {
     expect(body).toEqual(snap);
   });
 
-  fnTest(["M01.F04.I04"], "快照 miss：无 token / sub 无快照 → 回退 FALLBACK_MENUS demo 树", async () => {
+  fnTest(["M01.F04.I04"], "快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE", async () => {
     // 无 Authorization
     const res1 = await menusGET(reqWithBearer(null));
-    expect(res1.status).toBe(200);
-    expect(await res1.json()).toEqual(FALLBACK_MENUS);
+    expect(res1.status).toBe(503);
+    expect(((await res1.json()) as { code: string }).code).toBe("MENUS_UNAVAILABLE");
 
     // 有 token 但该 sub 从未缓存
     const res2 = await menusGET(reqWithBearer(fakeJwt("stranger")));
-    expect(res2.status).toBe(200);
-    expect(await res2.json()).toEqual(FALLBACK_MENUS);
+    expect(res2.status).toBe(503);
 
-    // 非三段 token（不是 JWT）→ sub 解不出 → 兜底
+    // 非三段 token（不是 JWT）→ sub 解不出 → 同样 503
     const res3 = await menusGET(reqWithBearer("not-a-jwt"));
-    expect(res3.status).toBe(200);
-    expect(await res3.json()).toEqual(FALLBACK_MENUS);
+    expect(res3.status).toBe(503);
   });
 });
 

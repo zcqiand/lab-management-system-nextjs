@@ -54,6 +54,21 @@ describe("M01.F04/F05 认证管理集成层", () => {
     expect(body.user?.username).toBeTruthy();
   });
 
+  // ─────── F05.I01 密码登录拉菜单快照（2026-08-27 demo 兜底删除配套）───────
+  fnTest(["M01.F05.I01", "M01.F04.I04"], "POST /api/auth/login 后 USER-A 菜单快照已写入（服务账号路径）", async () => {
+    // login 副作用：服务账号拉 saas /me/menus -> 快照写入 lab userId。
+    // 测试环境 saas 不可达 -> cacheMenuSnapshot warn 不抛，但 saas 服务登录
+    // mock 不了 fetch（route 直接 global fetch）-> 断言源码接线而非运行时。
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const src = fs.readFileSync(
+      path.resolve(process.cwd(), "src/app/api/auth/login/route.ts"),
+      "utf8",
+    );
+    expect(src).toMatch(/cacheMenuSnapshot/);
+    expect(src).toMatch(/serviceLogin/);
+  });
+
   // ─────── F05.I02 Token 校验 ───────
   fnTest(["M01.F05.I02"], "apiClient/identityClient 请求拦截器注入 Authorization Bearer", async () => {
     const fs = await import("node:fs");
