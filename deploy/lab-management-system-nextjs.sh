@@ -11,7 +11,7 @@
 # 与姊妹仓 saas-identity-platform.sh 的差异:
 #   - 容器内是 Node(next start :3000),不是 nginx:80 → -p 127.0.0.1:8012:3000
 #   - SQLite 挂卷持久化:./data ↔ /data(容器 entrypoint 首启迁移 + seed)
-#   - 密钥走 ./lab.env(AUTH_JWT_SECRET),由 setup-vps.sh 生成,只存在于 VPS
+#   - 密钥走 ./lab.env(LAB_JWT_SECRET),由 setup-vps.sh 生成,只存在于 VPS
 #
 # 前置:deploy 用户需在 docker 组中(sudo usermod -aG docker deploy)。
 
@@ -28,9 +28,11 @@ if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
   exit 2
 fi
 
-# lab.env 自举:缺失时就地生成随机 AUTH_JWT_SECRET(只在 VPS 本地生成,
+# lab.env 自举:缺失时就地生成随机 LAB_JWT_SECRET(只在 VPS 本地生成,
 # 不进 CI 日志/仓库)。重新生成会失效所有登录态,故仅在文件不存在时执行;
 # setup-vps.sh 若已生成过则这里跳过。
+# v0.3.55:AUTH_JWT_SECRET 是死键(src/lib/auth/factory.ts 读的是 LAB_JWT_SECRET,
+# 老 key 从未被读过,prod 一直用 factory.ts 硬编码 dev fallback 签发),改名对齐。
 # v0.3.0.1:同时写入 SAAS_BASE_URL(server)与 NEXT_PUBLIC_SAAS_BASE_URL(client)。
 # v0.3.34:加 DATABASE_URL(src/db/index.ts 用 postgres-js,容器启动必填)。
 # v0.3.35:NEXT_PUBLIC_APP_ID 对齐 src/api/env.ts:11 真正读的 key(原本写错名
@@ -44,35 +46,49 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 if [ ! -f "$BASE/lab.env" ]; then
-  echo "→ generate $BASE/lab.env (DATABASE_URL + AUTH_JWT_SECRET + SAAS_IDP_URL + SAAS_UI_BASE_URL + NEXT_PUBLIC_APP_ID)"
+  echo "→ generate $BASE/lab.env (DATABASE_URL + LAB_JWT_SECRET + SAAS_IDP_URL + SAAS_UI_BASE_URL + NEXT_PUBLIC_APP_ID)"
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
-    printf 'AUTH_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
+    printf 'LAB_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     # Phase 4 env 对称化: SAAS_BASE_URL 拆成 SAAS_IDP_URL (IdP 端点) + SAAS_UI_BASE_URL (登录 UI 页)
     printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-lab-management}"
-    # MSW 关闭 → 走真 backend (lab-nextjs 自己的 /api/* Route Handler, 连真 PG)
-    printf 'NEXT_PUBLIC_ENABLE_MSW=false\n'
+    # MSW 已删 (ADR-0012); 空串 = 同源走 lab-nextjs 自己的 /api/* Route Handler (连真 PG)
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
   } > "$BASE/lab.env"
 fi
-# 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 AUTH_JWT_SECRET)
+# 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 LAB_JWT_SECRET)
 if [ -f "$BASE/lab.env" ] && ! grep -q '^DATABASE_URL=' "$BASE/lab.env"; then
   echo "→ append DATABASE_URL to existing $BASE/lab.env"
   umask 077
   printf 'DATABASE_URL=%s\n' "$DATABASE_URL" >> "$BASE/lab.env"
 fi
-# 兼容旧 lab.env:已存在但缺 NEXT_PUBLIC_ENABLE_MSW=false,追加(MSW 必须关)
-if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_ENABLE_MSW=' "$BASE/lab.env"; then
-  echo "→ append NEXT_PUBLIC_ENABLE_MSW=false to existing $BASE/lab.env"
+# v0.3.55 迁移:老 lab.env 的死键 AUTH_JWT_SECRET → LAB_JWT_SECRET(factory.ts 真名)。
+# 沿用旧值(已是随机 32B),不重新生成,避免无谓失效;没有 AUTH_JWT_SECRET 也没有
+# LAB_JWT_SECRET 的老文件(密钥一直在吃代码 fallback)就地生成新随机值。
+if [ -f "$BASE/lab.env" ]; then
+  if grep -q '^AUTH_JWT_SECRET=' "$BASE/lab.env"; then
+    echo "→ migrate AUTH_JWT_SECRET → LAB_JWT_SECRET in $BASE/lab.env"
+    old_secret=$(grep '^AUTH_JWT_SECRET=' "$BASE/lab.env" | head -1 | cut -d= -f2-)
+    umask 077
+    sed -i '/^AUTH_JWT_SECRET=/d' "$BASE/lab.env"
+    printf 'LAB_JWT_SECRET=%s\n' "$old_secret" >> "$BASE/lab.env"
+  elif ! grep -q '^LAB_JWT_SECRET=' "$BASE/lab.env"; then
+    echo "→ append LAB_JWT_SECRET (was missing; prod had been using code fallback)"
+    umask 077
+    printf 'LAB_JWT_SECRET=%s\n' "$(openssl rand -hex 32)" >> "$BASE/lab.env"
+  fi
+fi
+# 兼容旧 lab.env:已存在但缺 NEXT_PUBLIC_API_BASE_URL=,追加(同源)
+if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_API_BASE_URL=' "$BASE/lab.env"; then
+  echo "→ append NEXT_PUBLIC_API_BASE_URL= to existing $BASE/lab.env"
   umask 077
-  printf 'NEXT_PUBLIC_ENABLE_MSW=false\n' >> "$BASE/lab.env"
   printf 'NEXT_PUBLIC_API_BASE_URL=\n' >> "$BASE/lab.env"
 fi
-# 兼容旧 lab.env:已存在但缺 SAAS_IDP_URL / SAAS_UI_BASE_URL,追加(不覆盖 AUTH_JWT_SECRET)
+# 兼容旧 lab.env:已存在但缺 SAAS_IDP_URL / SAAS_UI_BASE_URL,追加(不覆盖 LAB_JWT_SECRET)
 if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_IDP_URL=' "$BASE/lab.env"; then
   echo "→ append SAAS_IDP_URL / SAAS_UI_BASE_URL to existing $BASE/lab.env"
   umask 077
@@ -80,8 +96,6 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_IDP_URL=' "$BASE/lab.env"; then
     printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
     printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'SAAS_OAUTH_CLIENT_ID=%s\n' "${SAAS_OAUTH_CLIENT_ID:-lab-management}"
-    printf 'NEXT_PUBLIC_SAAS_APP_ID=%s\n' "${NEXT_PUBLIC_SAAS_APP_ID:-lab-management}"
   } >> "$BASE/lab.env"
 fi
 # v0.3.44:迁移已知旧默认值。lab.env 已存在且 SAAS_BASE_URL 还是早期脚本的
