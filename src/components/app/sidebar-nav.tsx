@@ -367,18 +367,25 @@ function ChevronToggle({ expanded }: { expanded: boolean }) {
 /** 客户端 hook：拉 lab 后端 GET /api/auth/menus（ADR-0009，2026-08-25 起取代
  *  浏览器直连 saas /api/v1/me/menus）。orval authGetMenus（axios + customFetch），
  *  Bearer token 来自 useAuth()（SSO callback 拿到的 saas accessToken，后端按
- *  JWT sub 读快照缓存；miss 回退 demo 菜单，端点永不 5xx）。
+ *  JWT sub 读快照缓存；miss 503，2026-08-27 起 demo 兜底删除 → render 抛错）。
  *  token 在 auth-context 里 mount 后才 hydrate，所以 deps 用 [token]，!token 时
- *  直接 return 避免无 token 打后端拿 demo 兜底树冒充登录菜单。
- *  契约 MenuNode{id,label,path?,icon?,children?} 在此适配成本地渲染 MenuNode。 */
+ *  直接 return 避免无 token 打后端。
+ *  契约 MenuNode{id,label,path?,icon?,children?} 在此适配成本地渲染 MenuNode。
+ *
+ *  失败语义（demo 兜底删除后）：
+ *    - 401：清 token + window.location.assign('/login')（保留—— token 过期不该
+ *      给用户看错误界面，而该回登录页）
+ *    - 其他失败（503 miss / 网络 / 500）：error state 写后 render 抛错，由 AppShell
+ *      ErrorBoundary 兜渲染「菜单加载失败」错误态——不再静默回退静态树。
+ */
 export function useBackendMenus(): {
   data: MenuNode[] | null;
   loading: boolean;
-  error: string | null;
+  error: Error | null;
 } {
   const [data, setData] = useState<MenuNode[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const { token, clearToken } = useAuth();
 
   useEffect(() => {
@@ -393,18 +400,22 @@ export function useBackendMenus(): {
         setData(d.map(adaptContractMenu));
         setLoading(false);
       })
-      .catch((err: unknown) => {
+      .catch((cause: unknown) => {
         if (cancelled) return;
         const status =
-          typeof err === "object" && err !== null && "response" in err
-            ? (err as { response?: { status?: number } }).response?.status
+          typeof cause === "object" && cause !== null && "response" in cause
+            ? (cause as { response?: { status?: number } }).response?.status
             : undefined;
         if (status === 401) {
           // token 过期/被吊销：清掉回登录页（mirror apiClient legacy interceptor 模式）
           clearToken();
           if (typeof window !== "undefined") window.location.assign("/login");
+          // 401 已重定向，不写 error state（避免 render 抛错破坏重定向）
+          setLoading(false);
+          return;
         }
-        setError(err instanceof Error ? err.message : String(err));
+        // 其他失败 → error state 写入；render 阶段抛错由 ErrorBoundary 兜
+        setError(cause instanceof Error ? cause : new Error(String(cause)));
         setLoading(false);
       });
     return () => {
@@ -412,6 +423,8 @@ export function useBackendMenus(): {
     };
   }, [token, clearToken]);
 
+  // render 阶段抛错 → AppShell ErrorBoundary 接住渲染错误态
+  if (error) throw error;
   return { data, loading, error };
 }
 
