@@ -17,8 +17,10 @@ import { NextResponse } from "next/server";
 import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
 
 const SAAS_BASE_URL = process.env.SAAS_BASE_URL ?? "http://localhost:3000";
-// 与 authorize 路由同一组 client 配置（apps.clientId/clientSecret 见 saas seeds）
-const SAAS_CLIENT_ID = process.env.SAAS_OAUTH_CLIENT_ID ?? "lab-mgmt";
+// 与 authorize 路由同一组 client 配置（apps.clientId/clientSecret 见 saas seeds）。
+// 2026-08-28 V014/V015 收敛 apps.client_id 为 UUID '11111111-1111-1111-1111-111111111111'。
+const SAAS_CLIENT_ID =
+  process.env.SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
 const SAAS_CLIENT_SECRET =
   process.env.SAAS_OAUTH_CLIENT_SECRET ?? "lab-mgmt-secret";
 const SAAS_TENANT_ID =

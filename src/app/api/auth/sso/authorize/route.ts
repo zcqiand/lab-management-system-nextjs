@@ -20,8 +20,11 @@ import { NextResponse } from "next/server";
 
 const SAAS_IDP_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
 const SAAS_UI_BASE_URL = process.env.SAAS_UI_BASE_URL ?? "http://localhost:3000";
-// OAuth client_id：lab 在 saas 注册的应用（apps.client_id，见 saas seeds apps.json）。
-const SAAS_CLIENT_ID = process.env.SAAS_OAUTH_CLIENT_ID ?? "lab-mgmt";
+// OAuth client_id：lab 在 saas 注册的应用（apps.client_id）。
+// 2026-08-28 V014/V015 seed 收敛 apps.client_id 为固定 UUID
+// '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用）；dev fallback 同步。
+const SAAS_CLIENT_ID =
+  process.env.SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
 // dev mock 语义：authorize 端点要求 tenantId（该 tenant 下须有用户）。
 // lab 登录前无租户上下文，用部署 env 注入，缺省取 saas 种子首个 tenant（acme）。
 const SAAS_TENANT_ID =

@@ -28,9 +28,12 @@ import { useAuth } from "@/state/auth-context";
 import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
 import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
 
-// OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id，
-// saas seeds apps.json）。真部署走部署期注入；当前单仓 demo 硬编码。
-const OAUTH_CLIENT_ID = "lab-mgmt";
+// OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id）。
+// 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-mgmt' 收敛为固定 UUID
+// '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用同一 app.id）。
+// 浏览器侧走 NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env 覆盖；dev fallback 仍用 UUID 以匹配 prod。
+const OAUTH_CLIENT_ID =
+  process.env.NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
 const SSO_STATE_STORAGE_KEY = "lab.sso.state";
 
 // 生成 OAuth 2.0 state（防 CSRF，RFC 6749 §10.12）

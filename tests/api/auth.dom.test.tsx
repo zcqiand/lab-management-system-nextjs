@@ -100,7 +100,7 @@ describe("M01.F04/F05 认证管理集成层", () => {
     }) as typeof fetch;
     try {
       const req = new Request(
-        "http://localhost/api/auth/sso/authorize?response_type=code&client_id=lab-mgmt&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=state-test",
+        "http://localhost/api/auth/sso/authorize?response_type=code&client_id=11111111-1111-1111-1111-111111111111&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=state-test",
       );
       const res = await ssoAuthorizeGET(req as unknown as Parameters<typeof ssoAuthorizeGET>[0]);
       expect(res.status).toBeLessThan(400);
