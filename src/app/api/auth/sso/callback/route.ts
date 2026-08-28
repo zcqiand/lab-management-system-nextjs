@@ -16,7 +16,9 @@
 import { NextResponse } from "next/server";
 import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
 
-const SAAS_BASE_URL = process.env.SAAS_BASE_URL ?? "http://localhost:3000";
+// v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(线上一直吃 localhost
+// fallback,token 换发 502)。真名 SAAS_IDP_URL,与 sso/authorize 路由一致。
+const SAAS_BASE_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
 // 与 authorize 路由同一组 client 配置（apps.clientId/clientSecret 见 saas seeds）。
 // 2026-08-28 V014/V015 收敛 apps.client_id 为 UUID '11111111-1111-1111-1111-111111111111'。
 const SAAS_CLIENT_ID =

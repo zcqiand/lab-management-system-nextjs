@@ -46,18 +46,38 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 if [ ! -f "$BASE/lab.env" ]; then
-  echo "→ generate $BASE/lab.env (DATABASE_URL + LAB_JWT_SECRET + SAAS_IDP_URL + SAAS_UI_BASE_URL + NEXT_PUBLIC_APP_ID)"
+  # 禁默认值兜底(2026-08-28 CLAUDE.md 硬规则):secret 类必须显式传入并 fail-fast
+  # 指明缺哪个 —— 服务账号缺失时 login/route.ts 会静默吃 dev fallback alice/dev123456,
+  # 菜单快照打错账号还无声。
+  if [ -z "${LAB_SAAS_SERVICE_USER:-}" ] || [ -z "${LAB_SAAS_SERVICE_PASSWORD:-}" ]; then
+    echo "ERROR: LAB_SAAS_SERVICE_USER/PASSWORD env required to bootstrap lab.env (add GitHub Secrets LAB_SAAS_SERVICE_USER/LAB_SAAS_SERVICE_PASSWORD → ci.yml envs → ssh-action envs)" >&2
+    exit 1
+  fi
+  echo "→ generate $BASE/lab.env (key 集合与仓内 .env.production 严格对齐,suite L0.5 check_deploy_parity 锁死)"
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
     printf 'LAB_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
-    # Phase 4 env 对称化: SAAS_BASE_URL 拆成 SAAS_IDP_URL (IdP 端点) + SAAS_UI_BASE_URL (登录 UI 页)
-    printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'NEXT_PUBLIC_APP_ID=%s\n' "${NEXT_PUBLIC_APP_ID:-lab-management}"
+    # Phase 4 env 对称化: SAAS_BASE_URL 拆成 SAAS_IDP_URL (IdP 端点) + SAAS_UI_BASE_URL (登录 UI 页)。
+    # 非 secret 走显式 prod 字面量(值 = .env.production 契约值),不吃 ${VAR:-default} 兜底。
+    printf 'SAAS_IDP_URL=https://saas-nextjs.xiangru.uk\n'
+    printf 'SAAS_UI_BASE_URL=https://saas-nextjs.xiangru.uk\n'
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=https://saas-nextjs.xiangru.uk\n'
+    # v0.3.56: NEXT_PUBLIC_APP_ID 是死键(src/api/env.ts 零引用),真名是 sidebar-nav/app-shell
+    # 读的 NEXT_PUBLIC_LAB_APP_CODE。NEXT_PUBLIC_* 是 build-time 烘焙,这行只影响
+    # server 侧 process.env,写上保 key 集合对齐。
+    printf 'NEXT_PUBLIC_LAB_APP_CODE=lab-management\n'
     # MSW 已删 (ADR-0012); 空串 = 同源走 lab-nextjs 自己的 /api/* Route Handler (连真 PG)
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
+    printf 'NEXT_PUBLIC_API_MODE=nextjs\n'
+    # v0.3.56 key 对齐(2026-08-28 线上漂移修复):显式字面量 = .env.production 契约值
+    printf 'LAB_SAAS_SERVICE_USER=%s\n' "$LAB_SAAS_SERVICE_USER"
+    printf 'LAB_SAAS_SERVICE_PASSWORD=%s\n' "$LAB_SAAS_SERVICE_PASSWORD"
+    printf 'LAB_JWT_ISSUER=lab-management-system\n'
+    printf 'LAB_JWT_TTL_SECONDS=3600\n'
+    printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
+    printf 'LAB_SSO_PROFILE=real\n'
+    printf 'SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111\n'
   } > "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 LAB_JWT_SECRET)
@@ -82,6 +102,43 @@ if [ -f "$BASE/lab.env" ]; then
     printf 'LAB_JWT_SECRET=%s\n' "$(openssl rand -hex 32)" >> "$BASE/lab.env"
   fi
 fi
+# v0.3.56 key 对齐迁移(2026-08-28 线上漂移修复):老 lab.env 停在 7 key,
+# 仓内 .env.production 已到 16 key。逐 key append-if-missing(值 = fallback
+# 同值默认,不改变运行行为;要覆盖走 ssh-action envs)。
+# key 集合契约由 tests/deploy-env-parity.test.ts 锁死,新加 key 必须两处同步。
+if [ -f "$BASE/lab.env" ]; then
+  append_if_missing() {
+    key="$1"; val="$2"
+    if ! grep -q "^${key}=" "$BASE/lab.env"; then
+      echo "→ append ${key} to existing $BASE/lab.env"
+      umask 077
+      printf '%s=%s\n' "$key" "$val" >> "$BASE/lab.env"
+    fi
+  }
+  append_if_missing NEXT_PUBLIC_LAB_APP_CODE 'lab-management'
+  append_if_missing NEXT_PUBLIC_API_MODE 'nextjs'
+  # 服务账号是 secret 类:老文件已有则保留;没有则从 env 传入,fail-fast 不兜底
+  if ! grep -q '^LAB_SAAS_SERVICE_USER=' "$BASE/lab.env"; then
+    if [ -z "${LAB_SAAS_SERVICE_USER:-}" ] || [ -z "${LAB_SAAS_SERVICE_PASSWORD:-}" ]; then
+      echo "ERROR: LAB_SAAS_SERVICE_USER/PASSWORD missing in $BASE/lab.env and not forwarded via ci.yml envs (login/route.ts fallback 是 dev 值 alice, prod 不得静默兜底)" >&2
+      exit 1
+    fi
+    append_if_missing LAB_SAAS_SERVICE_USER "$LAB_SAAS_SERVICE_USER"
+    append_if_missing LAB_SAAS_SERVICE_PASSWORD "$LAB_SAAS_SERVICE_PASSWORD"
+  fi
+  append_if_missing LAB_JWT_ISSUER 'lab-management-system'
+  append_if_missing LAB_JWT_TTL_SECONDS '3600'
+  append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
+  append_if_missing LAB_SSO_PROFILE 'real'
+  append_if_missing SAAS_OAUTH_CLIENT_ID '11111111-1111-1111-1111-111111111111'
+  # 死键清理:NEXT_PUBLIC_APP_ID 挂在零引用的 src/api/env.ts 上,真名
+  # NEXT_PUBLIC_LAB_APP_CODE 已在上面 append,老 key 删除保 key 集合对齐。
+  if grep -q '^NEXT_PUBLIC_APP_ID=' "$BASE/lab.env"; then
+    echo "→ drop dead key NEXT_PUBLIC_APP_ID from $BASE/lab.env"
+    umask 077
+    sed -i '/^NEXT_PUBLIC_APP_ID=/d' "$BASE/lab.env"
+  fi
+fi
 # 兼容旧 lab.env:已存在但缺 NEXT_PUBLIC_API_BASE_URL=,追加(同源)
 if [ -f "$BASE/lab.env" ] && ! grep -q '^NEXT_PUBLIC_API_BASE_URL=' "$BASE/lab.env"; then
   echo "→ append NEXT_PUBLIC_API_BASE_URL= to existing $BASE/lab.env"
@@ -93,9 +150,9 @@ if [ -f "$BASE/lab.env" ] && ! grep -q '^SAAS_IDP_URL=' "$BASE/lab.env"; then
   echo "→ append SAAS_IDP_URL / SAAS_UI_BASE_URL to existing $BASE/lab.env"
   umask 077
   {
-    printf 'SAAS_IDP_URL=%s\n' "${SAAS_IDP_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'SAAS_UI_BASE_URL=%s\n' "${SAAS_UI_BASE_URL:-https://saas-nextjs.xiangru.uk}"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "${NEXT_PUBLIC_SAAS_BASE_URL:-https://saas-nextjs.xiangru.uk}"
+    printf 'SAAS_IDP_URL=https://saas-nextjs.xiangru.uk\n'
+    printf 'SAAS_UI_BASE_URL=https://saas-nextjs.xiangru.uk\n'
+    printf 'NEXT_PUBLIC_SAAS_BASE_URL=https://saas-nextjs.xiangru.uk\n'
   } >> "$BASE/lab.env"
 fi
 # v0.3.44:迁移已知旧默认值。lab.env 已存在且 SAAS_BASE_URL 还是早期脚本的

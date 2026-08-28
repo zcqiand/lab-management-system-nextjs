@@ -61,27 +61,11 @@ sudo -u deploy mkdir -p "$BASE/data"
 mkdir -p /etc/nginx/ssl
 chmod 700 /etc/nginx/ssl
 
-# ── 4. lab.env(密钥只落 VPS,不进仓库/CI) ────────
-# 一次性写入 LAB_JWT_SECRET(随机;factory.ts 读这个名,老 AUTH_JWT_SECRET 是死键)
-# + SAAS_BASE_URL/NEXT_PUBLIC_SAAS_BASE_URL(固定生产值)
-# SAAS_BASE_URL 走生产 https://saas-nextjs.xiangru.uk;Next.js 前缀注入浏览器。
-# 这里**不**依赖 shell env 而写死生产 URL,与 .env.example 配套(模板里有 LOCAL 例子)。
-if [ ! -f "$BASE/lab.env" ]; then
-  log "generate $BASE/lab.env (LAB_JWT_SECRET + SAAS_BASE_URL)"
-  SECRET="$(openssl rand -hex 32)"
-  printf 'LAB_JWT_SECRET=%s\n' "$SECRET" > "$BASE/lab.env"
-  printf 'SAAS_BASE_URL=%s\n' "https://saas-nextjs.xiangru.uk" >> "$BASE/lab.env"
-  printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "https://saas-nextjs.xiangru.uk" >> "$BASE/lab.env"
-  chown deploy:deploy "$BASE/lab.env"
-  chmod 600 "$BASE/lab.env"
-else
-  log "keep existing $BASE/lab.env (verify SAAS_BASE_URL presence)"
-  if ! grep -q '^SAAS_BASE_URL=' "$BASE/lab.env"; then
-    log "append SAAS_BASE_URL to existing lab.env (no LAB_JWT_SECRET overwrite)"
-    printf 'SAAS_BASE_URL=%s\n' "https://saas-nextjs.xiangru.uk" >> "$BASE/lab.env"
-    printf 'NEXT_PUBLIC_SAAS_BASE_URL=%s\n' "https://saas-nextjs.xiangru.uk" >> "$BASE/lab.env"
-  fi
-fi
+# ── 4. lab.env:不在本脚本生成 ─────────────────────
+# env-file 唯一生产者是 deploy/lab-management-system-nextjs.sh(CI tag 部署时自举,
+# key 集合与仓内 .env.production 由 suite L0.5 check_deploy_parity 锁死)。
+# 本脚本曾用死键 SAAS_BASE_URL 自举(2026-08-28 漂移源之一),已删 —— 首次
+# tag 部署时 deploy 脚本会生成完整 lab.env。
 
 # ── 5. 渲染 nginx vhost template ───────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

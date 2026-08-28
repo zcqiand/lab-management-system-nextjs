@@ -17,7 +17,10 @@ const DEMO_TENANTS = [
   { tenantId: "TENANT-003", code: "第三方检测实验室", roleIds: ["viewer"] },
 ];
 
-const SAAS_BASE_URL = process.env.SAAS_BASE_URL ?? "http://localhost:3000";
+// v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(deploy 脚本 L115 迁移删掉,
+// 线上一直吃 localhost fallback 打容器内 3000,菜单快照静默 warn 失败)。
+// 真名 SAAS_IDP_URL,与 sso/authorize 路由一致。
+const SAAS_BASE_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
 const SERVICE_USER = process.env.LAB_SAAS_SERVICE_USER ?? "alice";
 const SERVICE_PASSWORD = process.env.LAB_SAAS_SERVICE_PASSWORD ?? "dev123456";
 

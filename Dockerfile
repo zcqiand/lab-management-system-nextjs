@@ -60,6 +60,13 @@ COPY . .
 ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public
 ENV DATABASE_URL=${DATABASE_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* build-time 烘焙进 client bundle(2026-08-28 起 .env.production
+# gitignored,Docker build context 里没有它):prod 值在此显式声明,语义与原
+# .env.production 完全一致。空串 = 同源走本仓 /api/* Route Handler(ADR-0014)。
+ENV NEXT_PUBLIC_API_BASE_URL=""
+ENV NEXT_PUBLIC_API_MODE=nextjs
+ENV NEXT_PUBLIC_SAAS_BASE_URL=https://saas-nextjs.xiangru.uk
+ENV NEXT_PUBLIC_LAB_APP_CODE=lab-management
 RUN npm run build
 
 
