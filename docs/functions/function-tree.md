@@ -152,7 +152,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M01.F05.I01 | JWT 登录 | 接口 | 用户名+密码登录，MSW mock 层签发 JWT token | 已上线 |
+| M01.F05.I01 | JWT 登录 | 接口 | 用户名+密码登录，MSW mock 层签发 JWT token | 已废弃 |
 | M01.F05.I02 | Token 校验 | 接口 | 请求拦截器注入 Bearer token，token 失效跳转登录 | 已上线 |
 | M01.F05.I03 | SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护） | 接口 | 授权码流：authorize 收 response_type=code&client_id=lab&redirect_uri=<callback>&state=<random>（sessionStorage「lab.sso.state」）→ callback body {grant_type:authorization_code, code, redirect_uri}；saas token 不出 lab 后端 | 已上线 |
 | M01.F05.I04 | 身份会话同步 | 接口 | 用身份平台 token+user 建会话，并从 /auth/permissions 拉取权限集（机构=租户 1:1） | 已上线 |
