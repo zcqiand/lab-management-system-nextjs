@@ -99,7 +99,6 @@ export class AuthService {
     return this.ssoAuth;
   }
 
-  // === M01.F05.I01 密码登录 ===
 
   login(username: string, password: string): LoginResponse {
     if (!username || !password) {

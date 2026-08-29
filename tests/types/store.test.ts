@@ -8,7 +8,7 @@ import type {
 import { fnTest } from "../fn";
 
 describe("types/store store 状态类型（v3）", () => {
-  fnTest(["M01.F05.I01"], "AuthState 未登录态可构造", () => {
+  fnTest(["M01.F05.I03"], "AuthState 未登录态可构造（SSO 流程）", () =>{
     const auth: AuthState = {
       user: null,
       token: null,
@@ -19,7 +19,7 @@ describe("types/store store 状态类型（v3）", () => {
     expect(auth.user).toBeNull();
   });
 
-  fnTest(["M01.F05.I01"], "AuthState 已登录态可构造", () => {
+  fnTest(["M01.F05.I03"], "AuthState 已登录态可构造（SSO 流程）", () => {
     const auth: AuthState = {
       user: {
         id: "u-001",
