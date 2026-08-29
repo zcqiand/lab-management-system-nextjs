@@ -1,30 +1,25 @@
 {
   "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "fix-pulled-schema 补独立 sql import 清理(v0.3.53)+ shared V015/V017 收敛后 emit 链验证通过",
-  "last_session_at": "2026-08-26",
-  "last_session_summary": "shared 收敛(lab-shared v0.1.7：V015 换 smoke-seed + V017 进 shared)后跑 emit-schema 全链 replay 16 迁移 PASS,终态与旧链等价(schema.sql 内容不变)。过程中暴露 fix-pulled-schema.mjs 盲区:新版 drizzle-kit 把 unused sql 拆成独立第二行 import,老清理逻辑只处理第一个 import 块 -> tsc TS6133 L3 红,补 2b 路径修复。/handoff 二次门禁 --all exit 0(本仓 158 条目,软告警 2 条 M97.F01.I02/I04 预存在与本次无关)",
+  "current_task": "env 治理收尾:线上 lab.env 漂移修复 + .env.production 转 gitignored + v0.3.59 部署验证",
+  "last_session_at": "2026-08-29",
+  "last_session_summary": "线上 lab.env 停在 7 key 而 .env.example 已 16 key(login/sso/callback 还在读 Phase 4 已删死键 SAAS_BASE_URL,菜单快照静默打 localhost)。修死键→SAAS_IDP_URL;deploy 脚本写全 key+服务账号 fail-fast;NEXT_PUBLIC_* 烘焙改 Dockerfile ENV;.env.production 全家族 untrack(gitignored 同 .env.local 模式);新增 tests/deploy-env-parity.test.ts 与 suite L0.5 check_deploy_parity 双层锁死 key 集合。tag v0.3.59 部署 GREEN,VPS append 9 key+drop 死键 NEXT_PUBLIC_APP_ID,线上 200",
   "done": [
-    "scripts/fix-pulled-schema.mjs 补 2b：unused 时删掉整行独立 `import { sql } from \"drizzle-orm\"`(幂等,老形状仍走原 2 路径)",
-    "emit-schema 实测收敛链：V001-V013(rules) -> V014 旧版 -> V015 smoke -> V017 rename 全 PASS,schema.sql 与旧链产物逐字节相同(新旧链终态等价的实证)",
-    "lab_dev 侧状态核准：flyway V014 checksum 已 repair(-1860597146),V017 待下次 springboot dev 启动自动应用(lab_dev 的 calculation 表届时 rules->methods)",
-    "gate L0/L1/L2/L3/L4/L5 全绿 158 条目;--all 15 项目全绿",
-    "commit a343248 + tag v0.3.53-20260826 + push origin/master"
+    "src/app/api/auth/{login,sso/callback}/route.ts: 死键 SAAS_BASE_URL → SAAS_IDP_URL(fallback localhost:3000)",
+    "deploy/lab-management-system-nextjs.sh: 自举 16 key,非 secret 显式字面量,LAB_SAAS_SERVICE_USER/PASSWORD fail-fast(禁 ${VAR:-default} 兜底);setup-vps.sh 删 SAAS_BASE_URL 自举段",
+    "Dockerfile: NEXT_PUBLIC_API_BASE_URL/MODE/SAAS_BASE_URL/LAB_APP_CODE 四个 ENV 烘焙(替代被 untrack 的 .env.production)",
+    "tests/deploy-env-parity.test.ts 新增: 脚本写入 key 集合 == .env.example(production 存在时附加核对)",
+    "tag v0.3.59-20260829 部署 GREEN: VPS lab.env 迁移 9 append + drop NEXT_PUBLIC_APP_ID,/api/health 200"
   ],
   "next": [
-    "无阻塞。可选：login/page.tsx:81 SsoCallbackRequest.state L3 缺失(pre-existing)"
+    "手动验收:登录看菜单是否从 saas 快照拉(此前静默失败回退静态菜单);SSO 链路走通(saas-nextjs /login → callback)"
   ],
   "open_questions": [
-    "emit-schema.mjs 的 drizzleKitPull() 用 spawnSync(\"npx\",...) 在 Windows 下解析不了 npx.cmd(静默 exit 4 被 tail 吞)-- 本次 drizzle-kit pull 是手动补跑的。修法 spawnSync 加 shell:true 或直接调 node_modules/.bin,待下个会话顺手修",
-    "NEXT_PUBLIC_ENABLE_MSW 在 .env.local/.env.production 的清理仍待定(历史遗留)"
+    "lab-msw/saas-msw 的 .env.production 契约面价值(不部署)是否长期保留"
   ],
   "dont": [
-    "不要把 generated/ 产物提交进 git -- 已 gitignore,新 clone 靠 drizzle-kit pull 重建",
-    "不要单独跑 drizzle-kit pull 后不跑 node scripts/fix-pulled-schema.mjs -- pull 产物有空串默认值丢引号 + unused sql import 两类缺陷,L3 必红",
-    "不要再恢复 src/app/api/saas/* BFF proxy(浏览器直连 + saas middleware CORS 是唯一路径);不要在 useSaasMenus 里省 `if (!token) return`",
-    "不要在 seed-from-snapshot.mjs 里去掉 JSON.stringify(jsonb 列)",
-    "不要把 @lab/management-system-msw 拉回 devDependencies;不要把 msw 包体打入 next build(transpilePackages 已解)",
-    "不要 catch 后吞掉异常 / 硬编码连接串或密钥"
+    "deploy 脚本不要写 ${VAR:-default} 兜底——CLAUDE.md 硬规则,secret 缺失 fail-fast 报具体 key",
+    ".env.production 已 gitignored,永不 git add -f(真值含 secret);真值变更走 python scripts/sync_secrets.py"
   ],
   "last_gate_passed_at": "2026-08-26T17:30+08:00",
   "active_branch": "master",
