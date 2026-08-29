@@ -109,7 +109,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 闭环定义 | 状态 |
 |---|---|---|---|
-| M98.F01 | 运行时后端切换（4-backend） | msw / aspnetcore / springboot / nextjs 选择，baseURL 持久化到 localStorage | 已废弃 |
+| M98.F01 | env 驱动后端配置（ADR-0014 — NEXT_PUBLIC_API_BASE_URL / NEXT_PUBLIC_ENABLE_MSW / NEXT_PUBLIC_API_MODE） | 接口 | 已上线 |
 | M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getApiBaseUrl() 上自动跑 | 已上线 |
 | M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 已上线 |
 
@@ -119,7 +119,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M98.F01.I01 | BackendSwitcher 下拉 | 按钮 | 4-backend 下拉；data-fn=`M98.F01.I01` 锚点在 src/components/app/backend-switcher.tsx | 已废弃 |
+| M98.F01.I01 | BackendBadge 后端模式显示（env: apiMode + baseUrl；ADR-0014 替代旧 BackendSwitcher） | 展示 | 已上线 |
 | M98.F01.I02 | 持久化 baseUrl | 接口 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 已废弃 |
 
 ### M98.F02 http-client 注入
@@ -144,9 +144,9 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
-| M01.F04.I01 | RBAC 角色权限 | 接口 | admin（全部权限）/ technician（受限权限）两级角色 | 已废弃 |
+| M01.F04.I01 | 动态菜单下发（GET /auth/menus） | 查询 | 已上线 |
 | M01.F04.I02 | 路由守卫 | 接口 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
-| M01.F04.I03 | 权限指令 | 接口 | 按权限码动态渲染/卸载 UI 元素；无权限元素从 DOM 移除 | 已废弃 |
+| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 已上线 |
 | M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=lab-management 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
 
 
@@ -269,7 +269,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M05.F01.I01 | 汇总表 | 接口 | 按报告名称（InspectionReportName）输出试验报告汇总表，报告名称下拉框选择汇总口径 | 已上线 |
-| M05.F01.I02 | 汇总类型 | 接口 | 三种 summaryType（material/concrete/connection）列定义各异 | 已废弃 |
+| M05.F01.I02 | 仪表盘统计 | 查询 | 已上线 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
