@@ -98,4 +98,16 @@ describe("M98 frontend 接线层", () => {
     const badRes = await switchTenantPOST(badReq);
     expect(badRes.status).toBe(404);
   });
+
+  fnTest(["M98.F01.I01"], "BackendBadge 源文件挂 data-fn=I01 + 含 mode/baseUrl 渲染", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const src = fs.readFileSync(
+      path.resolve(process.cwd(), "src/components/app/backend-badge.tsx"),
+      "utf8",
+    );
+    expect(src).toMatch(/data-fn="M98\.F01\.I01"/);
+    expect(src).toMatch(/getApiMode\(\)/);
+    expect(src).toMatch(/getApiBaseUrl\(\)/);
+  });
 });

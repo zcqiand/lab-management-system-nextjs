@@ -21,6 +21,16 @@ function mount() {
 
 describe("M05.F01 试验报告汇总表", () => {
   fnTest(
+    ["M05.F01.I02"],
+    "data-fn=M05.F01.I02 锚点存在（仪表盘统计容器 = 报告类别筛选栏）",
+    async () => {
+      const { container } = mount();
+      const root = container.querySelector('[data-fn="M05.F01.I02"]');
+      expect(root).not.toBeNull();
+    },
+  );
+
+  fnTest(
     ["M05.F01.I01"],
     "data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
     async () => {

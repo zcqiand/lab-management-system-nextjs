@@ -29,6 +29,18 @@ describe("M01.F04/F05 认证管理集成层", () => {
     expect(src).toMatch(/router\.replace\(['"]\/login['"]\)/);
   });
 
+  // ─────── F04.I03 路由守卫（未登录/无权限拦截）───────
+  fnTest(["M01.F04.I03"], "(console) layout 守卫：源文件挂 @entry=I03 + 含 router.replace('/login')（I02 之外的 @entry）", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const src = fs.readFileSync(
+      path.resolve(process.cwd(), "src/app/(console)/layout.tsx"),
+      "utf8",
+    );
+    expect(src).toMatch(/@entry M01\.F04\.I03/);
+    expect(src).toMatch(/router\.replace\(['"]\/login['"]\)/);
+  });
+
   // ─────── F04.I04 动态菜单 ───────
   fnTest(["M01.F04.I04"], "SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04", async () => {
     const fs = await import("node:fs");

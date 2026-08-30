@@ -62,6 +62,19 @@ describe("ADR-0009 /api/auth/menus 快照链", () => {
     const res3 = await menusGET(reqWithBearer("not-a-jwt"));
     expect(res3.status).toBe(503);
   });
+
+  fnTest(["M01.F04.I01"], "动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在", async () => {
+    // I01 是「菜单下发」API 端点本身；功能树要求源码挂锚点，避免锚点丢失
+    // 后 L5 误报已上线却无入口。
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const src = fs.readFileSync(
+      path.resolve(process.cwd(), "src/app/api/auth/menus/route.ts"),
+      "utf8",
+    );
+    expect(src).toMatch(/@entry M01\.F04\.I01/);
+    expect(src).toMatch(/export async function GET/);
+  });
 });
 
 describe("menu-snapshot 缓存单测", () => {

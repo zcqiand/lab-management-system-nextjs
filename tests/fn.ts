@@ -28,3 +28,23 @@ export function fnTest(ids: string[], name: string, body: () => void | Promise<v
     return body();
   });
 }
+
+/**
+ * 带条件的 fnTest。condition 为真时 skip（标记 inert 但仍注册 meta.fn —— 这样 L5
+ * 知道该 ID 至少被覆盖了一个测试，不会报「无测试引用」）。
+ *
+ * 用例：emit 产物校验。CI 上 emit 未跑（产物 gitignored），应该 skip；
+ * 但 ID 仍登记，避免误报。
+ */
+export function fnTestIf(
+  condition: boolean,
+  ids: string[],
+  name: string,
+  body: () => void | Promise<void>,
+) {
+  const t = condition ? base.skipIf(condition) : base;
+  return t(name, (ctx) => {
+    ctx.task.meta.fn = ids;
+    return body();
+  });
+}
