@@ -85,7 +85,7 @@
 | M06.F08.I04 | src/features/inspection-capability/ParamInterfaceList.tsx (关联参数页签) | POST /api/inspection-parameter-param-interfaces ; DELETE 同 | inspection_parameter_param_interface | M06.F08.I04 | – | 已上线 |
 | M06.F08.I05 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (列表行预览按钮) | – (本地渲染) | inspection_param_interface | M06.F08.I05 | – | 已上线 |
 | M06.F08.I06 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (弹窗) | – (本地渲染) | inspection_param_interface | M06.F08.I06 | – | 已上线 |
-| M98.F01.I01 | ~~src/components/app/backend-switcher.tsx~~ 已废弃（ADR-0014） | – (UI 下拉) | – | M98.F01.I01 | – | 已废弃 |
+| M98.F01.I01 | src/components/app/backend-badge.tsx (无交互模式标签) | – (env 读取，仅诊断) | – | M98.F01.I01 | – | 已上线 |
 | M98.F01.I02 | ~~src/api/backend-config.ts hydrateBackendConfig/snapshotBackendConfig~~ 已废弃（ADR-0014） | – (localStorage[`lab.backend`]) | – | M98.F01.I02 | – | 已废弃 |
 | M98.F02.I01 | src/api/http-client.ts (installHttpClient) | – (axios 拦截器) | – | M98.F02.I01 | – | 已上线 |
 | M98.F03.I01 | src/app/api/auth/login/route.ts | POST /api/auth/login | – (mock token) | M98.F03.I01 | – | 已上线 |
@@ -108,6 +108,7 @@
 | M04.F09.I03 | src/features/dicts/CategoryDictList.tsx (删除确认) | DELETE /api/catalog/brands/:code | inspection_brands | M04.F09.I03 | – | 已上线 |
 | M01.F04.I02 | src/app/(console)/layout.tsx (guard main) | router.replace('/login') | – | M01.F04.I02 | – | 已上线 |
 | M01.F04.I04 | src/components/app/sidebar-nav.tsx (useBackendMenus) + src/app/api/auth/menus/route.ts + src/lib/auth/menu-snapshot.ts | GET /api/auth/menus（ADR-0009：saas 快照缓存 → demo 兜底） | – | M01.F04.I04 | – | 已上线 |
+| M01.F04.I01 | src/app/api/auth/menus/route.ts（@entry 锚点）+ src/lib/auth/menu-snapshot.ts（缓存读写） | GET /api/auth/menus | – | M01.F04.I01 | – | 已上线 |
 | M01.F05.I01 | src/components/app/login-form.tsx (submit Button) | POST /api/auth/login | – | M01.F05.I01 | – | 已上线 |
 | M01.F05.I02 | src/api/legacy-client.ts (request interceptor) | Authorization: Bearer &lt;token&gt; | – | M01.F05.I02 | – | 已上线 |
 | M01.F05.I03 | src/app/login/page.tsx (SSO orchestrator div) | GET /api/auth/sso/authorize ; POST /api/auth/sso/callback | – | M01.F05.I03 | – | 已上线 |

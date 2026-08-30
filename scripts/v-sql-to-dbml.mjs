@@ -1,3 +1,4 @@
+// @entry M97.F01.I04 — parse shared/sql/migrations/V*.sql into DBML 0.9
 // scripts/v-sql-to-dbml.mjs — parse shared/sql/migrations/V*.sql into DBML 0.9
 // representation. No DBML runtime dep; emit is hand-rolled for the constructs that
 // lab-management-system actually uses (CREATE TABLE / CREATE INDEX / CREATE UNIQUE INDEX

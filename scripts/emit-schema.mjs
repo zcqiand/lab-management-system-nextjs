@@ -99,6 +99,7 @@ async function replay(client, files) {
 }
 
 function pgDump(host, port, user, password, database) {
+  // @entry M97.F01.I02 — pg_dump --schema-only 写出 generated/schema.sql
   const args = ["-h", host, "-p", String(port), "-U", user, "-d", database,
     "--schema-only", "--no-owner", "--no-privileges", "--no-comments"];
   const env = { ...process.env, PGPASSWORD: password };

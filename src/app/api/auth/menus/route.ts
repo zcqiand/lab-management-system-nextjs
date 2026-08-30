@@ -1,3 +1,4 @@
+// @entry M01.F04.I01 — 动态菜单下发（GET /api/auth/menus）
 // GET /api/auth/menus -> 菜单树（ADR-0009：saas 快照缓存 -> miss 503）
 //
 // 数据链（与 lab-springboot 同款语义，2026-08-27 起 demo 兜底删除）：
