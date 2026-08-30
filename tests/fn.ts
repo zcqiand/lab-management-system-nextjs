@@ -21,29 +21,13 @@ declare module "vitest" {
  *   - 间接受益不挂
  *   - 工程设施的测试不挂任何业务 ID
  *   - 一个测试挂 3 个以上 ID，通常说明它测得太宽
+ *
+ * 不要为「这个测试在 CI 上跳过了」找借口写注册 ID 的 helper（曾有 fnTestIf，
+ * 已撤：fake coverage 比 skip 不报的危害更大 —— 真正的事实是「该 ID 没有运行过的测试」，
+ * 那是真实的覆盖缺口，应通过补真实断言（源码级 / beforeAll emit）解决，不是绕过机制）。
  */
 export function fnTest(ids: string[], name: string, body: () => void | Promise<void>) {
   return base(name, (ctx) => {
-    ctx.task.meta.fn = ids;
-    return body();
-  });
-}
-
-/**
- * 带条件的 fnTest。condition 为真时 skip（标记 inert 但仍注册 meta.fn —— 这样 L5
- * 知道该 ID 至少被覆盖了一个测试，不会报「无测试引用」）。
- *
- * 用例：emit 产物校验。CI 上 emit 未跑（产物 gitignored），应该 skip；
- * 但 ID 仍登记，避免误报。
- */
-export function fnTestIf(
-  condition: boolean,
-  ids: string[],
-  name: string,
-  body: () => void | Promise<void>,
-) {
-  const t = condition ? base.skipIf(condition) : base;
-  return t(name, (ctx) => {
     ctx.task.meta.fn = ids;
     return body();
   });
