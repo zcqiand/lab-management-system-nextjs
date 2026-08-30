@@ -61,7 +61,8 @@ export function SummaryPage() {
 
   return (
     <div className="space-y-4" data-fn="M05.F01.I01">
-      <div className="flex items-center gap-3">
+      {/* @entry M05.F01.I02 — 仪表盘统计：报告类别筛选 + 列表渲染在同一容器 */}
+      <div className="flex items-center gap-3" data-fn="M05.F01.I02">
         <label htmlFor="summary-category" className="text-sm font-medium">
           报告类别
         </label>

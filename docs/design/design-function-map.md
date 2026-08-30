@@ -109,6 +109,9 @@
 | M01.F04.I02 | src/app/(console)/layout.tsx (guard main) | router.replace('/login') | – | M01.F04.I02 | – | 已上线 |
 | M01.F04.I04 | src/components/app/sidebar-nav.tsx (useBackendMenus) + src/app/api/auth/menus/route.ts + src/lib/auth/menu-snapshot.ts | GET /api/auth/menus（ADR-0009：saas 快照缓存 → demo 兜底） | – | M01.F04.I04 | – | 已上线 |
 | M01.F04.I01 | src/app/api/auth/menus/route.ts（@entry 锚点）+ src/lib/auth/menu-snapshot.ts（缓存读写） | GET /api/auth/menus | – | M01.F04.I01 | – | 已上线 |
+| M01.F04.I03 | src/app/(console)/layout.tsx（@entry 路由守卫 useEffect，hydrated && !token → router.replace(/login)） | – (client hook) | – | M01.F04.I03 | – | 已上线 |
+| M05.F01.I02 | src/features/summary/SummaryPage.tsx（@entry 仪表盘统计容器） | GET /api/summary?categoryCode=<code|ALL> | – | M05.F01.I02 | – | 已上线 |
+
 | M01.F05.I01 | src/components/app/login-form.tsx (submit Button) | POST /api/auth/login | – | M01.F05.I01 | – | 已上线 |
 | M01.F05.I02 | src/api/legacy-client.ts (request interceptor) | Authorization: Bearer &lt;token&gt; | – | M01.F05.I02 | – | 已上线 |
 | M01.F05.I03 | src/app/login/page.tsx (SSO orchestrator div) | GET /api/auth/sso/authorize ; POST /api/auth/sso/callback | – | M01.F05.I03 | – | 已上线 |

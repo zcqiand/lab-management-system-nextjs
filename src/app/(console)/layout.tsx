@@ -34,6 +34,9 @@ export default function ConsoleLayout({
   }, [hydrated, token, router]);
 
   // hydrate 完成前 token 是 null（避免 SSR/CSR mismatch）
+  // hydrate 完成前 token 是 null（避免 SSR/CSR mismatch）
+  // @entry M01.F04.I03 — 路由守卫：未登录（无 token）→ router.replace(/login)
+  // @entry M01.F04.I02 — 守卫占位 UI（hydrate 完成前的中间态）
   if (!hydrated || !token) {
     return (
       <main
