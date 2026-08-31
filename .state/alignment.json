@@ -6,24 +6,31 @@
     "features": 31,
     "items": 118
   },
-  "warnings_total": 2,
+  "warnings_total": 3,
   "warnings": {
-    "已上线但无测试引用": [
-      "M97.F01.I02",
-      "M97.F01.I04"
+    "已上线但不在任何流程且非孤儿白名单": [
+      "M01.F04.I01",
+      "M01.F04.I03",
+      "M05.F01.I02"
     ]
   },
   "unreachable_shipped": [],
   "function_map": {
     "M01.F04.I01": {
-      "name": "RBAC 角色权限",
-      "status": "已废弃",
-      "type": "接口",
+      "name": "动态菜单下发（GET /auth/menus）",
+      "status": "已上线",
+      "type": "查询",
       "requirements": [],
       "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在"
+      ],
+      "entry": [
+        "src\\app\\api\\auth\\menus\\route.ts"
+      ]
     },
     "M01.F04.I02": {
       "name": "路由守卫",
@@ -53,14 +60,20 @@
       ]
     },
     "M01.F04.I03": {
-      "name": "权限指令",
-      "status": "已废弃",
+      "name": "路由守卫（未登录/无权限拦截）",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 @entry=I03 + 含 router.replace('/login')（I02 之外的 @entry）"
+      ],
+      "entry": [
+        "src\\app\\(console)\\layout.tsx"
+      ]
     },
     "M01.F04.I04": {
       "name": "动态菜单",
@@ -74,7 +87,6 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 后 USER-A 菜单快照已写入（服务账号路径）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE",
@@ -86,7 +98,7 @@
     },
     "M01.F05.I01": {
       "name": "JWT 登录",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [
@@ -95,15 +107,8 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 后 USER-A 菜单快照已写入（服务账号路径）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/login 返回 token + user",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造"
-      ],
-      "entry": [
-        "src\\components\\app\\login-form.tsx"
-      ]
+      "tests": [],
+      "entry": []
     },
     "M01.F05.I02": {
       "name": "Token 校验",
@@ -135,7 +140,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造（SSO 流程）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造（SSO 流程）"
       ],
       "entry": [
         "src\\app\\login\\page.tsx"
@@ -1225,14 +1232,20 @@
       ]
     },
     "M05.F01.I02": {
-      "name": "汇总类型",
-      "status": "已废弃",
-      "type": "接口",
+      "name": "仪表盘统计",
+      "status": "已上线",
+      "type": "查询",
       "requirements": [],
       "flows": [],
-      "designs": [],
-      "tests": [],
-      "entry": []
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I02 锚点存在（仪表盘统计容器 = 报告类别筛选栏）"
+      ],
+      "entry": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
     },
     "M06.F01.I01": {
       "name": "检测专项列表",
@@ -1919,7 +1932,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::emit-schema.mjs 含 @entry=I02 锚点 + pgDump 函数 + 输出 schema.sql 头"
+      ],
       "entry": []
     },
     "M97.F01.I03": {
@@ -1934,7 +1949,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts：drizzle-kit pull 产物（pgTable 定义 ≥24 张）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts 是 drizzle-kit pull 产物（pgTable ≥24）"
       ],
       "entry": []
     },
@@ -1949,7 +1964,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::v-sql-to-dbml.mjs 含 @entry=I04 锚点 + ALTER RENAME 处理 + DBML 头部"
+      ],
       "entry": []
     },
     "M97.F02.I01": {
@@ -2001,9 +2018,9 @@
       "entry": []
     },
     "M98.F01.I01": {
-      "name": "BackendSwitcher 下拉",
-      "status": "已废弃",
-      "type": "按钮",
+      "name": "BackendBadge 后端模式显示（env: apiMode + baseUrl；ADR-0014 替代旧 BackendSwitcher）",
+      "status": "已上线",
+      "type": null,
       "requirements": [],
       "flows": [
         "docs\\design\\flow-function-map.md"
@@ -2011,8 +2028,12 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendBadge 源文件挂 data-fn=I01 + 含 mode/baseUrl 渲染"
+      ],
+      "entry": [
+        "src\\components\\app\\backend-badge.tsx"
+      ]
     },
     "M98.F01.I02": {
       "name": "持久化 baseUrl",
