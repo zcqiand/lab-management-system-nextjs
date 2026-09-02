@@ -16,7 +16,7 @@
 | 你是… | 直接看 |
 |---|---|
 | 新人，要 30 分钟搞懂本仓 | §1 → §2.1 → §3.3 → §4.2 |
-| 想知道「和 saas-nextjs 差在哪」 | §1 → §6.1 → [父仓 ARCHITECTURE.md §4.3](../../../../docs/ARCHITECTURE.md#43-前端仓reactvuenextjs--6-仓) |
+| 想知道「和 saas-nextjs 差在哪」 | §1 → §6.1 → [父仓 ARCHITECTURE.md §4.3](../../../docs/ARCHITECTURE.md#43-前端仓reactvuenextjs--6-仓) |
 | 改了 shared DDL 怎么把三件套 emit 出来 | §4.2 → §3.3 |
 | 改了 shared OpenAPI 怎么 orval | §4.1 → §3.2 |
 | 想知道借出去的 `pg` driver 怎么用 | §4.3 → §3.4 |
@@ -32,7 +32,7 @@
 
 | 维度 | saas-identity-platform-nextjs | lab-management-system-nextjs（本仓） |
 |---|---|---|
-| 角色 | Frontend + Backend + DB（[ADR-0008](../../../../docs/adr/0008-nextjs-full-stack.md)） | Frontend + **schema emit infra**（[ADR-0007](../../../../docs/adr/0007-shared-sql-ssot.md)） |
+| 角色 | Frontend + Backend + DB（[ADR-0008](../../../docs/adr/0008-nextjs-full-stack.md)） | Frontend + **schema emit infra**（[ADR-0007](../../../docs/adr/0007-shared-sql-ssot.md)） |
 | DB 在哪个仓 | 本仓的 `src/db/`（Drizzle PG schema） | **不在本仓**——DDL 在 shared，由本仓 emit 出三件套供人读 |
 | Auth 后端 | 本仓 5 个 M00 auth 路由 + 4 个 OAuth + /me/tenants + /admin + /health | **本仓 5 个 M00 auth 路由**（M98.F03 家族定位要求）+ 业务路由 |
 | 业务路由数据源 | 本仓 `src/db/` | **`@lab/management-system-msw/fixtures`**（in-memory，nextjs-self 模式） |
@@ -225,7 +225,7 @@ lab-management-system-nextjs/
 
 **与 saas-nextjs AppShell 的差异**：
 - 不引 `TenantProvider`（lab-nextjs 没有 tenant 概念，只有 auth-context）；
-- 菜单从后端 `/api/auth/menus` 拉（[ADR-0009](../../../../docs/adr/0009-db-credentials-env.md) saas 快照缓存 → demo 兜底）；
+- 菜单从后端 `/api/auth/menus` 拉（[ADR-0009](../../../docs/adr/0009-db-credentials-env.md) saas 快照缓存 → demo 兜底）；
 - 应用名从 saas 公共目录 `/api/v1/apps/[code]`（免鉴权）拉，不写死在客户端。
 
 ### 3.2 BFF 路由层（`src/app/api/`）
@@ -245,7 +245,7 @@ lab-management-system-nextjs/
 | `/api/auth/menus` | GET | （M01.F04.I04） | saas snapshot cache | ADR-0009 miss 回退 demo 树 |
 | `/api/auth/permissions` | GET | （M01.F05.I04） | saas 反代 | |
 
-> **何时走本仓 nextjs-self vs 走真后端**：`.env` 的 `NEXT_PUBLIC_API_BASE_URL=""`（默认同源）时，apiclient 命中本仓 `app/api/*`；改成 `http://localhost:5200` 走 lab-msw；改成 `http://localhost:5205` 走 springboot 真后端（[ADR-0014](../../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)）。
+> **何时走本仓 nextjs-self vs 走真后端**：`.env` 的 `NEXT_PUBLIC_API_BASE_URL=""`（默认同源）时，apiclient 命中本仓 `app/api/*`；改成 `http://localhost:5200` 走 lab-msw；改成 `http://localhost:5205` 走 springboot 真后端（[ADR-0014](../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)）。
 
 #### 3.2.2 业务路由
 
@@ -263,7 +263,7 @@ lab-management-system-nextjs/
 
 - 业务路由**不连真 PG**——nextjs-self 模式下数据全在 msw fixtures（同进程内存）；
 - `src/db/index.ts`（postgres-js driver）**仅供 schema emit 链自检**（`db.smoke.test.ts`），不参与请求处理；
-- 真生产部署切 `NEXT_PUBLIC_API_BASE_URL=http://<springboot-host>:8080` 走 springboot 后端，本仓 API routes 仅在 nextjs-self 模式生效。
+- 真生产部署切 `NEXT_PUBLIC_API_BASE_URL=http://<springboot-host>:5205` 走 springboot 后端，本仓 API routes 仅在 nextjs-self 模式生效。
 
 ### 3.3 schema emit infra 层（`scripts/`）
 
@@ -324,7 +324,7 @@ DONE → generated/{schema.sql, schema.ts, schema.dbml}
 
 ### 3.4 schema emit infra 层：`pg` 借链
 
-**关键事实**：`shared` 仓禁 npm runtime 依赖（[ADR-0007](../../../../docs/adr/0007-shared-sql-ssot.md)），但 `scripts/sync-db.mjs` 需要 `pg` driver 推 DDL 到 PG。**借链策略**：
+**关键事实**：`shared` 仓禁 npm runtime 依赖（[ADR-0007](../../../docs/adr/0007-shared-sql-ssot.md)），但 `scripts/sync-db.mjs` 需要 `pg` driver 推 DDL 到 PG。**借链策略**：
 
 | 优先级 | 来源 | 场景 |
 |---|---|---|
@@ -366,13 +366,13 @@ DONE → generated/{schema.sql, schema.ts, schema.dbml}
    → Client → SELECT 1 → 确认 lab_dev 可达（pg 借链 + 网络）
 
 4. npm run dev
-   → next dev :3000
+   → next dev :5201
    → src/app/(console)/* 渲染业务页
    → src/app/api/auth/* 5 个 M00 auth 路由就绪
    → src/app/api/contracts/* 业务路由 → @lab/management-system-msw/fixtures 返数据
    → http-client.ts::installHttpClient() 注入 baseURL=getApiBaseUrl()
    → 浏览器调 axios → http://localhost:5200（NEXT_PUBLIC_API_BASE_URL 默认值）
-     → lab-msw :5173 处理（GET /healthz → mode:"msw"）
+     → lab-msw :5200 处理（GET /healthz → mode:"msw"）
    → 浏览器渲染（shadcn-ui + Tailwind v4）
 
 5. （可选）python scripts/gate.py -p lab-management-system-nextjs
@@ -504,15 +504,15 @@ D. 真正跑同步（跨仓）
 
 | ADR | 主题 | 对本仓的影响 |
 |---|---|---|
-| [0001](../../../../docs/adr/0001-suite-owns-l0-and-l5.md) | suite 保留 L0 / L5 | 本仓 `.harness/stack.json` 只能声明 L1-L4 |
-| [0002](../../../../docs/adr/0002-trace-json-as-cross-language-anchor-contract.md) | trace.json 是跨语言锚点 | L4 vitest 跑 `TRACE_MAP=1` 产 `.state/trace.json`；禁止手写 |
-| [0003](../../../../docs/adr/0003-function-tree-requires-human-approval.md) | 功能清单变更需人批 | M01 起业务页要先 `/tree-change` 翻状态再 commit |
-| [0005](../../../../docs/adr/0005-defense-in-depth-for-protected-paths.md) | 受保护路径纵深防御 | `.claude/hooks/` 不让改；本仓也不能放宽 |
-| [0007](../../../../docs/adr/0007-shared-sql-ssot.md) | shared 仓扩到双 SSOT | **本仓 emit 链存在的根本原因**——shared 是 DB schema 真源，本仓负责把 SSOT replay 出可读产物 |
-| [0008](../../../../docs/adr/0008-nextjs-full-stack.md) | saas-nextjs 兼全栈 | 本仓**不兼**全栈——本仓是 schema emit infra，对称的 saas-nextjs 才是 Backend+DB |
-| [0009](../../../../docs/adr/0009-db-credentials-env.md) | DB 凭据走 env | `PG_HOST` / `PG_PASSWORD` / `DATABASE_URL` 走 env，deploy 烘焙；emitter 与 sync-db 共用 |
-| [0012](../../../../docs/adr/0012-msw-as-http-server.md) | msw 仓升级为独立 HTTP 服务 | dev 默认 `NEXT_PUBLIC_API_BASE_URL=http://localhost:5200`（lab-msw） |
-| [0014](../../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)（隐含 ADR） | env-driven 单 URL | 废弃 BackendSwitcher + localStorage；本仓 `backend-config.ts` 反映该决议 |
+| [0001](../../../docs/adr/0001-suite-owns-l0-and-l5.md) | suite 保留 L0 / L5 | 本仓 `.harness/stack.json` 只能声明 L1-L4 |
+| [0002](../../../docs/adr/0002-trace-json-as-cross-language-anchor-contract.md) | trace.json 是跨语言锚点 | L4 vitest 跑 `TRACE_MAP=1` 产 `.state/trace.json`；禁止手写 |
+| [0003](../../../docs/adr/0003-function-tree-requires-human-approval.md) | 功能清单变更需人批 | M01 起业务页要先 `/tree-change` 翻状态再 commit |
+| [0005](../../../docs/adr/0005-defense-in-depth-for-protected-paths.md) | 受保护路径纵深防御 | `.claude/hooks/` 不让改；本仓也不能放宽 |
+| [0007](../../../docs/adr/0007-shared-sql-ssot.md) | shared 仓扩到双 SSOT | **本仓 emit 链存在的根本原因**——shared 是 DB schema 真源，本仓负责把 SSOT replay 出可读产物 |
+| [0008](../../../docs/adr/0008-nextjs-full-stack.md) | saas-nextjs 兼全栈 | 本仓**不兼**全栈——本仓是 schema emit infra，对称的 saas-nextjs 才是 Backend+DB |
+| [0009](../../../docs/adr/0009-db-credentials-env.md) | DB 凭据走 env | `PG_HOST` / `PG_PASSWORD` / `DATABASE_URL` 走 env，deploy 烘焙；emitter 与 sync-db 共用 |
+| [0012](../../../docs/adr/0012-msw-as-http-server.md) | msw 仓升级为独立 HTTP 服务 | dev 默认 `NEXT_PUBLIC_API_BASE_URL=http://localhost:5200`（lab-msw） |
+| [0014](../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)（隐含 ADR） | env-driven 单 URL | 废弃 BackendSwitcher + localStorage；本仓 `backend-config.ts` 反映该决议 |
 
 ### 6.2 本仓 ADR（当前为空）
 
@@ -555,7 +555,7 @@ D. 真正跑同步（跨仓）
 | **lab_emit schema** | emit 链隔离 schema（替代 DROP public） | 2026-08-18 事故后默认；`SET search_path TO lab_emit` |
 | **pg devDep 借链** | shared sync-db.mjs 借本仓 node_modules/pg | 三段 fallback（/app/node_modules → 本仓 → saas-nextjs） |
 | **nextjs-self 模式** | `NEXT_PUBLIC_API_BASE_URL=""`（同源）时，apiclient 命中本仓 API routes | M98.F03；走 msw fixtures |
-| **MSW** | Mock Service Worker；本仓 dev 默认走独立 HTTP server `:5173`（ADR-0012 B 强度） | `GET /healthz → {mode:"msw"}` |
+| **MSW** | Mock Service Worker；本仓 dev 默认走独立 HTTP server `:5200`（ADR-0012 B 强度） | `GET /healthz → {mode:"msw"}` |
 | **ADR-0014** | env-driven 单 URL 配置 | 废弃 4-backend 运行时切换；改 `NEXT_PUBLIC_API_BASE_URL` / `_API_MODE` |
 | **BASE F 级镜像** | 契约仓的 F 级原样到本仓 | 本仓 function-tree.md §BASE F 级（M00-M06 + M97/M98） |
 | **REF 镜像** | BASE F 级下的 I 级子项 | 从 REF（backup/lab-management-system）抄，只收父 F ∈ BASE 的行 |
