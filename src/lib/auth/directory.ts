@@ -6,7 +6,8 @@
 // - tenantsOf / defaultTenant / findByTenantId
 // - upsert (首次 SSO 落地)
 //
-// 主键 username 已改为 email-style "admin@lab.local" (per ADR-0008)。
+// 主键 username：2026-09-02 契约收敛为 alice（与 saas seed V016 同源；四方 msw/nextjs/
+// aspnetcore/springboot 统一，contract-test 依赖）。ADR-0008 的 email 主键约定保留给 SSO upsert 路径。
 export interface LabUser {
   id: string;
   username: string; // = email (简化映射)
@@ -34,7 +35,7 @@ export interface IUserDirectory {
 
 const DEMO_USER: LabUser = {
   id: "USER-A",
-  username: "admin@lab.local",
+  username: "alice",
   displayName: "管理员",
   roleCode: "admin",
 };

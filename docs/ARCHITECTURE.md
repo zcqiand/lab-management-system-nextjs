@@ -245,7 +245,7 @@ lab-management-system-nextjs/
 | `/api/auth/menus` | GET | （M01.F04.I04） | saas snapshot cache | ADR-0009 miss 回退 demo 树 |
 | `/api/auth/permissions` | GET | （M01.F05.I04） | saas 反代 | |
 
-> **何时走本仓 nextjs-self vs 走真后端**：`.env` 的 `NEXT_PUBLIC_API_BASE_URL=""`（默认同源）时，apiclient 命中本仓 `app/api/*`；改成 `http://localhost:5173` 走 lab-msw；改成 `http://localhost:8080` 走 springboot 真后端（[ADR-0014](../../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)）。
+> **何时走本仓 nextjs-self vs 走真后端**：`.env` 的 `NEXT_PUBLIC_API_BASE_URL=""`（默认同源）时，apiclient 命中本仓 `app/api/*`；改成 `http://localhost:5200` 走 lab-msw；改成 `http://localhost:5205` 走 springboot 真后端（[ADR-0014](../../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)）。
 
 #### 3.2.2 业务路由
 
@@ -371,7 +371,7 @@ DONE → generated/{schema.sql, schema.ts, schema.dbml}
    → src/app/api/auth/* 5 个 M00 auth 路由就绪
    → src/app/api/contracts/* 业务路由 → @lab/management-system-msw/fixtures 返数据
    → http-client.ts::installHttpClient() 注入 baseURL=getApiBaseUrl()
-   → 浏览器调 axios → http://localhost:5173（NEXT_PUBLIC_API_BASE_URL 默认值）
+   → 浏览器调 axios → http://localhost:5200（NEXT_PUBLIC_API_BASE_URL 默认值）
      → lab-msw :5173 处理（GET /healthz → mode:"msw"）
    → 浏览器渲染（shadcn-ui + Tailwind v4）
 
@@ -511,7 +511,7 @@ D. 真正跑同步（跨仓）
 | [0007](../../../../docs/adr/0007-shared-sql-ssot.md) | shared 仓扩到双 SSOT | **本仓 emit 链存在的根本原因**——shared 是 DB schema 真源，本仓负责把 SSOT replay 出可读产物 |
 | [0008](../../../../docs/adr/0008-nextjs-full-stack.md) | saas-nextjs 兼全栈 | 本仓**不兼**全栈——本仓是 schema emit infra，对称的 saas-nextjs 才是 Backend+DB |
 | [0009](../../../../docs/adr/0009-db-credentials-env.md) | DB 凭据走 env | `PG_HOST` / `PG_PASSWORD` / `DATABASE_URL` 走 env，deploy 烘焙；emitter 与 sync-db 共用 |
-| [0012](../../../../docs/adr/0012-msw-as-http-server.md) | msw 仓升级为独立 HTTP 服务 | dev 默认 `NEXT_PUBLIC_API_BASE_URL=http://localhost:5173`（lab-msw） |
+| [0012](../../../../docs/adr/0012-msw-as-http-server.md) | msw 仓升级为独立 HTTP 服务 | dev 默认 `NEXT_PUBLIC_API_BASE_URL=http://localhost:5200`（lab-msw） |
 | [0014](../../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)（隐含 ADR） | env-driven 单 URL | 废弃 BackendSwitcher + localStorage；本仓 `backend-config.ts` 反映该决议 |
 
 ### 6.2 本仓 ADR（当前为空）

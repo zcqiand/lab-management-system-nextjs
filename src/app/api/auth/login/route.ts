@@ -9,18 +9,19 @@
 // miss 时 GET /menus 503 由前端 useBackendMenus 回退静态菜单。
 
 import { NextResponse } from "next/server";
-import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
+import { cacheMenuSnapshot, putMenuSnapshot } from "@/lib/auth/menu-snapshot";
+import { ConfigUserDirectory } from "@/lib/auth/directory";
 
 const DEMO_TENANTS = [
   { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
   { tenantId: "TENANT-002", code: "district-lab", name: "区检测站", roleIds: ["technician"] },
-  { tenantId: "TENANT-003", code: "第三方检测实验室", roleIds: ["viewer"] },
+  { tenantId: "TENANT-003", code: "third-party", name: "第三方检测实验室", roleIds: ["viewer"] },
 ];
 
 // v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(deploy 脚本 L115 迁移删掉,
 // 线上一直吃 localhost fallback 打容器内 3000,菜单快照静默 warn 失败)。
 // 真名 SAAS_IDP_URL,与 sso/authorize 路由一致。
-const SAAS_BASE_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
+const SAAS_BASE_URL = process.env.SAAS_IDP_URL ?? "http://localhost:5101";
 const SERVICE_USER = process.env.LAB_SAAS_SERVICE_USER ?? "alice";
 const SERVICE_PASSWORD = process.env.LAB_SAAS_SERVICE_PASSWORD ?? "dev123456";
 
@@ -56,15 +57,31 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  // 密码登录用户无 saas 身份 -> 服务账号拉菜单快照（失败只 warn，不阻塞登录）
+  // 2026-09-02 契约对齐：走 directory 校验（alice/dev123456，与 msw/springboot/aspnetcore
+  // 四方一致；错凭证 401 不再 demo 放行——contract-test 错误分支比对依赖）。
+  const directory = new ConfigUserDirectory(
+    process.env.LAB_AUTH_DEV_PASSWORD ?? "dev123456",
+  );
+  if (!directory.checkPassword(username, password)) {
+    return NextResponse.json(
+      { code: "INVALID_CREDENTIALS", message: "Invalid username or password" },
+      { status: 401 },
+    );
+  }
+  const user = directory.findByUsername(username)!;
+  // 密码登录用户无 saas 身份 -> 服务账号拉菜单快照（失败只 warn，不阻塞登录）。
+  // 2026-09-02 契约对齐：saas 不可达（no-sso）也写**空快照**——与 msw/springboot/aspnetcore
+  // noop 语义一致（login 写空快照 → GET /menus 200 [] 而非 503），四方契约面不分叉。
   const saasToken = await serviceLogin();
   if (saasToken) {
-    await cacheMenuSnapshot("USER-A", saasToken, SAAS_BASE_URL);
+    await cacheMenuSnapshot(user.id, saasToken, SAAS_BASE_URL);
+  } else {
+    putMenuSnapshot(user.id, []);
   }
   return NextResponse.json({
     token: `mock-jwt-${username}`,
     refreshToken: `mock-refresh-${username}`,
-    user: { id: "USER-A", username, displayName: username, roleCode: "admin" },
+    user,
     tenants: DEMO_TENANTS,
   });
 }

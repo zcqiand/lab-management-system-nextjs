@@ -18,8 +18,8 @@
 
 import { NextResponse } from "next/server";
 
-const SAAS_IDP_URL = process.env.SAAS_IDP_URL ?? "http://localhost:3000";
-const SAAS_UI_BASE_URL = process.env.SAAS_UI_BASE_URL ?? "http://localhost:3000";
+const SAAS_IDP_URL = process.env.SAAS_IDP_URL ?? "http://localhost:5101";
+const SAAS_UI_BASE_URL = process.env.SAAS_UI_BASE_URL ?? "http://localhost:5101";
 // OAuth client_id：lab 在 saas 注册的应用（apps.client_id）。
 // 2026-08-28 V014/V015 seed 收敛 apps.client_id 为固定 UUID
 // '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用）；dev fallback 同步。

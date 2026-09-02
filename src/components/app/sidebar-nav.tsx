@@ -494,4 +494,4 @@ export function useSaasApp(): {
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
 const SAAS_BASE =
-  process.env.NEXT_PUBLIC_SAAS_BASE_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SAAS_BASE_URL ?? "http://localhost:5101";

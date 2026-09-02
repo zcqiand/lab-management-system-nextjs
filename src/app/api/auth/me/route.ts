@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 
 const currentTenantId = "TENANT-001";
 
-const DEMO_USER = { id: "USER-A", username: "admin", displayName: "管理员", roleCode: "admin" };
+// 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
+const DEMO_USER = { id: "USER-A", username: "alice", displayName: "管理员", roleCode: "admin" };
 const DEMO_TENANTS = [
   { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
   { tenantId: "TENANT-002", code: "district-lab", name: "区检测站", roleIds: ["technician"] },

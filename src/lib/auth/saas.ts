@@ -228,7 +228,9 @@ export class NoopSaasMeClient implements SaasMeClient {
     void _saasAccessToken;
     return {
       id: "USER-A",
-      email: "admin@lab.local",
+      // 2026-09-02 契约收敛：与 directory DEMO_USER.username=alice 对齐（refresh 路径
+      // findByEmail(email) 必须命中目录行，否则 unknown user）
+      email: "alice",
       displayName: "管理员",
       memberships: [
         { id: "m1", userId: "USER-A", tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },

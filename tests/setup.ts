@@ -15,7 +15,7 @@ if (!process.env.DATABASE_URL) {
 
 // API base URL 引导（同 lab-react .env.test 语义）：vitest 不读 .env*，
 // 未显式设置时置空串 -> 相对 URL，jsdom origin 与 msw/node setupServer 的
-// 相对路径 handler（handlers-extra）同源匹配。若走 || 回退 :5173 绝对 URL，
+// 相对路径 handler（handlers-extra）同源匹配。若走 || 回退 :5200 绝对 URL，
 // 只有 orval faker handler（*/api 通配）能命中，DOM 测试全拿假数据。
 if (process.env.NEXT_PUBLIC_API_BASE_URL === undefined) {
   process.env.NEXT_PUBLIC_API_BASE_URL = "";

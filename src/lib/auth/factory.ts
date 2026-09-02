@@ -41,12 +41,12 @@ export function readLabConfig(env: NodeJS.ProcessEnv = process.env): LabConfig {
       refreshTtlSeconds: parseInt(env.LAB_JWT_REFRESH_TTL_SECONDS ?? "604800", 10),
     },
     sso: {
-      saasBaseUrl: env.LAB_SAAS_BASE ?? "http://localhost:3000",
+      saasBaseUrl: env.LAB_SAAS_BASE ?? "http://localhost:5101",
       clientId: env.LAB_SAAS_CLIENT_ID ?? "",
       clientSecret: env.LAB_SAAS_CLIENT_SECRET ?? "",
       defaultTenantId: env.LAB_SAAS_DEFAULT_TENANT_ID ?? "",
       callbackRedirectUri:
-        env.LAB_SSO_CALLBACK_REDIRECT ?? "http://localhost:3000/api/auth/sso/callback",
+        env.LAB_SSO_CALLBACK_REDIRECT ?? "http://localhost:5201/api/auth/sso/callback",
     },
     auth: {
       devPassword: env.LAB_AUTH_DEV_PASSWORD ?? "dev123456",

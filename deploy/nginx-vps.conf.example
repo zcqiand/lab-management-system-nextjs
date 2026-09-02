@@ -43,7 +43,7 @@ server {
     add_header Strict-Transport-Security "max-age=31536000" always;
 
     location / {
-        # VPS 暴露端口(容器内 next start 监听 :3000)
+        # VPS 暴露端口(容器内 next start 监听 :5201)
         # 改端口必须同步 deploy/lab-management-system-nextjs.sh 的 -p(saas 坑 15)
         proxy_pass http://127.0.0.1:8012;
 

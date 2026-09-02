@@ -18,7 +18,8 @@ export async function POST(req: Request) {
   return NextResponse.json({
     token: `mock-jwt-tenant-${tid}`,
     refreshToken: `mock-refresh-tenant-${tid}`,
-    user: { id: "USER-A", username: "admin", displayName: "管理员", roleCode: "admin" },
+    // 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
+    user: { id: "USER-A", username: "alice", displayName: "管理员", roleCode: "admin" },
     tenants: DEMO_TENANTS,
   });
 }

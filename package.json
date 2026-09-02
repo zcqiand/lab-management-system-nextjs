@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Full-stack frontend + schema emit + pg runtime lender for the lab-management-system 7-repo family.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 5201",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 5201",
     "gate": "cd ../.. && python scripts/gate.py -p lab-management-system-nextjs",
     "test": "vitest run",
     "trace": "TRACE_MAP=1 vitest run",
@@ -79,3 +79,4 @@
     "vitest": "^4.0.0"
   }
 }
+

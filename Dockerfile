@@ -2,7 +2,7 @@
 # lab-management-system-nextjs — 生产镜像
 #
 #   builder  → 装 deps + gen:shared(orval → src/api/endpoints/) + next build
-#   runtime  → node:24-slim + standalone server, 监听 PORT=3000
+#   runtime  → node:24-slim + standalone server, 监听 PORT=5201
 #
 # 数据库:PostgreSQL(远程)。容器内不持有 DB 文件 —— 运行期必须通过 DATABASE_URL
 #         环境变量注入连接串(由 VPS saas.env 注入)。
@@ -16,7 +16,7 @@
 # 迁移 / seed:runtime entrypoint 跑 scripts/sync-db.mjs + scripts/seed-db.mjs
 #         (seed 仅首启执行,靠 __schema_migrations 是否为空判断)。
 #
-# 端口:容器内 next start 监听 :3000;VPS nginx 反代到 publish 出的端口(默认 8022)。
+# 端口:容器内 next start 监听 :5201;VPS nginx 反代到 publish 出的端口(默认 8022)。
 #
 # 节点用户:slim 镜像只有 root;我们用 `node` 用户跑 next。
 # =============================================================================
@@ -76,7 +76,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
+ENV PORT=5201
 ENV HOSTNAME=0.0.0.0
 # DATABASE_URL 由 deploy/ 阶段 lab.env 注入(ADR-0009)。不在 Dockerfile 写死。
 # DB_PATH=/data/lab.db 是历史 SQLite 残留,src/db/index.ts 实际用 postgres-js → DATABASE_URL。
@@ -125,10 +125,10 @@ RUN mkdir -p /data && chown -R node:node /data
 COPY --chown=root:root deploy/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 3000
+EXPOSE 5201
 
 # slim 没有 wget/curl,用 node fetch 探活
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:5201/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

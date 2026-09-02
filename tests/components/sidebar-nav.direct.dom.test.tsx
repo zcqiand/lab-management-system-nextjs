@@ -159,7 +159,7 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1]!;
     const [url] = lastCall;
-    expect(url).toBe("http://localhost:3000/api/v1/apps/lab-management");
+    expect(url).toBe("http://localhost:5101/api/v1/apps/lab-management");
   });
 });
 

@@ -9,7 +9,7 @@
 # CI 同时 push :latest + :<tag> 两份镜像,回滚只要手动指定旧 tag 再跑一次本脚本。
 #
 # 与姊妹仓 saas-identity-platform.sh 的差异:
-#   - 容器内是 Node(next start :3000),不是 nginx:80 → -p 127.0.0.1:8012:3000
+#   - 容器内是 Node(next start :5201),不是 nginx:80 → -p 127.0.0.1:8012:5201
 #   - SQLite 挂卷持久化:./data ↔ /data(容器 entrypoint 首启迁移 + seed)
 #   - 密钥走 ./lab.env(LAB_JWT_SECRET),由 setup-vps.sh 生成,只存在于 VPS
 #
@@ -242,7 +242,7 @@ echo "→ docker run"
 docker run -d \
   --name lab-management-system-nextjs \
   --restart unless-stopped \
-  -p "127.0.0.1:8012:3000" \
+  -p "127.0.0.1:8012:5201" \
   -v "$BASE/data:/data" \
   --env-file "$BASE/lab.env" \
   "$IMAGE"

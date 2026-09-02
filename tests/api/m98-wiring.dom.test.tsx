@@ -41,7 +41,7 @@ describe("M98 frontend 接线层", () => {
     const req = new Request("http://test/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username: "labadmin", password: "dev123456" }),
+      body: JSON.stringify({ username: "alice", password: "dev123456" }),
     });
     const res = await loginPOST(req);
     expect(res.status).toBe(200);
@@ -55,7 +55,7 @@ describe("M98 frontend 接线层", () => {
     const res = await meGET();
     expect(res.status).toBe(200);
     const body = (await res.json()) as { user: { username: string }; tenants: unknown[]; currentTenantId: string };
-    expect(body.user.username).toBe("admin");
+    expect(body.user.username).toBe("alice");
     expect(Array.isArray(body.tenants)).toBe(true);
     expect(body.currentTenantId).toBe("TENANT-001");
   });

@@ -35,7 +35,7 @@ afterEach(() => {
 
 describe("M01.F05 AuthService", () => {
   it("login success returns session with 3 tenants", () => {
-    const resp = SVC.login("admin@lab.local", "dev123456");
+    const resp = SVC.login("alice", "dev123456");
     expect(resp.user.id).toBe("USER-A");
     expect(resp.tenants).toHaveLength(3);
     expect(resp.token).toBeTruthy();
@@ -43,7 +43,7 @@ describe("M01.F05 AuthService", () => {
   });
 
   it("login wrong password throws", () => {
-    expect(() => SVC.login("admin@lab.local", "wrong")).toThrow(/Invalid/);
+    expect(() => SVC.login("alice", "wrong")).toThrow(/Invalid/);
   });
 
   it("login blank fields throws", () => {

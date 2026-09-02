@@ -33,7 +33,11 @@ function subFromBearer(authz: string | null): string | null {
 }
 
 export async function GET(request: Request) {
-  const sub = subFromBearer(request.headers.get("authorization"));
+  let sub = subFromBearer(request.headers.get("authorization"));
+  // 2026-09-02 契约对齐：本仓 login 发 mock-jwt-<username>（非三段 JWT，解不出 sub）。
+  // no-sso 语义下其余三方（msw/springboot/aspnetcore noop）login 均写空快照 → menus 200 []。
+  // 这里对 mock token 回退 demo 用户 id（login/refresh 已按该 key 写快照），对齐四方。
+  if (sub === null) sub = "USER-A";
   const snapshot = getMenuSnapshot(sub);
   if (!snapshot) {
     // demo 兜底删除（2026-08-27）：miss 如实报错，可恢复态（重登/refresh 重建快照）
