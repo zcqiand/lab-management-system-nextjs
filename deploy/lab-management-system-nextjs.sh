@@ -187,13 +187,13 @@ NGINX_VHOST_FILE="${NGINX_SITES_AVAILABLE}/${NGINX_DOMAIN}"
 NGINX_VHOST_LINK="${NGINX_SITES_ENABLED}/${NGINX_DOMAIN}"
 NGINX_TEMPLATE="${BASE}/nginx-vps.conf.example"
 
-# 拉模板（deploy/ 目录随仓库 deploy 脚本一起,但首次拉时可能不存在,补一下）
-if [ ! -f "${NGINX_TEMPLATE}" ]; then
-  echo "→ fetching nginx-vps.conf.example template"
-  if ! curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"; then
-    echo "ERROR: failed to fetch nginx template, vhost re-render aborts"
-    exit 1
-  fi
+# 拉模板:每次都从 master 拉最新 —— VPS 本地会留 7 月老模板(801x 端口时代),
+# fetch-if-missing 让它永不更新 → 渲染出 proxy_pass 8010 全家族 502
+# (2026-09-03 事故根因之二)
+echo "→ fetching nginx-vps.conf.example template (always fresh from master)"
+if ! curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"; then
+  echo "ERROR: failed to fetch nginx template, vhost re-render aborts"
+  exit 1
 fi
 
 # 渲染到临时文件 —— sed 同时覆盖 3 种 placeholder:
