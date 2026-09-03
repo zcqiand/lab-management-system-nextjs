@@ -32,9 +32,9 @@
     "@tanstack/react-query": "^5.101.4",
     "axios": "^1.7.9",
     "docx-preview": "^0.4.0",
-    "jose": "^5.10.0",
     "docxtemplater": "^3.69.3",
     "drizzle-orm": "^0.36.4",
+    "jose": "^5.10.0",
     "next": "^15.1.0",
     "pizzip": "^3.2.0",
     "postgres": "^3.4.9",
@@ -79,4 +79,3 @@
     "vitest": "^4.0.0"
   }
 }
-

@@ -1,23 +1,48 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "proposed_at": "2026-08-29",
-  "summary": "废弃 M01.F04.I03 + M05.F01.I02（与 F04.I02 / 源码语义重复）",
-  "reason": "M01.F04.I03「路由守卫（未登录/无权限拦截）」与 M01.F04.I02「未登录跳转登录页；角色不匹配跳转 403；三态正确拦截」描述几乎一致。F02 已挂 data-fn=I02 在 src/app/(console)/layout.tsx:40 实现守卫占位；F03 是上一轮补 5 项 react-style 已上线时与 I02 一并恢复，但 nextjs 没源码、独立挂点没意义，合并到 F02。\n\nM05.F01.I02「仪表盘统计」状态「已上线」，但 src/features/summary/SummaryPage.tsx:4 注释「M05.F01.I02 汇总类型 已废弃，单一列表形态」—— 树与源码矛盾。nextjs 是「单列列表」（SummaryList），没有「汇总类型」（material/concrete/connection 三类）实现，标已上线是错的。改回已废弃。\n\n按 harness 规则「行不删，号不回收」，本提案只改状态。",
+  "proposed_at": "2026-09-04",
+  "summary": "M05.F01 仪表盘扩展（核心指标 + 任务漏斗 + 超期预警 + 见证跟踪）+ 顺带废弃 M01.F04.I03",
+  "reason": "M05.F01.I02 现状「仪表盘统计」标已上线但 SummaryPage 只渲染类别下拉+汇总表，是虚标（gate L5 软告警已点名）。本次保留 I02 作「仪表盘容器」layout 锚点（向后兼容），在其下加 I03/I04/I05 三个新区块：\n- I03 核心指标（今日试验总数/检测合格率/报告产出量）\n- I04 任务漏斗（待取样→已收样→试验中→报告编制→待审核→已签发 6 段计数）+ 超期未完成预警列表\n- I05 见证取样跟踪（见证率/见证到位情况）\n\n后端 /api/summary/stats 扩展新字段；前端 SummaryPage 加 3 个区块；tests/features/summary/summary.dom.test.tsx 扩展锚点。\n\n顺带：M01.F04.I03「路由守卫（未登录/无权限拦截）」与 I02 描述重复（F02 已实现并挂 data-fn=I02），合并到 F02，本仓无独立挂点。\n\n按 harness 规则「行不删，号不回收」，本提案只改状态 + 增行。",
   "changes": [
     {
       "action": "废弃",
       "id": "M01.F04.I03",
-      "reason": "与 M01.F04.I02 描述重复（F02 已实现并挂 data-fn=I02），合并到 F02。lab-nextjs 没有独立的 F03 实现，挂点无意义。"
+      "reason": "与 M01.F04.I02 描述重复（F02 已实现并挂 data-fn=I02 在 src/app/(console)/layout.tsx），合并到 F02。nextjs 无独立 I03 挂点。"
     },
     {
-      "action": "废弃",
+      "action": "变更",
       "id": "M05.F01.I02",
-      "reason": "nextjs 实际是「单列列表」形态（src/features/summary/SummaryList.tsx，对应 M05.F01.I01）；不存在「汇总类型 / 三类列定义各异」的实现。树状态「已上线」与源码注释「已废弃」矛盾。"
+      "name": "仪表盘容器",
+      "reason": "原描述「仪表盘统计」虚标已上线（实际是类别筛选栏）；改为 layout 锚点「仪表盘容器」，包裹 I03/I04/I05 三区块。保留 data-fn=M05.F01.I02 作为 SummaryPage 最外层 div 锚点（向后兼容现有测试）。"
+    },
+    {
+      "action": "新增",
+      "id": "M05.F01.I03",
+      "name": "核心指标卡",
+      "parent": "M05.F01",
+      "reason": "核心指标（今日试验总数/检测合格率/报告产出量）。GET /api/summary/stats 扩展 todayTestCount/qualifiedRate/reportOutputByStatus 字段；SummaryPage 顶部 3 张卡片渲染。"
+    },
+    {
+      "action": "新增",
+      "id": "M05.F01.I04",
+      "name": "任务状态漏斗 + 超期预警",
+      "parent": "M05.F01",
+      "reason": "试验任务状态漏斗（待取样→已收样→试验中→报告编制→待审核→已签发 6 段实时计数）+ 超期未完成预警列表（plannedTestDate < today 且未完成）。GET /api/summary/stats 扩展 funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued}+ overdueList[]。SummaryPage 渲染漏斗条 + 预警表格。"
+    },
+    {
+      "action": "新增",
+      "id": "M05.F01.I05",
+      "name": "见证取样跟踪",
+      "parent": "M05.F01",
+      "reason": "针对需监理见证项目显示见证率（合同需见证的接样单中已完成见证的比例）+ 见证到位情况明细。GET /api/summary/stats 扩展 witnessStats:{requireWitness, witnessed, witnessRate, details[]}。SummaryPage 渲染见证率条形图 + 明细表。"
     }
   ],
   "sync_files": [
-    "docs/functions/function-tree.md"
+    "docs/functions/function-tree.md",
+    "src/features/summary/SummaryPage.tsx",
+    "src/app/api/summary/stats/route.ts",
+    "tests/features/summary/summary.dom.test.tsx"
   ],
   "approved": true,
   "base_sha": "3d4332b0262e187d"

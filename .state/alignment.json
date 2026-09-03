@@ -4,14 +4,15 @@
   "functions": {
     "modules": 9,
     "features": 31,
-    "items": 118
+    "items": 121
   },
-  "warnings_total": 3,
+  "warnings_total": 4,
   "warnings": {
     "已上线但不在任何流程且非孤儿白名单": [
       "M01.F04.I01",
-      "M01.F04.I03",
-      "M05.F01.I02"
+      "M05.F01.I02",
+      "M05.F01.I03",
+      "M05.F01.I04"
     ]
   },
   "unreachable_shipped": [],
@@ -61,19 +62,13 @@
     },
     "M01.F04.I03": {
       "name": "路由守卫（未登录/无权限拦截）",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 @entry=I03 + 含 router.replace('/login')（I02 之外的 @entry）"
-      ],
-      "entry": [
-        "src\\app\\(console)\\layout.tsx"
-      ]
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M01.F04.I04": {
       "name": "动态菜单",
@@ -1238,7 +1233,23 @@
       ]
     },
     "M05.F01.I02": {
-      "name": "仪表盘统计",
+      "name": "仪表盘容器",
+      "status": "已上线",
+      "type": "页面",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I02 锚点存在（仪表盘容器，包裹 I03/I04/I01 三区块）"
+      ],
+      "entry": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    "M05.F01.I03": {
+      "name": "核心指标卡",
       "status": "已上线",
       "type": "查询",
       "requirements": [],
@@ -1247,11 +1258,37 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I02 锚点存在（仪表盘统计容器 = 报告类别筛选栏）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I03 锚点 + 3 张核心指标卡（今日试验/报告产出/合格率）"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
       ]
+    },
+    "M05.F01.I04": {
+      "name": "任务状态漏斗",
+      "status": "已上线",
+      "type": "报表",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗"
+      ],
+      "entry": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    "M05.F01.I05": {
+      "name": "见证取样跟踪",
+      "status": "规划",
+      "type": "报表",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M06.F01.I01": {
       "name": "检测专项列表",

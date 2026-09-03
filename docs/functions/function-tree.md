@@ -146,7 +146,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 |---|---|---|---|---|
 | M01.F04.I01 | 动态菜单下发（GET /auth/menus） | 查询 | 已上线 |
 | M01.F04.I02 | 路由守卫 | 接口 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
-| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 已上线 |
+| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 与 I02 描述重复，合并到 F02；本仓无独立挂点 | 已废弃 |
 | M01.F04.I04 | 动态菜单 | 接口 | 侧边栏菜单由身份平台 GET /menus?appId=lab-management 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
 
 
@@ -269,7 +269,10 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
 |---|---|---|---|---|
 | M05.F01.I01 | 汇总表 | 接口 | 按报告名称（InspectionReportName）输出试验报告汇总表，报告名称下拉框选择汇总口径 | 已上线 |
-| M05.F01.I02 | 仪表盘统计 | 查询 | 已上线 |
+| M05.F01.I02 | 仪表盘容器 | 页面 | SummaryPage 最外层 layout 锚点，包裹 I03/I04/I05 三区块 | 已上线 |
+| M05.F01.I03 | 核心指标卡 | 查询 | 今日试验总数 + 检测合格率（按材料类型 concrete/rebar/sand）+ 报告产出量（已生成/已签发/待审核）；GET /api/summary/stats 扩展 todayTestCount/qualifiedRateByMaterial/reportOutputByStatus | 已上线 |
+| M05.F01.I04 | 任务状态漏斗 | 报表 | 6 段实时计数：待取样→已收样→试验中→报告编制→待审核→已签发；GET /api/summary/stats 扩展 funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued} | 已上线 |
+| M05.F01.I05 | 见证取样跟踪 | 报表 | 见证率（合同需见证的接样单中已完成见证的比例）+ 见证到位情况明细；GET /api/summary/stats 扩展 witnessStats:{requireWitness, witnessed, witnessRate, details[]} | 规划 |
 
 
 | 子项 ID | 名称 | 类型 | 说明 | 状态 |
