@@ -88,9 +88,15 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::5xx → 不写快照 + warn（登录主流程不阻塞）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 不在响应里 → 写空快照（与 no-sso 兜底四方对齐）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 命中 → 写入子树 + 完成 name→label 映射 + 跨 app 数据不污染",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：响应是空对象 → 写空快照",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::userId/token 空 → 静默不写不发请求",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::网络异常 → 不写快照 + warn"
       ],
       "entry": [
         "src\\components\\app\\sidebar-nav.tsx"

@@ -1,27 +1,30 @@
 {
   "schema": 2,
   "project": "lab-management-system-nextjs",
-  "current_task": "env 治理收尾:线上 lab.env 漂移修复 + .env.production 转 gitignored + v0.3.59 部署验证",
-  "last_session_at": "2026-08-29",
-  "last_session_summary": "线上 lab.env 停在 7 key 而 .env.example 已 16 key(login/sso/callback 还在读 Phase 4 已删死键 SAAS_BASE_URL,菜单快照静默打 localhost)。修死键→SAAS_IDP_URL;deploy 脚本写全 key+服务账号 fail-fast;NEXT_PUBLIC_* 烘焙改 Dockerfile ENV;.env.production 全家族 untrack(gitignored 同 .env.local 模式);新增 tests/deploy-env-parity.test.ts 与 suite L0.5 check_deploy_parity 双层锁死 key 集合。tag v0.3.59 部署 GREEN,VPS append 9 key+drop 死键 NEXT_PUBLIC_APP_ID,线上 200",
+  "current_task": "cacheMenuSnapshot 解析 saas /me/menus Record<appCode, ...> 修复 + consumer 解析单测补齐，gate 已绿，待 prod SSO 验证",
+  "last_session_at": "2026-09-03",
+  "last_session_summary": "线上 /api/auth/menus 503 + 控制台 [menu-snapshot] fetch failed: i.map is not a function。根因：cacheMenuSnapshot 把 Record<appCode, EffectiveMenuNode[]> 强转 flat 数组 cast，tree.map 抛 TypeError 被 catch 吞，快照永空 → GET /menus 503。springboot/aspnetcore 2026-08-28 同步适配了，本仓漏。修 src/lib/auth/menu-snapshot.ts:84 body[appCode] ?? []；tests/api/menus-route.dom.test.tsx 加 7 个 fnTest 覆盖 Record 命中/跨 app 不污染/appCode 缺失/空对象/5xx/网络异常/空参。red 3 失败→green 10/10。--all gate 0",
   "done": [
-    "src/app/api/auth/{login,sso/callback}/route.ts: 死键 SAAS_BASE_URL → SAAS_IDP_URL(fallback localhost:3000)",
-    "deploy/lab-management-system-nextjs.sh: 自举 16 key,非 secret 显式字面量,LAB_SAAS_SERVICE_USER/PASSWORD fail-fast(禁 ${VAR:-default} 兜底);setup-vps.sh 删 SAAS_BASE_URL 自举段",
-    "Dockerfile: NEXT_PUBLIC_API_BASE_URL/MODE/SAAS_BASE_URL/LAB_APP_CODE 四个 ENV 烘焙(替代被 untrack 的 .env.production)",
-    "tests/deploy-env-parity.test.ts 新增: 脚本写入 key 集合 == .env.example(production 存在时附加核对)",
-    "tag v0.3.59-20260829 部署 GREEN: VPS lab.env 迁移 9 append + drop NEXT_PUBLIC_APP_ID,/api/health 200"
+    "src/lib/auth/menu-snapshot.ts cacheMenuSnapshot: (await resp.json()) as Record<string, SaasMenuNode[]>; const tree = body[appCode] ?? []; putMenuSnapshot(userId, tree.map(mapSaasMenu)) — 替代旧 flat cast",
+    "tests/api/menus-route.dom.test.tsx 新增 cacheMenuSnapshot describe 块，7 个 fnTest(M01.F04.I04)：Record 命中+映射+跨 app 隔离/appCode 不在响应/空对象/5xx warn/网络异常 warn/userId token 空静默",
+    "vitest 验证: 目标文件 10/10 绿(4 原有 + 7 新增)；full suite 含 PG 6+1 失败是 lab_dev 远端不可达(用户已修),与本次无关",
+    "gate.py --all exit 0: lab-nextjs L1-L5 全 PASS；saas-shared/springboot/vue 等同跑全绿"
   ],
   "next": [
-    "手动验收:登录看菜单是否从 saas 快照拉(此前静默失败回退静态菜单);SSO 链路走通(saas-nextjs /login → callback)"
+    "prod 验证: SSO 登录 lab-nextjs.xiangru.uk → DevTools 看 /api/auth/menus 应 200 而非 503；sidebar 不应再 AppShellErrorBoundary 兜错误态",
+    "可选: 改 .env.example:28 注释 (它说 \"用来从 /me/menus 返回的 { [appCode]: ... } 里挑本仓菜单\" 但 appCode query 参数 saas 忽略); 改成 \"appCode 仅用于 cacheMenuSnapshot 在响应 Map 里挑本仓子树\"",
+    "可选: 加 live 集成测试(cacheMenuSnapshot 真打远端 saas,describe.skipIf(!live) 同 saas-contract-test/me.test.ts),防止未来 saas 响应形状再变又漏"
   ],
   "open_questions": [
-    "lab-msw/saas-msw 的 .env.production 契约面价值(不部署)是否长期保留"
+    "是否需要把 .env.example:28 那行注释也跟改(避免下次改这块的人又踩同坑)",
+    "是否加 live 集成测试(代价: 起 saas 才跑,平时 skip;价值: 抓 provider 形状再变的情况)"
   ],
   "dont": [
-    "deploy 脚本不要写 ${VAR:-default} 兜底——CLAUDE.md 硬规则,secret 缺失 fail-fast 报具体 key",
-    ".env.production 已 gitignored,永不 git add -f(真值含 secret);真值变更走 python scripts/sync_secrets.py"
+    "不要改 saas /me/menus 响应形状 — Record<appCode, ...> 是 \"一次拿所有 app\" 的正确设计,springboot/aspnetcode 已对齐,本仓漏适配是 consumer bug 不是契约 bug",
+    "不要给 PG 测试加 skipIf(LAB_PG_REACHABLE) 凑绿 — PG 不可达是真实失败模式,改 skip 是 \"为绿而绿\" 违反 CLAUDE.md §2",
+    "不要改 menu-snapshot.ts 里的 TTL_MS=30min 或 store=Map 形态 — 单实例部署可接受,与 springboot 同款;真多实例要再开 ADR 单独讨论持久化"
   ],
-  "last_gate_passed_at": "2026-08-26T17:30+08:00",
+  "last_gate_passed_at": "2026-09-03T09:48+08:00",
   "active_branch": "master",
   "ahead_of_origin": "0"
 }

@@ -61,6 +61,15 @@ export function __resetMenuSnapshotCache(): void {
 /**
  * 拉取并缓存某用户的 saas 菜单快照。失败（saas 5xx/网络/4xx）只 console.warn
  * 不抛 — 菜单不可用不应阻塞登录主流程（与 springboot cacheMenus 同语义）。
+ *
+ * 2026-08-28 saas MeService 真实现起，/me/menus 响应形状是
+ * {@link Record}<appCode, EffectiveMenuNode[]>（shared 契约
+ * saas-identity-platform-shared/tsp/routes/me.tsp getMyMenus 返
+ * Record<EffectiveMenuNode[]>）—— 一次返该用户所有 app 下的菜单，本仓按 appCode
+ * 取自己的子树再映射。早期错误版本把整个响应当 flat 数组 cast，tree.map 抛
+ * `i.map is not a function`（对象无 .map），catch 吞掉 → 快照永远空 →
+ * /api/auth/menus 503 MENUS_UNAVAILABLE。 springboot / aspnetcode 同款契约
+ * 2026-08-28 同步改了，本仓漏改。
  */
 export async function cacheMenuSnapshot(
   userId: string | null | undefined,
@@ -80,7 +89,8 @@ export async function cacheMenuSnapshot(
       console.warn(`[menu-snapshot] saas /me/menus ${resp.status} for user ${userId}`);
       return;
     }
-    const tree = (await resp.json()) as SaasMenuNode[];
+    const body = (await resp.json()) as Record<string, SaasMenuNode[] | undefined>;
+    const tree = body[appCode] ?? []; // appCode 不在响应里 → 空快照（与 no-sso 兜底对齐）
     putMenuSnapshot(userId, tree.map(mapSaasMenu));
   } catch (err) {
     console.warn(`[menu-snapshot] fetch failed for user ${userId}: ${(err as Error).message}`);
