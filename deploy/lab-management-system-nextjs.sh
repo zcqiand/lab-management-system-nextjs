@@ -176,10 +176,9 @@ if [ -f "$BASE/lab.env" ] && grep -q '^SAAS_BASE_URL=' "$BASE/lab.env" && ! grep
 fi
 mkdir -p "$BASE/data"
 
-# nginx vhost 自举（缺时创建,不 reload —— reload 要 root）:
-# 检测 /etc/nginx/sites-enabled/<NGINX_DOMAIN> 是否存在;缺时从 nginx-vps.conf.example
-# 模板渲染,做 symlink。reload 需 sudo,留给手工:
-#   sudo nginx -t && sudo systemctl reload nginx
+# nginx vhost 重渲染（每次 deploy 都跑,ADR-0018:容器端口变了 vhost 必须跟）:
+# 模板从 master 拉,渲染后写入 sites-available,symlink sites-enabled,再 sudo nginx -t + reload。
+# diff 检测:内容未变跳过 reload (nginx -t 也省)。
 NGINX_DOMAIN="${NGINX_DOMAIN:-lab-nextjs.xiangru.uk}"
 NGINX_CERT_BASENAME="${NGINX_CERT_BASENAME:-xiangru-uk}"
 NGINX_SITES_AVAILABLE="/etc/nginx/sites-available"
@@ -188,44 +187,58 @@ NGINX_VHOST_FILE="${NGINX_SITES_AVAILABLE}/${NGINX_DOMAIN}"
 NGINX_VHOST_LINK="${NGINX_SITES_ENABLED}/${NGINX_DOMAIN}"
 NGINX_TEMPLATE="${BASE}/nginx-vps.conf.example"
 
-echo "→ nginx bootstrap: NGINX_DOMAIN='${NGINX_DOMAIN}' CERT='${NGINX_CERT_BASENAME}'"
-echo "→ nginx vhost target: ${NGINX_VHOST_FILE} (symlink ${NGINX_VHOST_LINK})"
-echo "→ nginx template: ${NGINX_TEMPLATE}"
-
 # 拉模板（deploy/ 目录随仓库 deploy 脚本一起,但首次拉时可能不存在,补一下）
 if [ ! -f "${NGINX_TEMPLATE}" ]; then
-  echo "→ fetching nginx-vps.conf.example template from raw.githubusercontent.com"
+  echo "→ fetching nginx-vps.conf.example template"
   if ! curl -fsSL "https://raw.githubusercontent.com/zcqiand/lab-management-system-nextjs/refs/heads/master/deploy/nginx-vps.conf.example" -o "${NGINX_TEMPLATE}"; then
-    echo "ERROR: failed to fetch nginx template, vhost bootstrap aborts"
-  else
-    echo "→ template fetched ($(wc -l < "${NGINX_TEMPLATE}") lines)"
+    echo "ERROR: failed to fetch nginx template, vhost re-render aborts"
+    exit 1
   fi
-else
-  echo "→ template already cached at ${NGINX_TEMPLATE}"
 fi
 
-if [ ! -f "${NGINX_TEMPLATE}" ]; then
-  echo "ERROR: nginx template missing, skipping vhost bootstrap (do 'cp deploy/nginx-vps.conf.example ${BASE}/' manually)"
-elif [ -e "${NGINX_VHOST_LINK}" ] || [ -e "${NGINX_VHOST_FILE}" ]; then
-  echo "→ nginx vhost ${NGINX_VHOST_FILE} already exists, skip bootstrap"
+# 渲染到临时文件 —— sed 同时覆盖 3 种 placeholder:
+#   Style A (lab-vue/react):      <domain>
+#   Style B/C (nextjs/sp/aspc):   lab.YOUR_DOMAIN / saas.YOUR_DOMAIN
+#   cert 路径: your-cert.{crt,cert} / <domain>.crt → 统一到 ${NGINX_CERT_BASENAME}.cert
+TMP_VHOST="$(mktemp -t vpstpl.XXXXXX)"
+sed \
+  -e "s|<domain>|${NGINX_DOMAIN}|g" \
+  -e "s|lab\.YOUR_DOMAIN|${NGINX_DOMAIN}|g" \
+  -e "s|saas\.YOUR_DOMAIN|${NGINX_DOMAIN}|g" \
+  -e "s|/etc/nginx/ssl/<domain>\.crt|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
+  -e "s|/etc/nginx/ssl/<domain>\.key|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.key|g" \
+  -e "s|/etc/nginx/ssl/your-cert\.crt|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
+  -e "s|/etc/nginx/ssl/your-cert\.cert|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
+  -e "s|/etc/nginx/ssl/your-cert\.key|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.key|g" \
+  "${NGINX_TEMPLATE}" > "${TMP_VHOST}"
+
+# diff 检测:已有 vhost 且内容相同就 skip,不同才重写 + reload
+if [ -e "${NGINX_VHOST_FILE}" ] && diff -q "${TMP_VHOST}" "${NGINX_VHOST_FILE}" >/dev/null 2>&1; then
+  echo "→ nginx vhost ${NGINX_VHOST_FILE} unchanged, skip"
+  rm -f "${TMP_VHOST}"
 else
-  echo "→ nginx vhost missing, bootstrapping"
-  umask 022
-  if sed \
-    -e "s/lab\.YOUR_DOMAIN/${NGINX_DOMAIN}/g" \
-    -e "s|/etc/nginx/ssl/your-cert.crt|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.cert|g" \
-    -e "s|/etc/nginx/ssl/your-cert.key|/etc/nginx/ssl/${NGINX_CERT_BASENAME}.key|g" \
-    "${NGINX_TEMPLATE}" > "${NGINX_VHOST_FILE}"; then
-    if ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}"; then
-      echo "→ nginx vhost created at ${NGINX_VHOST_FILE}"
-      echo "→ symlink created at ${NGINX_VHOST_LINK}"
-      echo "→ next: sudo nginx -t && sudo systemctl reload nginx"
-    else
-      echo "ERROR: failed to create symlink ${NGINX_VHOST_LINK}"
-    fi
+  echo "→ rendering nginx vhost ${NGINX_VHOST_FILE} (domain=${NGINX_DOMAIN} cert=${NGINX_CERT_BASENAME})"
+  # 写入 sites-available (deploy 用户可能没写权限,需要 sudoers 配 nginx 白名单)
+  if [ -w "${NGINX_SITES_AVAILABLE}" ]; then
+    cp "${TMP_VHOST}" "${NGINX_VHOST_FILE}"
   else
-    echo "ERROR: sed failed, vhost not created"
+    sudo cp "${TMP_VHOST}" "${NGINX_VHOST_FILE}" \
+      || { echo "ERROR: sudo cp ${NGINX_VHOST_FILE} failed"; rm -f "${TMP_VHOST}"; exit 1; }
   fi
+  # symlink sites-enabled
+  if [ -w "${NGINX_SITES_ENABLED}" ]; then
+    ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}"
+  else
+    sudo ln -sf "${NGINX_VHOST_FILE}" "${NGINX_VHOST_LINK}" \
+      || { echo "ERROR: sudo ln ${NGINX_VHOST_LINK} failed"; rm -f "${TMP_VHOST}"; exit 1; }
+  fi
+  rm -f "${TMP_VHOST}"
+  # nginx config test + reload (CI 自动完成,不再依赖手工)
+  echo "→ nginx -t"
+  sudo nginx -t
+  echo "→ systemctl reload nginx"
+  sudo systemctl reload nginx
+  echo "✓ nginx reloaded"
 fi
 
 echo "→ image: $IMAGE"
