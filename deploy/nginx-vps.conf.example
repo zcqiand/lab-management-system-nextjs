@@ -14,7 +14,8 @@
 # 这份配置的目的:
 #   - lab.YOUR_DOMAIN 的 HTTP 301 到 HTTPS
 #   - HTTPS 终结在 VPS(持 cert)
-#   - proxy_pass 到本机容器端口 8012(由 docker run -p 127.0.0.1:8012:3000 决定)
+#   - proxy_pass 到本机容器端口 5201（host=container；ADR-0018 单层 port 方案，
+#     由 docker run -p 127.0.0.1:5201:5201 决定；lab 家族 X01 段）
 #
 # 注意:与 saas 版不同,不再声明 `listen 80 default_server; return 444;`
 # —— 同一台 VPS 上 saas 的 vhost 已占 default_server,重复声明 nginx -t 直接报错。
@@ -43,9 +44,9 @@ server {
     add_header Strict-Transport-Security "max-age=31536000" always;
 
     location / {
-        # VPS 暴露端口(容器内 next start 监听 :5201)
-        # 改端口必须同步 deploy/lab-management-system-nextjs.sh 的 -p(saas 坑 15)
-        proxy_pass http://127.0.0.1:8012;
+        # VPS 暴露端口(容器内 next start 监听 :5201, host=container=5201)
+        # 改端口必须同步 deploy/lab-management-system-nextjs.sh 的 -p 与 PORT env
+        proxy_pass http://127.0.0.1:5201;
 
         proxy_http_version 1.1;
         proxy_set_header Host              $host;
