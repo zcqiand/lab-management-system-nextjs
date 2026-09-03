@@ -190,7 +190,7 @@ export class AuthService {
     return this.session(user, null, memberships, t.refreshToken);
   }
 
-  // === M00.F01 当前会话 ===
+  // === M98.F03.I02 当前会话 helper（被 /api/auth/me route 调用，业务标识 M00.F01 当前用户会话） ===
 
   me(claims: Record<string, unknown>): CurrentUserSession {
     const user = this.resolveUser(claims);

@@ -2099,7 +2099,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 hit：Bearer sub 有 memberships 快照 → 返回 saas 租户",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 miss：有 Bearer 但 sub 无快照 → 401（前端 refresh 自愈）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::demo 路径：无 Bearer → demo 租户（现状不变）"
       ],
       "entry": []
     },

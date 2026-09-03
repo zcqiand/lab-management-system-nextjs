@@ -15,6 +15,7 @@
 
 import { NextResponse } from "next/server";
 import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
+import { putMembershipSnapshot } from "@/lib/auth/membership-snapshot";
 
 // v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(线上一直吃 localhost
 // fallback,token 换发 502)。真名 SAAS_IDP_URL,与 sso/authorize 路由一致。
@@ -114,6 +115,19 @@ export async function POST(request: Request) {
   // 2.5 ADR-0009：瞬时持 accessToken 时拉菜单进快照缓存（失败只 warn）
   if (me.id) {
     await cacheMenuSnapshot(me.id, tokenRes.accessToken, SAAS_BASE_URL);
+    // 2026-09-03 租户体系对齐：memberships 快照（/api/auth/me 按同 key 读取）。
+    // 快照与下方返回给前端的 tenants 同源 —— hydrateAuth 的 find 必命中。
+    putMembershipSnapshot(
+      me.id,
+      (me.memberships ?? [])
+        .filter((m) => m.status !== "removed")
+        .map((m) => ({
+          tenantId: m.tenantId,
+          code: m.tenantId,
+          name: m.tenantId,
+          roleIds: m.roleIds ?? [],
+        })),
+    );
   }
 
   // 3. 映射 lab LoginResponse（旧 demo 契约形状不变，前端 authStore 无感）
