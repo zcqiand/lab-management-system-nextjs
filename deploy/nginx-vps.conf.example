@@ -31,7 +31,7 @@ server {
     server_name lab.YOUR_DOMAIN;             # 改
 
     # cert / key 在 VPS 本地,**不入仓**
-    ssl_certificate     /etc/nginx/ssl/your-cert.crt;   # 改
+    ssl_certificate     /etc/nginx/ssl/your-cert.cert;  # 改
     ssl_certificate_key /etc/nginx/ssl/your-cert.key;   # 改
 
     ssl_session_cache   shared:SSL:10m;
