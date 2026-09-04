@@ -23,10 +23,13 @@ import { requireEnv } from "@/lib/env-required";
 //
 // ADR-0019：所有 OAuth 凭据 (idp url / client_id / client_secret / tenant_id)
 // 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
-const SAAS_BASE_URL = requireEnv("SAAS_IDP_URL");
-const SAAS_CLIENT_ID = requireEnv("SAAS_OAUTH_CLIENT_ID");
-const SAAS_CLIENT_SECRET = requireEnv("SAAS_OAUTH_CLIENT_SECRET");
-const SAAS_TENANT_ID = requireEnv("SAAS_TENANT_ID");
+//
+// 惰性求值：顶层调 requireEnv 会让 next build 的 "Collecting page data" 崩
+// （Docker builder stage 没有 prod env）。运行时缺失仍 throw → 500。
+const SAAS_BASE_URL = () => requireEnv("SAAS_IDP_URL");
+const SAAS_CLIENT_ID = () => requireEnv("SAAS_OAUTH_CLIENT_ID");
+const SAAS_CLIENT_SECRET = () => requireEnv("SAAS_OAUTH_CLIENT_SECRET");
+const SAAS_TENANT_ID = () => requireEnv("SAAS_TENANT_ID");
 
 type SaasTokenResponse = {
   accessToken?: string;
@@ -65,15 +68,15 @@ export async function POST(request: Request) {
   // 1. code 换 saas token（confidential client，secret 只在本服务端）
   let tokenRes: SaasTokenResponse;
   try {
-    const res = await fetch(`${SAAS_BASE_URL}/api/v1/oauth/token`, {
+    const res = await fetch(`${SAAS_BASE_URL()}/api/v1/oauth/token`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         grantType: "authorization_code",
         code: body.code,
-        clientId: SAAS_CLIENT_ID,
-        clientSecret: SAAS_CLIENT_SECRET,
-        tenantId: SAAS_TENANT_ID,
+        clientId: SAAS_CLIENT_ID(),
+        clientSecret: SAAS_CLIENT_SECRET(),
+        tenantId: SAAS_TENANT_ID(),
         redirectUri: body.redirect_uri,
       }),
       signal: AbortSignal.timeout(10_000),
@@ -92,7 +95,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         code: "SSO_TOKEN_UNREACHABLE",
-        message: `连不上 saas（${SAAS_BASE_URL}）：${(err as Error).message}`,
+        message: `连不上 saas（${SAAS_BASE_URL()}）：${(err as Error).message}`,
       },
       { status: 502 },
     );
@@ -101,7 +104,7 @@ export async function POST(request: Request) {
   // 2. accessToken 拉当前用户（失败不阻塞登录，user/tenants 降级为最小信息）
   let me: SaasMe = {};
   try {
-    const res = await fetch(`${SAAS_BASE_URL}/api/v1/me`, {
+    const res = await fetch(`${SAAS_BASE_URL()}/api/v1/me`, {
       headers: { authorization: `Bearer ${tokenRes.accessToken}` },
       cache: "no-store",
       signal: AbortSignal.timeout(10_000),
@@ -113,7 +116,7 @@ export async function POST(request: Request) {
 
   // 2.5 ADR-0009：瞬时持 accessToken 时拉菜单进快照缓存（失败只 warn）
   if (me.id) {
-    await cacheMenuSnapshot(me.id, tokenRes.accessToken, SAAS_BASE_URL);
+    await cacheMenuSnapshot(me.id, tokenRes.accessToken, SAAS_BASE_URL());
     // 2026-09-03 租户体系对齐：memberships 快照（/api/auth/me 按同 key 读取）。
     // 快照与下方返回给前端的 tenants 同源 —— hydrateAuth 的 find 必命中。
     putMembershipSnapshot(

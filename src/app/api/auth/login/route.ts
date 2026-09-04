@@ -30,18 +30,25 @@ const DEMO_TENANTS = [
 //
 // ADR-0019：所有服务账号凭据 (idp url / service_user / service_password / dev_password)
 // 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 alice/dev123456 字面值。
-const SAAS_BASE_URL = requireEnv("SAAS_IDP_URL");
-const SERVICE_USER = requireEnv("LAB_SAAS_SERVICE_USER");
-const SERVICE_PASSWORD = requireEnv("LAB_SAAS_SERVICE_PASSWORD");
+// ADR-0019：所有服务账号凭据 (idp url / service_user / service_password / dev_password)
+// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 alice/dev123456 字面值。
+//
+// 惰性求值（不在模块顶层调 requireEnv）：next build 的 "Collecting page data"
+// 会 import 本模块，顶层求值等于要求 build 环境备齐 prod 凭据。Docker builder
+// stage 没有（.env.production gitignored，不在 build context），build 直接崩。
+// 放进函数体后 build 不求值，运行时缺失仍立即 throw → 500，fail-fast 语义不变。
+const SAAS_BASE_URL = () => requireEnv("SAAS_IDP_URL");
+const SERVICE_USER = () => requireEnv("LAB_SAAS_SERVICE_USER");
+const SERVICE_PASSWORD = () => requireEnv("LAB_SAAS_SERVICE_PASSWORD");
 
 /** saas /api/v1/auth/login 密码登录（服务账号用），返回 accessToken。失败返回 null（调用方 warn 兜底）。
  *  2026-09-04 export：menus route miss 自愈复用本函数（同步阻塞重拉菜单快照）。 */
 export async function serviceLogin(): Promise<string | null> {
   try {
-    const resp = await fetch(`${SAAS_BASE_URL.replace(/\/$/, "")}/api/v1/auth/login`, {
+    const resp = await fetch(`${SAAS_BASE_URL().replace(/\/$/, "")}/api/v1/auth/login`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username: SERVICE_USER, password: SERVICE_PASSWORD }),
+      body: JSON.stringify({ username: SERVICE_USER(), password: SERVICE_PASSWORD() }),
       cache: "no-store",
       signal: AbortSignal.timeout(10_000),
     });
@@ -94,7 +101,7 @@ export async function POST(req: Request) {
   // noop 语义一致（login 写空快照 → GET /menus 200 [] 而非 503），四方契约面不分叉。
   const saasToken = await serviceLogin();
   if (saasToken) {
-    await cacheMenuSnapshot(user.id, saasToken, SAAS_BASE_URL);
+    await cacheMenuSnapshot(user.id, saasToken, SAAS_BASE_URL());
   } else {
     putMenuSnapshot(user.id, []);
   }

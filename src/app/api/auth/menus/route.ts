@@ -23,7 +23,9 @@ import { subFromBearer } from "@/lib/auth/bearer";
 // 必须与 login/route.ts 一致，否则两边漂移。
 //
 // ADR-0019：SAAS_IDP_URL 缺失 throw,不允许 fallback 到 localhost。
-const SAAS_BASE_URL = requireEnv("SAAS_IDP_URL");
+// 惰性求值：顶层调 requireEnv 会让 next build 的 "Collecting page data" 崩
+// （Docker builder stage 没有 prod env）。运行时缺失仍 throw → 500。
+const SAAS_BASE_URL = () => requireEnv("SAAS_IDP_URL");
 
 export async function GET(request: Request) {
   const sub = subFromBearer(request.headers.get("authorization"));
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
     // 对齐 login route serviceLogin 链同步重拉；拉到（含空树）→ 200；拉不到 → 503。
     const saasToken = await serviceLogin();
     if (saasToken) {
-      await cacheMenuSnapshot(sub, saasToken, SAAS_BASE_URL);
+      await cacheMenuSnapshot(sub, saasToken, SAAS_BASE_URL());
       const recovered = getMenuSnapshot(sub);
       if (recovered) return NextResponse.json(recovered);
     } else {

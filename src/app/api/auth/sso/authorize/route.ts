@@ -21,11 +21,16 @@ import { requireEnv } from "@/lib/env-required";
 
 // ADR-0019：所有 OAuth 凭据 (idp url / ui base / client_id / tenant_id / scope)
 // 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
-const SAAS_IDP_URL = requireEnv("SAAS_IDP_URL");
-const SAAS_UI_BASE_URL = requireEnv("SAAS_UI_BASE_URL");
-const SAAS_CLIENT_ID = requireEnv("SAAS_OAUTH_CLIENT_ID");
-const SAAS_TENANT_ID = requireEnv("SAAS_TENANT_ID");
-const SAAS_SCOPE = requireEnv("SAAS_OAUTH_SCOPE");
+// ADR-0019：所有 OAuth 凭据 (idp url / ui base / client_id / tenant_id / scope)
+// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
+//
+// 惰性求值：顶层调 requireEnv 会让 next build 的 "Collecting page data" 崩
+// （Docker builder stage 没有 prod env）。运行时缺失仍 throw → 500。
+const SAAS_IDP_URL = () => requireEnv("SAAS_IDP_URL");
+const SAAS_UI_BASE_URL = () => requireEnv("SAAS_UI_BASE_URL");
+const SAAS_CLIENT_ID = () => requireEnv("SAAS_OAUTH_CLIENT_ID");
+const SAAS_TENANT_ID = () => requireEnv("SAAS_TENANT_ID");
+const SAAS_SCOPE = () => requireEnv("SAAS_OAUTH_SCOPE");
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -58,17 +63,17 @@ export async function GET(request: Request) {
   let code: string;
   try {
     const authorizeRes = await fetch(
-      `${SAAS_IDP_URL}/api/v1/oauth/authorize`,
+      `${SAAS_IDP_URL()}/api/v1/oauth/authorize`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          clientId: SAAS_CLIENT_ID,
+          clientId: SAAS_CLIENT_ID(),
           redirectUri,
           responseType: "code",
-          scope: SAAS_SCOPE,
+          scope: SAAS_SCOPE(),
           state,
-          tenantId: SAAS_TENANT_ID,
+          tenantId: SAAS_TENANT_ID(),
         }),
         signal: AbortSignal.timeout(10_000),
       },
@@ -91,14 +96,14 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         code: "SSO_AUTHORIZE_UNREACHABLE",
-        message: `连不上 saas IdP（${SAAS_IDP_URL}）：${(err as Error).message}`,
+        message: `连不上 saas IdP（${SAAS_IDP_URL()}）：${(err as Error).message}`,
       },
       { status: 502 },
     );
   }
 
   // 2. 拼 saas 登录页 URL：code + redirect_uri + state 原样透传（用 SAAS_UI_BASE_URL）
-  const saasUrl = new URL("/login", SAAS_UI_BASE_URL);
+  const saasUrl = new URL("/login", SAAS_UI_BASE_URL());
   saasUrl.searchParams.set("code", code);
   saasUrl.searchParams.set("redirect_uri", redirectUri);
   saasUrl.searchParams.set("state", state);
