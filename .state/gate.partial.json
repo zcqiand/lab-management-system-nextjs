@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "passed": true,
+  "passed": false,
   "partial": true,
   "ran": [
-    "L5"
+    "L0.no_fallback"
   ],
-  "checked_at": "2026-08-30T08:27:36+0800",
+  "checked_at": "2026-09-04T11:34:57+0800",
   "gates": [
     {
-      "level": "L5",
-      "name": "引用完整性",
-      "passed": true,
-      "returncode": 0,
-      "duration_s": 34.813,
-      "output": "158 个功能条目，引用完整。软告警 3 条（见 .state/alignment.json）\r\n  [WARN] 已上线但不在任何流程且非孤儿白名单: M01.F04.I01, M01.F04.I03, M05.F01.I02"
+      "level": "L0.no_fallback",
+      "name": "业务身份字段兜底（ADR-0019）",
+      "passed": false,
+      "returncode": 1,
+      "duration_s": 0.203,
+      "output": "- lab-management-system-nextjs/src/app/login/page.tsx:36  process.env.NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID ?? 兜底到 '11111111-1111-1111-1111-111111111111'（CLAUDE.md §2 禁）\r\n  - lab-management-system-nextjs/src/components/app/sidebar-nav.tsx:497  process.env.NEXT_PUBLIC_SAAS_BASE_URL ?? 兜底到 'http://localhost:5101'（CLAUDE.md §2 禁）\r\n\r\n扫描 230 文件, 跳过 0（白名单豁免）; 命中 2 处。\r\nADR-0019 禁止业务身份字段兜底到 demo 字面量。修复后重跑 gate。"
     }
   ]
 }

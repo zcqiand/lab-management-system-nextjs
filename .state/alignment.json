@@ -89,9 +89,14 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：响应是空对象 → 写空快照",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::userId/token 空 → 静默不写不发请求",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 401（ADR-0019 删 demo 兜底）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::网络异常 → 不写快照 + warn"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::网络异常 → 不写快照 + warn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + saas 可达 → 自愈重拉 → 200 菜单树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + saas 登录失败 → 仍 503 MENUS_UNAVAILABLE（错误语义不变）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + 网络不可达 → 仍 503（不炸不挂起）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::无 Authorization 返 401（ADR-0019 删 demo USER-A 兜底）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::自愈成功后再次 miss 应走缓存命中——不重复调 saas serviceLogin（限流兜底）"
       ],
       "entry": [
         "src\\components\\app\\sidebar-nav.tsx"
@@ -2120,7 +2125,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回 mock token + 3 租户"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户"
       ],
       "entry": []
     },
@@ -2136,10 +2141,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 返回 user + tenants[] + currentTenantId",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 hit：Bearer sub 有 memberships 快照 → 返回 saas 租户",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 miss：有 Bearer 但 sub 无快照 → 401（前端 refresh 自愈）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::demo 路径：无 Bearer → demo 租户（现状不变）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::demo 路径：删「无 Bearer = demo 租户」反模式 → 401（ADR-0019）"
       ],
       "entry": []
     },
@@ -2171,7 +2176,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 用 refreshToken 换新 token"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 无 refreshToken 返 401（ADR-0019 删 admin 兜底）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 返 400 REFRESH_NOT_IMPLEMENTED 且不调 saas（ADR-0019）"
       ],
       "entry": []
     },
@@ -2187,7 +2193,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 校验 tenantId 后换 token"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 无 Bearer 返 401（ADR-0019 删 demo 兜底）"
       ],
       "entry": []
     }

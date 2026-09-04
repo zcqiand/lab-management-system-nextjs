@@ -79,6 +79,8 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
     printf 'LAB_SSO_PROFILE=real\n'
     printf 'SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111\n'
+    # ADR-0019：浏览器侧 client_id 必须从 env 注入,bundle 不再 fallback UUID 字面。
+    printf 'NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111\n'
   } > "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 LAB_JWT_SECRET)
@@ -132,6 +134,8 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
   append_if_missing LAB_SSO_PROFILE 'real'
   append_if_missing SAAS_OAUTH_CLIENT_ID '11111111-1111-1111-1111-111111111111'
+  # ADR-0019：浏览器 bundle 同样要显式声明,否则 build 时丢 key。
+  append_if_missing NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID '11111111-1111-1111-1111-111111111111'
   # 死键清理:NEXT_PUBLIC_APP_ID 挂在零引用的 src/api/env.ts 上,真名
   # NEXT_PUBLIC_LAB_APP_CODE 已在上面 append,老 key 删除保 key 集合对齐。
   if grep -q '^NEXT_PUBLIC_APP_ID=' "$BASE/lab.env"; then
