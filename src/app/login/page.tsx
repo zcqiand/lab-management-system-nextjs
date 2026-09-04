@@ -31,9 +31,21 @@ import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
 // OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id）。
 // 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-mgmt' 收敛为固定 UUID
 // '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用同一 app.id）。
-// 浏览器侧走 NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env 覆盖；dev fallback 仍用 UUID 以匹配 prod。
-const OAUTH_CLIENT_ID =
-  process.env.NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
+// 浏览器侧走 NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env 覆盖。
+//
+// ADR-0019：缺失 throw，不允许 fallback 到 UUID 字面。NEXT_PUBLIC_* 在 build
+// 时内嵌 bundle，等于把 client_id 公开发到客户端——fallback 一旦命中，prod
+// 即「client_id 公开 + secret 公开」双失效。
+const OAUTH_CLIENT_ID = (() => {
+  const v = process.env.NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID;
+  if (v === undefined) {
+    throw new Error(
+      "NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env is required (ADR-0019 禁字面默认值). " +
+        "Set in .env.local (dev) or Dockerfile ENV (prod).",
+    );
+  }
+  return v;
+})();
 const SSO_STATE_STORAGE_KEY = "lab.sso.state";
 
 // 生成 OAuth 2.0 state（防 CSRF，RFC 6749 §10.12）

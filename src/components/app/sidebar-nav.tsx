@@ -492,6 +492,18 @@ export function useSaasApp(): {
   return { app, loading, error };
 }
 
-const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
-const SAAS_BASE =
-  process.env.NEXT_PUBLIC_SAAS_BASE_URL ?? "http://localhost:5101";
+// ADR-0019：客户端 bundle 内嵌值也禁字面 fallback。
+// APP_CODE 决定菜单按 app code 分组,SAAS_BASE 决定浏览器跨域 origin——
+// 任一未显式注入,prod 会「菜单互相污染 / 跨源 405」之类隐性故障。
+function requireClientEnv(name: string): string {
+  const v = process.env[name];
+  if (v === undefined) {
+    throw new Error(
+      `${name} env is required (ADR-0019 禁字面默认值). ` +
+        "Set in .env.local (dev) or Dockerfile ENV (prod).",
+    );
+  }
+  return v;
+}
+const APP_CODE = requireClientEnv("NEXT_PUBLIC_LAB_APP_CODE");
+const SAAS_BASE = requireClientEnv("NEXT_PUBLIC_SAAS_BASE_URL");

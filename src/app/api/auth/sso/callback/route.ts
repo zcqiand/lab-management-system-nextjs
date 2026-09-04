@@ -16,18 +16,17 @@
 import { NextResponse } from "next/server";
 import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
 import { putMembershipSnapshot } from "@/lib/auth/membership-snapshot";
+import { requireEnv } from "@/lib/env-required";
 
 // v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(线上一直吃 localhost
 // fallback,token 换发 502)。真名 SAAS_IDP_URL,与 sso/authorize 路由一致。
-const SAAS_BASE_URL = process.env.SAAS_IDP_URL ?? "http://localhost:5101";
-// 与 authorize 路由同一组 client 配置（apps.clientId/clientSecret 见 saas seeds）。
-// 2026-08-28 V014/V015 收敛 apps.client_id 为 UUID '11111111-1111-1111-1111-111111111111'。
-const SAAS_CLIENT_ID =
-  process.env.SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
-const SAAS_CLIENT_SECRET =
-  process.env.SAAS_OAUTH_CLIENT_SECRET ?? "lab-mgmt-secret";
-const SAAS_TENANT_ID =
-  process.env.SAAS_TENANT_ID ?? "00000000-0000-0000-0000-000000000001";
+//
+// ADR-0019：所有 OAuth 凭据 (idp url / client_id / client_secret / tenant_id)
+// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
+const SAAS_BASE_URL = requireEnv("SAAS_IDP_URL");
+const SAAS_CLIENT_ID = requireEnv("SAAS_OAUTH_CLIENT_ID");
+const SAAS_CLIENT_SECRET = requireEnv("SAAS_OAUTH_CLIENT_SECRET");
+const SAAS_TENANT_ID = requireEnv("SAAS_TENANT_ID");
 
 type SaasTokenResponse = {
   accessToken?: string;

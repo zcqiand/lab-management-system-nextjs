@@ -12,7 +12,7 @@
 // 跟随 BackendSwitcher.tsx / backend-context.tsx 一并删除。F03 走直接 import
 // 路由 handler + 构造 mock Request（不动 nextjs dev server）。
 
-import { describe, expect } from "vitest";
+import { describe, expect, vi } from "vitest";
 import { installHttpClient } from "@/api/http-client";
 import { fnTest } from "../fn";
 
@@ -37,7 +37,9 @@ describe("M98 frontend 接线层", () => {
     }
   });
 
-  fnTest(["M98.F03.I01"], "POST /api/auth/login 接受 username+password 返回 mock token + 3 租户", async () => {
+  fnTest(["M98.F03.I01"], "POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户", async () => {
+    // ADR-0019 + P2 debt：login 改用 LabJwtSigner 真签 (3 段 base64url)，
+    // 与 msw/aspnetcore/springboot 3 真后端 token 形态对齐 → contract-test 4-way 一致。
     const req = new Request("http://test/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -46,18 +48,21 @@ describe("M98 frontend 接线层", () => {
     const res = await loginPOST(req);
     expect(res.status).toBe(200);
     const body = (await res.json()) as { token: string; tenants: Array<{ tenantId: string }> };
-    expect(body.token).toMatch(/^mock-jwt-/);
+    // 真 JWT = 3 段 base64url + payload 含 sub
+    expect(body.token.split(".").length).toBe(3);
+    const payload = JSON.parse(Buffer.from(body.token.split(".")[1]!, "base64url").toString("utf-8"));
+    expect(payload.sub).toBe("USER-A");
     expect(body.tenants).toHaveLength(3);
     expect(body.tenants[0]?.tenantId).toBe("TENANT-001");
   });
 
-  fnTest(["M98.F03.I02"], "GET /api/auth/me 返回 user + tenants[] + currentTenantId", async () => {
-    const res = await meGET();
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { user: { username: string }; tenants: unknown[]; currentTenantId: string };
-    expect(body.user.username).toBe("alice");
-    expect(Array.isArray(body.tenants)).toBe(true);
-    expect(body.currentTenantId).toBe("TENANT-001");
+  fnTest(["M98.F03.I02"], "GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
+    // ADR-0019：删「无 Bearer = DEMO_USER」反模式。meGET 无 Bearer 必须 401。
+    // 真路径要 login 后拿 token + 建 membership 快照，单独 fnTest 覆盖。
+    const res = await meGET(new Request("http://test/api/auth/me"));
+    expect(res.status).toBe(401);
+    const body = (await res.json()) as { code: string };
+    expect(body.code).toBe("UNAUTHORIZED");
   });
 
   fnTest(["M98.F03.I03"], "POST /api/auth/logout 返回 204", async () => {
@@ -65,38 +70,61 @@ describe("M98 frontend 接线层", () => {
     expect(res.status).toBe(204);
   });
 
-  fnTest(["M98.F03.I04"], "POST /api/auth/refresh 用 refreshToken 换新 token", async () => {
+  fnTest(["M98.F03.I04"], "POST /api/auth/refresh 无 refreshToken 返 401（ADR-0019 删 admin 兜底）", async () => {
+    // ADR-0019：删「refreshToken ?? "admin"」反模式。refreshPOST 无 token 必须 401。
+    // 真路径要 saas oauth/token grant_type=refresh_token,单独 fnTest 覆盖。
     const req = new Request("http://test/api/auth/refresh", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ refreshToken: "mock-refresh-labadmin" }),
+      body: JSON.stringify({}),
     });
     const res = await refreshPOST(req);
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { token: string };
-    expect(body.token).toMatch(/^mock-jwt-/);
+    expect(res.status).toBe(401);
+    const body = (await res.json()) as { code: string };
+    expect(body.code).toBe("UNAUTHORIZED");
   });
 
-  fnTest(["M98.F03.I05"], "POST /api/auth/switch-tenant 校验 tenantId 后换 token", async () => {
+  fnTest(["M98.F03.I04"], "POST /api/auth/refresh 返 400 REFRESH_NOT_IMPLEMENTED 且不调 saas（ADR-0019）", async () => {
+    // ADR-0019：refresh 现在返 400 REFRESH_NOT_IMPLEMENTED（真路径走 saas /oauth/token grant_type=refresh_token,本仓 demo 暂未接通）。
+    // 钉死「demo refresh 不调 saas」契约——未来接 saas SSO 时此断言会失败提醒扩展。
+    const origFetch = globalThis.fetch;
+    const fetchSpy = vi.fn();
+    globalThis.fetch = fetchSpy as unknown as typeof fetch;
+    try {
+      const req = new Request("http://test/api/auth/refresh", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ refreshToken: "mock-refresh-labadmin" }),
+      });
+      const res = await refreshPOST(req);
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { code: string };
+      expect(body.code).toBe("REFRESH_NOT_IMPLEMENTED");
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      globalThis.fetch = origFetch;
+    }
+  });
+
+  fnTest(["M98.F03.I05"], "POST /api/auth/switch-tenant 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
+    // ADR-0019：删「无 Bearer = 切到 demo USER-A」反模式。
     const req = new Request("http://test/api/auth/switch-tenant", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ tenantId: "TENANT-002" }),
     });
     const res = await switchTenantPOST(req);
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { token: string; tenants: Array<{ tenantId: string }> };
-    expect(body.token).toMatch(/^mock-jwt-/);
-    // tenants 列表仍含目标 tenantId（用于前端切换后续请求的 baseURL 拼接）
-    expect(body.tenants.some((t) => t.tenantId === "TENANT-002")).toBe(true);
-    // 错误 tenantId → 404
+    expect(res.status).toBe(401);
+    const body = (await res.json()) as { code: string };
+    expect(body.code).toBe("UNAUTHORIZED");
+    // 错误 tenantId → 401 优先（auth 失败早于 tenant 校验,ADR-0019）
     const badReq = new Request("http://test/api/auth/switch-tenant", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ tenantId: "TENANT-999" }),
     });
     const badRes = await switchTenantPOST(badReq);
-    expect(badRes.status).toBe(404);
+    expect(badRes.status).toBe(401);
   });
 
   fnTest(["M98.F01.I01"], "BackendBadge 源文件挂 data-fn=I01 + 含 mode/baseUrl 渲染", async () => {

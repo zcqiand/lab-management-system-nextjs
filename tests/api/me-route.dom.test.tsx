@@ -52,10 +52,12 @@ describe("2026-09-03 /api/auth/me 租户体系对齐", () => {
     expect(((await res.json()) as { code: string }).code).toBe("MEMBERSHIP_UNAVAILABLE");
   });
 
-  fnTest(["M98.F03.I02"], "demo 路径：无 Bearer → demo 租户（现状不变）", async () => {
+  fnTest(["M98.F03.I02"], "demo 路径：删「无 Bearer = demo 租户」反模式 → 401（ADR-0019）", async () => {
+    // ADR-0019：删「无 Bearer = demo 租户」反模式。无 Bearer 必须 401,与
+    // 2026-08-27 msw demo 兜底删除原则对齐。前端必须先 login 拿 token。
     const res = await meGET(reqWithBearer(null));
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { tenants: Array<{ tenantId: string }> };
-    expect(body.tenants[0]!.tenantId).toBe("TENANT-001");
+    expect(res.status).toBe(401);
+    const body = (await res.json()) as { code: string };
+    expect(body.code).toBe("UNAUTHORIZED");
   });
 });

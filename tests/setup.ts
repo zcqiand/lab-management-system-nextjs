@@ -21,3 +21,23 @@ if (process.env.NEXT_PUBLIC_API_BASE_URL === undefined) {
   process.env.NEXT_PUBLIC_API_BASE_URL = "";
 }
 
+// ADR-0019：以下 env 在 src/ 顶层 requireEnv,测试模块 import 时就 throw。
+// 显式 seed dev 值,等同 .env.test 同步覆盖。dev/prod 真值由 deploy 脚本注入。
+const ADR0019_TEST_ENV: Record<string, string> = {
+  SAAS_IDP_URL: "http://localhost:5101",
+  SAAS_UI_BASE_URL: "http://localhost:5101",
+  SAAS_OAUTH_CLIENT_ID: "11111111-1111-1111-1111-111111111111",
+  SAAS_OAUTH_CLIENT_SECRET: "lab-mgmt-secret",
+  SAAS_OAUTH_SCOPE: "lab.read lab.write",
+  SAAS_TENANT_ID: "00000000-0000-0000-0000-000000000001",
+  LAB_SAAS_SERVICE_USER: "alice",
+  LAB_SAAS_SERVICE_PASSWORD: "dev123456",
+  LAB_AUTH_DEV_PASSWORD: "dev123456",
+  NEXT_PUBLIC_SAAS_BASE_URL: "http://localhost:5101",
+  NEXT_PUBLIC_LAB_APP_CODE: "lab-management",
+  NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: "11111111-1111-1111-1111-111111111111",
+};
+for (const [k, v] of Object.entries(ADR0019_TEST_ENV)) {
+  if (process.env[k] === undefined) process.env[k] = v;
+}
+

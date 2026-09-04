@@ -17,26 +17,29 @@
 //   - SAAS_UI_BASE_URL 指向登录 UI 页（/login 渲染端，dev 同 saas-nextjs :3000，prod 同域）
 
 import { NextResponse } from "next/server";
+import { requireEnv } from "@/lib/env-required";
 
-const SAAS_IDP_URL = process.env.SAAS_IDP_URL ?? "http://localhost:5101";
-const SAAS_UI_BASE_URL = process.env.SAAS_UI_BASE_URL ?? "http://localhost:5101";
-// OAuth client_id：lab 在 saas 注册的应用（apps.client_id）。
-// 2026-08-28 V014/V015 seed 收敛 apps.client_id 为固定 UUID
-// '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用）；dev fallback 同步。
-const SAAS_CLIENT_ID =
-  process.env.SAAS_OAUTH_CLIENT_ID ?? "11111111-1111-1111-1111-111111111111";
-// dev mock 语义：authorize 端点要求 tenantId（该 tenant 下须有用户）。
-// lab 登录前无租户上下文，用部署 env 注入，缺省取 saas 种子首个 tenant（acme）。
-const SAAS_TENANT_ID =
-  process.env.SAAS_TENANT_ID ?? "00000000-0000-0000-0000-000000000001";
-const SAAS_SCOPE = process.env.SAAS_OAUTH_SCOPE ?? "lab.read lab.write";
+// ADR-0019：所有 OAuth 凭据 (idp url / ui base / client_id / tenant_id / scope)
+// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
+const SAAS_IDP_URL = requireEnv("SAAS_IDP_URL");
+const SAAS_UI_BASE_URL = requireEnv("SAAS_UI_BASE_URL");
+const SAAS_CLIENT_ID = requireEnv("SAAS_OAUTH_CLIENT_ID");
+const SAAS_TENANT_ID = requireEnv("SAAS_TENANT_ID");
+const SAAS_SCOPE = requireEnv("SAAS_OAUTH_SCOPE");
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const responseType = url.searchParams.get("response_type") ?? "code";
-  const clientId = url.searchParams.get("client_id") ?? SAAS_CLIENT_ID;
+  // ADR-0019：response_type / state 是 OAuth 安全关键参数,client 控制;
+  // 缺失必须 400,不允许 fallback (state ?? "mock-state" 过去是 CSRF 防御绕过)。
+  const responseType = url.searchParams.get("response_type");
   const redirectUri = url.searchParams.get("redirect_uri");
-  const state = url.searchParams.get("state") ?? "mock-state";
+  const state = url.searchParams.get("state");
+  if (!responseType || !state) {
+    return NextResponse.json(
+      { code: "BAD_REQUEST", message: "response_type and state are required" },
+      { status: 400 },
+    );
+  }
 
   if (!redirectUri) {
     return NextResponse.json(
@@ -60,7 +63,7 @@ export async function GET(request: Request) {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          clientId,
+          clientId: SAAS_CLIENT_ID,
           redirectUri,
           responseType: "code",
           scope: SAAS_SCOPE,

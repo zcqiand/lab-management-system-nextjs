@@ -49,19 +49,20 @@ describe("ADR-0009 /api/auth/menus 快照链", () => {
     expect(body).toEqual(snap);
   });
 
-  fnTest(["M01.F04.I04"], "快照 miss：无 token / sub 无快照 → 503 MENUS_UNAVAILABLE", async () => {
-    // 无 Authorization
+  fnTest(["M01.F04.I04"], "快照 miss：无 token / sub 无快照 → 401（ADR-0019 删 demo 兜底）", async () => {
+    // ADR-0019：删「无 Bearer = USER-A 走自愈」反模式。无 Bearer 必须 401,不再走自愈。
+    // 真路径要 login 后拿 token 才能调 /menus,miss 时 503 走原逻辑。
     const res1 = await menusGET(reqWithBearer(null));
-    expect(res1.status).toBe(503);
-    expect(((await res1.json()) as { code: string }).code).toBe("MENUS_UNAVAILABLE");
+    expect(res1.status).toBe(401);
+    expect(((await res1.json()) as { code: string }).code).toBe("UNAUTHORIZED");
 
-    // 有 token 但该 sub 从未缓存
+    // 有 token 但该 sub 从未缓存 → 503
     const res2 = await menusGET(reqWithBearer(fakeJwt("stranger")));
     expect(res2.status).toBe(503);
 
-    // 非三段 token（不是 JWT）→ sub 解不出 → 同样 503
+    // 非三段 token（不是 JWT）→ sub 解不出 → 401 (Bearer 缺失语义)
     const res3 = await menusGET(reqWithBearer("not-a-jwt"));
-    expect(res3.status).toBe(503);
+    expect(res3.status).toBe(401);
   });
 
   fnTest(["M01.F04.I01"], "动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在", async () => {

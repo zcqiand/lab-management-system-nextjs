@@ -91,7 +91,12 @@ export class StateCookieManager {
     if (!sp.ts || now - sp.ts > MAX_AGE_SECONDS) {
       throw new Error("lab_sso_state expired");
     }
-    return sp.redirect ?? "";
+    // ADR-0019：redirect 是 OAuth 回调关键参数,缺失 throw 拒解,不静默返空串。
+    // 空串返给 OAuth state 校验 = 静默跳 /,等同于 CSRF 防御绕过。
+    if (!sp.redirect) {
+      throw new Error("lab_sso_state missing redirect (ADR-0019 禁空串兜底)");
+    }
+    return sp.redirect;
   }
 
   private hmac(input: string): string {

@@ -48,9 +48,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  // ADR-0019：tenantId 是业务身份字段，缺失必须 400，不允许 fallback 到 "TENANT-001"
+  // 防止「未传租户 → 全落进同一 demo 租户」跨租户污染。
+  const tenantId = String(body.tenantId ?? "").trim();
+  if (!tenantId) {
+    return NextResponse.json(
+      { code: "BAD_REQUEST", message: "tenantId is required (ADR-0019)" },
+      { status: 400 },
+    );
+  }
   const newContract = {
     id: newId("CONTRACT"),
-    tenantId: String(body.tenantId ?? "TENANT-001"),
+    tenantId,
     contractCode: String(body.contractCode ?? ""),
     clientUnit: String(body.clientUnit ?? ""),
     projectName: String(body.projectName ?? ""),
