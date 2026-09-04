@@ -41,17 +41,23 @@ export async function GET(request: Request) {
   }
   // ADR-0019 + P2 debt：与 msw/aspnetcore/springboot 3 真后端 /me 形态对齐。
   // msw 返 tenants[{tenantId, code, name, roleIds}],nextjs 原本只返 {tenantId, roleIds} 导致 4-way divergence。
-  // 从 membership-snapshot 读 roleIds,DEMO_TENANTS 补 code/name(单源)。
+  // 优先级：snapshot 自带 code/name（sso/callback 写入）> DEMO_TENANTS_FULL（demo 兜底）。
+  // SSO 路径必走 snapshot 自带；demo 路径写 snapshot 时也带 code/name（login/route.ts
+  // 2026-09-04 修复）；DEMO_TENANTS_FULL 仅作最后兜底（snapshot 缺值时）。
   const DEMO_TENANTS_FULL: Record<string, { code: string; name: string }> = {
     "TENANT-001": { code: "city-lab", name: "市住建工程质量检测中心" },
     "TENANT-002": { code: "district-lab", name: "区检测站" },
     "TENANT-003": { code: "third-party", name: "第三方检测实验室" },
   };
-  const fullTenants = tenants.map((t) => ({
-    tenantId: t.tenantId,
-    roleIds: t.roleIds,
-    ...(DEMO_TENANTS_FULL[t.tenantId] ?? {}),
-  }));
+  const fullTenants = tenants.map((t) => {
+    const fallback: { code?: string; name?: string } = DEMO_TENANTS_FULL[t.tenantId] ?? {};
+    return {
+      tenantId: t.tenantId,
+      roleIds: t.roleIds,
+      code: t.code ?? fallback.code ?? t.tenantId,
+      name: t.name ?? fallback.name ?? t.tenantId,
+    };
+  });
   return NextResponse.json({
     user: DEMO_USER,
     tenants: fullTenants,

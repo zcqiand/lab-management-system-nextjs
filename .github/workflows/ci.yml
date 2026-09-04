@@ -36,6 +36,23 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
+      # 2026-09-04 ADR-0019：build 时 next.js collect page data 会 import route 模块，
+      # sso/callback 等路由顶层 requireEnv 触发；CI 必须 seed 同款 dev 值（与
+      # tests/setup.ts ADR0019_TEST_ENV 镜像），prod 真值由 deploy 脚本注入。
+      # 禁 fallback 字面量（CLAUDE.md §2 硬规则）—— CI 不传 → build 必 throw。
+      SAAS_IDP_URL: http://localhost:5101
+      SAAS_UI_BASE_URL: http://localhost:5101
+      SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      SAAS_OAUTH_CLIENT_SECRET: ci-build-placeholder-secret
+      SAAS_OAUTH_SCOPE: "lab.read lab.write"
+      SAAS_TENANT_ID: 00000000-0000-0000-0000-000000000001
+      LAB_SAAS_SERVICE_USER: alice
+      LAB_SAAS_SERVICE_PASSWORD: dev123456
+      LAB_AUTH_DEV_PASSWORD: dev123456
+      NEXT_PUBLIC_SAAS_BASE_URL: http://localhost:5101
+      NEXT_PUBLIC_LAB_APP_CODE: lab-management
+      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      NEXT_PUBLIC_API_BASE_URL: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -91,7 +108,13 @@ jobs:
       - name: L3 typecheck
         run: npx --no tsc --noEmit
       - name: L4 test
-        run: npx --no vitest run
+        # 2026-09-04 ADR-0020 family-wide 真库分层：CI 跑编译+mock+smoke，gate 跑真库 mutate。
+        # receipts-pg 直连 lab_test 写 receipts / contracts，CI 没 seed 步骤会失败；
+        # 家族约定「CI=编译+mock / gate=真库」，与 .NET [Trait("Category","RealDb")]
+        # / springboot @Tag("pg") + -DexcludedGroups=pg 同款：
+        # 测试代码本身不再 skip（用户禁），CI workflow 决定不跑，gate 全量跑。
+        # db.smoke.test.ts 保留跑（它只创建/丢弃 lab_smoke schema，不污染 public）。
+        run: npx --no vitest run --exclude='tests/api/receipts-pg.test.ts'
 
   # tag push → test 绿 → docker build & push → VPS pull + restart
   # env 文件自举由 deploy/<repo>.sh 脚本自己处理(VPS 上脚本是 repo 副本,删 inline 让脚本权威)
@@ -120,6 +143,23 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
+      # 2026-09-04 ADR-0019：build 时 next.js collect page data 会 import route 模块，
+      # sso/callback 等路由顶层 requireEnv 触发；CI 必须 seed 同款 dev 值（与
+      # tests/setup.ts ADR0019_TEST_ENV 镜像），prod 真值由 deploy 脚本注入。
+      # 禁 fallback 字面量（CLAUDE.md §2 硬规则）—— CI 不传 → build 必 throw。
+      SAAS_IDP_URL: http://localhost:5101
+      SAAS_UI_BASE_URL: http://localhost:5101
+      SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      SAAS_OAUTH_CLIENT_SECRET: ci-build-placeholder-secret
+      SAAS_OAUTH_SCOPE: "lab.read lab.write"
+      SAAS_TENANT_ID: 00000000-0000-0000-0000-000000000001
+      LAB_SAAS_SERVICE_USER: alice
+      LAB_SAAS_SERVICE_PASSWORD: dev123456
+      LAB_AUTH_DEV_PASSWORD: dev123456
+      NEXT_PUBLIC_SAAS_BASE_URL: http://localhost:5101
+      NEXT_PUBLIC_LAB_APP_CODE: lab-management
+      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      NEXT_PUBLIC_API_BASE_URL: ""
     steps:
       - uses: actions/checkout@v4
         with:

@@ -13,6 +13,10 @@
 // 2026-08-16 修复：原版每次跑都 DROP SCHEMA public CASCADE + replay，同 vitest session
 // 里后跑的 PG 测试因 schema 空而全炸；改用 lab_smoke 隔离后 smoke 自洁，public 不动。
 //
+// 2026-09-04 ADR-0020 family-wide：默认目标库 lab_test（家族 5 仓统一），lab_dev 仅当
+// DATABASE_URL 显式设置时走（开发手动 seed 用）。连不上即失败 —— 不 skip（与
+// ADR-0019 fail-fast 一致：默认兜底 = 隐藏 bug 的重大隐患）。
+//
 // M97 fnTest 挂载：F01.I01（replay 语义）+ F02.I01/I02/I03（pg devDep / 借链可达 /
 // 被 shared sync-db 消费的同款路径）。
 
@@ -41,7 +45,7 @@ try {
   // pg 没装时跳过（与 saas smoke 同款策略）
 }
 
-const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_dev";
+const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_test";
 const SMOKE_SCHEMA = "lab_smoke";
 
 describe("DB smoke (PG)", () => {

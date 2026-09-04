@@ -103,7 +103,12 @@ export async function POST(req: Request) {
   // 这与 sso/callback 写 saas 真实 memberships 同语义,只是数据来自 DEMO_TENANTS。
   putMembershipSnapshot(
     user.id,
-    DEMO_TENANTS.map((t) => ({ tenantId: t.tenantId, roleIds: t.roleIds })),
+    DEMO_TENANTS.map((t) => ({
+      tenantId: t.tenantId,
+      code: t.code,
+      name: t.name,
+      roleIds: t.roleIds,
+    })),
   );
   return NextResponse.json({
     // ADR-0019 + P2 debt：demo 模式也走真 HS256（LabJwtSigner），与 3 真后端 token 形态对齐。

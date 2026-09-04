@@ -8,9 +8,10 @@
  * （localhost:5432，本机无 PG 时不可达）——不读它。解析顺序：
  * 进程 env（已设则不动）→ seed-db.ts / db.smoke.test.ts 同款 fallback（远程 lab_dev）。
  */
+// 家族统一：默认连共享 lab_test（gate 跑真库）。lab_dev 只在显式 DATABASE_URL 时用。
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL =
-    "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_dev";
+    "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_test";
 }
 
 // API base URL 引导（同 lab-react .env.test 语义）：vitest 不读 .env*，
