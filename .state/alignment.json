@@ -27,7 +27,18 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:1848 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2034 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:6320 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3048 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2874 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:712 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:1729 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2554 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:1964 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2095 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:1875 (annot)"
       ],
       "entry": [
         "src\\app\\api\\auth\\menus\\route.ts"
@@ -54,7 +65,18 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::权限守卫端到端：technician 在 review 状态无通过/拒绝按钮",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::重置：任何状态回到 draft",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:960 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1740 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:2293 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:2573 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:2447 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2250 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:2774 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:792 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:1977 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:1923 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:756 (annot)"
       ],
       "entry": [
         "src\\app\\(console)\\layout.tsx"
@@ -113,7 +135,21 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:877 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:970 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1174 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2278 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2208 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:913 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-flow.test.ts:743 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:1356 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:922 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:850 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:673 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:996 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:842 (annot)"
+      ],
       "entry": []
     },
     "M01.F05.I02": {
@@ -128,7 +164,19 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:2950 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1255 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2712 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:6894 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2972 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2629 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1664 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2323 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:3055 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2535 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2728 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2438 (annot)"
       ],
       "entry": [
         "src\\api\\legacy-client.ts"
@@ -202,7 +250,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:90 (annot)"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -221,7 +270,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:111 (annot)"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -239,7 +289,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:134 (annot)"
       ],
       "entry": [
         "src\\app\\(console)\\contracts\\page.tsx"
@@ -252,7 +303,9 @@
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:166 (annot)"
+      ],
       "entry": []
     },
     "M03.F01.I01": {
@@ -587,7 +640,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:119 (annot)"
       ],
       "entry": [
         "src\\features\\data-entry\\DataEntryPage.tsx"
@@ -621,7 +675,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13472 (annot)"
       ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
@@ -1048,7 +1103,13 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3825 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3444 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2274 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3090 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:2791 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2960 (annot)"
       ],
       "entry": []
     },
@@ -1064,7 +1125,11 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4482 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4237 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2809 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4035 (annot)"
       ],
       "entry": []
     },
@@ -1098,7 +1163,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3665 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3041 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2892 (annot)"
       ],
       "entry": []
     },
@@ -1114,7 +1182,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5641 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5401 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3414 (annot)"
       ],
       "entry": []
     },
@@ -1148,7 +1219,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6887 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6795 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3942 (annot)"
       ],
       "entry": []
     },
@@ -1164,7 +1238,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4354 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3461 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4514 (annot)"
       ],
       "entry": []
     },
@@ -1263,7 +1340,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I03 锚点 + 3 张核心指标卡（今日试验/报告产出/合格率）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I03 锚点 + 3 张核心指标卡（今日试验/报告产出/合格率）",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2335 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2892 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3238 (annot)"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
@@ -1279,7 +1359,9 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2457 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3817 (annot)"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
@@ -1373,7 +1455,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8098 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8132 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5091 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1388,7 +1473,11 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8699 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8748 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5634 (annot)"
+      ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
       ]
@@ -1405,7 +1494,8 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9461 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1423,7 +1513,8 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3890 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
@@ -1495,7 +1586,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4345 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1543,7 +1635,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4799 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1634,7 +1727,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11722 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationMethodList.tsx"
@@ -1764,7 +1858,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10601 (annot)"
       ],
       "entry": []
     },
@@ -1780,7 +1875,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11160 (annot)"
       ],
       "entry": []
     },
@@ -1947,7 +2043,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10029 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
