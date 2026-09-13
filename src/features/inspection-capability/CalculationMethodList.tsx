@@ -53,6 +53,7 @@ export function CalculationMethodList() {
   const [objects, setObjects] = useState<Opt[]>([]);
   const [params, setParams] = useState<Opt[]>([]);
   const [selectedStandard, setSelectedStandard] = useState<string | null>(null);
+  const [listVersion, setListVersion] = useState(0);
 
   // 跟踪当前选中的检测标准（树组件用内部状态，这里提升上来让保存/删除后能刷新）
   useEffect(() => {
@@ -70,10 +71,11 @@ export function CalculationMethodList() {
       .catch(() => {});
   }, []);
 
-  const reloadList = (standardCode: string) => {
-    // 触发树组件 useEffect 重拉：先 null 再设回原值
-    setSelectedStandard(null);
-    setTimeout(() => setSelectedStandard(standardCode), 0);
+  const reloadList = () => {
+    // 列表数据版本号：增删改后 +1 强制树 refetch。不能走「null→setTimeout 设回原值」——
+    // 批量更新下 React Object.is bailout 吞掉终值相等的状态变化，零重渲染零 refetch
+    //（2026-09-13 e2e 三端一致性实测抓出）
+    setListVersion((v) => v + 1);
   };
 
   const openCreate = () => {
@@ -115,7 +117,7 @@ export function CalculationMethodList() {
         );
       else await apiClient.post(API_ROUTES["/inspection-calculation-methods"], payload);
       setOpen(false);
-      if (selectedStandard) reloadList(selectedStandard);
+      if (selectedStandard) reloadList();
     } catch (err: unknown) {
       setError(
         (err as { response?: { data?: { message?: string } } })?.response?.data
@@ -127,7 +129,7 @@ export function CalculationMethodList() {
   const remove = async (id: string) => {
     if (!confirm("确定删除？")) return;
     await apiClient.delete(`${API_ROUTES["/inspection-calculation-methods"]}/${id}`);
-    if (selectedStandard) reloadList(selectedStandard);
+    if (selectedStandard) reloadList();
   };
 
   const buildPutBody = (_item: CalcRow, sortOrder: number) => ({ sortOrder });
@@ -168,6 +170,7 @@ export function CalculationMethodList() {
           { key: "remark", label: "下限", width: "w-24" },
         ]}
         buildPutBody={buildPutBody}
+        reloadSignal={listVersion}
         selectedStandard={selectedStandard}
         onSelectedStandardChange={setSelectedStandard}
         onCreate={openCreate}

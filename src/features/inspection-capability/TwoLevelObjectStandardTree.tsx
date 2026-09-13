@@ -93,6 +93,9 @@ interface Props<T extends TreeListItem> {
   onSelectedStandardChange?: (code: string | null) => void;
   /** 列表加载完成回调（用于父组件拿到当前 list 引用） */
   onListLoaded?: (items: T[]) => void;
+  /** 外部数据版本号：父组件增删改后 +1 强制列表 refetch（替代已废弃的
+   *  「null→回设」刷新——Object.is bailout 会吞掉终值相等的状态变化） */
+  reloadSignal?: number;
 }
 
 /**
@@ -120,6 +123,7 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     onSelectedStandardChange,
     onListLoaded,
     sortBy,
+    reloadSignal,
   } = props;
 
   const sortKeys = sortBy && sortBy.length > 0 ? sortBy : ["sortOrder"];
@@ -238,7 +242,7 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
       .finally(() => setLoading(false));
     // onListLoaded 是回调引用，故意省略以避免无限重渲
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listEndpoint, listFilterParam, selectedStandard]);
+  }, [listEndpoint, listFilterParam, selectedStandard, reloadSignal]);
 
   const selectedStandardObj = useMemo(() => {
     for (const arr of Object.values(standardsByObject)) {

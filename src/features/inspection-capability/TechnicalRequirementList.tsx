@@ -66,15 +66,18 @@ export function TechnicalRequirementList({
   const [objects, setObjects] = useState<Opt[]>([])
   const [params, setParams] = useState<Opt[]>([])
   const [selectedStandard, setSelectedStandard] = useState<string | null>(null)
+  const [listVersion, setListVersion] = useState(0)
 
   useEffect(() => {
     apiClient.get<{ items: Opt[] }>(API_ROUTES['/inspection-objects'], { params: { page: 1, pageSize: '1000' } }).then((r) => setObjects(r.data?.items ?? [])).catch(() => {})
     apiClient.get<{ items: Opt[] }>(API_ROUTES['/inspection-parameters'], { params: { page: 1, pageSize: '1000' } }).then((r) => setParams(r.data?.items ?? [])).catch(() => {})
   }, [])
 
-  const reloadList = (standardCode: string) => {
-    setSelectedStandard(null)
-    setTimeout(() => setSelectedStandard(standardCode), 0)
+  const reloadList = () => {
+    // 列表数据版本号：增删改后 +1 强制树 refetch。不能走「null→setTimeout 设回原值」——
+    // 批量更新下 React Object.is bailout 吞掉终值相等的状态变化，零重渲染零 refetch
+    //（2026-09-13 e2e 三端一致性实测抓出：新建后列表不刷新，react/vue 同场景会刷新）
+    setListVersion((v) => v + 1)
   }
 
   const openCreate = () => {
@@ -122,7 +125,7 @@ export function TechnicalRequirementList({
       if (editId) await apiClient.put(`${API_ROUTES['/inspection-technical-requirements']}/${editId}`, payload)
       else await apiClient.post(API_ROUTES['/inspection-technical-requirements'], payload)
       setOpen(false)
-      if (selectedStandard) reloadList(selectedStandard)
+      if (selectedStandard) reloadList()
     } catch (err: unknown) {
       setError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '保存失败')
     }
@@ -131,7 +134,7 @@ export function TechnicalRequirementList({
   const remove = async (id: string) => {
     if (!confirm('确定删除？')) return
     await apiClient.delete(`${API_ROUTES['/inspection-technical-requirements']}/${id}`)
-    if (selectedStandard) reloadList(selectedStandard)
+    if (selectedStandard) reloadList()
   }
 
   const buildPutBody = (_item: TechRow, sortOrder: number) => ({ sortOrder })
@@ -162,6 +165,7 @@ export function TechnicalRequirementList({
           { key: 'minValue', label: '下限', width: 'w-20', align: 'right' },
         ]}
         buildPutBody={buildPutBody}
+        reloadSignal={listVersion}
         selectedStandard={selectedStandard}
         onSelectedStandardChange={setSelectedStandard}
         onCreate={openCreate}
