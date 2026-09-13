@@ -495,8 +495,13 @@ export function useSaasApp(): {
 // ADR-0019：客户端 bundle 内嵌值也禁字面 fallback。
 // APP_CODE 决定菜单按 app code 分组,SAAS_BASE 决定浏览器跨域 origin——
 // 任一未显式注入,prod 会「菜单互相污染 / 跨源 405」之类隐性故障。
-function requireClientEnv(name: string): string {
-  const v = process.env[name];
+//
+// 2026-09-13 e2e 首轮联跑抓出的回归：原实现 requireClientEnv(name) 走
+// `process.env[name]` 动态访问,webpack DefinePlugin 无法内联动态 key（本仓
+// src/api/env.ts 头注释记录过同一坑）——客户端运行时 process.env 是空壳,
+// 浏览器必炸「env is required」。修法：字面量访问（DefinePlugin 可内联）,
+// 缺失仍 throw（无字面兜底,ADR-0019 语义不变）。
+function requireClientEnv(v: string | undefined, name: string): string {
   if (v === undefined) {
     throw new Error(
       `${name} env is required (ADR-0019 禁字面默认值). ` +
@@ -505,5 +510,5 @@ function requireClientEnv(name: string): string {
   }
   return v;
 }
-const APP_CODE = requireClientEnv("NEXT_PUBLIC_LAB_APP_CODE");
-const SAAS_BASE = requireClientEnv("NEXT_PUBLIC_SAAS_BASE_URL");
+const APP_CODE = requireClientEnv(process.env.NEXT_PUBLIC_LAB_APP_CODE, "NEXT_PUBLIC_LAB_APP_CODE");
+const SAAS_BASE = requireClientEnv(process.env.NEXT_PUBLIC_SAAS_BASE_URL, "NEXT_PUBLIC_SAAS_BASE_URL");
