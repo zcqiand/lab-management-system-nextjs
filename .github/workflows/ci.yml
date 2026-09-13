@@ -88,12 +88,15 @@ jobs:
         run: npx --no tsc --noEmit
       - name: L4 test
         # 2026-09-04 ADR-0020 family-wide 真库分层：CI 跑编译+mock+smoke，gate 跑真库 mutate。
-        # receipts-pg 直连 lab_test 写 receipts / contracts，CI 没 seed 步骤会失败；
+        # *-pg.test.ts 直连 lab_test 真库，CI 的 postgres service 只有空库；
         # 家族约定「CI=编译+mock / gate=真库」，与 .NET [Trait("Category","RealDb")]
         # / springboot @Tag("pg") + -DexcludedGroups=pg 同款：
         # 测试代码本身不再 skip（用户禁），CI workflow 决定不跑，gate 全量跑。
         # db.smoke.test.ts 保留跑（它只创建/丢弃 lab_smoke schema，不污染 public）。
-        run: npx --no vitest run --exclude='tests/api/receipts-pg.test.ts'
+        # vitest CLI --exclude 不过滤文件（a5fbe8b 后首次真跑到 L4 才暴露），走 config env 门。
+        env:
+          VITEST_SKIP_PG: "1"
+        run: npx --no vitest run
 
   # tag push → test 绿 → docker build & push → VPS pull + restart
   # env 文件自举由 deploy/<repo>.sh 脚本自己处理(VPS 上脚本是 repo 副本,删 inline 让脚本权威)

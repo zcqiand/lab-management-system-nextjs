@@ -17,6 +17,12 @@ import FnReporter from "./tests/fnReporter";
 import { fileURLToPath } from "node:url";
 
 const sharedExclude = ["node_modules", "dist", ".next", "src/**/*.{test,spec}.{ts,tsx}"];
+// 真库分层（家族约定 CI=编译性 / gate=真库，aspnetcore Category!=RealDb /
+// springboot -DexcludedGroups=pg 的 vitest 等价物）：CI 设 VITEST_SKIP_PG=1
+// 排除 *-pg.test.ts——CI 的 postgres service 只有空库（db.smoke 自建 schema
+// 不受影响），真库行为由本机 gate 对 lab_test 验证。
+// 注意 vitest 的 CLI --exclude 不过滤文件（list/run 实测均忽略），必须走 config。
+const pgExclude = process.env.VITEST_SKIP_PG === "1" ? ["tests/api/*-pg.test.ts"] : [];
 const resolveAlias = {
   "@": new URL("./src", import.meta.url).pathname,
   "server-only": fileURLToPath(new URL("./tests/server-only.stub.ts", import.meta.url)),
@@ -36,7 +42,7 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["tests/**/*.test.{ts,tsx}"],
-          exclude: [...sharedExclude, "tests/**/*.dom.test.{ts,tsx}"],
+          exclude: [...sharedExclude, "tests/**/*.dom.test.{ts,tsx}", ...pgExclude],
           setupFiles: ["tests/setup.ts"],
           env: { DB_PATH: ":memory:" },
           testTimeout: 10000,
