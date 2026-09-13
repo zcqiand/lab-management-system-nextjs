@@ -1,65 +1,55 @@
 // M06.F04 检测标准 CRUD。
-// GET  /api/inspection/standards → {items,total}（wrapDict：按专项过滤两跳反查、
-//      按项目过滤一跳反查；聚合列 parameterNames）
-// POST /api/inspection/standards → 201
+// GET  /api/inspection/standards → {items,page,pageSize,total}（wrapDict：id=code + keyword；
+//      按专项过滤经 specialty_objects→object_standards 两跳反查、按项目过滤一跳反查；
+//      聚合列 parameterNames）
+// POST /api/inspection/standards → 201；重复 code → 400「标准编码已存在」
+//
+// 数据源：lab_test.inspection_standards（src/lib/db-queries.ts DICT_CFGS；Batch1 接真库）。
+// fixture 版本无 tenant 过滤；inspection_standards schema 无 tenant_id 列（SSOT），
+// dict 侧保持全局可见（与 fixture 版等价；种子行全部 TENANT-001 域）。
 
 import { NextRequest, NextResponse } from "next/server";
-import {
-  inspectionStandards,
-  getStandard,
-  inspectionParameters,
-  inspectionSpecialtyObjects,
-  inspectionObjectStandards,
-  inspectionStandardParameters,
-} from "@lab/management-system-msw/fixtures";
-import { wrapDict, badRequest, NOW } from "@/lib/api-helpers";
+import { badRequest, num, qp, NOW } from "@/lib/api-helpers";
+import { DICT_CFGS, createDictDb, isDbUnavailable, listDictDb } from "@/lib/db-queries";
+
+function dbUnavailable() {
+  return NextResponse.json(
+    { code: "DB_UNAVAILABLE", message: "检查 DATABASE_URL / npm run seed:db" },
+    { status: 503 },
+  );
+}
 
 export async function GET(req: NextRequest) {
-  return wrapDict(inspectionStandards as unknown as Record<string, unknown>[], req, {
-    reverse: {
-      inspectionSpecialtyCode: [
-        {
-          link: inspectionSpecialtyObjects as unknown as Record<string, unknown>[],
-          from: "inspectionSpecialtyCode",
-          to: "inspectionObjectCode",
+  try {
+    const url = qp(req);
+    return NextResponse.json(
+      await listDictDb(DICT_CFGS.standards, {
+        keyword: url.get("keyword") ?? "",
+        direct: {
+          inspectionSpecialtyCode: url.get("inspectionSpecialtyCode") ?? "",
+          inspectionObjectCode: url.get("inspectionObjectCode") ?? "",
         },
-        {
-          link: inspectionObjectStandards as unknown as Record<string, unknown>[],
-          from: "inspectionObjectCode",
-          to: "inspectionStandardCode",
-        },
-      ],
-      inspectionObjectCode: [
-        {
-          link: inspectionObjectStandards as unknown as Record<string, unknown>[],
-          from: "inspectionObjectCode",
-          to: "inspectionStandardCode",
-        },
-      ],
-    },
-    aggregate: [
-      {
-        as: "parameterNames",
-        link: inspectionStandardParameters as unknown as Record<string, unknown>[],
-        selfCol: "inspectionStandardCode",
-        otherCol: "inspectionParameterCode",
-        names: new Map(
-          (inspectionParameters as unknown as Array<{ code: string; name: string }>).map((p) => [
-            String(p.code),
-            String(p.name),
-          ]),
-        ),
-      },
-    ],
-  });
+        page: num(url.get("page"), 1),
+        pageSizeParam: url.get("pageSize"),
+      }),
+    );
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body.code ?? "");
   if (!code || !body.name) return badRequest("code/name 必填");
-  if (getStandard(code)) return badRequest("标准编码已存在");
   const row = { createdAt: NOW(), updatedAt: NOW(), ...body };
-  inspectionStandards.push(row as never);
-  return NextResponse.json(row, { status: 201 });
+  try {
+    const res = await createDictDb(DICT_CFGS.standards, row);
+    if (!res.ok) return badRequest(res.message);
+    return NextResponse.json(res.row, { status: 201 });
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }

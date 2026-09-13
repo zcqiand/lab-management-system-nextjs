@@ -2,14 +2,7 @@
 // 语义真相源 = 各 route.ts 头部注释所引的 lab-msw handler 行为。
 // 映射器实现零 import 放在 db-map.ts（seed 脚本复用）；本文件 re-export，
 // 域查询函数（真正 import { db, schema } from "@/db"）追加在下方。
-export {
-  TENANT,
-  toCamel,
-  toSnake,
-  rowToDto,
-  dtoToRow,
-  PG_TABLES,
-} from "./db-map";
+export { TENANT, toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-map";
 
 // ———— receipts 域（Task 4：三态流转 SQL + applyFlowActionDb 事务）————
 //
@@ -17,9 +10,10 @@ export {
 // src/lib/api-helpers.ts applyFlowAction（flow 流转，2026-08-16 修订版）。
 // FK 列空串在库里是 null 不是 ''（seed 归一，carried ruling 3）：DTO 保持 null
 // 原样返回，不转回 ''。
-import { and, eq, ne, desc, sql as dsql } from "drizzle-orm";
+import { and, eq, ne, desc, inArray, sql as dsql } from "drizzle-orm";
+import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db, schema } from "@/db";
-import { TENANT as TENANT_ID, rowToDto as toDto } from "./db-map";
+import { TENANT as TENANT_ID, rowToDto as toDto, toCamel } from "./db-map";
 
 type Row = Record<string, unknown>;
 
@@ -188,8 +182,7 @@ export async function applyFlowActionDb(
     const idx = FLOW_ORDER_FULL.indexOf(r.flowStatus as FlowStatusFull);
     if (idx < 0)
       return { id, ok: false as const, message: `Unknown flowStatus: ${r.flowStatus}` };
-    const to =
-      action === "submit" ? FLOW_ORDER_FULL[idx + 1] : FLOW_ORDER_FULL[idx - 1];
+    const to = action === "submit" ? FLOW_ORDER_FULL[idx + 1] : FLOW_ORDER_FULL[idx - 1];
     if (!to) {
       return {
         id,
@@ -217,8 +210,7 @@ export async function applyFlowActionDb(
             : action === "withdraw"
               ? null
               : (r.lastSubmittedBy as never),
-        issuedAt:
-          action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
+        issuedAt: action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
         flowHistory: hist as never,
         updatedAt: now,
       })
@@ -285,9 +277,463 @@ export async function createReceiptDb(dto: Row): Promise<Row> {
 export function isDbUnavailable(e: unknown): boolean {
   const err = e as { code?: string; message?: string } | null | undefined;
   if (!err) return false;
-  if (err.code && ["ECONNREFUSED", "ENOTFOUND", "ETIMEDOUT", "EAI_AGAIN"].includes(err.code))
+  if (
+    err.code &&
+    ["ECONNREFUSED", "ENOTFOUND", "ETIMEDOUT", "EAI_AGAIN"].includes(err.code)
+  )
     return true;
   return /ECONNREFUSED|ENOTFOUND|ETIMEDOUT|connect ECONNREFUSED|DATABASE_URL is not set/i.test(
     String(err.message ?? ""),
   );
 }
+
+// ———— dict / catalog 域（Batch1：16 条 dict + catalog 路由从 msw fixture 数组接真库）————
+//
+// 语义真相源 = src/lib/api-helpers.ts wrapDict（dict 8 表）与
+// src/lib/catalog-handlers.ts catalogGet/Post/Put/Delete（catalog 4 表）的
+// fixture 版实现（golden 快照对比逐字节对齐，.tmp-batch1-golden/）。
+// 契约红线（ADR-0015）：响应形状 / 过滤参数族 / 分页语义 / 状态码 / 错误文案零改动。
+
+export interface DictAggregateCfg {
+  /** 聚合列名（如 parameterNames / standardCodes / objectNames） */
+  as: string;
+  /** junction 表 */
+  link: PgTable;
+  /** link 表里指向本表 code 的列 */
+  selfCol: PgColumn;
+  /** link 表里指向对端 code 的列 */
+  otherCol: PgColumn;
+  /** 对端码表（提供 code→name 映射；wrapDict aggregate.names 兜底语义：name 缺失回落 code） */
+  names?: { table: PgTable; code: PgColumn; name: PgColumn };
+}
+
+export interface DictReverseHop {
+  link: PgTable;
+  /** 靠参数一侧的列 */
+  from: PgColumn;
+  /** 靠本表 code 一侧的列 */
+  to: PgColumn;
+}
+
+export interface DictCfg {
+  /** 主表（须有 code/name 列） */
+  table: PgTable;
+  code: PgColumn;
+  name: PgColumn;
+  /** query 参数 → 直列等值过滤（wrapDict「key in items[0]」分支） */
+  direct: Record<string, PgColumn>;
+  /** query 参数 → junction 反查链（wrapDict junctions.reverse；逐跳 EXISTS） */
+  reverse: Record<string, DictReverseHop[]>;
+  /** 聚合列（wrapDict junctions.aggregate；分页后逐行补列） */
+  aggregate: DictAggregateCfg[];
+  /** tenant 列：catalog 4 表有 tenant_id；dict 4 表 schema 无此列（SSOT schema.ts），
+   * fixture 版本本就无 tenant 过滤，dict 侧保持全局可见（种子行全部 TENANT-001 域）。 */
+  tenantCol?: PgColumn;
+  /** POST 重复 code 的 400 文案（fixture 版 getSpecialty(code) 分支原句） */
+  dupMessage: string;
+}
+
+/** wrapDict num() 同款：Number(v) 有限且 > 0 才认，否则回落默认。 */
+function posNum(v: string | null | undefined): number | undefined {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
+/**
+ * junction 反查链 → EXISTS 子查询。
+ *
+ * 【忠实复刻 wrapDict 的既有语义，含其怪癖】wrapDict reverse 的逐跳 Set 传递：
+ *   allowed 初值 null → 第一跳 filter 放行「全部」link 行（查询参数值从未参与过滤！），
+ *   后续跳只按上一跳结果串联。因此 ?inspectionObjectCode=X 对 parameters 的
+ *   实际语义是「在 junction 链上有挂链的行保留」（X 本身被忽略）——
+ *   golden 对比实证：params_by_object 旧版返 560（有任一挂链的参数），非按值过滤的 19。
+ * 本函数产出等价 EXISTS（只约束链上连通 + 末跳 to=本表 code，不用 value）：
+ *   单跳 exists (select 1 from link where link.to = t.code)
+ *   两跳 exists (select 1 from l0 join l1 on l1.from = l0.to where l1.to = t.code)
+ * value 仅决定「链是否启用」（query 参数出现与否），与 wrapDict 相同。
+ * 链内各 link 表互不相同（现配置均满足），无需别名。
+ */
+function reverseExists(hops: DictReverseHop[], selfCode: PgColumn) {
+  let joins = dsql``;
+  for (let i = 1; i < hops.length; i++) {
+    const hop = hops[i]!;
+    const prev = hops[i - 1]!;
+    joins = dsql`${joins} join ${hop.link} on ${hop.from} = ${prev.to}`;
+  }
+  const first = hops[0]!;
+  const last = hops[hops.length - 1]!;
+  return dsql`exists (select 1 from ${first.link}${joins}
+    where ${last.to} = ${selfCode})`;
+}
+
+function dictWhere(cfg: DictCfg, q: ListDictQuery) {
+  const conds = [];
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  // keyword：wrapDict 是 JS includes（区分大小写的字面子串）——strpos 字面匹配
+  // 精确同语义（不用 ilike：那是不区分大小写的增强，超出 wrapDict 契约）。
+  if (q.keyword)
+    conds.push(
+      dsql`strpos(${cfg.code}, ${q.keyword}) > 0 or strpos(${cfg.name}, ${q.keyword}) > 0`,
+    );
+  const direct = q.direct ?? {};
+  for (const [param, col] of Object.entries(cfg.direct)) {
+    const v = direct[param];
+    if (v) conds.push(eq(col, v));
+  }
+  for (const [param, hops] of Object.entries(cfg.reverse)) {
+    if (direct[param]) conds.push(reverseExists(hops, cfg.code));
+  }
+  return conds.length ? and(...conds) : undefined;
+}
+
+export interface ListDictQuery {
+  /** wrapDict keyword：code/name 字面子串（区分大小写） */
+  keyword?: string;
+  /** 直列 / junction 反查过滤参数（仅收路由声明支持的参数；wrapDict 对未知参数静默忽略） */
+  direct?: Record<string, string>;
+  /** 1-based 页码（调用方已按 num(…,1) 归一） */
+  page: number;
+  /**
+   * pageSize 原始 query 串：wrapDict 缺省/非法 → 全量（items.length || 1，空集 → 1），
+   * 由本函数在 count 之后解析（默认值依赖 total）。
+   */
+  pageSizeParam?: string | null;
+}
+
+/**
+ * dict 行 → DTO：camelCase 兜底 + id=code 补列（dict 表无 id 列，wrapDict 同款 patch）
+ * + null 键剔除。msw 快照 JSON 契约里不存在 null 值（可空列无值时整个键缺位，
+ * golden 实证：standards 的 version/sourceDocumentId/sourceHash 均如此），
+ * DB 出库 null → 删键，保证响应键集与 fixture 版逐键一致。
+ */
+function dictRowToDto(row: Row, patchId: boolean): Row {
+  const dto = toDto(row);
+  for (const k of Object.keys(dto)) {
+    if (dto[k] === null || dto[k] === undefined) delete dto[k];
+  }
+  if (patchId) dto.id = String(dto.code);
+  return dto;
+}
+
+/**
+ * 列表查询（tenant 隔离[若有列] + keyword + 直列/junction 反查过滤 + count 先行 + 分页）。
+ * 响应 = wrapDict 的 Page<T> 4 字段 {items, page, pageSize, total}。
+ * 无 ORDER BY：Postgres 静态表堆序 = 入库序 = msw fixture 数组序（种子即 fixture 灌入），
+ * 与 fixture 版「数组原序返回」对齐；字典行无可靠业务排序列（sort_order 同段内重复）。
+ */
+export async function listDictDb(
+  cfg: DictCfg,
+  q: ListDictQuery,
+): Promise<{ items: Row[]; page: number; pageSize: number; total: number }> {
+  const where = dictWhere(cfg, q);
+  // count 先行：pageSize 缺省值 = total（wrapDict items.length || 1 同款）
+  const counted = await db
+    .select({ n: dsql<number>`count(*)::int` })
+    .from(cfg.table)
+    .where(where);
+  const total = counted[0]?.n ?? 0;
+  const pageSize = posNum(q.pageSizeParam) ?? (total || 1);
+  const rows = (await db
+    .select()
+    .from(cfg.table)
+    .where(where)
+    .limit(pageSize)
+    .offset((q.page - 1) * pageSize)) as Row[];
+  const items = rows.map((r) => dictRowToDto(r, true));
+  if (cfg.aggregate.length && items.length) await fillAggregates(cfg, items);
+  return { items, page: q.page, pageSize, total };
+}
+
+/**
+ * 聚合列（wrapDict aggregate 语义逐字复刻）：分页后逐行补 out[as] =
+ * dedup(link 里 self=本行code 的对端 code → name 兜底 code).join('，')。
+ * 在 JS 侧而非 string_agg 做：Set 保序去重 + name 兜底 + 空串剔除的行为
+ * 逐字节可对齐 fixture 版（SQL DISTINCT 聚合不保插入序）。
+ */
+async function fillAggregates(cfg: DictCfg, items: Row[]) {
+  const selfCodeKey = toCamel(cfg.code.name);
+  const codes = items.map((r) => String(r[selfCodeKey]));
+  for (const a of cfg.aggregate) {
+    const selfKey = toCamel(a.selfCol.name);
+    const otherKey = toCamel(a.otherCol.name);
+    const linkRows = (await db
+      .select()
+      .from(a.link)
+      .where(inArray(a.selfCol, codes))) as Row[];
+    let names: Map<string, string> | undefined;
+    if (a.names) {
+      const codeKey = toCamel(a.names.code.name);
+      const nameKey = toCamel(a.names.name.name);
+      const otherCodes = [
+        ...new Set(linkRows.map((l) => String(l[otherKey] ?? "")).filter(Boolean)),
+      ];
+      const nameRows =
+        otherCodes.length > 0
+          ? ((await db
+              .select()
+              .from(a.names.table)
+              .where(inArray(a.names.code, otherCodes))) as Row[])
+          : [];
+      names = new Map(nameRows.map((r) => [String(r[codeKey]), String(r[nameKey])]));
+    }
+    for (const item of items) {
+      item[a.as] = [
+        ...new Set(
+          linkRows
+            .filter((l) => String(l[selfKey] ?? "") === String(item[selfCodeKey] ?? ""))
+            .map((l) => {
+              const code = String(l[otherKey] ?? "");
+              return names?.get(code) ?? code;
+            })
+            .filter(Boolean),
+        ),
+      ].join("，");
+    }
+  }
+}
+
+/** 单条查询（detail GET；wrapDict 不补 id —— 明细响应就是裸行）。 */
+export async function getDictDb(cfg: DictCfg, code: string): Promise<Row | undefined> {
+  const conds = [eq(cfg.code, code)];
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  const rows = (await db
+    .select()
+    .from(cfg.table)
+    .where(and(...conds))
+    .limit(1)) as Row[];
+  return rows[0] ? dictRowToDto(rows[0], false) : undefined;
+}
+
+export type CreateDictResult = { ok: true; row: Row } | { ok: false; message: string };
+
+/**
+ * INSERT（POST）。fixture 版先查重（getSpecialty(code)）返 400 文案——同样先查，
+ * 命中返 {ok:false, message:cfg.dupMessage}，路由层映射 400。
+ * 列过滤到 schema 已知列（未知键静默丢弃）；tenant 表强制 TENANT_ID
+ * （否则 tenant 过滤的 GET 永远看不见新行）。
+ */
+export async function createDictDb(cfg: DictCfg, body: Row): Promise<CreateDictResult> {
+  const code = String(body.code ?? "");
+  if (await getDictDb(cfg, code)) return { ok: false, message: cfg.dupMessage };
+  const values: Row = {};
+  for (const [k, v] of Object.entries(body)) {
+    if (k in cfg.table) values[k] = v;
+  }
+  // code 以后处理兜底（body 可能缺 code 键——route 侧已保证非空）
+  values.code = code;
+  if (cfg.tenantCol) values.tenantId = TENANT_ID;
+  const rows = (await db
+    .insert(cfg.table)
+    .values(values as never)
+    .returning()) as Row[];
+  return { ok: true, row: dictRowToDto(rows[0] as Row, false) };
+}
+
+/**
+ * PUT 全量更新（fixture 版 Object.assign(r, body, { code: r.code, updatedAt }) 语义 =
+ * body 键覆盖 + code/tenantId 不可改 + updatedAt 重写；未知键无列归宿静默丢弃）。
+ */
+export async function putDictDb(
+  cfg: DictCfg,
+  code: string,
+  body: Row,
+): Promise<Row | undefined> {
+  const existing = await getDictDb(cfg, code);
+  if (!existing) return undefined;
+  const patch: Row = { updatedAt: new Date().toISOString() };
+  for (const [k, v] of Object.entries(body)) {
+    if (k === "code" || k === "tenantId") continue;
+    if (!(k in cfg.table)) continue;
+    patch[k] = v;
+  }
+  const conds = [eq(cfg.code, code)];
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  const rows = (await db
+    .update(cfg.table)
+    .set(patch as never)
+    .where(and(...conds))
+    .returning()) as Row[];
+  return rows[0] ? dictRowToDto(rows[0], false) : undefined;
+}
+
+/** DELETE（返回是否删了行；tenant 隔离[若有列]）。 */
+export async function deleteDictDb(cfg: DictCfg, code: string): Promise<boolean> {
+  const conds = [eq(cfg.code, code)];
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  const deleted = await db
+    .delete(cfg.table)
+    .where(and(...conds))
+    .returning({ code: cfg.code });
+  return deleted.length > 0;
+}
+
+// ———— dict / catalog 表配置（语义 = 各 route.ts 头部注释所引 wrapDict / catalogHandlers）————
+//
+// junction 链（与 wrapDict 调用点逐跳对应；语义见 reverseExists 注释——
+// 「链上挂链即保留」，查询值不参与过滤，与 fixture 版逐字节对齐）：
+//   专项→参数：specialty_objects → object_parameters
+//   专项→标准：specialty_objects → object_standards
+//   项目→参数：object_parameters          标准→参数：standard_parameters
+//   项目→标准：object_standards
+
+const sp = schema.inspectionSpecialties;
+const obj = schema.inspectionObjects;
+const param = schema.inspectionParameters;
+const std = schema.inspectionStandards;
+const specObj = schema.inspectionSpecialtyObjects;
+const objParam = schema.inspectionObjectParameters;
+const objStd = schema.inspectionObjectStandards;
+const stdParam = schema.inspectionStandardParameters;
+
+/** M06 dict 4 表配置（inspection/{specialties,objects,parameters,standards}）。 */
+export const DICT_CFGS = {
+  specialties: {
+    table: sp,
+    code: sp.code,
+    name: sp.name,
+    direct: {},
+    reverse: {},
+    aggregate: [],
+    dupMessage: "专项编码已存在",
+  },
+  objects: {
+    table: obj,
+    code: obj.code,
+    name: obj.name,
+    direct: { inspectionSpecialtyCode: obj.inspectionSpecialtyCode },
+    reverse: {},
+    aggregate: [
+      {
+        as: "parameterNames",
+        link: objParam,
+        selfCol: objParam.inspectionObjectCode,
+        otherCol: objParam.inspectionParameterCode,
+        names: { table: param, code: param.code, name: param.name },
+      },
+      {
+        as: "standardCodes",
+        link: objStd,
+        selfCol: objStd.inspectionObjectCode,
+        otherCol: objStd.inspectionStandardCode,
+      },
+    ],
+    dupMessage: "项目编码已存在",
+  },
+  parameters: {
+    table: param,
+    code: param.code,
+    name: param.name,
+    direct: {},
+    reverse: {
+      inspectionSpecialtyCode: [
+        {
+          link: specObj,
+          from: specObj.inspectionSpecialtyCode,
+          to: specObj.inspectionObjectCode,
+        },
+        {
+          link: objParam,
+          from: objParam.inspectionObjectCode,
+          to: objParam.inspectionParameterCode,
+        },
+      ],
+      inspectionObjectCode: [
+        {
+          link: objParam,
+          from: objParam.inspectionObjectCode,
+          to: objParam.inspectionParameterCode,
+        },
+      ],
+      inspectionStandardCode: [
+        {
+          link: stdParam,
+          from: stdParam.inspectionStandardCode,
+          to: stdParam.inspectionParameterCode,
+        },
+      ],
+    },
+    aggregate: [
+      {
+        as: "objectNames",
+        link: objParam,
+        selfCol: objParam.inspectionParameterCode,
+        otherCol: objParam.inspectionObjectCode,
+        names: { table: obj, code: obj.code, name: obj.name },
+      },
+      {
+        as: "standardCodes",
+        link: stdParam,
+        selfCol: stdParam.inspectionParameterCode,
+        otherCol: stdParam.inspectionStandardCode,
+      },
+    ],
+    dupMessage: "参数编码已存在",
+  },
+  standards: {
+    table: std,
+    code: std.code,
+    name: std.name,
+    direct: {},
+    reverse: {
+      inspectionSpecialtyCode: [
+        {
+          link: specObj,
+          from: specObj.inspectionSpecialtyCode,
+          to: specObj.inspectionObjectCode,
+        },
+        {
+          link: objStd,
+          from: objStd.inspectionObjectCode,
+          to: objStd.inspectionStandardCode,
+        },
+      ],
+      inspectionObjectCode: [
+        {
+          link: objStd,
+          from: objStd.inspectionObjectCode,
+          to: objStd.inspectionStandardCode,
+        },
+      ],
+    },
+    aggregate: [
+      {
+        as: "parameterNames",
+        link: stdParam,
+        selfCol: stdParam.inspectionStandardCode,
+        otherCol: stdParam.inspectionParameterCode,
+        names: { table: param, code: param.code, name: param.name },
+      },
+    ],
+    dupMessage: "标准编码已存在",
+  },
+} satisfies Record<string, DictCfg>;
+
+/** M04 catalog 4 表配置（catalog/{brands,models,specs,grades}；同构，tenant 列齐全）。 */
+function catalogCfg(
+  table: PgTable & {
+    code: PgColumn;
+    name: PgColumn;
+    inspectionObjectCode: PgColumn;
+    tenantId: PgColumn;
+  },
+): DictCfg {
+  return {
+    table,
+    code: table.code,
+    name: table.name,
+    // catalogGet 只认 inspectionObjectCode 直列过滤（keyword 不支持——fixture 版静默忽略）
+    direct: { inspectionObjectCode: table.inspectionObjectCode },
+    reverse: {},
+    aggregate: [],
+    tenantCol: table.tenantId,
+    dupMessage: "编码已存在",
+  };
+}
+
+/** catalog 4 表（Batch1 接真库；catalog-handlers.ts 改为薄封装调本表）。 */
+export const CATALOG_CFGS = {
+  brands: catalogCfg(schema.inspectionBrands),
+  models: catalogCfg(schema.inspectionModels),
+  specs: catalogCfg(schema.inspectionSpecs),
+  grades: catalogCfg(schema.inspectionGrades),
+} satisfies Record<string, DictCfg>;

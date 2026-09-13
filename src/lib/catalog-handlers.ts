@@ -1,24 +1,60 @@
-// catalog 4 码表（型号/规格/等级/牌号）共享 GET/POST —— lab-msw catalogHandlers
-// 工厂的 Next route 版。msw 返回裸数组；REF SampleManagerModal 读 res.data.items[].name，
-// 故包成 {items,total}。
+// catalog 4 码表（型号/规格/等级/牌号）共享 GET/POST/PUT/DELETE —— Batch1 接真库版。
+//
+// 前身是 fixture 数组工厂（msw catalogHandlers 的 Next route 版，GET 收数组引用）；
+// 2026-09 Batch1 起 16 条 dict+catalog 路由统一走 src/lib/db-queries.ts 的
+// listDictDb / createDictDb / putDictDb / deleteDictDb（CATALOG_CFGS 四张表配置），
+// 本文件保留为薄封装，让 8 个 catalog route.ts 维持 catalogGet(req) 同款调用形状。
+//
+// 语义真相源 = fixture 版 catalogHandlers（golden 快照逐字节对齐）：
+//   GET    ?inspectionObjectCode= 直列过滤 + id=code 补列 + Page<T> 4 字段
+//          （keyword 不支持——fixture 版静默忽略，DB 版同款只声明 inspectionObjectCode）
+//   POST   {code,name,sortOrder} 强转兜底 + 201；fixture 版无查重（内存数组可存重复
+//          code），DB 侧 code 是主键——重复改返 400「编码已存在」（唯一一处刻意偏差，
+//          正常前端流不会触发，见 db-queries createDictDb）
+//   PUT    body 键覆盖 + code 不可改 + updatedAt 重写；404 "Entry not found"
+//   DELETE 204 / 404 "Entry not found"
 
 import { NextRequest, NextResponse } from "next/server";
-import { pageOf, qp, num, NOW, notFound, noContent } from "@/lib/api-helpers";
+import { qp, num, NOW, notFound, noContent, badRequest } from "@/lib/api-helpers";
+import {
+  CATALOG_CFGS,
+  type DictCfg,
+  listDictDb,
+  createDictDb,
+  putDictDb,
+  deleteDictDb,
+  isDbUnavailable,
+} from "@/lib/db-queries";
 
-export function catalogGet(arr: Record<string, unknown>[], req: NextRequest) {
-  const url = qp(req);
-  const obj = url.get("inspectionObjectCode");
-  let items = arr;
-  if (obj) items = items.filter((e) => e["inspectionObjectCode"] === obj);
-  // 补 id=code（REF CategoryDictList 组件 rowId 读 id 列；catalog fixtures PK 是 code）
-  const withId = items.map((e) => ({ ...e, id: String(e["id"] ?? e["code"]) }));
+export type CatalogFamily = keyof typeof CATALOG_CFGS;
+
+function dbUnavailable() {
   return NextResponse.json(
-    pageOf(withId, num(url.get("page"), 1), num(url.get("pageSize"), withId.length || 1)),
+    { code: "DB_UNAVAILABLE", message: "检查 DATABASE_URL / npm run seed:db" },
+    { status: 503 },
   );
 }
 
-export async function catalogPost(arr: Record<string, unknown>[], req: NextRequest) {
+export async function catalogGet(cfg: DictCfg, req: NextRequest) {
+  try {
+    const url = qp(req);
+    // fixture 版 catalogGet 不支持 keyword（query 里给了也静默忽略）——不传即同语义
+    return NextResponse.json(
+      await listDictDb(cfg, {
+        direct: { inspectionObjectCode: url.get("inspectionObjectCode") ?? "" },
+        page: num(url.get("page"), 1),
+        pageSizeParam: url.get("pageSize"),
+      }),
+    );
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
+}
+
+export async function catalogPost(cfg: DictCfg, req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  // fixture 版 catalogPost 的强转兜底原样保留（code/name 空串也放行，无 code/name 必填校验）
   const entry = {
     code: String(body.code ?? ""),
     name: String(body.name ?? ""),
@@ -27,24 +63,35 @@ export async function catalogPost(arr: Record<string, unknown>[], req: NextReque
     updatedAt: NOW(),
     ...body,
   };
-  arr.push(entry as never);
-  return NextResponse.json(entry, { status: 201 });
+  try {
+    const res = await createDictDb(cfg, entry);
+    if (!res.ok) return badRequest(res.message);
+    return NextResponse.json(res.row, { status: 201 });
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }
 
-export async function catalogPut(
-  arr: Record<string, unknown>[],
-  req: NextRequest,
-  code: string,
-) {
-  const row = arr.find((e) => String(e["code"]) === code);
-  if (!row) return notFound("Entry not found");
-  Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
-  return NextResponse.json(row);
+export async function catalogPut(cfg: DictCfg, req: NextRequest, code: string) {
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  try {
+    const row = await putDictDb(cfg, code, body);
+    if (!row) return notFound("Entry not found");
+    return NextResponse.json(row);
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }
 
-export function catalogDelete(arr: Record<string, unknown>[], code: string) {
-  const i = arr.findIndex((e) => String(e["code"]) === code);
-  if (i < 0) return notFound("Entry not found");
-  arr.splice(i, 1);
-  return noContent();
+export async function catalogDelete(cfg: DictCfg, code: string) {
+  try {
+    const ok = await deleteDictDb(cfg, code);
+    if (!ok) return notFound("Entry not found");
+    return noContent();
+  } catch (e) {
+    if (isDbUnavailable(e)) return dbUnavailable();
+    throw e;
+  }
 }

@@ -1,13 +1,19 @@
 // M04.F08 等级维护：PUT/DELETE /api/catalog/grades/:code
+//
+// 数据源：lab_test.inspection_grades（src/lib/db-queries.ts CATALOG_CFGS；Batch1 接真库）。
+// fixture 版本无 tenant 过滤；DB 版本按 TENANT-001 隔离（种子行全部 TENANT-001，安全）。
 
 import { NextRequest } from "next/server";
 import { catalogPut, catalogDelete } from "@/lib/catalog-handlers";
-import { inspectionGrades } from "@lab/management-system-msw/fixtures";
+import { CATALOG_CFGS } from "@/lib/db-queries";
 
 export async function PUT(req: NextRequest, { params }: { params: { code: string } }) {
-  return catalogPut(inspectionGrades as unknown as Record<string, unknown>[], req, params.code);
+  return catalogPut(CATALOG_CFGS.grades, req, params.code);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { code: string } }) {
-  return catalogDelete(inspectionGrades as unknown as Record<string, unknown>[], params.code);
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { code: string } },
+) {
+  return catalogDelete(CATALOG_CFGS.grades, params.code);
 }

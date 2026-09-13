@@ -1,14 +1,18 @@
 // M04.F08 等级维护（catalog 同构 4 表之一）。
-// GET /api/catalog/grades?inspectionObjectCode= → {items,total}；POST → 201
+// GET /api/catalog/grades?inspectionObjectCode= → {items,page,pageSize,total}（id=code 补列）
+// POST /api/catalog/grades → 201
+//
+// 数据源：lab_test.inspection_grades（src/lib/db-queries.ts CATALOG_CFGS；Batch1 接真库）。
+// fixture 版本无 tenant 过滤；DB 版本按 TENANT-001 隔离（种子行全部 TENANT-001，安全）。
 
 import { NextRequest } from "next/server";
 import { catalogGet, catalogPost } from "@/lib/catalog-handlers";
-import { inspectionGrades } from "@lab/management-system-msw/fixtures";
+import { CATALOG_CFGS } from "@/lib/db-queries";
 
 export async function GET(req: NextRequest) {
-  return catalogGet(inspectionGrades as unknown as Record<string, unknown>[], req);
+  return catalogGet(CATALOG_CFGS.grades, req);
 }
 
 export async function POST(req: NextRequest) {
-  return catalogPost(inspectionGrades as unknown as Record<string, unknown>[], req);
+  return catalogPost(CATALOG_CFGS.grades, req);
 }
