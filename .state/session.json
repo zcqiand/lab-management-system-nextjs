@@ -1,30 +1,19 @@
 {
-  "schema": 2,
+  "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "cacheMenuSnapshot 解析 saas /me/menus Record<appCode, ...> 修复 + consumer 解析单测补齐，gate 已绿，待 prod SSO 验证",
-  "last_session_at": "2026-09-03",
-  "last_session_summary": "线上 /api/auth/menus 503 + 控制台 [menu-snapshot] fetch failed: i.map is not a function。根因：cacheMenuSnapshot 把 Record<appCode, EffectiveMenuNode[]> 强转 flat 数组 cast，tree.map 抛 TypeError 被 catch 吞，快照永空 → GET /menus 503。springboot/aspnetcore 2026-08-28 同步适配了，本仓漏。修 src/lib/auth/menu-snapshot.ts:84 body[appCode] ?? []；tests/api/menus-route.dom.test.tsx 加 7 个 fnTest 覆盖 Record 命中/跨 app 不污染/appCode 缺失/空对象/5xx/网络异常/空参。red 3 失败→green 10/10。--all gate 0",
+  "current_task": "ADR-0033 阶段二：M97/M98 infra 段退役 + BASE 镜像",
   "done": [
-    "src/lib/auth/menu-snapshot.ts cacheMenuSnapshot: (await resp.json()) as Record<string, SaasMenuNode[]>; const tree = body[appCode] ?? []; putMenuSnapshot(userId, tree.map(mapSaasMenu)) — 替代旧 flat cast",
-    "tests/api/menus-route.dom.test.tsx 新增 cacheMenuSnapshot describe 块，7 个 fnTest(M01.F04.I04)：Record 命中+映射+跨 app 隔离/appCode 不在响应/空对象/5xx warn/网络异常 warn/userId token 空静默",
-    "vitest 验证: 目标文件 10/10 绿(4 原有 + 7 新增)；full suite 含 PG 6+1 失败是 lab_dev 远端不可达(用户已修),与本次无关",
-    "gate.py --all exit 0: lab-nextjs L1-L5 全 PASS；saas-shared/springboot/vue 等同跑全绿"
+    "function-tree: M97（schema emit infra）/M98（前端接线层）整段删除；M01.F04.I03 已上线；M05.F01.I06 入树",
+    "tests 解挂 fnTest→普通 it（m98-wiring/me-route/db.smoke，标题去 ID 字面防 fnReporter 误吸）",
+    "src: backend-badge/sidebar-nav data-fn、SummaryPage @entry I06、注释清理；design maps M97/M98 行删除；commit a768310"
   ],
   "next": [
-    "prod 验证: SSO 登录 lab-nextjs.xiangru.uk → DevTools 看 /api/auth/menus 应 200 而非 503；sidebar 不应再 AppShellErrorBoundary 兜错误态",
-    "可选: 改 .env.example:28 注释 (它说 \"用来从 /me/menus 返回的 { [appCode]: ... } 里挑本仓菜单\" 但 appCode query 参数 saas 忽略); 改成 \"appCode 仅用于 cacheMenuSnapshot 在响应 Map 里挑本仓子树\"",
-    "可选: 加 live 集成测试(cacheMenuSnapshot 真打远端 saas,describe.skipIf(!live) 同 saas-contract-test/me.test.ts),防止未来 saas 响应形状再变又漏"
+    "阶段三 e2e 接入（E2E_*_URL fail-fast）"
   ],
-  "open_questions": [
-    "是否需要把 .env.example:28 那行注释也跟改(避免下次改这块的人又踩同坑)",
-    "是否加 live 集成测试(代价: 起 saas 才跑,平时 skip;价值: 抓 provider 形状再变的情况)"
-  ],
+  "open_questions": [],
   "dont": [
-    "不要改 saas /me/menus 响应形状 — Record<appCode, ...> 是 \"一次拿所有 app\" 的正确设计,springboot/aspnetcode 已对齐,本仓漏适配是 consumer bug 不是契约 bug",
-    "不要给 PG 测试加 skipIf(LAB_PG_REACHABLE) 凑绿 — PG 不可达是真实失败模式,改 skip 是 \"为绿而绿\" 违反 CLAUDE.md §2",
-    "不要改 menu-snapshot.ts 里的 TTL_MS=30min 或 store=Map 形态 — 单实例部署可接受,与 springboot 同款;真多实例要再开 ADR 单独讨论持久化"
+    "it() 标题写 Mxx.Fxx.Ixx 字面——fnReporter 正则会误吸进 alignment.json"
   ],
-  "last_gate_passed_at": "2026-09-03T09:48+08:00",
   "active_branch": "master",
-  "ahead_of_origin": "0"
+  "last_session_at": "2026-09-13"
 }
