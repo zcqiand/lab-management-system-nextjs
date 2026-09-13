@@ -10,7 +10,8 @@
 //      （label→name，有子节点=group）
 //   5. 2026-08-27 起 demo 兜底删除：500 miss → render 抛错上抛 ErrorBoundary，
 //      不静默回退静态树（与 react/vue 仓同语义）
-// useSaasApp 仍直连 saas /api/v1/apps/[code]（免鉴权公共目录），测试保留。
+// useSaasApp 仍直连 saas /api/v1/clients/[clientId]（免鉴权公共目录，2026-09-08
+// shared 重命名 /apps/{code} → /clients/{clientId}，返 OAuthClientPublicInfo），测试保留。
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import React from "react";
@@ -57,15 +58,22 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
   beforeEach(() => {
     queue.length = 0;
     calls.length = 0;
-    // useSaasApp 仍走 fetch（saas 公共目录）；axios mock 只盯 /api/auth/menus
-    fetchMock = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          code: "lab-management",
-          name: "建筑工程实验室管理系统",
-        }),
-        { status: 200 },
-      ),
+    // useSaasApp 仍走 fetch（saas 公共目录）；axios mock 只盯 /api/auth/menus。
+    // 响应形状 = SSOT OAuthClientPublicInfo {clientId, clientName, status}。
+    // 每次调用出新 Response：token 异步 hydrate 会让 hook effect 跑两次，
+    // 复用同一 Response 实例第二次 r.json() 撞「body already read」走 catch。
+    fetchMock = vi.fn().mockImplementation(
+      () =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              clientId: "lab-management",
+              clientName: "建筑工程实验室管理系统",
+              status: 1,
+            }),
+            { status: 200 },
+          ),
+        ),
     );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     localStorage.clear();
@@ -151,15 +159,22 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     }
   });
 
-  it("useSaasApp：仍直连 saas /api/v1/apps/[code]（公共目录，不走后端）", async () => {
+  it("useSaasApp：仍直连 saas /api/v1/clients/[clientId]（公共目录，不走后端），映射回 {code,name}", async () => {
     localStorage.setItem("lab.token", "test-jwt");
 
-    renderHook(() => useSaasApp(), { wrapper: wrap });
+    const { result } = renderHook(() => useSaasApp(), { wrapper: wrap });
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1]!;
     const [url] = lastCall;
-    expect(url).toBe("http://localhost:5101/api/v1/apps/lab-management");
+    expect(url).toBe("http://localhost:5101/api/v1/clients/lab-management");
+    // OAuthClientPublicInfo → 本地展示形状映射
+    await waitFor(() =>
+      expect(result.current.app).toEqual({
+        code: "lab-management",
+        name: "建筑工程实验室管理系统",
+      }),
+    );
   });
 });
 

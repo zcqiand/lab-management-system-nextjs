@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { token, clearToken } = useAuth();
   const apiMode = getApiMode();
   const { data: menus, loading: menusLoading } = useBackendMenus();
-  // 应用名来自 saas 公共应用目录（/api/v1/apps/<code> 反代），不写死在客户端
+  // 应用名来自 saas 公共应用目录（/api/v1/clients/<clientId>），不写死在客户端
   const { app } = useSaasApp();
 
   return (

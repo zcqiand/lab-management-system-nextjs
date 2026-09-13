@@ -2,7 +2,7 @@
 
 // SidebarNav — 菜单走 lab 后端 GET /api/auth/menus（ADR-0009，2026-08-25 起
 // 取代浏览器直连 saas /api/v1/me/menus：后端 SSO callback 时快照缓存 saas
-// 菜单，miss 回退 demo 树）。应用名仍走 saas 公共目录 /api/v1/apps/[code]
+// 菜单，miss 回退 demo 树）。应用名仍走 saas 公共目录 /api/v1/clients/[clientId]
 // （免鉴权），应用代码来自 env（不写死在客户端）。
 //
 // 与 saas 仓 SidebarNav 的差异：
@@ -445,21 +445,18 @@ function adaptContractMenu(node: ContractMenuNode, index: number): MenuNode {
   };
 }
 
-/** 客户端 hook：浏览器直连 saas /api/v1/apps/<code>（saas 公共应用目录，免鉴权）。
- *  应用名不写死在客户端，由 saas 注册信息驱动；不可达时回退 null（调用方显示占位）。
- *  /apps/[code] 当前免鉴权，所以即使没 token 也拉；但若 token 存在仍带上（forward-compat，
- *  万一 saas 把这端点改成鉴权，前端不用再改）。 */
+/** 客户端 hook：浏览器直连 saas /api/v1/clients/<clientId>（saas 公共应用目录，免鉴权）。
+ *  2026-09-08 shared 重命名 /apps/{code} → /clients/{clientId}，响应收敛为 SSOT
+ *  OAuthClientPublicInfo {clientId, clientName, status}——在此映射回本地展示形状
+ *  {code, name}，调用方无感。应用名不写死在客户端，由 saas 注册信息驱动；
+ *  不可达时回退 null（调用方显示占位）。当前免鉴权，所以即使没 token 也拉；
+ *  但若 token 存在仍带上（forward-compat，万一 saas 把这端点改成鉴权，前端不用再改）。 */
 export function useSaasApp(): {
-  app: { code: string; name: string; description?: string; icon?: string } | null;
+  app: { code: string; name: string } | null;
   loading: boolean;
   error: string | null;
 } {
-  const [app, setApp] = useState<{
-    code: string;
-    name: string;
-    description?: string;
-    icon?: string;
-  } | null>(null);
+  const [app, setApp] = useState<{ code: string; name: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuth();
@@ -469,14 +466,14 @@ export function useSaasApp(): {
     setLoading(true);
     const headers: Record<string, string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
-    fetch(`${SAAS_BASE}/api/v1/apps/${encodeURIComponent(APP_CODE)}`, {
+    fetch(`${SAAS_BASE}/api/v1/clients/${encodeURIComponent(APP_CODE)}`, {
       cache: "no-store",
       headers,
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d: { code: string; name: string }) => {
+      .then((d: { clientId: string; clientName: string }) => {
         if (cancelled) return;
-        setApp(d);
+        setApp({ code: d.clientId, name: d.clientName });
         setLoading(false);
       })
       .catch((err: unknown) => {
