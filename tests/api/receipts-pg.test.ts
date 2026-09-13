@@ -24,6 +24,8 @@ const TEST_MARKER = "__receipts_pg_test_";
 
 // 种子 contract（FK 依赖；id 唯一避免与 msw fixture 冲突）
 const TEST_CONTRACT_ID = "test-contract-receipts-pg";
+// category FK 依赖（receipts_category_fk）；自播 + marker 守卫清理
+const SEEDED_CATEGORY_CODE = "CAT-SMK-001";
 const SEEDED_RECEIVING_ID = "test-receipt-receiving-001";
 const SEEDED_REVIEW_ID = "test-receipt-review-001";
 const SEEDED_SUBMITTED_ID = "test-receipt-submitted-001";
@@ -50,10 +52,21 @@ async function disconnect() {
 async function cleanupTestRows(s: ReturnType<typeof postgres>) {
   await s`delete from sample_receipts where commission_code like ${TEST_MARKER + "%"}`;
   await s`delete from contracts where id = ${TEST_CONTRACT_ID}`;
+  // category 只删自己种的那行（name 带 marker 守卫）：若库里已有同名 code 的
+  // 正式行，ON CONFLICT 跳过、name 仍是原值，这里就不会误删。
+  await s`delete from inspection_report_names where code = ${SEEDED_CATEGORY_CODE} and name = ${TEST_MARKER + "category"}`;
 }
 
 async function seedFixture(s: ReturnType<typeof postgres>) {
   await cleanupTestRows(s);
+  // category FK 依赖自播（receipts_category_fk → inspection_report_names.code）。
+  // 背景：ADR-0025/0033 后 lab_test 由 drizzle 迁移纯 schema 重建，旧 V015 冒烟
+  // 种子里的 CAT-SMK-001 不复存在 —— 本测试自给依赖，不再隐式依赖库内容。
+  // ON CONFLICT DO NOTHING：与库里已有的正式 CAT-SMK-001 共存不冲突。
+  await s`insert into inspection_report_names (code, name, sort_order, created_at, updated_at)
+    values (${SEEDED_CATEGORY_CODE}, ${TEST_MARKER + "category"}, 0,
+            ${"2026-09-04T00:00:00Z"}, ${"2026-09-04T00:00:00Z"})
+    on conflict (code) do nothing`;
   // contract（NOT NULL: contract_code / client_unit / project_name / construction_unit /
   // witness_unit / witness / status / created_at / updated_at）
   await s`insert into contracts (
