@@ -85,14 +85,6 @@
 | M06.F08.I04 | src/features/inspection-capability/ParamInterfaceList.tsx (关联参数页签) | POST /api/inspection-parameter-param-interfaces ; DELETE 同 | inspection_parameter_param_interface | M06.F08.I04 | – | 已上线 |
 | M06.F08.I05 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (列表行预览按钮) | – (本地渲染) | inspection_param_interface | M06.F08.I05 | – | 已上线 |
 | M06.F08.I06 | src/features/inspection-capability/ParamInterfacePreviewModal.tsx (弹窗) | – (本地渲染) | inspection_param_interface | M06.F08.I06 | – | 已上线 |
-| M98.F01.I01 | src/components/app/backend-badge.tsx (无交互模式标签) | – (env 读取，仅诊断) | – | M98.F01.I01 | – | 已上线 |
-| M98.F01.I02 | ~~src/api/backend-config.ts hydrateBackendConfig/snapshotBackendConfig~~ 已废弃（ADR-0014） | – (localStorage[`lab.backend`]) | – | M98.F01.I02 | – | 已废弃 |
-| M98.F02.I01 | src/api/http-client.ts (installHttpClient) | – (axios 拦截器) | – | M98.F02.I01 | – | 已上线 |
-| M98.F03.I01 | src/app/api/auth/login/route.ts | POST /api/auth/login | – (mock token) | M98.F03.I01 | – | 已上线 |
-| M98.F03.I02 | src/app/api/auth/me/route.ts | GET /api/auth/me | – | M98.F03.I02 | – | 已上线 |
-| M98.F03.I03 | src/app/api/auth/logout/route.ts | POST /api/auth/logout | – | M98.F03.I03 | – | 已上线 |
-| M98.F03.I04 | src/app/api/auth/refresh/route.ts | POST /api/auth/refresh | – | M98.F03.I04 | – | 已上线 |
-| M98.F03.I05 | src/app/api/auth/switch-tenant/route.ts | POST /api/auth/switch-tenant | – | M98.F03.I05 | – | 已上线 |
 | M05.F01.I01 | src/features/summary/SummaryPage.tsx | GET /api/summary?categoryCode= ; GET /api/report-names (下拉) | sample_receipts | M05.F01.I01 | – | 已上线 |
 | M04.F06.I01 | src/features/dicts/CategoryDictList.tsx (endpoint=models) | GET /api/catalog/models?inspectionObjectCode= | inspection_models | M04.F06.I01 | – | 已上线 |
 | M04.F06.I02 | src/features/dicts/CategoryDictList.tsx (新建/编辑弹窗) | POST /api/catalog/models ; PUT /api/catalog/models/:code | inspection_models | M04.F06.I02 | – | 已上线 |
@@ -118,13 +110,6 @@
 | M01.F05.I03 | src/app/login/page.tsx (SSO orchestrator div) | GET /api/auth/sso/authorize ; POST /api/auth/sso/callback | – | M01.F05.I03 | – | 已上线 |
 | M01.F05.I04 | src/state/authStore.ts (acceptSsoSession) | GET /api/auth/permissions | – | M01.F05.I04 | – | 已上线 |
 | M01.F05.I05 | src/components/app/app-shell.tsx (logout Button) | POST /api/auth/logout | – | M01.F05.I05 | – | 已上线 |
-| M97.F01.I01 | scripts/emit-schema.mjs (replay 段) | node scripts/emit-schema.mjs replay | – (lab_dev) | M97.F01.I01 | – | 已上线 (infra) |
-| M97.F01.I02 | scripts/emit-schema.mjs (catalogDump / pg_dump 段) | node scripts/emit-schema.mjs dump | – (lab_dev) | M97.F01.I02 | – | 已上线 (infra) |
-| M97.F01.I03 | scripts/emit-schema.mjs (drizzle-kit pull 段) + scripts/fix-pulled-schema.mjs | node scripts/emit-schema.mjs pull | – (lab_dev) | M97.F01.I03 | – | 已上线 (infra) |
-| M97.F01.I04 | scripts/emit-schema.mjs (DBML 段) + scripts/v-sql-to-dbml.mjs | node scripts/emit-schema.mjs dbml | – (lab_dev) | M97.F01.I04 | – | 已上线 (infra) |
-| M97.F02.I01 | package.json devDependencies (pg ^8.13.1) | – (借链给 sync-db) | – | M97.F02.I01 | – | 已上线 (infra) |
-| M97.F02.I02 | scripts/borrow-pg.mjs (sanity) | node scripts/borrow-pg.mjs | lab_dev | M97.F02.I02 | – | 已上线 (infra) |
-| M97.F02.I03 | ../lab-management-system-shared/scripts/sync-db.mjs:36-46 (createRequire borrow) | – (消费侧) | lab_dev | M97.F02.I03 | – | 已上线 (infra) |
 
 ## 约定
 

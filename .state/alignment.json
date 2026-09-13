@@ -2,17 +2,27 @@
   "schema": 1,
   "project": "lab-management-system-nextjs",
   "functions": {
-    "modules": 9,
-    "features": 31,
-    "items": 121
+    "modules": 7,
+    "features": 26,
+    "items": 107
   },
-  "warnings_total": 4,
+  "warnings_total": 10,
   "warnings": {
+    "已上线但无设计映射": [
+      "M01.F04.I03",
+      "M05.F01.I06"
+    ],
+    "已上线但无测试引用": [
+      "M01.F04.I03",
+      "M05.F01.I06"
+    ],
     "已上线但不在任何流程且非孤儿白名单": [
       "M01.F04.I01",
+      "M01.F04.I03",
       "M05.F01.I02",
       "M05.F01.I03",
-      "M05.F01.I04"
+      "M05.F01.I04",
+      "M05.F01.I06"
     ]
   },
   "unreachable_shipped": [],
@@ -84,7 +94,7 @@
     },
     "M01.F04.I03": {
       "name": "路由守卫（未登录/无权限拦截）",
-      "status": "已废弃",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1345,6 +1355,18 @@
       "tests": [],
       "entry": []
     },
+    "M05.F01.I06": {
+      "name": "仪表盘统计基础端点",
+      "status": "已上线",
+      "type": "查询",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
     "M06.F01.I01": {
       "name": "检测专项列表",
       "status": "已上线",
@@ -1979,212 +2001,6 @@
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
       ]
-    },
-    "M97.F01.I01": {
-      "name": "replay V*.sql to lab_dev",
-      "status": "已废弃",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [],
-      "entry": []
-    },
-    "M97.F01.I02": {
-      "name": "pg_dump --schema-only",
-      "status": "已废弃",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [],
-      "entry": []
-    },
-    "M97.F01.I03": {
-      "name": "drizzle-kit pull",
-      "status": "已废弃",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [],
-      "entry": []
-    },
-    "M97.F01.I04": {
-      "name": "v-sql → DBML",
-      "status": "已废弃",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [],
-      "entry": []
-    },
-    "M97.F02.I01": {
-      "name": "pg devDep",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）"
-      ],
-      "entry": []
-    },
-    "M97.F02.I02": {
-      "name": "borrow-pg sanity",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）"
-      ],
-      "entry": []
-    },
-    "M97.F02.I03": {
-      "name": "consumed by shared replay test",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared drizzle.replay.test.ts 同款（createRequire 本仓 package.json 解析 pg）"
-      ],
-      "entry": []
-    },
-    "M98.F01.I01": {
-      "name": "BackendBadge 后端模式显示（env: apiMode + baseUrl；ADR-0014 替代旧 BackendSwitcher）",
-      "status": "已上线",
-      "type": null,
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::BackendBadge 源文件挂 data-fn=I01 + 含 mode/baseUrl 渲染"
-      ],
-      "entry": [
-        "src\\components\\app\\backend-badge.tsx"
-      ]
-    },
-    "M98.F01.I02": {
-      "name": "持久化 baseUrl",
-      "status": "已废弃",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [],
-      "entry": []
-    },
-    "M98.F02.I01": {
-      "name": "axios 拦截器",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::installHttpClient 是函数且注册到全局 axios 拦截器不抛"
-      ],
-      "entry": []
-    },
-    "M98.F03.I01": {
-      "name": "POST /api/auth/login",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户"
-      ],
-      "entry": []
-    },
-    "M98.F03.I02": {
-      "name": "GET /api/auth/me",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 hit：Bearer sub 有 memberships 快照 → 返回 saas 租户",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::SSO 用户快照 miss：有 Bearer 但 sub 无快照 → 401（前端 refresh 自愈）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/me-route.dom.test.tsx::demo 路径：删「无 Bearer = demo 租户」反模式 → 401（ADR-0019）"
-      ],
-      "entry": []
-    },
-    "M98.F03.I03": {
-      "name": "POST /api/auth/logout",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/logout 返回 204"
-      ],
-      "entry": []
-    },
-    "M98.F03.I04": {
-      "name": "POST /api/auth/refresh",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 无 refreshToken 返 401（ADR-0019 删 admin 兜底）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/refresh 返 400 REFRESH_NOT_IMPLEMENTED 且不调 saas（ADR-0019）"
-      ],
-      "entry": []
-    },
-    "M98.F03.I05": {
-      "name": "POST /api/auth/switch-tenant",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/m98-wiring.dom.test.tsx::POST /api/auth/switch-tenant 无 Bearer 返 401（ADR-0019 删 demo 兜底）"
-      ],
-      "entry": []
     }
   }
 }

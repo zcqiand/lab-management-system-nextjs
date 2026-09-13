@@ -8,11 +8,10 @@
 //
 // 跳过条件：DATABASE_URL 未设 / `npm install` 没装 pg 时。CI 实跑。
 //
-// M97 fnTest 挂载：F02.I01/I02（pg devDep / 借链可达）。
-// （原 M97.F01 replay V*.sql 语义随 Flyway 退役废弃——ADR-0033。）
+// pg 借链 smoke：本仓持有 pg devDep，shared 仓 replay 测试借它 require("pg")
+//（ADR-0033 阶段二：infra 段自 function-tree 退役，fnTest 解挂为普通 it）。
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { fnTest } from "./fn";
 import { createRequire } from "node:module";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -86,7 +85,7 @@ describe("DB smoke (PG)", () => {
     expect(rows[0]?.ok).toBe(1);
   });
 
-  fnTest(["M97.F02.I01", "M97.F02.I02"], "pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）", async () => {
+  it("pg devDep 可加载 + 借链联目标库（require('pg') + SELECT 1）", async () => {
     if (!client) return;
     const { rows } = await client.query("SELECT current_database() AS db");
     // CI 默认 lab_test,本地默认 lab_dev。两条路径都验「能 SELECT」即可,不绑 DB 名
@@ -95,7 +94,7 @@ describe("DB smoke (PG)", () => {
     expect(dbName?.length ?? 0).toBeGreaterThan(0);
   });
 
-  fnTest(["M97.F02.I03"], "借链与 shared drizzle.replay.test.ts 同款（createRequire 本仓 package.json 解析 pg）", () => {
+  it("借链与 shared drizzle.replay.test.ts 同款（createRequire 本仓 package.json 解析 pg）", () => {
     // 本文件顶部的 pgModule 加载就是 shared tests/drizzle.replay.test.ts 的同款路径：
     // createRequire(本仓 package.json) → require("pg") 命中本仓 devDependencies
     expect(pgModule).not.toBeNull();

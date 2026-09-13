@@ -121,6 +121,7 @@ export function SummaryPage() {
 
   return (
     // @entry M05.F01.I02 — 仪表盘容器（包裹 I03/I04 + 汇总表）
+    // @entry M05.F01.I06 — 仪表盘统计基础端点（ADR-0033 阶段二自 M05.F02.I01 改挂）
     <div className="space-y-6" data-fn="M05.F01.I02">
       {/* —— M05.F01.I03 核心指标卡 —— */}
       <section data-fn="M05.F01.I03" data-testid="dashboard-metrics" className="space-y-3">

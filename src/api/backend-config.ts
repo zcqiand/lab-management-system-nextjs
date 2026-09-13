@@ -11,7 +11,7 @@
 // *_ENABLE_MSW env 与 isMswEnabled() 函数一并删除。
 //
 // 所有调用方从 `getBaseUrl()` / `getBackend()` 切到 `getApiBaseUrl()` / `getApiMode()`。
-// 改动必须在 `function-tree.md` M98.F01 → 已废弃 批准之后（ADR-0014）。
+// 运行时后端切换已废弃（ADR-0014）：本文件只走 env 单 URL，不提供切换语义。
 
 import { env } from "./env";
 

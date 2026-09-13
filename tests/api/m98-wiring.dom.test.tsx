@@ -1,20 +1,11 @@
-// M98 接线层 — fnTest（ADR-0014 后只保留 F02 + F03）。
+// 前端接线层单测（ADR-0033 阶段二：M98 infra 段自 function-tree 退役，
+// fnTest 锚点解挂为普通 it —— 路由 handler / 拦截器仍是本仓自有实现，照常测试）。
 //
-// 覆盖：
-//   F02.I01 axios 拦截器
-//   F03.I01 POST /api/auth/login
-//   F03.I02 GET /api/auth/me
-//   F03.I03 POST /api/auth/logout
-//   F03.I04 POST /api/auth/refresh
-//   F03.I05 POST /api/auth/switch-tenant
-//
-// F01.I01（BackendSwitcher）+ F01.I02（持久化 baseUrl）已废弃（ADR-0014），
-// 跟随 BackendSwitcher.tsx / backend-context.tsx 一并删除。F03 走直接 import
-// 路由 handler + 构造 mock Request（不动 nextjs dev server）。
+// 覆盖：axios 拦截器 + /api/auth/{login,me,logout,refresh,switch-tenant} 5 路由。
+// 走直接 import 路由 handler + 构造 mock Request（不动 nextjs dev server）。
 
-import { describe, expect, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { installHttpClient } from "@/api/http-client";
-import { fnTest } from "../fn";
 
 import { POST as loginPOST } from "@/app/api/auth/login/route";
 import { GET as meGET } from "@/app/api/auth/me/route";
@@ -23,7 +14,7 @@ import { POST as refreshPOST } from "@/app/api/auth/refresh/route";
 import { POST as switchTenantPOST } from "@/app/api/auth/switch-tenant/route";
 
 describe("M98 frontend 接线层", () => {
-  fnTest(["M98.F02.I01"], "installHttpClient 是函数且注册到全局 axios 拦截器不抛", async () => {
+  it("installHttpClient 是函数且注册到全局 axios 拦截器不抛", async () => {
     // installHttpClient 注册 request 拦截器到全局 axios 单例；多次调用都安全。
     expect(typeof installHttpClient).toBe("function");
     expect(() => installHttpClient(() => "token-a")).not.toThrow();
@@ -37,7 +28,7 @@ describe("M98 frontend 接线层", () => {
     }
   });
 
-  fnTest(["M98.F03.I01"], "POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户", async () => {
+  it("POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户", async () => {
     // ADR-0019 + P2 debt：login 改用 LabJwtSigner 真签 (3 段 base64url)，
     // 与 msw/aspnetcore/springboot 3 真后端 token 形态对齐 → contract-test 4-way 一致。
     const req = new Request("http://test/api/auth/login", {
@@ -56,23 +47,23 @@ describe("M98 frontend 接线层", () => {
     expect(body.tenants[0]?.tenantId).toBe("TENANT-001");
   });
 
-  fnTest(["M98.F03.I02"], "GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
+  it("GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
     // ADR-0019：删「无 Bearer = DEMO_USER」反模式。meGET 无 Bearer 必须 401。
-    // 真路径要 login 后拿 token + 建 membership 快照，单独 fnTest 覆盖。
+    // 真路径要 login 后拿 token + 建 membership 快照，me-route.dom.test.tsx 覆盖。
     const res = await meGET(new Request("http://test/api/auth/me"));
     expect(res.status).toBe(401);
     const body = (await res.json()) as { code: string };
     expect(body.code).toBe("UNAUTHORIZED");
   });
 
-  fnTest(["M98.F03.I03"], "POST /api/auth/logout 返回 204", async () => {
+  it("POST /api/auth/logout 返回 204", async () => {
     const res = await logoutPOST();
     expect(res.status).toBe(204);
   });
 
-  fnTest(["M98.F03.I04"], "POST /api/auth/refresh 无 refreshToken 返 401（ADR-0019 删 admin 兜底）", async () => {
+  it("POST /api/auth/refresh 无 refreshToken 返 401（ADR-0019 删 admin 兜底）", async () => {
     // ADR-0019：删「refreshToken ?? "admin"」反模式。refreshPOST 无 token 必须 401。
-    // 真路径要 saas oauth/token grant_type=refresh_token,单独 fnTest 覆盖。
+    // 真路径要 saas oauth/token grant_type=refresh_token,本文件下方 400 分支覆盖。
     const req = new Request("http://test/api/auth/refresh", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -84,7 +75,7 @@ describe("M98 frontend 接线层", () => {
     expect(body.code).toBe("UNAUTHORIZED");
   });
 
-  fnTest(["M98.F03.I04"], "POST /api/auth/refresh 返 400 REFRESH_NOT_IMPLEMENTED 且不调 saas（ADR-0019）", async () => {
+  it("POST /api/auth/refresh 返 400 REFRESH_NOT_IMPLEMENTED 且不调 saas（ADR-0019）", async () => {
     // ADR-0019：refresh 现在返 400 REFRESH_NOT_IMPLEMENTED（真路径走 saas /oauth/token grant_type=refresh_token,本仓 demo 暂未接通）。
     // 钉死「demo refresh 不调 saas」契约——未来接 saas SSO 时此断言会失败提醒扩展。
     const origFetch = globalThis.fetch;
@@ -106,7 +97,7 @@ describe("M98 frontend 接线层", () => {
     }
   });
 
-  fnTest(["M98.F03.I05"], "POST /api/auth/switch-tenant 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
+  it("POST /api/auth/switch-tenant 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {
     // ADR-0019：删「无 Bearer = 切到 demo USER-A」反模式。
     const req = new Request("http://test/api/auth/switch-tenant", {
       method: "POST",
@@ -127,14 +118,13 @@ describe("M98 frontend 接线层", () => {
     expect(badRes.status).toBe(401);
   });
 
-  fnTest(["M98.F01.I01"], "BackendBadge 源文件挂 data-fn=I01 + 含 mode/baseUrl 渲染", async () => {
+  it("BackendBadge 源文件含 mode/baseUrl 渲染（纯展示，ADR-0014 后无切换语义）", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const src = fs.readFileSync(
       path.resolve(process.cwd(), "src/components/app/backend-badge.tsx"),
       "utf8",
     );
-    expect(src).toMatch(/data-fn="M98\.F01\.I01"/);
     expect(src).toMatch(/getApiMode\(\)/);
     expect(src).toMatch(/getApiBaseUrl\(\)/);
   });

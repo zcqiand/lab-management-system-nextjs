@@ -329,7 +329,7 @@ function NavLeaf({
         type="button"
         onClick={() => onSelect(node.code, node.path)}
         disabled={!node.path}
-        data-fn={`M98.F04.${node.code}`}
+        data-fn={`m-${node.code}`}
         data-testid={`sidebar-item-${node.code}`}
         title={collapsed ? node.name : undefined}
         aria-label={collapsed ? node.name : undefined}

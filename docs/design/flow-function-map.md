@@ -46,14 +46,6 @@ flowchart LR
 | M02.F01.I01 | 合同管理是上游资源池，所有接样单通过 contractId 引用；本身不参与流程转换 |
 | M02.F01.I02 | 同上（合同新建/编辑） |
 | M02.F01.I03 | 同上（合同删除；与试验流程解耦） |
-| M98.F01.I01 | 后端模式标签（无交互）：src/components/app/backend-badge.tsx；读 NEXT_PUBLIC_API_MODE 与 NEXT_PUBLIC_API_BASE_URL，仅诊断用途（替代旧 BackendSwitcher，ADR-0014） |
-| M98.F01.I02 | ~~baseURL 持久化到 localStorage 跨标签同步~~已废弃（ADR-0014）；baseURL 改由 NEXT_PUBLIC_API_BASE_URL 部署期配置 |
-| M98.F02.I01 | axios 拦截器在 baseURL = getApiBaseUrl() 上自动跑；infra 副作用，不参与业务流程 |
-| M98.F03.I01 | POST /api/auth/login 是 nextjs-backend-mode 下的认证入口；M00 选租户前置 |
-| M98.F03.I02 | GET /api/auth/me 给 M00.F01（当前用户会话）提供数据 |
-| M98.F03.I03 | POST /api/auth/logout 走侧栏登出按钮（M01.F05.I05） |
-| M98.F03.I04 | POST /api/auth/refresh 走 axios 拦截器（M98.F02.I01） |
-| M98.F03.I05 | POST /api/auth/switch-tenant 给 M00.F02（登录选租户）提供后端 |
 | M05.F01.I01 | 试验报告汇总表：按报告名称（categoryCode）聚合 sample_receipts，是流程末端读视图（不参与状态流转） |
 | M06.F05.I01 | 计算方法维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
 | M06.F05.I02 | 同上（计算方法新建/编辑） |
@@ -86,13 +78,6 @@ flowchart LR
 | M04.F09.I01 | 牌号码表维护是 M04 基础数据子域，被接样（M03.F01 样品牌号下拉）读取，但本身不参与流程状态 |
 | M04.F09.I02 | 同上（牌号新建/编辑） |
 | M04.F09.I03 | 同上（牌号删除） |
-| M97.F01.I01 | 发射脚本 replay 段：从 `../lab-management-system-shared/sql/migrations/V*.sql` 在 lab_dev 全量回放，dev 期 schema emit 基建，无 UI 无权限 |
-| M97.F01.I02 | 发射脚本 dump 段：用 catalogDump / pg_dump --schema-only 把 lab_dev 真实表结构输出成 `generated/schema.sql`，dev 期 schema emit 基建 |
-| M97.F01.I03 | 发射脚本 pull 段：跑 drizzle-kit pull 出 TS schema 到 `generated/schema.ts`，再过 `scripts/fix-pulled-schema.mjs` 后处理，dev 期基建 |
-| M97.F01.I04 | 发射脚本 dbml 段 + `scripts/v-sql-to-dbml.mjs`：把表结构翻成 DBML 写 `generated/schema.dbml`，供文档/ER 图消费 |
-| M97.F02.I01 | dev 依赖 `pg ^8.13.1`：必须留 devDependency，sync-db.mjs 借链不能进消费方 runtime bundle（CLAUDE.md §3 硬约束） |
-| M97.F02.I02 | `scripts/borrow-pg.mjs` sanity：验证 pg 借链与 lab_dev 可达，L4 smoke 同款路径 |
-| M97.F02.I03 | `../lab-management-system-shared/scripts/sync-db.mjs:36-46` createRequire 借用本仓 pg 客户端连 lab_dev；infra 副作用 |
 
 ---
 

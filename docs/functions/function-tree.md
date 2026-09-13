@@ -24,8 +24,6 @@
 ## 本仓角色
 
 **Full-stack 前端 + schema emit infra 仓**。Next.js 特殊：既是前端，又可通过 API routes 作后端。
-
-M97 全规划（infra，**没有 UI/data-fn**），M98 含产品切面（Next.js API routes + http-client 注入；M98.F01 运行时后端切换已废弃 — ADR-0014，改走 .env 单 URL）。
 M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 级原样 + REF 树中挂在这些 F 级下的 I 级子项（父 F ∈ BASE，check_align 合法扩充）。REF 已上线/开发中行在本仓初始「规划」，落地后逐波 tree-change 推进；REF 已废弃行照抄「已废弃」。
 
 ---
@@ -41,8 +39,6 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M04 | 基础数据 | 型号/规格/等级/牌号维护 | 规划 |
 | M05 | 数据统计 | 报告汇总表（按报告名称） | 规划 |
 | M06 | 检测能力 | 检测专项/项目/参数/标准/计算方法/技术要求/报告名称/参数界面 | 规划 |
-| M97 | schema emit infrastructure | lab-management-system-shared V*.sql → {schema.sql, schema.dbml, schema.ts} + pg 借链 | 规划 |
-| M98 | frontend 接线层 | apiclient + Next.js API routes（自身作后端）；M98.F01 4-backend 切换已废弃（ADR-0014），改走 NEXT_PUBLIC_API_BASE_URL | 已上线 |
 
 ---
 
@@ -68,7 +64,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 |---|---|---|---|---|---|
 | M01.F04.I01 | 动态菜单下发（GET /auth/menus） | 查询 | 前端+后端 |  | 已上线 |
 | M01.F04.I02 | 路由守卫 | 接口 | 前端+后端 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
-| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 前端+后端 | 与 I02 描述重复，合并到 F02；本仓无独立挂点 | 已废弃 |
+| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 前端+后端 |  | 已上线 |
 | M01.F04.I04 | 动态菜单 | 接口 | 前端+后端 | 侧边栏菜单由身份平台 GET /menus?appId=lab-management 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
 
 ### M01.F05 认证管理
@@ -252,6 +248,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M05.F01.I03 | 核心指标卡 | 查询 | 前端+后端 | 今日试验总数 + 检测合格率（按材料类型 concrete/rebar/sand）+ 报告产出量（已生成/已签发/待审核）；GET /api/summary/stats 扩展 todayTestCount/qualifiedRateByMaterial/reportOutputByStatus | 已上线 |
 | M05.F01.I04 | 任务状态漏斗 | 报表 | 前端+后端 | 6 段实时计数：待取样→已收样→试验中→报告编制→待审核→已签发；GET /api/summary/stats 扩展 funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued} | 已上线 |
 | M05.F01.I05 | 见证取样跟踪 | 报表 | 前端+后端 | 见证率（合同需见证的接样单中已完成见证的比例）+ 见证到位情况明细；GET /api/summary/stats 扩展 witnessStats:{requireWitness, witnessed, witnessRate, details[]} | 规划 |
+| M05.F01.I06 | 仪表盘统计基础端点 | 查询 | 前端+后端 | GET /api/summary/stats 基础字段：contractCount/receiptCount/sampleCount + 报告状态 3 桶（draft=receiving+task+data_entry；reviewing=review+approval；issued=issuance+archived）+ pendingTaskCount。ADR-0033 阶段二自 M05.F02.I01 改挂 F01（BASE I06 下沉对齐） | 已上线 |
 
 ---
 
@@ -347,70 +344,12 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 ---
 
-## M97 schema emit infrastructure
 
-| 功能 ID | 功能名称 | 说明 | 状态 |
-|---|---|---|---|
-| M97.F01 | emit schema snapshot | ADR-0033 阶段一废弃：shared 改 Drizzle schema-first（ADR-0025），V*.sql 退役，本仓改 pull-schema.sh 直拉真库 | 已废弃 |
-| M97.F02 | lend pg runtime | 持有 `pg` devDep 供 shared 仓 replay 测试 `require("pg")` 借 | 已上线 |
-
-### M97.F01 emit schema snapshot
-
-| 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
-|---|---|---|---|---|---|
-| M97.F01.I01 | replay V*.sql to lab_dev | 接口 | 前端+后端 | Flyway 退役，ADR-0033 | 已废弃 |
-| M97.F01.I02 | pg_dump --schema-only | 接口 | 仅后端 | 同上 | 已废弃 |
-| M97.F01.I03 | drizzle-kit pull | 接口 | 仅后端 | 被 pull-schema.sh 取代：产物落 src/db/schema.ts 入 git | 已废弃 |
-| M97.F01.I04 | v-sql → DBML | 接口 | 仅后端 | 同上 | 已废弃 |
-
-### M97.F02 lend pg runtime
-
-| 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
-|---|---|---|---|---|---|
-| M97.F02.I01 | pg devDep | 接口 | 前端+后端 | `pg ^8.13.1` 落到本仓 devDependencies（**不是** dependencies） | 已上线 |
-| M97.F02.I02 | borrow-pg sanity | 接口 | 前端+后端 | `node scripts/borrow-pg.mjs`：验证 `require("pg")` + 联 lab_dev | 已上线 |
-| M97.F02.I03 | consumed by shared replay test | 接口 | 前端+后端 | `../lab-management-system-shared/tests/drizzle.replay.test.ts` 借本仓的 pg（原 sync-db.mjs 消费方已随 ADR-0033 删除） | 已上线 |
-
----
-
-## M98 frontend 接线层
-
-| 功能 ID | 功能名称 | 说明 | 状态 |
-|---|---|---|---|
-| M98.F01 | env 驱动后端配置（ADR-0014 — NEXT_PUBLIC_API_BASE_URL / NEXT_PUBLIC_ENABLE_MSW / NEXT_PUBLIC_API_MODE） | 接口 | 已上线 |
-| M98.F02 | http-client 注入 | axios 拦截器在 baseURL = getApiBaseUrl() 上自动跑 | 已上线 |
-| M98.F03 | Next.js API routes（自身作后端） | `/api/auth/{login,me,logout,refresh,switch-tenant}` 5 个路由；nextjs-backend-mode 下命中 | 已上线 |
-
-### M98.F01 env 驱动后端配置（ADR-0014 — NEXT_PUBLIC_API_BASE_URL / NEXT_PUBLIC_ENABLE_MSW / NEXT_PUBLIC_API_MODE）
-
-| 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
-|---|---|---|---|---|---|
-| M98.F01.I01 | BackendBadge 后端模式显示（env: apiMode + baseUrl；ADR-0014 替代旧 BackendSwitcher） | 展示 | 前端+后端 |  | 已上线 |
-| M98.F01.I02 | 持久化 baseUrl | 接口 | 前端+后端 | localStorage[`lab.backend`]；跨标签 storage 事件同步 | 已废弃 |
-
-### M98.F02 http-client 注入
-
-| 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
-|---|---|---|---|---|---|
-| M98.F02.I01 | axios 拦截器 | 接口 | 前端+后端 | src/api/http-client.ts 的 installHttpClient；注入 baseURL + Authorization | 已上线 |
-
-### M98.F03 Next.js API routes（自身作后端）
-
-| 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
-|---|---|---|---|---|---|
-| M98.F03.I01 | POST /api/auth/login | 接口 | 前端+后端 | demo：返 mock token + 3 租户；真路径接 pg | 已上线 |
-| M98.F03.I02 | GET /api/auth/me | 接口 | 前端+后端 | 当面用户 + tenants[] + currentTenantId | 已上线 |
-| M98.F03.I03 | POST /api/auth/logout | 接口 | 前端+后端 | 204 No Content | 已上线 |
-| M98.F03.I04 | POST /api/auth/refresh | 接口 | 前端+后端 | 用 refreshToken 换新 token | 已上线 |
-| M98.F03.I05 | POST /api/auth/switch-tenant | 接口 | 前端+后端 | 校验 tenantId 后换 token；msw 仓的同款语义 | 已上线 |
-
----
 
 ## 维护约定
 
 - 谁改功能，谁改表，同一个 commit。
 - `规划` → `开发中`：必须先有需求文档引用它。
 - `开发中` → `已上线`：L5 会警告它缺设计映射与测试引用。警告不阻断，由人裁量。
-- infra 模块的特殊性：M97 全规划，**没有 UI/data-fn**，所以 fnTest 列故意留空，trace.json 留 `[]`。
-- nextjs-as-backend：M98.F03 的 5 个 API route 是「家族定位要求」的功能，不是产品代码。
+- nextjs-as-backend：`/api/auth/*` 5 个 API route 是「家族定位要求」的功能，不是产品代码，不再单列 M98 段（ADR-0033 阶段二：infra 段自 tree 退役，由各仓自管）。
 - BASE F 级下的 I 级子项镜像自 REF（backup/lab-management-system），只收父 F ∈ BASE 的行；BASE 外的 15 个 F 级段（老机构/角色/用户管理、人员/设备/设施、报告编制、旧报告类别/模板/标准/参数/技术要求、合同类别/计算方法/试件尺寸）不入本仓树，由 check_align 裁决锁定。
