@@ -66,6 +66,12 @@ jobs:
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
       - name: Checkout msw sibling
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw
+      # 测试基建相对路径引 msw sibling 源码,sibling handler 链 import msw/axios/jose
+      # ——从 sibling 目录向上解析够不到本仓 node_modules,必须给 sibling 装依赖
+      # (--omit=dev:链上所需全在 dependencies)
+      - name: Install msw sibling dependencies
+        run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+        working-directory: ../lab-management-system-msw
       - name: Install dependencies
         run: npm ci
       # shared-openapi.yaml 生成 src/api/endpoints/(gitignored,见 CLAUDE.md §3)

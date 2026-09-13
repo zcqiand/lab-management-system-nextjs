@@ -8,7 +8,7 @@ import { CategoryDictList } from '@/features/dicts/CategoryDictList'
 import {
   inspectionModels,
   inspectionBrands,
-} from '@lab/management-system-msw/fixtures'
+} from '../../../../lab-management-system-msw/src/fixtures/seed'
 
 /**
  * M04.F06-F09 型号/规格/等级/牌号维护 4 页 smoke（CategoryDictList 参数化）。
