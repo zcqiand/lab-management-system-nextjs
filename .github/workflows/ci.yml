@@ -16,10 +16,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    # generated/schema.ts 是 drizzle-kit pull 产出（gitignored,见 CLAUDE.md §3），
-    # src/db/schema.ts:7 export * from "../../generated/schema"。CI 起 postgres 服务
-    # 跑 migrate + pull schema，再 build/typecheck。DB host/port/credentials 由
-    # services.postgres 自动注入到 DATABASE_URL。
+    # DB-First（ADR-0025/ADR-0033）：src/db/schema.ts 是 pull 产物、已入 git。
+    # CI 起 postgres 服务仅供 db.smoke.test 验 shared target DDL 可执行；
+    # build/typecheck 不连 DB。
     services:
       postgres:
         image: postgres:16-alpine
@@ -72,33 +71,7 @@ jobs:
       # shared-openapi.yaml 生成 src/api/endpoints/(gitignored,见 CLAUDE.md §3)
       - name: gen:shared
         run: npm run gen:shared
-      # 把 shared 的 V*.sql 灌到 CI postgres,再建表 drizzle schema
-      # sync-db.mjs 在 sibling 仓 ../lab-management-system-shared/scripts/(CLAUDE.md §4)。
-      # v0.2.6+ 优先读 DATABASE_URL,sync-db.mjs 内的 PG_* 兜底仅用于兼容老脚本。
-      - name: sync-db (CI postgres)
-        run: node ../lab-management-system-shared/scripts/sync-db.mjs
-      # drizzle-kit pull:从已 migrate 的 CI postgres 拉 schema 到 generated/schema.ts
-      # 这是 src/db/schema.ts:7 export * from "../../generated/schema" 的 SSOT
-      - name: drizzle-kit pull → generated/schema.ts
-        run: npx --no drizzle-kit pull --config=drizzle.config.pg.ts
-      # drizzle-kit 解析 V009/V012 的 `DEFAULT ''` 会有 bug,产出 `default(').notNull()`
-      # 而不是合法的 `default('').notNull()`。sed 修。
-      # 等待 drizzle-kit 升级修这个再撤补丁。
-      - name: Fix drizzle-kit DEFAULT '' bug
-        run: sed -i "s/default(')\./default('')./g" generated/schema.ts
-      # drizzle-kit 在某些版本会 import `sql` 但实际未用,tsc L3 报
-      # "'sql' is declared but its value is never read"。sed 移除整行（容忍有无分号）。
-      # v0.3.44:sync-db 现在建 __schema_migrations,drizzle-kit pull 产出的
-      # schemaMigrations 表用 sql`CURRENT_TIMESTAMP` -> `sql` 是真 import,不能删。
-      # 仅当全文无 sql` 用法时才删(unused 场景),有用法则保留。
-      - name: Drop unused `sql` import from generated/schema.ts (only if truly unused)
-        run: |
-          if ! grep -q 'sql`' generated/schema.ts; then
-            sed -i -E '/^import \{ sql \} from "drizzle-orm"\s*;?\s*$/d' generated/schema.ts
-          else
-            echo "sql template literal in use, keeping import"
-          fi
-      # Build —— next build 会 import src/db/schema.ts,需要 generated/schema.ts 已就位
+      # Build —— src/db/schema.ts 已入 git（DB-First），build 无需任何 DB 产物步骤
       - name: Build
         run: npm run build
       - name: L1 format
@@ -125,22 +98,7 @@ jobs:
     concurrency:
       group: deploy-${{ github.event.repository.name }}-${{ github.ref }}
       cancel-in-progress: false
-    # generated/schema.ts 在 .gitignore,git checkout 不带。deploy job 起 postgres service
-    # 跑 sync-db + drizzle-kit pull,产物落 generated/,docker build COPY . . 时已有。
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: lab_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+    # DB-First：src/db/schema.ts 已入 git，deploy job 不再需要 postgres service / sync-db / pull。
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lab_test
       # 2026-09-04 ADR-0019：build 时 next.js collect page data 会 import route 模块，
@@ -177,23 +135,6 @@ jobs:
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw
       - name: Install dependencies
         run: npm ci
-      - name: sync-db (CI postgres)
-        run: node ../lab-management-system-shared/scripts/sync-db.mjs
-      - name: drizzle-kit pull → generated/schema.ts
-        run: npx --no drizzle-kit pull --config=drizzle.config.pg.ts
-      # sed 同样修复 drizzle-kit DEFAULT '' / unused sql import bug
-      - name: Fix drizzle-kit DEFAULT '' bug
-        run: sed -i "s/default(')\./default('')./g" generated/schema.ts
-      # v0.3.44:sync-db 现在建 __schema_migrations,drizzle-kit pull 产出的
-      # schemaMigrations 表用 sql`CURRENT_TIMESTAMP` -> `sql` 是真 import,不能删。
-      # 仅当全文无 sql` 用法时才删(unused 场景),有用法则保留。
-      - name: Drop unused `sql` import from generated/schema.ts (only if truly unused)
-        run: |
-          if ! grep -q 'sql`' generated/schema.ts; then
-            sed -i -E '/^import \{ sql \} from "drizzle-orm"\s*;?\s*$/d' generated/schema.ts
-          else
-            echo "sql template literal in use, keeping import"
-          fi
 
       # secrets 全部建在 Repository 级,不声明 environment
       - name: Login to Docker Hub

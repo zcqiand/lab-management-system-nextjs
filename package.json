@@ -18,9 +18,7 @@
     "prebuild": "npm run gen:shared",
     "borrow:pg": "node scripts/borrow-pg.mjs",
     "borrow:pg:sibling": "node scripts/borrow-from-nextjs-pg.mjs",
-    "emit:schema": "node scripts/emit-schema.mjs",
-    "emit:dbml": "node scripts/v-sql-to-dbml.mjs",
-    "drizzle:pull": "drizzle-kit pull --config=drizzle.config.pg.ts",
+    "pull:schema": "bash scripts/pull-schema.sh",
     "fix:schema": "node scripts/fix-pulled-schema.mjs",
     "seed:db": "tsx --env-file-if-exists=.env scripts/seed-db.ts"
   },

@@ -351,17 +351,17 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 说明 | 状态 |
 |---|---|---|---|
-| M97.F01 | emit schema snapshot | 读 shared V*.sql → replay → generated/{schema.sql, schema.dbml, schema.ts} 三件套 | 已上线 |
-| M97.F02 | lend pg runtime | 持有 `pg` devDep 供 shared/sync-db.mjs `require("pg")` 借 | 已上线 |
+| M97.F01 | emit schema snapshot | ADR-0033 阶段一废弃：shared 改 Drizzle schema-first（ADR-0025），V*.sql 退役，本仓改 pull-schema.sh 直拉真库 | 已废弃 |
+| M97.F02 | lend pg runtime | 持有 `pg` devDep 供 shared 仓 replay 测试 `require("pg")` 借 | 已上线 |
 
 ### M97.F01 emit schema snapshot
 
 | 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
 |---|---|---|---|---|---|
-| M97.F01.I01 | replay V*.sql to lab_dev | 接口 | 前端+后端 | 顺序 execute V001..V<N>，每条一个事务；中途失败回滚 | 已上线 |
-| M97.F01.I02 | pg_dump --schema-only | 接口 | 仅后端 | 写到 generated/schema.sql；带 `tenant_id` V012 后的列 | 已上线 |
-| M97.F01.I03 | drizzle-kit pull | 接口 | 仅后端 | 写到 generated/schema.ts；PG dialect | 已上线 |
-| M97.F01.I04 | v-sql → DBML | 接口 | 仅后端 | 写到 generated/schema.dbml；让 msw / 未来 backend 直接对比 ER | 已上线 |
+| M97.F01.I01 | replay V*.sql to lab_dev | 接口 | 前端+后端 | Flyway 退役，ADR-0033 | 已废弃 |
+| M97.F01.I02 | pg_dump --schema-only | 接口 | 仅后端 | 同上 | 已废弃 |
+| M97.F01.I03 | drizzle-kit pull | 接口 | 仅后端 | 被 pull-schema.sh 取代：产物落 src/db/schema.ts 入 git | 已废弃 |
+| M97.F01.I04 | v-sql → DBML | 接口 | 仅后端 | 同上 | 已废弃 |
 
 ### M97.F02 lend pg runtime
 
@@ -369,7 +369,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 |---|---|---|---|---|---|
 | M97.F02.I01 | pg devDep | 接口 | 前端+后端 | `pg ^8.13.1` 落到本仓 devDependencies（**不是** dependencies） | 已上线 |
 | M97.F02.I02 | borrow-pg sanity | 接口 | 前端+后端 | `node scripts/borrow-pg.mjs`：验证 `require("pg")` + 联 lab_dev | 已上线 |
-| M97.F02.I03 | consumed by shared sync-db | 接口 | 前端+后端 | `../lab-management-system-shared/scripts/sync-db.mjs:36-46` 借本仓的 pg | 已上线 |
+| M97.F02.I03 | consumed by shared replay test | 接口 | 前端+后端 | `../lab-management-system-shared/tests/drizzle.replay.test.ts` 借本仓的 pg（原 sync-db.mjs 消费方已随 ADR-0033 删除） | 已上线 |
 
 ---
 

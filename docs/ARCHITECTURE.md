@@ -1,9 +1,9 @@
 # lab-management-system-nextjs Architecture
 
 > 子仓级架构文档。回答三个问题：
-> 1. 为什么这个 nextjs 仓**同时是 Frontend + schema emit infra**（与 saas-nextjs 的全栈形态有何不同）；
+> 1. 为什么这个 nextjs 仓**同时是 Frontend + DB-First schema 消费层**（与 saas-nextjs 的全栈形态有何不同）；
 > 2. 双角色的目录骨架、各层职责、关键文件长什么样；
-> 3. 一次「改 shared DDL → 三件套 emit → 前端刷新」和一次「前端 dev」分别怎么走。
+> 3. 一次「改 shared schema → migrate → 本仓 pull + commit」和一次「前端 dev」分别怎么走。
 
 > **范围**：本文档只描述 *架构*（结构 / 边界 / 数据流 / 决策）。
 > 编码细则见 [docs/conventions/](conventions/)（不进主上下文），单个决策的 ADR 见 [docs/adr/](adr/)，需求见 [docs/requirements/](requirements/)。
@@ -17,7 +17,7 @@
 |---|---|
 | 新人，要 30 分钟搞懂本仓 | §1 → §2.1 → §3.3 → §4.2 |
 | 想知道「和 saas-nextjs 差在哪」 | §1 → §6.1 → [父仓 ARCHITECTURE.md §4.3](../../../docs/ARCHITECTURE.md#43-前端仓reactvuenextjs--6-仓) |
-| 改了 shared DDL 怎么把三件套 emit 出来 | §4.2 → §3.3 |
+| 改了 shared schema 怎么把镜像 pull 回来 | §4.2 → §3.3 |
 | 改了 shared OpenAPI 怎么 orval | §4.1 → §3.2 |
 | 想知道借出去的 `pg` driver 怎么用 | §4.3 → §3.4 |
 | 想问「为什么这么设计」 | §6 → 对应 ADR |
@@ -26,36 +26,39 @@
 
 ## 1. 双角色定位
 
-**lab-management-system-nextjs 是一个 nextjs 仓，但身兼两角：lab 家族的「前端 3/3」+ 全家族的「schema emit infra 仓」。** 这个双角色是它与 `saas-identity-platform-nextjs`（Frontend + Backend + DB 三合一全栈）最关键的区别。
+**lab-management-system-nextjs 是一个 nextjs 仓，但身兼两角：lab 家族的「前端 3/3」+ 家族的「DB-First schema 消费层 + pg 借链 host」。** 这个双角色是它与 `saas-identity-platform-nextjs`（Frontend + Backend + DB 三合一全栈）最关键的区别。
 
 ### 1.1 与 saas-nextjs 全栈形态的差异
 
 | 维度 | saas-identity-platform-nextjs | lab-management-system-nextjs（本仓） |
 |---|---|---|
-| 角色 | Frontend + Backend + DB（[ADR-0008](../../../docs/adr/0008-nextjs-full-stack.md)） | Frontend + **schema emit infra**（[ADR-0007](../../../docs/adr/0007-shared-sql-ssot.md)） |
-| DB 在哪个仓 | 本仓的 `src/db/`（Drizzle PG schema） | **不在本仓**——DDL 在 shared，由本仓 emit 出三件套供人读 |
+| 角色 | Frontend + Backend + DB（[ADR-0008](../../../docs/adr/0008-nextjs-full-stack.md)） | Frontend + **DB-First schema 消费层**（ADR-0025/ADR-0033，消费 shared SSOT） |
+| DB 在哪个仓 | 本仓的 `src/db/`（Drizzle PG schema，**本仓就是真源**） | **真源在 shared** `src/db/schema.ts`——本仓 `pull-schema.sh` 从真库 pull 镜像入 git |
 | Auth 后端 | 本仓 5 个 M00 auth 路由 + 4 个 OAuth + /me/tenants + /admin + /health | **本仓 5 个 M00 auth 路由**（M98.F03 家族定位要求）+ 业务路由 |
 | 业务路由数据源 | 本仓 `src/db/` | **`@lab/management-system-msw/fixtures`**（in-memory，nextjs-self 模式） |
-| 借出的 runtime | 无 | **`pg` devDep**——被 shared `sync-db.mjs` 借（[§3.4](#34-schema-emit-infra-层pg-借链)） |
-| 真正的数据持久 | 本仓 `src/db/index.ts` 走 postgres-js | **不持久**——emit 链只读 PG catalog；nextjs-self 模式走 fixtures |
+| 借出的 runtime | 无 | **`pg` devDep**——被 shared replay 测试借（[§3.4](#34-pg-借链保留的-infra-角色)） |
+| 真正的数据持久 | 本仓 `src/db/index.ts` 走 postgres-js | **不持久**——nextjs-self 模式走 fixtures；`src/db/index.ts` 仅 pull/smoke 自检 |
 
-一句话总结：**saas-nextjs 是「把后端活干了」，lab-nextjs 是「把 schema 形状广播到 14 仓」。**
+一句话总结：**saas-nextjs 是「把后端活干了」，lab-nextjs 是「从真库 pull schema 镜像入 git」+「前端 3/3」。**
+
+> 历史：本仓曾是家族的「schema emit infra 仓」（replay V*.sql + pg_dump + DBML 三件套，M97.F01）。
+> ADR-0025/ADR-0033 切 DB-First 后该角色整体退役（M97.F01 已废弃），见 §3.3。
 
 ### 1.2 双角色的两个核心闭环
 
 ```
 ┌─────────────────── lab-management-system-nextjs ──────────────────────┐
 │                                                                     │
-│  角色 A ─ Frontend ─────────────────────  角色 B ─ schema emit infra  │
+│  角色 A ─ Frontend ─────────────  角色 B ─ DB-First schema 消费层     │
 │  ┌────────────────────────┐              ┌────────────────────────┐ │
-│  │ src/app/(console)/...   │              │ scripts/emit-schema.mjs│ │
-│  │  ├─ page.tsx 业务页     │              │  ├─ replay V001..V017  │ │
-│  │  └─ src/components/app  │              │  ├─ pg_dump --schema-  │ │
-│  │     ├─ AppShell         │              │  │  only → schema.sql  │ │
-│  │     └─ SidebarNav       │              │  ├─ drizzle-kit pull   │ │
-│  │ src/app/api/auth/*      │              │  │  → schema.ts        │ │
-│  │  (M00 auth + M98.F03)   │              │  └─ v-sql-to-dbml.mjs  │ │
-│  │ src/app/api/contracts/* │              │     → schema.dbml      │ │
+│  │ src/app/(console)/...   │              │ scripts/pull-schema.sh │ │
+│  │  ├─ page.tsx 业务页     │              │  ├─ drizzle-kit pull   │ │
+│  │  └─ src/components/app  │              │  │  真库 → schema.ts    │ │
+│  │     ├─ AppShell         │              │  ├─ fix-pulled-schema  │ │
+│  │     └─ SidebarNav       │              │  ├─ git diff drift 检测│ │
+│  │ src/app/api/auth/*      │              │  └─ ADR-0026 marker    │ │
+│  │  (M00 auth + M98.F03)   │              │  产物 src/db/schema.ts │ │
+│  │ src/app/api/contracts/* │              │     （入 git）          │ │
 │  │  (业务路由 → msw fixtures)             │ scripts/borrow-pg.mjs  │ │
 │  │ orval → src/api/        │              │  └─ 验证 pg devDep 借链│ │
 │  │     endpoints/endpoints │              └────────────────────────┘ │
@@ -64,7 +67,7 @@
 │                    │                              │                  │
 └────────────────────┼──────────────────────────────┼──────────────────┘
                      │                              │
-       nextjs-self / msw-http / 真后端      shared/sql/migrations/V*.sql
+       nextjs-self / msw-http / 真后端      shared src/db/schema.ts → migrate → lab_dev
        （ADR-0014 env 切）                  （shared 仓禁 runtime 依赖）
                                             借本仓 node_modules/pg
 ```
@@ -72,9 +75,9 @@
 | 角色 | 闭环 | 触发命令 |
 |---|---|---|
 | **Frontend** | `next dev` 渲染 (console)/* 页面 → apiclient 调后端 → 后端返 fixture / 真数据 → UI 渲染 | `npm install` → `npm run gen:shared` → `npm run dev` |
-| **schema emit infra** | 读 shared V*.sql → replay 到 PG → pg_dump + drizzle-kit pull + DBML parser → 写 `generated/{schema.sql, schema.ts, schema.dbml}` 三件套 | `npm run emit:schema`（包内带 `npm run fix:schema`） |
+| **DB-First schema 消费层** | shared 改 `src/db/schema.ts` → migrate 到 lab_dev → 本仓 `pull-schema.sh` pull 真库 → `src/db/schema.ts` 入 git（drift 即显式 commit） | `npm run pull:schema`（包内带 `npm run fix:schema`） |
 
-**关键约束**：两个角色**不能互相打扰**——Frontend 的 L3 typecheck 必须过、schema emit 必须 idempotent；任何一方挂了都不允许拖累另一方。
+**关键约束**：两个角色**不能互相打扰**——Frontend 的 L3 typecheck 必须过、pull 链产物必须与真库一致（drift 即显式 commit，不静默吞）；任何一方挂了都不允许拖累另一方。
 
 ---
 
@@ -91,12 +94,14 @@ lab-management-system-nextjs/
 │   ├── requirements/           ← REQ 模板（lab 家族对称）
 │   └── conventions/nextjs.md   ← Server vs Client 组件 / Route Handler / Server Action
 ├── scripts/
-│   ├── gen-shared.ts           ← npm run gen:shared：shared emit:openapi + 本仓 orval
-│   ├── emit-schema.mjs         ← npm run emit:schema：三件套（replay + pg_dump + drizzle-kit pull + DBML）
+│   ├── gen-shared.ts           ← npm run gen:shared：shared emit:openapi + 本仓 orval + ADR-0026 marker
+│   ├── pull-schema.sh          ← npm run pull:schema：drizzle-kit pull 真库 → src/db/schema.ts + drift 检测
 │   ├── fix-pulled-schema.mjs   ← npm run fix:schema：修 drizzle-kit pull 产物的两类已知缺陷
 │   ├── borrow-pg.mjs           ← npm run borrow:pg：自检（pg 可加载 + lab_dev 可达）
 │   ├── borrow-from-nextjs-pg.mjs ← npm run borrow:pg:sibling：sibling 仓外部 reach 入口
-│   └── v-sql-to-dbml.mjs       ← npm run emit:dbml：纯解析 V*.sql → DBML 0.9（无 DBML runtime dep）
+│   ├── dump-db.mjs             ← src/seeds 快照 dump（prod bootstrap / 灾备）
+│   ├── seed-db.ts              ← msw fixtures → lab_dev 灌数据
+│   └── seed-from-snapshot.mjs  ← src/seeds/*.json → 目标 PG（prod bootstrap 反方向）
 ├── src/
 │   ├── app/
 │   │   ├── (console)/          ← 业务路由分组（合同/接样/检测/报告/码表/能力）
@@ -163,25 +168,21 @@ lab-management-system-nextjs/
 │   │   ├── db-queries.ts       ← pg 复杂查询封装
 │   │   └── utils.ts            ← cn() 等小工具
 │   ├── db/
-│   │   ├── index.ts            ← postgres-js driver（**仅 schema emit 校验用**，非 nextjs-self 路径）
-│   │   └── schema.ts           ← pgSchema = [] 占位（drizzle-kit pull 入口）
+│   │   ├── index.ts            ← postgres-js driver（仅 pull/smoke 自检 + src 内查询，非 nextjs-self 路径）
+│   │   └── schema.ts           ← pull-schema.sh 产物（**入 git**，真库镜像，禁手改表结构）
 │   ├── data/                   ← 静态 fixture 资源（demo seed 兜底）
 │   ├── features/               ← 业务 feature 模块（按 M 拆分）
 │   ├── seeds/                  ← 业务种子数据
 │   ├── state/                  ← Zustand store + auth-context
 │   └── types/                  ← 跨模块类型
 ├── tests/
-│   ├── db.smoke.test.ts        ← pg devDep 链 smoke（验证 lab_dev 可达）
-│   ├── emit-artifacts.test.ts  ← 验证 generated/{schema.sql, schema.ts, schema.dbml} 存在且非空
+│   ├── db.smoke.test.ts        ← 验 shared target DDL 可执行（lab_smoke 隔离 schema）
 │   ├── fn.ts                   ← fnTest helper（fn-ID 嵌入 it 名称）
 │   ├── fnReporter.ts           ← vitest reporter → .state/trace.json
 │   ├── setup.dom.ts + setup.ts
 │   ├── server-only.stub.ts
 │   ├── api/  components/  features/  helpers/  integration/  lib/  types/
-├── generated/                  ← schema emit 产物（gitignored）
-│   ├── schema.sql              ← pg_dump --schema-only（fallback: pg_catalog）
-│   ├── schema.ts               ← drizzle-kit pull（PG dialect）
-│   └── schema.dbml             ← 手写解析 V*.sql → DBML 0.9
+├── generated/                  ← orval codegen 产物（gitignored；openapi/）
 ├── public/                     ← 静态资源（favicon / icons）
 ├── deploy/
 │   ├── docker-entrypoint.sh    ← container 启动脚本
@@ -190,7 +191,7 @@ lab-management-system-nextjs/
 │   └── setup-vps.sh
 ├── tools/                      ← dev 辅助脚本
 ├── next.config.ts              ← Next.js 配置
-├── drizzle.config.pg.ts        ← drizzle-kit pull 配置（PG dialect）
+├── drizzle.config.ts           ← drizzle-kit pull 配置（PG dialect；PG_* env，无 fallback 密码）
 ├── orval.config.ts             ← orval codegen 配置（axios-functions + mutator）
 ├── vitest.config.ts
 ├── eslint.config.js
@@ -262,81 +263,50 @@ lab-management-system-nextjs/
 **关键约束**：
 
 - 业务路由**不连真 PG**——nextjs-self 模式下数据全在 msw fixtures（同进程内存）；
-- `src/db/index.ts`（postgres-js driver）**仅供 schema emit 链自检**（`db.smoke.test.ts`），不参与请求处理；
+- `src/db/index.ts`（postgres-js driver）**仅供 DB-First 链自检**（`db.smoke.test.ts` 验 shared target DDL），不参与请求处理；
 - 真生产部署切 `NEXT_PUBLIC_API_BASE_URL=http://<springboot-host>:5205` 走 springboot 后端，本仓 API routes 仅在 nextjs-self 模式生效。
 
-### 3.3 schema emit infra 层（`scripts/`）
+### 3.3 DB-First schema 消费层（`scripts/`）
 
-**职责**：把 shared `sql/migrations/V*.sql` 单调序列**重放**到 PG 实例上，再用三套不同方法 dump 出当前态 schema 形状，供家族所有仓对比 ER。**这是本仓的独特之处**——saas-nextjs 完全没有这个角色。
+**职责**：从真库把 DDL 结构反推（`drizzle-kit pull`）为本仓 `src/db/schema.ts` 入 git（ADR-0025/ADR-0033，镜像 saas-nextjs）。原「emit 三件套」（replay V*.sql + pg_dump + DBML）随 Flyway 退役删除（M97.F01 已废弃）。
 
 | 脚本 | 入口 | 关键产物 | 触发 |
 |---|---|---|---|
-| `emit-schema.mjs` | `npm run emit:schema` | `generated/{schema.sql, schema.ts, schema.dbml}` 三件套 | 改了 shared V*.sql 后跑 |
-| `fix-pulled-schema.mjs` | `npm run fix:schema` | 修 `generated/schema.ts` 两类已知缺陷 | 跑 drizzle-kit pull 后跑 |
-| `v-sql-to-dbml.mjs` | `npm run emit:dbml`（或 emit-schema 内部 spawn） | `generated/schema.dbml` | emit-schema 自动调 |
+| `pull-schema.sh` | `npm run pull:schema` | `src/db/schema.ts`（入 git）+ drift 检测 + ADR-0026 marker | shared 改 schema 并 migrate 后跑 |
+| `fix-pulled-schema.mjs` | `npm run fix:schema` | 修 pull 产物 `.default(')` / unused `sql` 两类缺陷 | pull-schema.sh 内部自动调（step 3） |
 | `borrow-pg.mjs` | `npm run borrow:pg` | 仅打印 `pg version` + `SELECT 1` | L4 smoke 路径同款自检 |
 | `borrow-from-nextjs-pg.mjs` | `npm run borrow:pg:sibling` | 同上 | sibling 仓从外部 reach 入口 |
 
-#### 3.3.1 三件套生成链（`emit-schema.mjs` 流程）
+#### 3.3.1 pull 链（`pull-schema.sh` 流程）
 
 ```
-shared/sql/migrations/V001..V017
-  ↓ fs.readdirSync + sort（按 V 数字升序）
-  ↓ BEGIN/EXEC/COMMIT per file（中途失败 ROLLBACK + exit 3）
-  ↓ 默认走 lab_emit schema 自洁（2026-08-18 事故后改：不碰 public）
-  ↓ --clobber-public 才走旧 DROP public CASCADE 路径
-replay 完成（应用数 = files.length）
-  ↓
-pg_dump --schema-only  → generated/schema.sql
-  ├─ 优先 pg_dump 二进制（spawnSync）
-  └─ 失败 fallback 到 pg_catalog 直查
-      （pg_dump client/server 版本不匹配场景，本机无 PG 二进制）
-  ↓
-drizzle-kit pull --config=drizzle.config.pg.ts
-  ↓ spawnSync('npx', ['--no', 'drizzle-kit', 'pull', ...])
-  ↓ 输出 generated/schema.ts（PG dialect）
-  ↓
-fix-pulled-schema.mjs
-  ↓ 修两类已知缺陷（D2 ruling）：
+真库 lab_dev（结构由 shared src/db/schema.ts migrate 而来）
+  ↓ npx --no drizzle-kit pull --config drizzle.config.ts
+  ↓ 产物 drizzle/schema.ts（drizzle-kit pull 默认输出目录）
+  ↓ move → src/db/schema.ts
+  ↓ fix-pulled-schema.mjs（幂等）：
   │   1. `.default(')` → `.default('')`：pull 对 text NOT NULL DEFAULT '' 列丢引号
-  │   2. import 列表 / 独立整行的 unused `sql`（drizzle-kit 新版拆成两行）
-  ↓ 幂等：再跑一遍是 no-op
-  ↓
-v-sql-to-dbml.mjs
-  ↓ 纯解析 V*.sql（无 DBML runtime dep）→ generated/schema.dbml
-  ↓ 应用 ALTER TABLE ... RENAME TO（V013 重命名 param_* → inspection_param_*）
-DONE → generated/{schema.sql, schema.ts, schema.dbml}
+  │   2. import 列表 / 独立整行的 unused `sql`
+  ↓ rm -rf drizzle/（relations.ts 等辅助文件不要）
+  ↓ git diff src/db/schema.ts——漂移即 exit 1（DB 真演进或本地未同步，需显式 commit）
+  ↓ ADR-0026 marker：.state/last-gen-shared.json 写 db_synced_sha
+OK → src/db/schema.ts 与 git HEAD 一致
 ```
 
-#### 3.3.2 隔离 schema：`lab_emit`
+**已知 pull 保真度限制**（不修，ORM 查询无感）：遗留约束名（`param_interfaces_pkey` 等）pull 会丢（渲染成列级 `.primaryKey()`）；真名以 shared schema.ts / 真库为准。
 
-**2026-08-18 事故后安全默认**：
+### 3.4 `pg` 借链（保留的 infra 角色）
 
-- 旧版本 `DROP SCHEMA public CASCADE; CREATE SCHEMA public` 会把 `lab_dev` 库里 `seed-db.ts` 灌的业务数据 + `receipts-pg` 测试依赖一并清空；
-- 新默认走 **`lab_emit` 隔离 schema**——`SET search_path TO lab_emit` 之后 replay，不动 public；
-- 仅 `--clobber-public` 显式开关才走旧 DROP 路径（供全新空库初始化用）。
-
-#### 3.3.3 pg_dump fallback：`pg_catalog` 直查
-
-**为什么存在**：本机只有 pgAdmin 14 自带的 `pg_dump.exe`，版本 < 服务器（PG 16 @ 100.79.128.25），直接 abort。走 `pg_catalog` 直查（`pg_class` / `pg_attribute` / `pg_constraint` / `pg_indexes`）生成等价 `--schema-only` 输出，**不依赖任何本机 PG 二进制**——与借 `pg` devDep 链同款哲学。
-
-输出 header 加 `-- via pg_catalog (fallback: pg_dump client/server version mismatch)` 标明非 pg_dump 原生产物。
-
-### 3.4 schema emit infra 层：`pg` 借链
-
-**关键事实**：`shared` 仓禁 npm runtime 依赖（[ADR-0007](../../../docs/adr/0007-shared-sql-ssot.md)），但 `scripts/sync-db.mjs` 需要 `pg` driver 推 DDL 到 PG。**借链策略**：
+**关键事实**：`shared` 仓禁 npm runtime 依赖（[ADR-0007](../../../docs/adr/0007-shared-sql-ssot.md)），但其 `tests/drizzle.replay.test.ts`（空库 push 重建断言）需要 `pg` driver。**借链策略**：
 
 | 优先级 | 来源 | 场景 |
 |---|---|---|
-| 1 | `/app/node_modules/pg` | runtime container（Dockerfile COPY 全量 node_modules） |
-| 2 | `../lab-management-system-nextjs/node_modules/pg` | dev 路径——**本仓就是首选借出方** |
-| 3 | `../saas-identity-platform-nextjs/node_modules/pg` | saas 家族 dev（备选） |
-
-`sync-db.mjs:36-46` 实现的 fallback 链：先试 `/app/node_modules/pg` → 再试 `../lab-management-system-nextjs/node_modules/pg` → 最后试 `../saas-identity-platform-nextjs/node_modules/pg`。三者都失败 → exit 1 + 报错路径说明。
+| 1 | `../lab-management-system-nextjs/node_modules/pg` | dev 路径——**本仓就是首选借出方** |
+| 2 | `../saas-identity-platform-nextjs/node_modules/pg` | saas 家族 dev（备选） |
 
 **对本仓的硬约束**：
 
-- `pg` 必须落 `devDependencies`（**不能升 dependencies**）——sync-db 的借链不能进消费方 runtime bundle；
+- `pg` 必须落 `devDependencies`（**不能升 dependencies**）——借链不能进消费方 runtime bundle；
 - `borrow-pg.mjs` 自检 = pg 可加载 + lab_dev 可达（验证借链完整）；
 - `borrow-from-nextjs-pg.mjs` 是 sibling 仓外部 reach 入口（镜像 saas-nextjs 的同款脚本）。
 
@@ -388,44 +358,23 @@ DONE → generated/{schema.sql, schema.ts, schema.dbml}
 - **`.env` 用 `registry.npmmirror.com`**（CLAUDE.md 顶层约束）；
 - **后端 CORS allowlist 必须含 3000**（nextjs dev）——msw 已硬编码白名单（lab-msw: nextjs(3000) + react/vue(5173) + 对侧 saas-msw(5174)）。
 
-### 4.2 schema emit 流程（infra 角色）
+### 4.2 schema 同步流程（infra 角色，DB-First）
 
 ```
-A. 改 shared DDL（家族任何人）
-   shared/sql/migrations/V018__<desc>.sql
-   ↓ git commit + push
+A. 改 shared DB schema（家族任何人，经 /tree-change 审批链）
+   ../lab-management-system-shared/src/db/schema.ts
+   ↓ npm run db:generate（物化 drizzle/）→ gate 绿 → commit
+   ↓ npm run migrate-db（应用迁移到 lab_dev）
 
 B. cd output/lab-management-system-nextjs
-   npm run emit:schema
-   ↓ emit-schema.mjs:
-     1. fs.readdirSync(V018) → 排序 V001..V018
-     2. Client connect 100.79.128.25:5432/lab_dev
-        ├─ 默认: DROP SCHEMA lab_emit CASCADE; CREATE SCHEMA lab_emit; SET search_path lab_emit
-        └─ --clobber-public: DROP SCHEMA public CASCADE; CREATE SCHEMA public
-     3. for f in files: BEGIN / EXEC / COMMIT（per-file 事务）
-        ├─ 中途失败: ROLLBACK + exit 3
-        └─ 全部成功: applied = files.length
-     4. pg_dump --schema-only -h ... -d lab_dev → generated/schema.sql
-        └─ pg_dump 二进制不可用 → pg_catalog 直查 fallback
-     5. spawnSync('npx', ['--no', 'drizzle-kit', 'pull', '--config=drizzle.config.pg.ts'])
-        → generated/schema.ts（PG dialect）
-     6. spawnSync('node', ['v-sql-to-dbml.mjs'])
-        → generated/schema.dbml（DBML 0.9）
-   ↓
-C. npm run fix:schema
-   ↓ fix-pulled-schema.mjs 修两类 drizzle-kit pull 已知缺陷
-     1. .default(') → .default('')（text NOT NULL DEFAULT '' 丢引号）
-     2. import 列表 / 独立整行的 unused `sql`
-   ↓ 幂等：再跑一遍 no-op
+   bash scripts/pull-schema.sh
+   ↓ drizzle-kit pull 真库 → src/db/schema.ts（fix + drift 检测 + ADR-0026 marker）
+   ↓ drift = DB 真演进 → git add src/db/schema.ts && git commit
 
-D. 验证三件套
-   npm test -- emit-artifacts
-   → tests/emit-artifacts.test.ts 断言 generated/{schema.sql, schema.ts, schema.dbml} 存在且非空
+C. npm test
+   → tests/db.smoke.test.ts 验 shared target DDL 可执行（lab_smoke 隔离 schema）
 
-E. git commit（注意 generated/ 在 .gitignore 不入）
-   ↓ 只 commit 改了的相关文件（emit-schema.mjs 修复 / 触发原因）
-
-F. （可选）父仓推进本仓 gitlink
+D. （可选）父仓推进本仓 gitlink
    cd ..  # suite 根
    git update-index --add --cacheinfo 160000,<NEW_HASH>,output/lab-management-system-nextjs
    chore(submodule): 推进 lab-management-system-nextjs 指针
@@ -434,21 +383,16 @@ F. （可选）父仓推进本仓 gitlink
 
 **关键检查点**：
 
-- `generated/` 全 gitignored——不要 commit 任何 emit 产物；
-- 默认走 `lab_emit` 隔离 schema，不碰 `public`；
-- `fix:schema` 一定要跑（drizzle-kit pull 产物两缺陷必现）；
-- 想"重新生成" = 重跑 `emit:schema` + `fix:schema`，**不要**手动编辑 `generated/` 任何文件。
+- **`src/db/schema.ts` 必须入 git**——CI / 新 clone 不再有任何 pull 步骤；
+- pull 报 drift = DB 真演进或本地未同步，确认后显式 commit（这正是 DB-First 工作流）；
+- 禁止手改 `src/db/schema.ts` 的表结构（它是真库的镜像，改结构 = 改 shared schema.ts）。
 
 ### 4.3 pg 借链流程（跨仓）
 
 ```
-A. shared 仓需要 pg driver 推 DDL（无 runtime dep，禁装）
-   ↓ ../lab-management-system-shared/scripts/sync-db.mjs:36-46
-   ↓ 三段 fallback：
-     1. createRequire('/app/node_modules/pg')       → runtime container
-     2. createRequire('../lab-management-system-nextjs/package.json') → 本仓
-     3. createRequire('../saas-identity-platform-nextjs/package.json') → saas 仓
-   ↓ 任一成功即返回 pg
+A. shared 仓需要 pg driver 跑 replay 测试（无 runtime dep，禁装）
+   ↓ ../lab-management-system-shared/tests/drizzle.replay.test.ts
+   ↓ createRequire('../lab-management-system-nextjs/package.json') → 本仓 node_modules/pg
 
 B. 本仓 dev 自检
    cd output/lab-management-system-nextjs
@@ -462,20 +406,14 @@ B. 本仓 dev 自检
 
 C. L4 smoke 同款路径
    tests/db.smoke.test.ts
-   → 验证 pg 可加载 + lab_dev 可达
+   → 验证 pg 可加载 + shared target DDL 可执行
    → trace.json 报 fn-ID（M97.F02.I02）
-
-D. 真正跑同步（跨仓）
-   cd output/lab-management-system-shared
-   node scripts/sync-db.mjs --incremental
-   → 借本仓 pg → 顺序推 V*.sql → 跟踪 __schema_migrations 表
 ```
 
 **关键检查点**：
 
 - **本仓 `pg` 必须留 devDependencies**——升 dependencies 会污染消费方 runtime bundle；
-- sibling 仓外部 reach 入口：`scripts/borrow-from-nextjs-pg.mjs`（镜像 saas-nextjs 同款脚本）；
-- 跨仓同步必须**同一批 commit**推完，避免一边指针新、一边指针旧的不一致窗口。
+- sibling 仓外部 reach 入口：`scripts/borrow-from-nextjs-pg.mjs`（镜像 saas-nextjs 同款脚本）。
 
 ---
 
@@ -489,12 +427,12 @@ D. 真正跑同步（跨仓）
 | 4 | `src/api/http-client.ts` | axios 拦截器 | `installHttpClient(getToken)`——bootstrap **必须调一次**；返 `ApiError`（含 status + body） |
 | 5 | `src/api/mutator/custom-fetch.ts` | orval mutator | `.then(r => r.data)` 解 AxiosResponse 外壳 + `as unknown as Promise<TData>` 桥接 strict mode |
 | 6 | `orval.config.ts` | orval codegen | `axios-functions` 客户端 + `split` 模式 + custom mutator；输出 `src/api/endpoints/{endpoints.ts, endpoints.schemas.ts}` |
-| 7 | `drizzle.config.pg.ts` | drizzle-kit pull 配置 | PG dialect；`schema=./src/db/schema.ts`（占位 `pgSchema = []`，本仓不手抄 PG 表）；`out=./generated` |
-| 8 | `scripts/emit-schema.mjs` | schema emit 链主入口 | 5 段流程：list migrations → replay（`lab_emit` 隔离 schema）→ pg_dump（含 pg_catalog fallback）→ drizzle-kit pull → DBML parser |
+| 7 | `drizzle.config.ts` | drizzle-kit pull 配置 | PG dialect；PG_HOST/PG_PORT/PG_USER/PG_PASSWORD/PG_DATABASE 全走 env（禁默认值兜底，密码由 pull-schema.sh fail-fast 校验）；无 schema 字段（pull 不读 schema.ts） |
+| 8 | `scripts/pull-schema.sh` | DB-First pull 链主入口（`npm run pull:schema`） | 5 步：pull → move src/db/schema.ts → fix → git diff drift 检测 → ADR-0026 marker |
 | 9* | `scripts/fix-pulled-schema.mjs` | pull 产物后处理 | 修 `.default(')` → `.default('')` + unused `sql` import；幂等 |
 | 10* | `scripts/borrow-pg.mjs` | pg 借链自检 | 验证 `require("pg")` + `SELECT 1`；L4 smoke 同款路径 |
 
-> 标 `*` 为最核心补充——`fix-pulled-schema` 缺失则 `generated/schema.ts` tsc 红；`borrow-pg` 缺失则 sync-db 跨仓同步直接断。
+> 标 `*` 为最核心补充——`fix-pulled-schema` 缺失则 `src/db/schema.ts` tsc 红；`borrow-pg` 缺失则 shared replay 测试借链断。
 
 ---
 
@@ -508,40 +446,38 @@ D. 真正跑同步（跨仓）
 | [0002](../../../docs/adr/0002-trace-json-as-cross-language-anchor-contract.md) | trace.json 是跨语言锚点 | L4 vitest 跑 `TRACE_MAP=1` 产 `.state/trace.json`；禁止手写 |
 | [0003](../../../docs/adr/0003-function-tree-requires-human-approval.md) | 功能清单变更需人批 | M01 起业务页要先 `/tree-change` 翻状态再 commit |
 | [0005](../../../docs/adr/0005-defense-in-depth-for-protected-paths.md) | 受保护路径纵深防御 | `.claude/hooks/` 不让改；本仓也不能放宽 |
-| [0007](../../../docs/adr/0007-shared-sql-ssot.md) | shared 仓扩到双 SSOT | **本仓 emit 链存在的根本原因**——shared 是 DB schema 真源，本仓负责把 SSOT replay 出可读产物 |
-| [0008](../../../docs/adr/0008-nextjs-full-stack.md) | saas-nextjs 兼全栈 | 本仓**不兼**全栈——本仓是 schema emit infra，对称的 saas-nextjs 才是 Backend+DB |
-| [0009](../../../docs/adr/0009-db-credentials-env.md) | DB 凭据走 env | `PG_HOST` / `PG_PASSWORD` / `DATABASE_URL` 走 env，deploy 烘焙；emitter 与 sync-db 共用 |
+| [0007](../../../docs/adr/0007-shared-sql-ssot.md) | shared 仓扩到双 SSOT | 本仓消费 DB SSOT 的历史起点；ADR-0025 之后真源形态变为 shared `src/db/schema.ts` |
+| [0008](../../../docs/adr/0008-nextjs-full-stack.md) | saas-nextjs 兼全栈 | 本仓**不兼**全栈——本仓是 Frontend + DB-First 消费层，saas-nextjs 才是 Backend+DB |
+| [0009](../../../docs/adr/0009-db-credentials-env.md) | DB 凭据走 env | `PG_*` / `DATABASE_URL` 走 env，deploy 烘焙；pull 链与借链自检共用 |
 | [0012](../../../docs/adr/0012-msw-as-http-server.md) | msw 仓升级为独立 HTTP 服务 | dev 默认 `NEXT_PUBLIC_API_BASE_URL=http://localhost:5200`（lab-msw） |
 | [0014](../../../docs/conventions/multi-repo-family.md#4-后端配置env-driven-单-urladr-0014)（隐含 ADR） | env-driven 单 URL | 废弃 BackendSwitcher + localStorage；本仓 `backend-config.ts` 反映该决议 |
 
 ### 6.2 本仓 ADR（当前为空）
 
-`docs/adr/` 目录当前**空**——本仓特有决策（如 emit 链为什么走 `lab_emit` 隔离 schema 而不是 DROP public）目前散落在 `scripts/emit-schema.mjs` 文件 header（"2026-08-18 事故后"）和 `tests/db.smoke.test.ts` 注释中。**TODO**：随 emit 链定型，逐步把以下决策沉淀为 ADR：
+`docs/adr/` 目录当前**空**——本仓特有决策（如 pull 链的 drift 检测为什么用 `git diff` 而不是 hash 比对）目前散落在 `scripts/pull-schema.sh` / `scripts/fix-pulled-schema.mjs` 文件 header 和 `tests/db.smoke.test.ts` 注释中。**TODO**：随 DB-First 链定型，逐步把以下决策沉淀为 ADR：
 
 | 候选主题 | 当前散落位置 | 拟文件名 |
 |---|---|---|
-| `lab_emit` 隔离 schema（替代 DROP public） | `scripts/emit-schema.mjs:64-66` + commit message | `0001-isolate-emit-schema.md` |
-| `pg_catalog` fallback（pg_dump client/server 版本不匹配） | `scripts/emit-schema.mjs:113-121` | `0002-pg-catalog-fallback.md` |
-| drizzle-kit pull 两类已知缺陷的 fix 链 | `scripts/fix-pulled-schema.mjs` | `0003-fix-pulled-schema.md` |
-| orval `custom-fetch` mutator（axios 1.7+ strict-mode 兼容） | `src/api/mutator/custom-fetch.ts` header | `0004-orval-custom-fetch-mutator.md` |
-| 借 `pg` devDep 链（为何本仓是 sync-db 的首选借出方） | `docs/adr/0000-borrow-pg-as-devdep.md`（候选） | `0000-borrow-pg-as-devdep.md` |
+| drizzle-kit pull 两类已知缺陷的 fix 链 | `scripts/fix-pulled-schema.mjs` | `0001-fix-pulled-schema.md` |
+| orval `custom-fetch` mutator（axios 1.7+ strict-mode 兼容） | `src/api/mutator/custom-fetch.ts` header | `0002-orval-custom-fetch-mutator.md` |
+| 借 `pg` devDep 链（为何本仓是 shared replay 测试的首选借出方） | `docs/adr/0000-borrow-pg-as-devdep.md`（候选） | `0000-borrow-pg-as-devdep.md` |
 
 ### 6.3 与 saas-nextjs 全栈形态的差异（关键说明）
 
 | 维度 | saas-nextjs | **lab-nextjs（本仓）** |
 |---|---|---|
 | Backend in仓 | ✅ `src/app/api/v1/{auth,oauth,me,admin,health}` | ✅ 5 个 M00 auth 路由 + 业务路由（fixture backed） |
-| DB in仓 | ✅ `src/db/`（postgres-js + Drizzle PG） | ❌ 不在本仓；emit 链只读 PG catalog |
-| DB 持久 | ✅ 真持久（lab_dev / lab_prod） | ❌ nextjs-self 模式全在内存 |
-| schema emit 链 | ❌ 无 | ✅ `scripts/emit-schema.mjs`（家族唯一） |
-| 借 pg | ❌ 无 | ✅ **本仓是首选借出方**（`lab-shared/scripts/sync-db.mjs` 第二段 fallback 即本仓） |
-| M97 模块 | ❌ 无 | ✅ emit infra F 级（F01/F02） |
+| DB in仓 | ✅ `src/db/`（postgres-js + Drizzle PG）**+ 本仓即真源** | ⚠️ `src/db/schema.ts` 在本仓但是 **pull 镜像**（真源在 shared） |
+| DB 持久 | ✅ 真持久（saas_dev / saas_prod） | ❌ nextjs-self 模式全在内存 |
+| DB-First pull 链 | ✅ `pull-schema.sh`（pull 自己的真源） | ✅ `pull-schema.sh`（pull shared SSOT migrate 出的真库） |
+| 借 pg | ❌ 无 | ✅ **lab 家族首选借出方**（shared `tests/drizzle.replay.test.ts` 第一优先级即本仓） |
+| M97 模块 | ❌ 无 | ⚠️ F01 emit 链已废弃（ADR-0033）；F02 借链保留（服务 shared replay 测试） |
 | M98.F01 4-backend | ✅ 已废弃（ADR-0014） | ✅ 已废弃（ADR-0014） |
 | M98.F02 http-client 注入 | ✅ | ✅ |
 | M98.F03 Next.js API routes | ✅ Backend 形态（含 OAuth + /me + /admin + /health） | ✅ **仅 5 个 M00 auth 路由**（family-positioning 要求，非产品代码） |
 | M03-M06 业务路由 | ❌（走真后端） | ✅（走 msw fixtures） |
 
-**一句话**：saas-nextjs 是「把后端活干了」；lab-nextjs 是「把 schema 形状广播到 14 仓」+「前端 3/3」。两者的 Next.js App Router 是同一套骨架，但内里**承担的角色完全不一样**。
+**一句话**：saas-nextjs 是「把后端活干了」；lab-nextjs 是「pull shared schema 镜像入 git」+「前端 3/3」。两者的 Next.js App Router 是同一套骨架，但内里**承担的角色完全不一样**。
 
 ---
 
@@ -549,11 +485,11 @@ D. 真正跑同步（跨仓）
 
 | 术语 | 含义 | 详细 |
 |---|---|---|
-| **双角色** | Frontend + schema emit infra | 本仓定位；与 saas-nextjs 全栈三角色（Frontend+Backend+DB）形成对照 |
-| **schema emit infra** | 把 shared V*.sql replay 出可读 schema 三件套的角色 | 本仓 M97；scripts/emit-schema.mjs 是入口 |
-| **三件套** | `generated/{schema.sql, schema.ts, schema.dbml}` | schema.sql=pg_dump / schema.ts=drizzle-kit pull / schema.dbml=手写 V*.sql 解析 |
-| **lab_emit schema** | emit 链隔离 schema（替代 DROP public） | 2026-08-18 事故后默认；`SET search_path TO lab_emit` |
-| **pg devDep 借链** | shared sync-db.mjs 借本仓 node_modules/pg | 三段 fallback（/app/node_modules → 本仓 → saas-nextjs） |
+| **双角色** | Frontend + DB-First schema 消费层 | 本仓定位；与 saas-nextjs 全栈三角色（Frontend+Backend+DB）形成对照 |
+| **DB-First pull 链** | `pull-schema.sh`：真库 → drizzle-kit pull → src/db/schema.ts 入 git | ADR-0025/ADR-0033；原 emit 三件套角色已退役（M97.F01 废弃） |
+| **ADR-0026 marker** | `.state/last-gen-shared.json` 记 db_synced_sha | pull-schema.sh 末步写入；check_align staleness 检查用 |
+| **lab_smoke schema** | db.smoke.test 的隔离 schema | `SET search_path TO lab_smoke`，验 shared target DDL 可执行，不污染 public |
+| **pg devDep 借链** | shared replay 测试借本仓 node_modules/pg | 两段 fallback（本仓 → saas-nextjs）；禁升 dependencies |
 | **nextjs-self 模式** | `NEXT_PUBLIC_API_BASE_URL=""`（同源）时，apiclient 命中本仓 API routes | M98.F03；走 msw fixtures |
 | **MSW** | Mock Service Worker；本仓 dev 默认走独立 HTTP server `:5200`（ADR-0012 B 强度） | `GET /healthz → {mode:"msw"}` |
 | **ADR-0014** | env-driven 单 URL 配置 | 废弃 4-backend 运行时切换；改 `NEXT_PUBLIC_API_BASE_URL` / `_API_MODE` |
@@ -585,11 +521,10 @@ D. 真正跑同步（跨仓）
 
 **本仓特有的、本文档独有**：
 
-1. **双角色定位**（§1）——本仓是家族里唯一的 Frontend + schema emit infra 双角色仓；
-2. **schema emit 三件套链**（§3.3, §4.2）——`emit-schema.mjs` + `fix-pulled-schema.mjs` + `v-sql-to-dbml.mjs` 是本仓独有；
-3. **pg 借链**（§3.4, §4.3）——本仓是 `lab-shared/scripts/sync-db.mjs` 的**首选借出方**；
-4. **`lab_emit` 隔离 schema + `pg_catalog` fallback**（§3.3.2-3）——本仓独有安全默认；
-5. **nextjs-self 模式下业务路由走 msw fixtures**（§3.2.2）——与 saas-nextjs 真持久化形成对照。
+1. **双角色定位**（§1）——本仓是家族里唯一的 Frontend + DB-First schema 消费层双角色仓；
+2. **DB-First pull 链**（§3.3, §4.2）——`pull-schema.sh` + `fix-pulled-schema.mjs` 镜像 saas-nextjs（本仓独有 extra fix 步）；
+3. **pg 借链**（§3.4, §4.3）——本仓是 shared `tests/drizzle.replay.test.ts` 的**首选借出方**；
+4. **nextjs-self 模式下业务路由走 msw fixtures**（§3.2.2）——与 saas-nextjs 真持久化形成对照。
 
 ---
 
@@ -599,10 +534,9 @@ D. 真正跑同步（跨仓）
 |---|---|---|
 | orval + axios 没 installHttpClient 拦截器 | prod 永远走同 origin 被 nginx 405 | `main.tsx` bootstrap 调 `installHttpClient` |
 | axios baseURL 含 `/api/v1` 前缀 | path 前缀重复 | baseURL 是 root URL；path 自带 prefix |
-| 改了 shared V*.sql 没跑 emit-schema | 三件套 stale，家族仓对比 ER 时误判 | `npm run emit:schema` + `npm run fix:schema` |
-| 跑 emit-schema 没带 `lab_emit` 隔离 | `DROP SCHEMA public CASCADE` 清空 lab_dev | 默认走 `lab_emit`；仅 `--clobber-public` 才走旧路径 |
-| drizzle-kit pull 后没跑 fix:schema | `generated/schema.ts` 编译失败 / 运行时炸 | `npm run fix:schema` 修 `.default(')` 与 unused `sql` |
-| pg devDep 升 dependencies | 消费方 runtime bundle 污染 | 留 `devDependencies`；sync-db 的借链不能进 bundle |
+| 改了 shared schema.ts 没重 pull | 本仓 `src/db/schema.ts` stale，check_align 报 marker 过期 | `bash scripts/pull-schema.sh`（或 `npm run pull:schema`）+ commit |
+| drizzle-kit pull 后没跑 fix:schema | `src/db/schema.ts` 编译失败 / 运行时炸 | pull-schema.sh 内部自动跑；手动重跑用 `npm run fix:schema` |
+| pg devDep 升 dependencies | 消费方 runtime bundle 污染 | 留 `devDependencies`；shared replay 测试借链不能进 bundle |
 | 改 M01 起业务页前没走 `/tree-change` | L5 红 / 评审失败 | 先 `/tree-change` 提案 → commit 同一批 |
 | `gen-shared` 跑过但 endpoints/ 还没出 | L3 typecheck 红 + apiclient 找不到 | `npm run gen:shared` 后 `git status` 看 `src/api/endpoints/` |
 | 后端 CORS allowlist 漏 3000 | 浏览器 preflight 莫名失败 | nextjs dev 默认跨源；msw/server.ts 已硬编码白名单 |

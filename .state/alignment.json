@@ -1982,58 +1982,50 @@
     },
     "M97.F01.I01": {
       "name": "replay V*.sql to lab_dev",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::replay shared V*.sql 全量成功（每条一事务，中途失败即 abort）"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F01.I02": {
       "name": "pg_dump --schema-only",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::emit-schema.mjs 含 @entry=I02 锚点 + pgDump 函数 + 输出 schema.sql 头"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F01.I03": {
       "name": "drizzle-kit pull",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::schema.ts 是 drizzle-kit pull 产物（pgTable ≥24）"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F01.I04": {
       "name": "v-sql → DBML",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/emit-artifacts.test.ts::v-sql-to-dbml.mjs 含 @entry=I04 锚点 + ALTER RENAME 处理 + DBML 头部"
-      ],
+      "tests": [],
       "entry": []
     },
     "M97.F02.I01": {
@@ -2065,7 +2057,7 @@
       "entry": []
     },
     "M97.F02.I03": {
-      "name": "consumed by shared sync-db",
+      "name": "consumed by shared replay test",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -2074,7 +2066,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared sync-db.mjs 同款（createRequire 本仓 package.json 解析 pg）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/db.smoke.test.ts::借链与 shared drizzle.replay.test.ts 同款（createRequire 本仓 package.json 解析 pg）"
       ],
       "entry": []
     },
