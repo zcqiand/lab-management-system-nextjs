@@ -1,18 +1,21 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "ADR-0033 阶段二：M97/M98 infra 段退役 + BASE 镜像",
+  "current_task": "ADR-0033 阶段三收工归档（e2e 联跑暴露缺陷已修）",
   "done": [
-    "function-tree: M97（schema emit infra）/M98（前端接线层）整段删除；M01.F04.I03 已上线；M05.F01.I06 入树",
-    "tests 解挂 fnTest→普通 it（m98-wiring/me-route/db.smoke，标题去 ID 字面防 fnReporter 误吸）",
-    "src: backend-badge/sidebar-nav data-fn、SummaryPage @entry I06、注释清理；design maps M97/M98 行删除；commit a768310"
+    "阶段二收口：M97/M98 退役 + BASE 镜像（commit a768310）",
+    "e7eb5ec app-shell sidebar-nav DefinePlugin 动态 key 不内联修复（字面量访问）",
+    "8b69008 inspection-capability 列表刷新 reloadSignal 版本号修复——Object.is bailout 吞掉 null→setTimeout 回设的 refetch，新建/删除后列表不刷新；e2e 三端一致性实测抓出（react/vue 同场景会刷新，实现缺陷非端间分歧）",
+    "suite 5c528b3 指针 bump；e2e 套件三端全绿"
   ],
   "next": [
-    "阶段三 e2e 接入（E2E_*_URL fail-fast）"
+    "GitHub 推送 8b69008",
+    "e2e 铺开新业务域时关注冷编译假红（新增路由同步进 e2e 仓 globalSetup 暖机清单）"
   ],
   "open_questions": [],
   "dont": [
-    "it() 标题写 Mxx.Fxx.Ixx 字面——fnReporter 正则会误吸进 alignment.json"
+    "it() 标题写 Mxx.Fxx.Ixx 字面——fnReporter 正则会误吸进 alignment.json",
+    "列表刷新禁「setState(null)→setTimeout 回设」模式——Object.is bailout 会静默吞掉"
   ],
   "active_branch": "master",
   "last_session_at": "2026-09-13"
