@@ -26,10 +26,11 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/state/auth-context";
 import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
+import { env } from "@/api/env";
 import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
 
 // OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id）。
-// 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-mgmt' 收敛为固定 UUID
+// 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-management' 收敛为固定 UUID
 // 'lab-management'（3 个 saas 后端共用同一 app.id）。
 // 浏览器侧走 NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env 覆盖。
 //
@@ -68,7 +69,13 @@ export default function LoginPage() {
   const router = useRouter();
   const { token, setToken } = useAuth();
   const baseUrl = getApiBaseUrl();
-  const apiMode = getApiMode();
+  // hydration：getApiMode() 读 localStorage，SSR 拿不到 → 服务端渲染 env 默认、
+  // 客户端首帧渲染选中项，两帧文本不一致 React 19 直接抛 hydration mismatch。
+  // 首帧固定用 env 标签（与 SSR 一致），mount 后再同步切换器选择。
+  const [apiMode, setApiMode] = useState<string>(env.NEXT_PUBLIC_API_MODE);
+  useEffect(() => {
+    setApiMode(getApiMode());
+  }, []);
   const [status, setStatus] = useState<string>("检查登录态...");
 
   useEffect(() => {

@@ -39,6 +39,11 @@ export function installHttpClient(getToken: () => string | null): void {
     if (!config.baseURL) {
       config.baseURL = getApiBaseUrl();
     }
+    // 跨源后端（aspnetcore/springboot）的 SSO state cookie 依赖 withCredentials：
+    // 没有它，跨源响应的 Set-Cookie 不被存储、后续请求也不携带（lab-aspnetcore
+    // StateCookieManager 报 "missing lab_sso_state cookie" → 500）。同源模式无副作用。
+    // 后端 CORS 已配 AllowCredentials（labFrontend policy）。镜像 lab-react 同款。
+    config.withCredentials = true;
     const token = getToken();
     if (token) {
       config.headers.set("Authorization", `Bearer ${token}`);
