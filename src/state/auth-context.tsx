@@ -20,8 +20,26 @@ import {
 import { authGetCurrentUser, authSwitchTenant } from "@/api/endpoints/endpoints";
 import type { CurrentUser, MyTenant } from "@/api/endpoints/endpoints.schemas";
 import { getApiBaseUrl } from "@/api/backend-config";
+import { installHttpClient } from "@/api/http-client";
 
 const TOKEN_KEY = "lab.token";
+
+// axios 拦截器安装（baseURL / Bearer / withCredentials）：必须在任何 effect 发请求
+// 之前就位 —— 子组件 effect 先于父 effect 运行，放 AuthProvider 的 useEffect 会晚于
+// login 页的 SSO authorize，所以装在模块作用域（镜像 lab-react main.tsx 引导）。
+// 2026-09-14 回归：此前全仓无人调用 installHttpClient，拦截器是死代码 → 跨源 XHR
+// 不带 credentials，浏览器丢弃 authorize 响应的 Set-Cookie → SSO callback 恒
+// "missing lab_sso_state cookie" 500。window 守卫：SSR 不装（axios 服务端实例共享，
+// 且 token getter 读 localStorage）。
+if (typeof window !== "undefined") {
+  installHttpClient(() => {
+    try {
+      return localStorage.getItem(TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  });
+}
 
 export interface AuthContextValue {
   token: string | null;

@@ -31,4 +31,15 @@ describe("installHttpClient", () => {
 
     expect(captured?.withCredentials).toBe(true);
   });
+
+  it("repeated install replaces the interceptor instead of piling up", () => {
+    axios.interceptors.request.clear();
+    installHttpClient(() => null);
+    installHttpClient(() => "newer-token");
+    const active = (
+      axios.interceptors.request.handlers as Array<{ fulfilled?: unknown } | null>
+    ).filter((h) => h?.fulfilled);
+    // 两个 token getter 只留一个拦截器：新 getter 生效，旧闭包不残留
+    expect(active).toHaveLength(1);
+  });
 });

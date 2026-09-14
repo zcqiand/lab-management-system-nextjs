@@ -31,11 +31,20 @@ export function toApiError(err: unknown): ApiError {
 }
 
 /**
- * 注入运行时 baseUrl + Bearer token。
- * 在 BootstrapClient mount 之前调一次（ClientLayout 的 Provider 内）。
+ * 注入运行时 baseUrl + Bearer token + withCredentials。
+ * 在 auth-context 模块加载时调一次（客户端引导，见该文件说明）。
+ * 幂等 = eject 旧拦截器再装新的：重复调用（HMR / 意外二次引导）不叠加，
+ * 链尾旧闭包覆盖新 token 的 pileup 是 lab-react 踩过的坑。
  */
+let interceptorId: number | null = null;
 export function installHttpClient(getToken: () => string | null): void {
-  axios.interceptors.request.use((config) => {
+  // 测试环境可能把 axios mock 成无拦截器面的对象 —— 引导装不上就跳过，
+  // 别让模块加载炸掉（真实 axios 恒有 interceptors）。
+  if (!axios?.interceptors?.request?.use) return;
+  if (interceptorId !== null) {
+    axios.interceptors.request.eject(interceptorId);
+  }
+  interceptorId = axios.interceptors.request.use((config) => {
     if (!config.baseURL) {
       config.baseURL = getApiBaseUrl();
     }
