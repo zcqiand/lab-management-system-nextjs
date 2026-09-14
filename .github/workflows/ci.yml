@@ -41,7 +41,7 @@ jobs:
       # 禁 fallback 字面量（CLAUDE.md §2 硬规则）—— CI 不传 → build 必 throw。
       SAAS_IDP_URL: http://localhost:5101
       SAAS_UI_BASE_URL: http://localhost:5101
-      SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      SAAS_OAUTH_CLIENT_ID: lab-management
       SAAS_OAUTH_CLIENT_SECRET: ci-build-placeholder-secret
       SAAS_OAUTH_SCOPE: "lab.read lab.write"
       SAAS_TENANT_ID: 00000000-0000-0000-0000-000000000001
@@ -50,7 +50,7 @@ jobs:
       LAB_AUTH_DEV_PASSWORD: dev123456
       NEXT_PUBLIC_SAAS_BASE_URL: http://localhost:5101
       NEXT_PUBLIC_LAB_APP_CODE: lab-management
-      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: lab-management
       NEXT_PUBLIC_API_BASE_URL: ""
     steps:
       - uses: actions/checkout@v4
@@ -116,7 +116,7 @@ jobs:
       # 禁 fallback 字面量（CLAUDE.md §2 硬规则）—— CI 不传 → build 必 throw。
       SAAS_IDP_URL: http://localhost:5101
       SAAS_UI_BASE_URL: http://localhost:5101
-      SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      SAAS_OAUTH_CLIENT_ID: lab-management
       SAAS_OAUTH_CLIENT_SECRET: ci-build-placeholder-secret
       SAAS_OAUTH_SCOPE: "lab.read lab.write"
       SAAS_TENANT_ID: 00000000-0000-0000-0000-000000000001
@@ -125,7 +125,7 @@ jobs:
       LAB_AUTH_DEV_PASSWORD: dev123456
       NEXT_PUBLIC_SAAS_BASE_URL: http://localhost:5101
       NEXT_PUBLIC_LAB_APP_CODE: lab-management
-      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: 11111111-1111-1111-1111-111111111111
+      NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: lab-management
       NEXT_PUBLIC_API_BASE_URL: ""
     steps:
       - uses: actions/checkout@v4

@@ -118,14 +118,73 @@ describe("M98 frontend 接线层", () => {
     expect(badRes.status).toBe(401);
   });
 
-  it("BackendBadge 源文件含 mode/baseUrl 渲染（纯展示，ADR-0014 后无切换语义）", async () => {
+  it("POST /api/auth/switch-tenant 有效 Bearer + 租户 → 200 + 真 HS256 JWT（3 段）", async () => {
+    // 2026-09-14 对齐 login route：签真 token（LabJwtSigner），不再
+    // mock-jwt-tenant-${tid} opaque——那会让 subFromBearer 解不出 sub，切完即 401 断会话。
+    const { LabJwtSigner } = await import("@/lib/auth/jwt");
+    const signer = new LabJwtSigner(
+      "dev-key-32-bytes-minimum-length!",
+      "lab-management-system",
+      3600,
+      604800,
+    );
+    const req = new Request("http://test/api/auth/switch-tenant", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${signer.issue("USER-A", "TENANT-001")}`,
+      },
+      body: JSON.stringify({ tenantId: "TENANT-002" }),
+    });
+    const res = await switchTenantPOST(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      token?: string;
+      user?: { id: string };
+      tenants?: { tenantId: string }[];
+    };
+    const parts = (body.token ?? "").split(".");
+    expect(parts.length, "token 必须是 3 段 JWT（opaque mock 禁止回归）").toBe(3);
+    // 新 token 的 tenant claim 落目标租户（payload 解码断言）
+    const payload = JSON.parse(Buffer.from(parts[1]!, "base64url").toString("utf-8")) as {
+      sub?: string;
+      tenant_id?: string;
+    };
+    expect(payload.sub).toBe("USER-A");
+    expect(payload.tenant_id).toBe("TENANT-002");
+    expect(body.user?.id).toBe("USER-A");
+    expect(body.tenants?.length).toBeGreaterThan(0);
+  });
+
+  it("POST /api/auth/switch-tenant 未知租户 → 404", async () => {
+    const { LabJwtSigner } = await import("@/lib/auth/jwt");
+    const signer = new LabJwtSigner(
+      "dev-key-32-bytes-minimum-length!",
+      "lab-management-system",
+      3600,
+      604800,
+    );
+    const req = new Request("http://test/api/auth/switch-tenant", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${signer.issue("USER-A", "TENANT-001")}`,
+      },
+      body: JSON.stringify({ tenantId: "TENANT-999" }),
+    });
+    const res = await switchTenantPOST(req);
+    expect(res.status).toBe(404);
+  });
+
+  it("BackendBadge 源文件含切换语义（DropdownMenu + setSelectedBackend，2026-09-14 恢复运行时切换）", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const src = fs.readFileSync(
       path.resolve(process.cwd(), "src/components/app/backend-badge.tsx"),
       "utf8",
     );
-    expect(src).toMatch(/getApiMode\(\)/);
-    expect(src).toMatch(/getApiBaseUrl\(\)/);
+    expect(src).toMatch(/setSelectedBackend/);
+    expect(src).toMatch(/SELECTABLE_BACKENDS/);
+    expect(src).toMatch(/DropdownMenu/);
   });
 });

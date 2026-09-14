@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "approved": true,
+  "base_sha": "3dd774a40e0c5bb8",
+  "summary": "顶栏会话功能落地：M00.F01 新增 I01（会话信息展示：/auth/me hydrate + 顶栏用户显示名）；M00.F02 新增 I01（顶栏租户切换组件：switch-tenant 换发真 HS256 token，会话不断）。后端切换器属 dev infra（ADR-0033 阶段二约定 infra 自 tree 退役），不进树。",
+  "changes": [
+    {
+      "id": "M00.F01.I01",
+      "action": "新增",
+      "name": "会话信息展示",
+      "reason": "GET /auth/me hydrate user/tenants/currentTenantId；顶栏登出旁显示登录用户 displayName（data-testid=user-display-name）。M00.F01 当前用户会话此前无 I 级子项，前端从未消费 /auth/me。"
+    },
+    {
+      "id": "M00.F02.I01",
+      "action": "新增",
+      "name": "租户切换组件",
+      "reason": "顶栏 TenantSwitcher（DropdownMenu， Building2 图标，对齐 saas tenant-switcher 视觉）：列出当前用户租户，选中调 POST /auth/switch-tenant；后端同 commit 修 mock-jwt opaque token → LabJwtSigner 真签（原实现切完即 401 断会话）。"
+    }
+  ],
+  "sync_files": []
+}

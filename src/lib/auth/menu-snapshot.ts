@@ -16,12 +16,15 @@ export interface ContractMenuNode {
   children?: ContractMenuNode[];
 }
 
-/** saas EffectiveMenuNode（MenuRow + children 树，saas /me/menus 返回形状）。 */
+/** saas EffectiveMenuNode（MenuRow + children 树，saas /me/menus 返回形状）。
+ *  2026-09-13 对齐 saas 真实 payload：展示名是 title（不是 name），
+ *  应用键是 clientId（2026-09-08 saas /apps/{code}→/clients/{clientId} 重命名随动），
+ *  type 是 "menu"|"directory"（契约无此字段，适配时剥掉）。 */
 interface SaasMenuNode {
   id: string;
-  appId?: string;
-  code?: string;
-  name: string;
+  clientId?: string;
+  parentId?: string | null;
+  title: string;
   path?: string | null;
   icon?: string | null;
   type?: string;
@@ -97,10 +100,11 @@ export async function cacheMenuSnapshot(
   }
 }
 
-/** saas EffectiveMenuNode → 契约 MenuNode（name→label，剥掉 appId/code 等本地不消费字段）。 */
+/** saas EffectiveMenuNode → 契约 MenuNode（title→label，剥掉 clientId/parentId/type/sortOrder
+ *  等本地不消费字段）。 */
 function mapSaasMenu(node: SaasMenuNode): ContractMenuNode {
   const children = node.children ?? [];
-  const out: ContractMenuNode = { id: node.id, label: node.name };
+  const out: ContractMenuNode = { id: node.id, label: node.title };
   if (node.path) out.path = node.path;
   if (node.icon) out.icon = node.icon;
   if (children.length > 0) out.children = children.map(mapSaasMenu);

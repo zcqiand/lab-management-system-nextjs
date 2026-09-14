@@ -78,9 +78,17 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'LAB_JWT_TTL_SECONDS=3600\n'
     printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
     printf 'LAB_SSO_PROFILE=real\n'
-    printf 'SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111\n'
-    # ADR-0019：浏览器侧 client_id 必须从 env 注入,bundle 不再 fallback UUID 字面。
-    printf 'NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111\n'
+    # 2026-09-13 saas pivot: client_id = oauth_client.client_id 字符串 code（行 UUID 必 404）
+    printf 'SAAS_OAUTH_CLIENT_ID=lab-management\n'
+    # ADR-0019：浏览器侧 client_id 必须从 env 注入,bundle 不再 fallback 字面。
+    printf 'NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=lab-management\n'
+    # SSO 三件套（ADR-0019：authorize/callback requireEnv,缺一 502）。
+    # client_secret = saas oauth_client.client_secret 种子契约值（saas 侧同字面,对齐才有 token 交换）。
+    printf 'SAAS_OAUTH_CLIENT_SECRET=lab-mgmt-secret\n'
+    printf 'SAAS_TENANT_ID=00000000-0000-0000-0000-000000000001\n'
+    printf 'SAAS_OAUTH_SCOPE=lab.read lab.write\n'
+    # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）
+    printf 'LAB_AUTH_DEV_PASSWORD=%s\n' "$(openssl rand -hex 16)"
   } > "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 LAB_JWT_SECRET)
@@ -133,9 +141,19 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing LAB_JWT_TTL_SECONDS '3600'
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
   append_if_missing LAB_SSO_PROFILE 'real'
-  append_if_missing SAAS_OAUTH_CLIENT_ID '11111111-1111-1111-1111-111111111111'
+  # 2026-09-13 saas pivot: client_id = oauth_client.client_id 字符串 code（行 UUID 必 404）
+  append_if_missing SAAS_OAUTH_CLIENT_ID 'lab-management'
   # ADR-0019：浏览器 bundle 同样要显式声明,否则 build 时丢 key。
-  append_if_missing NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID '11111111-1111-1111-1111-111111111111'
+  append_if_missing NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID 'lab-management'
+  # SSO 三件套（ADR-0019：authorize/callback requireEnv,缺一 502）
+  append_if_missing SAAS_OAUTH_CLIENT_SECRET 'lab-mgmt-secret'
+  append_if_missing SAAS_TENANT_ID '00000000-0000-0000-0000-000000000001'
+  append_if_missing SAAS_OAUTH_SCOPE 'lab.read lab.write'
+  # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）
+  if ! grep -q '^LAB_AUTH_DEV_PASSWORD=' "$BASE/lab.env"; then
+    umask 077
+    printf 'LAB_AUTH_DEV_PASSWORD=%s\n' "$(openssl rand -hex 16)" >> "$BASE/lab.env"
+  fi
   # 死键清理:NEXT_PUBLIC_APP_ID 挂在零引用的 src/api/env.ts 上,真名
   # NEXT_PUBLIC_LAB_APP_CODE 已在上面 append,老 key 删除保 key 集合对齐。
   if grep -q '^NEXT_PUBLIC_APP_ID=' "$BASE/lab.env"; then

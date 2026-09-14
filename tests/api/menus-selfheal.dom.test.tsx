@@ -65,7 +65,7 @@ describe("/api/auth/menus miss 自愈", () => {
   }
 
   fnTest(["M01.F04.I04"], "miss + saas 可达 → 自愈重拉 → 200 菜单树", async () => {
-    mockSaasOk([{ id: "m-dash", name: "仪表盘", path: "dashboard" }]);
+    mockSaasOk([{ id: "m-dash", clientId: "lab-management", title: "仪表盘", type: "menu", path: "dashboard" }]);
 
     const res = await menusGET(reqWithBearer(fakeJwt("restarted-user")));
     expect(res.status).toBe(200);
@@ -108,7 +108,7 @@ describe("/api/auth/menus miss 自愈", () => {
   });
 
   fnTest(["M01.F04.I04"], "自愈成功后再次 miss 应走缓存命中——不重复调 saas serviceLogin（限流兜底）", async () => {
-    mockSaasOk([{ id: "m-dash", name: "仪表盘", path: "dashboard" }]);
+    mockSaasOk([{ id: "m-dash", clientId: "lab-management", title: "仪表盘", type: "menu", path: "dashboard" }]);
 
     // 第一次 miss → 走 serviceLogin 自愈 → 200 + 缓存写入
     const first = await menusGET(reqWithBearer(fakeJwt("user-rate-limit")));

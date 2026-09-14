@@ -16,6 +16,7 @@ import { LogOut, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarNav, useSaasApp, useBackendMenus } from "@/components/app/sidebar-nav";
 import { BackendBadge } from "@/components/app/backend-badge";
+import { TenantSwitcher } from "@/components/app/tenant-switcher";
 import { useAuth } from "@/state/auth-context";
 import { getApiMode } from "@/api/backend-config";
 
@@ -60,7 +61,7 @@ export class AppShellErrorBoundary extends React.Component<
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { token, clearToken } = useAuth();
+  const { token, user, clearToken } = useAuth();
   const apiMode = getApiMode();
   const { data: menus, loading: menusLoading } = useBackendMenus();
   // 应用名来自 saas 公共应用目录（/api/v1/clients/<clientId>），不写死在客户端
@@ -104,19 +105,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </span>
             {token ? (
-              <Button
-                variant="outline"
-                size="sm"
-                data-fn="M01.F05.I05"
-                data-testid="logout-button"
-                onClick={() => {
-                  clearToken();
-                  window.location.href = "/login";
-                }}
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                登出
-              </Button>
+              <>
+                {/* 登录用户显示名（M00.F01.I01，/api/auth/me hydrate） */}
+                <span
+                  className="font-medium text-slate-900"
+                  data-testid="user-display-name"
+                  data-fn="M00.F01.I01"
+                >
+                  {user?.displayName ?? user?.username ?? "…"}
+                </span>
+                {/* 租户切换（M00.F02.I01） */}
+                <TenantSwitcher />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  data-fn="M01.F05.I05"
+                  data-testid="logout-button"
+                  onClick={() => {
+                    clearToken();
+                    window.location.href = "/login";
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  登出
+                </Button>
+              </>
             ) : (
               <Button variant="outline" size="sm" asChild>
                 <Link href="/login">去登录</Link>

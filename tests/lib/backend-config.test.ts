@@ -1,0 +1,127 @@
+// backend-config 运行时切换语义（2026-09-14 用户裁定恢复，对齐 saas 家族）。
+// node 环境（无 localStorage）：用内存 stub 模拟 jsdom 语义，
+// 覆盖 选择→baseURL/mode 跟随、nextjs-self 空串不被吞、未知 key 落 env、持久化。
+import { afterEach, describe, expect, it } from "vitest";
+
+import {
+  BACKENDS,
+  SELECTABLE_BACKENDS,
+  getApiBaseUrl,
+  getApiMode,
+  getSelectedBackend,
+  resolveSelectedBackendUrl,
+  setSelectedBackend,
+} from "@/api/backend-config";
+
+function installFakeLocalStorage(): void {
+  const store = new Map<string, string>();
+  const fake = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => {
+      store.set(k, String(v));
+    },
+    removeItem: (k: string) => {
+      store.delete(k);
+    },
+    clear: () => {
+      store.clear();
+    },
+    key: (i: number) => [...store.keys()][i] ?? null,
+    get length() {
+      return store.size;
+    },
+  };
+  (globalThis as { localStorage?: unknown }).localStorage = fake;
+}
+
+function uninstallFakeLocalStorage(): void {
+  delete (globalThis as { localStorage?: unknown }).localStorage;
+}
+
+describe("backend-config 运行时切换", () => {
+  afterEach(() => {
+    uninstallFakeLocalStorage();
+  });
+
+  it("dev 构建下 4 后端全部可选（端口表 = multi-repo-family §6）", () => {
+    expect(SELECTABLE_BACKENDS).toHaveLength(4);
+    expect(BACKENDS.map((b) => b.key)).toEqual([
+      "msw",
+      "nextjs-self",
+      "aspnetcore",
+      "springboot",
+    ]);
+    expect(BACKENDS.find((b) => b.key === "msw")?.baseUrl).toBe("http://localhost:5200");
+    expect(BACKENDS.find((b) => b.key === "aspnetcore")?.baseUrl).toBe("http://localhost:5204");
+    expect(BACKENDS.find((b) => b.key === "springboot")?.baseUrl).toBe("http://localhost:5205");
+  });
+
+  it("未选择时走 env 默认（NEXT_PUBLIC_API_BASE_URL，setup.ts seed 空串=同源）", () => {
+    installFakeLocalStorage();
+    expect(getSelectedBackend()).toBe("");
+    expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
+    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "msw-http");
+  });
+
+  it("选择 msw → baseURL/mode 跟随选中项，且持久化到 localStorage", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("msw");
+    expect(getSelectedBackend()).toBe("msw");
+    expect(getApiBaseUrl()).toBe("http://localhost:5200");
+    expect(getApiMode()).toBe("msw");
+    expect(globalThis.localStorage.getItem("lab.api.backend")).toBe("msw");
+  });
+
+  it("选择 nextjs-self → 空串 baseURL（同源）必须原样返回，不能 || 吞掉", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("nextjs-self");
+    expect(getApiBaseUrl()).toBe("");
+    expect(getApiMode()).toBe("nextjs-self");
+  });
+
+  it("选择 springboot → http://localhost:5205", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("springboot");
+    expect(getApiBaseUrl()).toBe("http://localhost:5205");
+  });
+
+  it("未知/已下线 key（localStorage 跨构建遗留）→ 落 env 默认", () => {
+    installFakeLocalStorage();
+    globalThis.localStorage.setItem("lab.api.backend", "retired-backend");
+    expect(getSelectedBackend()).toBe("retired-backend");
+    expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
+    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "msw-http");
+  });
+
+  it("setSelectedBackend(\"\") 清除选择 → 回 env 默认", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("msw");
+    setSelectedBackend("");
+    expect(getSelectedBackend()).toBe("");
+    expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
+    expect(globalThis.localStorage.getItem("lab.api.backend")).toBeNull();
+  });
+
+  it("resolveSelectedBackendUrl：key → URL，未知 key → 空串", () => {
+    expect(resolveSelectedBackendUrl("msw")).toBe("http://localhost:5200");
+    expect(resolveSelectedBackendUrl("nextjs-self")).toBe("");
+    expect(resolveSelectedBackendUrl("nope")).toBe("");
+  });
+
+  it("localStorage 抛异常（SSR/隐私模式）不崩：get 返空串、set 静默", () => {
+    (globalThis as { localStorage?: unknown }).localStorage = {
+      getItem: () => {
+        throw new Error("SecurityError");
+      },
+      setItem: () => {
+        throw new Error("SecurityError");
+      },
+      removeItem: () => {
+        throw new Error("SecurityError");
+      },
+    };
+    expect(getSelectedBackend()).toBe("");
+    expect(() => setSelectedBackend("msw")).not.toThrow();
+    expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
+  });
+});

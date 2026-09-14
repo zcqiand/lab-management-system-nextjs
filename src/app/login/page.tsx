@@ -30,7 +30,7 @@ import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
 
 // OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id）。
 // 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-mgmt' 收敛为固定 UUID
-// '11111111-1111-1111-1111-111111111111'（3 个 saas 后端共用同一 app.id）。
+// 'lab-management'（3 个 saas 后端共用同一 app.id）。
 // 浏览器侧走 NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID env 覆盖。
 //
 // ADR-0019：缺失 throw，不允许 fallback 到 UUID 字面。NEXT_PUBLIC_* 在 build

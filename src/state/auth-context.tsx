@@ -1,9 +1,11 @@
 "use client";
 
-// Token 上下文 — M98 frontend 接线层 demo 用。
+// 认证上下文 — token + 当前用户 + 租户列表（M00.F01 当前用户会话 / M00.F02 登录选租户）。
 //
-// 存 access token（来自 SSO callback）。不存 refresh / user / tenants ——
-// 那些走 backend-config 的 session 路径（待补，本仓不重写完整 OAuth 闭环）。
+// token 存 localStorage（lab.token，原语义不变）；user / tenants / currentTenantId
+// 不落盘 —— 页面刷新时由 GET /api/auth/me（带 Bearer）hydrate。
+// switchTenant(tenantId)：POST /api/auth/switch-tenant → 换发新 tenant claim 的
+// 真 HS256 token → 同页后续请求即落新租户作用域（无需刷新）。
 
 import {
   createContext,
@@ -11,22 +13,35 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { authGetCurrentUser, authSwitchTenant } from "@/api/endpoints/endpoints";
+import type { CurrentUser, MyTenant } from "@/api/endpoints/endpoints.schemas";
+import { getApiBaseUrl } from "@/api/backend-config";
 
 const TOKEN_KEY = "lab.token";
 
 export interface AuthContextValue {
   token: string | null;
+  user: CurrentUser | null;
+  tenants: MyTenant[];
+  currentTenantId: string | null;
   setToken: (token: string | null) => void;
   clearToken: () => void;
+  switchTenant: (tenantId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [tenants, setTenants] = useState<MyTenant[]>([]);
+  const [currentTenantId, setCurrentTenantId] = useState<string | null>(null);
+  // 防并发 hydrate（token 变化触发多个 effect 轮次时只发一次 /me）
+  const hydrating = useRef(false);
 
   // 同步 hydrate：组件 mount 时从 localStorage 读，避免 SSR/CSR mismatch
   useEffect(() => {
@@ -38,6 +53,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // 会话信息 hydrate：有 token 且无 user → GET /api/auth/me
+  // （M00.F01：顶栏 displayName + TenantSwitcher 的数据源）
+  useEffect(() => {
+    if (!token || user || hydrating.current) return;
+    hydrating.current = true;
+    authGetCurrentUser({
+      headers: { Authorization: `Bearer ${token}` },
+      baseURL: getApiBaseUrl(),
+    })
+      .then((session) => {
+        setUser(session.user);
+        setTenants(session.tenants ?? []);
+        setCurrentTenantId(session.currentTenantId ?? session.tenants?.[0]?.tenantId ?? null);
+      })
+      .catch(() => {
+        // /me 失败（快照 miss / 后端不可达）：不阻断 UI，顶栏显示占位。
+        // 401 重定向语义由 useBackendMenus 统一处理，这里不重复。
+      })
+      .finally(() => {
+        hydrating.current = false;
+      });
+  }, [token, user]);
+
   const setToken = useCallback((next: string | null) => {
     setTokenState(next);
     try {
@@ -48,11 +86,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const clearToken = useCallback(() => setToken(null), [setToken]);
+  const clearToken = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    setTenants([]);
+    setCurrentTenantId(null);
+  }, [setToken]);
+
+  // 切租户：换发带新 tenant claim 的 token，会话不中断（ADR-0019：opaque mock token 已删）
+  const switchTenant = useCallback(
+    async (tenantId: string) => {
+      if (!token) throw new Error("switchTenant requires a token");
+      const resp = await authSwitchTenant(
+        { tenantId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          baseURL: getApiBaseUrl(),
+        },
+      );
+      setToken(resp.token);
+      setUser(resp.user);
+      setTenants(resp.tenants ?? []);
+      setCurrentTenantId(tenantId);
+    },
+    [token, setToken],
+  );
 
   const value = useMemo<AuthContextValue>(
-    () => ({ token, setToken, clearToken }),
-    [token, setToken, clearToken],
+    () => ({ token, user, tenants, currentTenantId, setToken, clearToken, switchTenant }),
+    [token, user, tenants, currentTenantId, setToken, clearToken, switchTenant],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

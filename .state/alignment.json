@@ -4,11 +4,13 @@
   "functions": {
     "modules": 7,
     "features": 26,
-    "items": 107
+    "items": 109
   },
-  "warnings_total": 10,
+  "warnings_total": 14,
   "warnings": {
     "已上线但无设计映射": [
+      "M00.F01.I01",
+      "M00.F02.I01",
       "M01.F04.I03",
       "M05.F01.I06"
     ],
@@ -17,6 +19,8 @@
       "M05.F01.I06"
     ],
     "已上线但不在任何流程且非孤儿白名单": [
+      "M00.F01.I01",
+      "M00.F02.I01",
       "M01.F04.I01",
       "M01.F04.I03",
       "M05.F01.I02",
@@ -27,6 +31,51 @@
   },
   "unreachable_shipped": [],
   "function_map": {
+    "M00.F01.I01": {
+      "name": "会话信息展示",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::AppShell header 挂 user-display-name（displayName，/api/auth/me hydrate）",
+        "output\\lab-management-system-contract-test\\tests\\auth-me.test.ts:586 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:515 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:807 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:1907 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:3971 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:1603 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:1419 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:1906 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-flow-write.test.ts:509 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:2323 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:731 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:1843 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:1722 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:868 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1798 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:661 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:1844 (annot)"
+      ],
+      "entry": [
+        "src\\components\\app\\app-shell.tsx"
+      ]
+    },
+    "M00.F02.I01": {
+      "name": "租户切换组件",
+      "status": "已上线",
+      "type": "按钮",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::TenantSwitcher 挂 data-fn + 登出左侧渲染 + switchTenant 换 token"
+      ],
+      "entry": [
+        "src\\components\\app\\tenant-switcher.tsx"
+      ]
+    },
     "M01.F04.I01": {
       "name": "动态菜单下发（GET /auth/menus）",
       "status": "已上线",
@@ -77,8 +126,8 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:960 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1740 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:2293 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1750 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:3513 (annot)",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:2573 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:2447 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2250 (annot)",
@@ -117,7 +166,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::5xx → 不写快照 + warn（登录主流程不阻塞）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 不在响应里 → 写空快照（与 no-sso 兜底四方对齐）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 命中 → 写入子树 + 完成 name→label 映射 + 跨 app 数据不污染",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 命中 → 写入子树 + 完成 title→label 映射 + 跨 app 数据不污染",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：响应是空对象 → 写空快照",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::userId/token 空 → 静默不写不发请求",
@@ -176,7 +225,7 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:2950 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1255 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1265 (annot)",
         "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2712 (annot)",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:6894 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2972 (annot)",

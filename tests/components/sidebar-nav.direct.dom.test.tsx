@@ -25,10 +25,26 @@ type MockResponse = { status: number; data: unknown };
 const queue: MockResponse[] = [];
 const calls: { url?: string; headers?: Record<string, string> }[] = [];
 
+// 2026-09-14 auth-context 扩展（M00.F01）：token hydrate 后 AuthProvider 会自动
+// GET /api/auth/me 拉会话信息。mock 按 url 分流：meQueue 供 /me（空则默认 200 会话），
+// queue 供 /api/auth/menus。
+const meQueue: MockResponse[] = [];
+const ME_SESSION = {
+  user: { id: "USER-A", username: "alice", displayName: "管理员", roleCode: "admin" },
+  tenants: [
+    { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
+  ],
+  currentTenantId: "TENANT-001",
+};
+
 vi.mock("axios", () => ({
   default: async (config: { url?: string; headers?: Record<string, string> }) => {
     calls.push({ url: config?.url, headers: config?.headers });
-    const r = queue.shift();
+    const url = config?.url ?? "";
+    // 精确匹配（"/api/auth/menus" 含 "/api/auth/me" 子串，startsWith 会误伤）
+    const isMe = url === "/api/auth/me";
+    const r = (isMe ? meQueue : queue).shift() ??
+      (isMe ? { status: 200, data: ME_SESSION } : undefined);
     if (!r || r.status >= 400) {
       throw Object.assign(new Error(`HTTP ${r?.status ?? "no-mock"}`), {
         response: r ? { status: r.status, data: r.data } : undefined,
@@ -57,6 +73,7 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
 
   beforeEach(() => {
     queue.length = 0;
+    meQueue.length = 0;
     calls.length = 0;
     // useSaasApp 仍走 fetch（saas 公共目录）；axios mock 只盯 /api/auth/menus。
     // 响应形状 = SSOT OAuthClientPublicInfo {clientId, clientName, status}。
@@ -108,8 +125,10 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     const { result } = renderHook(() => useBackendMenus(), { wrapper: wrap });
 
     await waitFor(() => expect(result.current.data).not.toBeNull());
-    // 端点 + Bearer
-    expect(calls).toEqual([
+    // 端点 + Bearer（AuthProvider 扩展后同会话还会发 /api/auth/me hydrate，
+    // 这里只断言 menus 这一通：url + Bearer 头）
+    const menuCalls = calls.filter((c) => c.url === "/api/auth/menus");
+    expect(menuCalls).toEqual([
       { url: "/api/auth/menus", headers: { Authorization: "Bearer test-jwt-from-sso" } },
     ]);
     // 适配：label→name，有子节点=group，无子节点=page
@@ -184,6 +203,7 @@ describe("M01.F04.I04 useBackendMenus — demo 兜底删除后失败语义", () 
 
   beforeEach(() => {
     queue.length = 0;
+    meQueue.length = 0;
     calls.length = 0;
     fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ code: "lab-management", name: "建筑工程实验室管理系统" }), {

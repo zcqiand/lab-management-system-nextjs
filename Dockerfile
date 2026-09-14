@@ -70,7 +70,7 @@ ENV NEXT_PUBLIC_LAB_APP_CODE=lab-management
 # ADR-0019:login/page.tsx 顶层 throw if undefined(删了 UUID 字面兜底),
 # next build "Collecting page data" 阶段即崩。NEXT_PUBLIC_* build-time 烘焙进
 # bundle,运行时 lab.env 注入对 client 侧无效,必须在此声明。
-ENV NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=11111111-1111-1111-1111-111111111111
+ENV NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=lab-management
 RUN npm run build
 
 

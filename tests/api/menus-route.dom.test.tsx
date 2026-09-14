@@ -124,19 +124,23 @@ describe("cacheMenuSnapshot：saas /me/menus Record<appCode, EffectiveMenuNode[]
     return fetchMock;
   }
 
-  fnTest(["M01.F04.I04"], "Record 形状：appCode 命中 → 写入子树 + 完成 name→label 映射 + 跨 app 数据不污染", async () => {
+  fnTest(["M01.F04.I04"], "Record 形状：appCode 命中 → 写入子树 + 完成 title→label 映射 + 跨 app 数据不污染", async () => {
+    // saas 真实 payload 形状（2026-09-08 clientId 重命名后）：展示名 title，type menu|directory
     mockSaas({
       "lab-management": [
         {
           id: "g1",
-          name: "分组1",
+          clientId: "lab-management",
+          title: "分组1",
+          type: "directory",
           path: null,
           icon: null,
-          children: [{ id: "p1", name: "页面1", path: "/p1", icon: "Icon1" }],
+          sortOrder: 15,
+          children: [{ id: "p1", clientId: "lab-management", title: "页面1", type: "menu", path: "p1", icon: "Icon1", sortOrder: 1 }],
         },
-        { id: "p2", name: "页面2", path: "/p2" },
+        { id: "p2", clientId: "lab-management", title: "页面2", type: "menu", path: "p2", sortOrder: 2 },
       ],
-      erp: [{ id: "erp-1", name: "ERP 页" }], // 跨 app 数据，绝不能进 lab 快照
+      erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }], // 跨 app 数据，绝不能进 lab 快照
     });
 
     await cacheMenuSnapshot("user-x", "tok", "http://saas", "lab-management");
@@ -145,9 +149,9 @@ describe("cacheMenuSnapshot：saas /me/menus Record<appCode, EffectiveMenuNode[]
       {
         id: "g1",
         label: "分组1",
-        children: [{ id: "p1", label: "页面1", path: "/p1", icon: "Icon1" }],
+        children: [{ id: "p1", label: "页面1", path: "p1", icon: "Icon1" }],
       },
-      { id: "p2", label: "页面2", path: "/p2" },
+      { id: "p2", label: "页面2", path: "p2" },
     ]);
 
     // URL 带 appCode query 参数 + Bearer header
@@ -159,7 +163,7 @@ describe("cacheMenuSnapshot：saas /me/menus Record<appCode, EffectiveMenuNode[]
   });
 
   fnTest(["M01.F04.I04"], "Record 形状：appCode 不在响应里 → 写空快照（与 no-sso 兜底四方对齐）", async () => {
-    mockSaas({ erp: [{ id: "erp-1", name: "ERP 页" }] });
+    mockSaas({ erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }] });
 
     await cacheMenuSnapshot("user-y", "tok", "http://saas", "lab-management");
 

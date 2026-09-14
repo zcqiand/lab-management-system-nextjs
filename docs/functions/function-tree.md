@@ -49,6 +49,18 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M00.F01 | 当前用户会话 | 当前用户信息 + 关联租户列表 + 当前选中租户（GET /auth/me） | 规划 |
 | M00.F02 | 登录选租户 | 登录后选择租户，换发携带 tenant_id claim 的 token（POST /auth/switch-tenant） | 规划 |
 
+### M00.F01 当前用户会话
+
+| 功能 ID | 子项名称 | 类型 | 端 | 说明 | 状态 |
+|---|---|---|---|---|---|
+| M00.F01.I01 | 会话信息展示 | 接口 | 前端+后端 | GET /auth/me hydrate user/tenants/currentTenantId；顶栏登出旁显示登录用户 displayName（data-testid=user-display-name） | 已上线 |
+
+### M00.F02 登录选租户
+
+| 功能 ID | 子项名称 | 类型 | 端 | 说明 | 状态 |
+|---|---|---|---|---|---|
+| M00.F02.I01 | 租户切换组件 | 按钮 | 前端+后端 | 顶栏 TenantSwitcher（DropdownMenu + Building2，对齐 saas 视觉）：列出当前用户租户，选中调 POST /auth/switch-tenant 换发真 HS256 token，会话不断（data-fn=M00.F02.I01） | 已上线 |
+
 ---
 
 ## M01 认证管理

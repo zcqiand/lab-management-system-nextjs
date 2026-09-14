@@ -27,7 +27,7 @@ if (process.env.NEXT_PUBLIC_API_BASE_URL === undefined) {
 const ADR0019_TEST_ENV: Record<string, string> = {
   SAAS_IDP_URL: "http://localhost:5101",
   SAAS_UI_BASE_URL: "http://localhost:5101",
-  SAAS_OAUTH_CLIENT_ID: "11111111-1111-1111-1111-111111111111",
+  SAAS_OAUTH_CLIENT_ID: "lab-management",
   SAAS_OAUTH_CLIENT_SECRET: "lab-mgmt-secret",
   SAAS_OAUTH_SCOPE: "lab.read lab.write",
   SAAS_TENANT_ID: "00000000-0000-0000-0000-000000000001",
@@ -36,7 +36,7 @@ const ADR0019_TEST_ENV: Record<string, string> = {
   LAB_AUTH_DEV_PASSWORD: "dev123456",
   NEXT_PUBLIC_SAAS_BASE_URL: "http://localhost:5101",
   NEXT_PUBLIC_LAB_APP_CODE: "lab-management",
-  NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: "11111111-1111-1111-1111-111111111111",
+  NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: "lab-management",
 };
 for (const [k, v] of Object.entries(ADR0019_TEST_ENV)) {
   if (process.env[k] === undefined) process.env[k] = v;
