@@ -2,13 +2,12 @@
 import { useEffect, useState } from 'react'
 // REF src/features/inspection-capability/ParamInterfaceList.tsx 移植。
 // 差异：apiClient → @/api/legacy-client + API_ROUTES（link 端点映射到
-// /api/inspection-param-interfaces/links）。
+// 契约路径 /api/param-interfaces/links，REQ-2026-001）。
 import { apiClient, API_ROUTES } from '@/api/legacy-client'
 import { AssociationManager } from './AssociationManager'
 import { ParamInterfacePreviewModal } from './ParamInterfacePreviewModal'
 
 interface InspectionParamInterface {
-  id: string
   code: string
   name: string
   componentPath?: string
@@ -20,7 +19,7 @@ interface InspectionParamInterface {
 }
 
 interface ParamInterfaceParameterLink {
-  inspectionParamInterfaceCode: string
+  paramInterfaceCode: string
   inspectionParameterCode: string
 }
 interface InspectionParameter {
@@ -105,7 +104,7 @@ export function ParamInterfaceList() {
     ]).then(([paramRes, paramMasterRes]) => {
       const paramMap: Record<string, string[]> = {}
       for (const link of paramRes.data?.items ?? []) {
-        const pk = link.inspectionParamInterfaceCode ?? ''
+        const pk = link.paramInterfaceCode ?? ''
         const arr = paramMap[pk] ?? []
         if (link.inspectionParameterCode && !arr.includes(link.inspectionParameterCode)) arr.push(link.inspectionParameterCode)
         paramMap[pk] = arr
@@ -129,7 +128,7 @@ export function ParamInterfaceList() {
     setFormOpen(true)
   }
   const openEdit = (row: InspectionParamInterface) => {
-    setEditId(row.id)
+    setEditId(row.code)
     setSavedCode(row.code)
     setForm({
       code: row.code,
@@ -178,9 +177,9 @@ export function ParamInterfaceList() {
     }
   }
 
-  const remove = async (id: string) => {
+  const remove = async (code: string) => {
     try {
-      await apiClient.delete(`${API_ROUTES['/inspection-param-interfaces']}/${id}`)
+      await apiClient.delete(`${API_ROUTES['/inspection-param-interfaces']}/${code}`)
       load()
     } catch (err: unknown) {
       setError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '删除失败')
@@ -230,7 +229,7 @@ export function ParamInterfaceList() {
             {rows.map((r) => {
               const params = (paramByPi[r.code] ?? []).map((c) => paramNameByCode[c] ?? c)
               return (
-                <tr key={r.id} className="border-t hover:bg-gray-50 align-top">
+                <tr key={r.code} className="border-t hover:bg-gray-50 align-top">
                   <td className="px-4 py-2 font-mono text-xs">{r.code}</td>
                   <td className="px-4 py-2 whitespace-nowrap">{r.name}</td>
                   <td className="px-4 py-2 font-mono text-xs text-gray-700">{r.componentPath ?? '-'}</td>
@@ -242,7 +241,7 @@ export function ParamInterfaceList() {
                       type="button"
                       onClick={() => setPreviewRow(r)}
                       data-fn="M06.F08.I05"
-                      aria-label={`预览 ${r.id}`}
+                      aria-label={`预览 ${r.code}`}
                       className="text-gray-600 hover:underline mr-3"
                     >
                       预览
@@ -251,16 +250,16 @@ export function ParamInterfaceList() {
                       type="button"
                       onClick={() => openEdit(r)}
                       data-fn="M06.F08.I02"
-                      aria-label={`编辑 ${r.id}`}
+                      aria-label={`编辑 ${r.code}`}
                       className="text-blue-600 hover:underline mr-3"
                     >
                       编辑
                     </button>
                     <button
                       type="button"
-                      onClick={() => remove(r.id)}
+                      onClick={() => remove(r.code)}
                       data-fn="M06.F08.I03"
-                      aria-label={`删除 ${r.id}`}
+                      aria-label={`删除 ${r.code}`}
                       className="text-red-600 hover:underline"
                     >
                       删除
@@ -368,7 +367,7 @@ export function ParamInterfaceList() {
                 <AssociationManager
                   ariaLabel={`${savedCode} 关联检测参数`}
                   endpoint="/inspection-parameter-param-interfaces"
-                  parentParam="inspectionParamInterfaceCode"
+                  parentParam="paramInterfaceCode"
                   parentCode={savedCode}
                   targetLabel="检测参数"
                   targetEndpoint="/inspection-parameters"

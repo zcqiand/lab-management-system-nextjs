@@ -8,7 +8,7 @@
 //     2026-08-27 起 demo 兜底删除，useBackendMenus 失败 render 抛错，
 //     AppShellErrorBoundary 兜渲染错误态）
 //   - 内容是 children，由调用方（page.tsx）提供
-//   - 顶部 header 加 token + backend 状态 + 登出按钮
+//   - 顶部 header：应用名（左）+ 登录用户显示名 / 租户切换 / 登出（右）
 
 import React from "react";
 import Link from "next/link";
@@ -18,7 +18,6 @@ import { SidebarNav, useSaasApp, useBackendMenus } from "@/components/app/sideba
 import { BackendBadge } from "@/components/app/backend-badge";
 import { TenantSwitcher } from "@/components/app/tenant-switcher";
 import { useAuth } from "@/state/auth-context";
-import { getApiMode } from "@/api/backend-config";
 
 const APP_CODE = process.env.NEXT_PUBLIC_LAB_APP_CODE ?? "lab-management";
 
@@ -62,7 +61,6 @@ export class AppShellErrorBoundary extends React.Component<
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { token, user, clearToken } = useAuth();
-  const apiMode = getApiMode();
   const { data: menus, loading: menusLoading } = useBackendMenus();
   // 应用名来自 saas 公共应用目录（/api/v1/clients/<clientId>），不写死在客户端
   const { app } = useSaasApp();
@@ -82,7 +80,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           appCode={APP_CODE}
           appName={app?.name}
           footerExtras={<BackendBadge />}
-          version={`lab-management-system-nextjs · 接线层 · appCode=${APP_CODE}`}
         />
       )}
       <main className="flex-1 flex flex-col min-w-0">
@@ -91,19 +88,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {app?.name ?? "Lab Operational Console"}
           </h1>
           <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
-            <span className="font-mono">
-              应用=
-              <span className="text-slate-900 font-medium">{app?.name ?? APP_CODE}</span>
-            </span>
-            <span className="font-mono">
-              backend=<span className="text-slate-900 font-medium">{apiMode}</span>
-            </span>
-            <span className="font-mono">
-              token=
-              <span className="text-slate-900 font-medium">
-                {token ? `${token.slice(0, 16)}…` : "无"}
-              </span>
-            </span>
             {token ? (
               <>
                 {/* 登录用户显示名（M00.F01.I01，/api/auth/me hydrate） */}

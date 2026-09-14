@@ -20,7 +20,7 @@
 // REF tests/helpers/seed.ts 的 seedParamInterfaces / seedData / orgInfoTable 是
 // shared MockServer 架构；本仓是 lab-msw fixtures 数组架构。以下扩展按本仓模式
 // 提供等价能力（移植自 REF tests/helpers/seed.ts，id/数据逐一保留）：
-//   - `seedParamInterfaces(server?)`：把 inspection-param-interfaces / inspection-param-interface-links
+//   - `seedParamInterfaces(server?)`：把 param-interfaces / param-interfaces/links
 //     两张 fixtures 清空并按 generated JSON 重灌（id 形态 `pi-${code}` 与 REF 一致）。
 //     msw seed 本就含这两张表，但测试调它取「干净确定性」语义——保留 no-op 不行，
 //     因为 REF 语义是 replaceAll 后重灌。参数仅为兼容 REF 调用签名，值被忽略。
@@ -252,7 +252,7 @@ const FLOW_ORDER_FULL = [
 
 /**
  * 安装 REF 形状适配 handler：
- *  - dictCrud 表（report-names / standards / parameters / inspection-param-interfaces）：裸数组 → {items,total}
+ *  - dictCrud 表（report-names / standards / parameters / param-interfaces）：裸数组 → {items,total}
  *  - 4 条链接 GET：裸数组 → {items,total}（保留过滤参数语义 + role）
  *  - /samples：+ keyword（sampleCode/sampleName includes）
  *  - /receipts：+ categoryCode / lastSubmittedBy
@@ -261,11 +261,11 @@ const FLOW_ORDER_FULL = [
 export function installShapeAdapters(server: { use: (...h: unknown[]) => void }): void {
   server.use(
     // —— dictCrud 主表（msw 裸数组 → REF {items}）——
-    // Task 13：report-names/inspection-param-interfaces 走 wrapDict（补 id=code + keyword 过滤）；
+    // Task 13：report-names/param-interfaces 走 wrapDict（补 id=code + keyword 过滤）；
     // standards/parameters 的 wrapDict（含 junction 反查）在下方 Task 13 段注册——
     // 同 URL 后注册者胜（msw use() 头插），此处不重复注册。
     http.get("*/api/report-names", ({ request }) => wrapDict(inspectionReportNames as unknown as Array<Record<string, unknown>>, request)),
-    http.get("*/api/inspection-param-interfaces", ({ request }) => wrapDict(inspectionParamInterfaces as unknown as Array<Record<string, unknown>>, request)),
+    http.get("*/api/param-interfaces", ({ request }) => wrapDict(inspectionParamInterfaces as unknown as Array<Record<string, unknown>>, request)),
 
     // —— 链接 GET（msw 裸数组 → REF {items}）——
     http.get("*/api/report-names/links/standard", ({ request }) => {
@@ -293,17 +293,16 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
         : inspectionStandardParameters;
       return HttpResponse.json({ items, total: items.length });
     }),
-    http.get("*/api/inspection-param-interfaces/links", ({ request }) => {
+    http.get("*/api/param-interfaces/links", ({ request }) => {
       const url = new URL(request.url);
-      // Task 13 Step 3：补 REF 过滤参数族（inspectionParamInterfaceCode / reportNameCode，
-      // 见 backup shared lab-handlers.ts paramInterfaceLinkHandlers GET）。原先只支持
-      // parameterCode；无这些参数的既有调用行为不变。
-      const code = url.searchParams.get("parameterCode");
-      const pic = url.searchParams.get("inspectionParamInterfaceCode");
+      // 契约过滤参数（REQ-2026-001）：inspectionParameterCode / paramInterfaceCode；
+      // parameterCode 保留为 REF 兼容别名。无这些参数的既有调用行为不变。
+      const code = url.searchParams.get("inspectionParameterCode") ?? url.searchParams.get("parameterCode");
+      const pic = url.searchParams.get("paramInterfaceCode");
       const rn = url.searchParams.get("reportNameCode");
       let items: unknown[] = inspectionParamInterfaceLinks;
       if (code) items = items.filter((l) => (l as { inspectionParameterCode: string }).inspectionParameterCode === code);
-      if (pic) items = items.filter((l) => (l as { inspectionParamInterfaceCode: string }).inspectionParamInterfaceCode === pic);
+      if (pic) items = items.filter((l) => (l as { paramInterfaceCode: string }).paramInterfaceCode === pic);
       if (rn) items = items.filter((l) => (l as { reportNameCode?: string }).reportNameCode === rn);
       return HttpResponse.json({ items, total: items.length });
     }),
@@ -580,7 +579,24 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
     http.delete("*/api/report-names/links/object", linkDelete(inspectionObjectReportNames as unknown as Array<Record<string, unknown>>)),
     http.delete("*/api/report-names/links/standard", linkDelete(inspectionReportNameStandards as unknown as Array<Record<string, unknown>>)),
     http.delete("*/api/report-names/links/parameter", linkDelete(inspectionReportNameParameters as unknown as Array<Record<string, unknown>>)),
-    http.delete("*/api/inspection-param-interfaces/links", linkDelete(inspectionParamInterfaceLinks as unknown as Array<Record<string, unknown>>)),
+    http.delete("*/api/param-interfaces/links", async ({ request }) => {
+      // 契约 unlink 是 @body；同时兼容 query（REQ-2026-001 过渡期）
+      const url = new URL(request.url);
+      let keys: Record<string, string> = {};
+      try {
+        const b = (await request.json()) as Record<string, unknown>;
+        keys = { inspectionParameterCode: String(b["inspectionParameterCode"] ?? ""), paramInterfaceCode: String(b["paramInterfaceCode"] ?? "") };
+      } catch {
+        keys = {
+          inspectionParameterCode: url.searchParams.get("inspectionParameterCode") ?? "",
+          paramInterfaceCode: url.searchParams.get("paramInterfaceCode") ?? "",
+        };
+      }
+      const arr = inspectionParamInterfaceLinks as unknown as Array<Record<string, unknown>>;
+      const i = arr.findIndex((l) => l["inspectionParameterCode"] === keys.inspectionParameterCode && l["paramInterfaceCode"] === keys.paramInterfaceCode);
+      if (i >= 0) arr.splice(i, 1);
+      return new HttpResponse(null, { status: 204 });
+    }),
     http.delete("*/api/inspection/links/standard-parameter", linkDelete(inspectionStandardParameters as unknown as Array<Record<string, unknown>>)),
 
     // —— 计算方法 GET：+ testingStandardCode 过滤（msw 只支持 object/parameter）——
@@ -642,7 +658,7 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
     //   POST 校验 + 重复 400；DELETE 内置（isOfficial）不可删 400；
     //   links POST 确定性 id + 重复 400 + 201。
     // 这里对同一 inspectionParamInterfaces / inspectionParamInterfaceLinks fixtures 原地实现 REF 语义。
-    http.post("*/api/inspection-param-interfaces", async ({ request }) => {
+    http.post("*/api/param-interfaces", async ({ request }) => {
       const body = (await request.json()) as Record<string, unknown>;
       if (!body["code"] || !body["name"] || !body["componentPath"])
         return HttpResponse.json({ message: "code/name/componentPath 必填" }, { status: 400 });
@@ -650,7 +666,6 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
         return HttpResponse.json({ message: "参数界面编码已存在" }, { status: 400 });
       const now = new Date().toISOString();
       const row = {
-        id: `pi-${String(body["code"])}`,
         code: body["code"],
         name: body["name"],
         componentPath: body["componentPath"],
@@ -664,37 +679,39 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       inspectionParamInterfaces.push(row as unknown as (typeof inspectionParamInterfaces)[number]);
       return HttpResponse.json(row, { status: 201 });
     }),
-    http.put("*/api/inspection-param-interfaces/:id", async ({ params, request }) => {
+    http.put("*/api/param-interfaces/:id", async ({ params, request }) => {
       const arr = inspectionParamInterfaces as unknown as Array<Record<string, unknown>>;
-      const row = arr.find((r) => r["id"] === params.id || r["code"] === params.id);
+      const row = arr.find((r) => r["code"] === params.id);
       if (!row) return HttpResponse.json({ message: "InspectionParamInterface not found" }, { status: 404 });
       Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
       return HttpResponse.json(row);
     }),
-    http.delete("*/api/inspection-param-interfaces/:id", ({ params }) => {
+    http.delete("*/api/param-interfaces/:id", ({ params }) => {
       const arr = inspectionParamInterfaces as unknown as Array<Record<string, unknown>>;
-      const i = arr.findIndex((r) => r["id"] === params.id || r["code"] === params.id);
+      const i = arr.findIndex((r) => r["code"] === params.id);
       if (i < 0) return HttpResponse.json({ message: "参数界面不存在" }, { status: 404 });
       if (arr[i]!["isOfficial"])
         return HttpResponse.json({ message: "内置模型不可删除" }, { status: 400 });
       arr.splice(i, 1);
       return new HttpResponse(null, { status: 204 });
     }),
-    http.post("*/api/inspection-param-interfaces/links", async ({ request }) => {
+    http.post("*/api/param-interfaces/links", async ({ request }) => {
       const body = (await request.json()) as Record<string, unknown>;
-      if (!body["inspectionParameterCode"] || !body["inspectionParamInterfaceCode"])
-        return HttpResponse.json({ message: "inspectionParameterCode/inspectionParamInterfaceCode 必填" }, { status: 400 });
-      const id = body["reportNameCode"]
-        ? `pi-param-${String(body["inspectionParamInterfaceCode"])}-${String(body["inspectionParameterCode"])}-${String(body["reportNameCode"])}`
-        : `pi-param-${String(body["inspectionParamInterfaceCode"])}-${String(body["inspectionParameterCode"])}`;
+      if (!body["inspectionParameterCode"] || !body["paramInterfaceCode"])
+        return HttpResponse.json({ message: "inspectionParameterCode/paramInterfaceCode 必填" }, { status: 400 });
       const arr = inspectionParamInterfaceLinks as unknown as Array<Record<string, unknown>>;
-      if (arr.some((r) => r["id"] === id))
+      const dup = arr.some(
+        (r) =>
+          r["inspectionParameterCode"] === body["inspectionParameterCode"] &&
+          r["paramInterfaceCode"] === body["paramInterfaceCode"] &&
+          (r["reportNameCode"] ?? undefined) === (body["reportNameCode"] ?? undefined),
+      );
+      if (dup)
         return HttpResponse.json({ message: "关联已存在" }, { status: 400 });
       const now = new Date().toISOString();
       const row = {
-        id,
         inspectionParameterCode: body["inspectionParameterCode"],
-        inspectionParamInterfaceCode: body["inspectionParamInterfaceCode"],
+        paramInterfaceCode: body["paramInterfaceCode"],
         reportNameCode: body["reportNameCode"],
         createdAt: now,
         updatedAt: now,
@@ -856,16 +873,13 @@ export function seedParamInterfaces(_server?: unknown): void {
   }
 
   const linkRows = paramInterfaceLinksJson as Array<{
-    inspectionParameterCode: string; inspectionParamInterfaceCode: string; reportNameCode?: string
+    inspectionParameterCode: string; paramInterfaceCode: string; reportNameCode?: string
   }>
   inspectionParamInterfaceLinks.length = 0
   for (const link of linkRows) {
     inspectionParamInterfaceLinks.push({
-      id: link.reportNameCode
-        ? `pi-param-${link.inspectionParamInterfaceCode}-${link.inspectionParameterCode}-${link.reportNameCode}`
-        : `pi-param-${link.inspectionParamInterfaceCode}-${link.inspectionParameterCode}`,
       inspectionParameterCode: link.inspectionParameterCode,
-      inspectionParamInterfaceCode: link.inspectionParamInterfaceCode,
+      paramInterfaceCode: link.paramInterfaceCode,
       reportNameCode: link.reportNameCode,
       createdAt: now, updatedAt: now, tenantId: TENANT,
     } as unknown as (typeof inspectionParamInterfaceLinks)[number])

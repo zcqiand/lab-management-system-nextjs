@@ -124,7 +124,7 @@ beforeEach(() => {
   inspectionParameterParamInterfaceTable.insert({
     id: 'pi-param-1',
     inspectionParameterCode: 'IP-0001',
-    inspectionParamInterfaceCode: 'default',
+    paramInterfaceCode: 'default',
     createdAt: '',
     updatedAt: '',
   } as never)

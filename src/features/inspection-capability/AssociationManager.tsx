@@ -234,7 +234,9 @@ export function AssociationManager(props: Props) {
       if (v !== undefined) params[f.name] = v;
     }
     try {
-      await apiClient.delete(route(endpoint), { params });
+      // 契约 unlink（如 DELETE /api/param-interfaces/links）是 @body 语义；
+      // 同时带 query 兼容仍读 query 的消费方（REQ-2026-001）。
+      await apiClient.delete(route(endpoint), { params, data: params });
       loadAll();
     } catch (err: unknown) {
       setError(

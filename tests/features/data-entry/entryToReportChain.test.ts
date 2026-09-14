@@ -70,11 +70,11 @@ describe("录入卡 → 报告模板 取数链路", () => {
 
   fnTest(
     ["M06.F08.I04"],
-    "参数界面关联的 inspectionParamInterfaceCode 全部存在于 inspection-param-interface.json",
+    "参数界面关联的 paramInterfaceCode 全部存在于 inspection-param-interface.json",
     () => {
       const codes = new Set((inspectionParamInterfaces as ParamInterfaceRow[]).map((p) => p.code));
       const dangling = (inspectionParamInterfaceLinks as ParamInterfaceLink[]).filter(
-        (l) => !codes.has(l.inspectionParamInterfaceCode),
+        (l) => !codes.has(l.paramInterfaceCode),
       );
       // 历史 bug：4 条关联把 componentPath('rebar-mech-numeric') 当成了 code，
       // resolveInterfaceByParam 会静默丢弃 → 录入页悄悄回退默认四格卡。

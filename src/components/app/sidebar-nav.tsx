@@ -17,6 +17,7 @@ import {
   useRouter as useNextRouter,
   useSearchParams,
 } from "next/navigation";
+import pkg from "../../../package.json";
 import {
   Activity,
   Beaker,
@@ -100,7 +101,7 @@ export function SidebarNav({
   appName,
   footerAction,
   footerExtras,
-  version = "lab-management-system-nextjs · 接线层",
+  version = "",
 }: SidebarNavProps) {
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -172,7 +173,9 @@ export function SidebarNav({
               <h1 className="text-sm font-bold leading-tight truncate" data-testid="sidebar-app-name">
                 {appName ?? "Lab-Management"}
               </h1>
-              <p className="text-xs text-white/50 truncate">appCode = {appCode}</p>
+              <p className="text-xs text-white/50 truncate" data-testid="sidebar-app-version">
+                v{pkg.version}
+              </p>
             </div>
           )}
         </div>

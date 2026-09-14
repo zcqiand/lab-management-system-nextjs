@@ -44,7 +44,9 @@ test.skipIf(isCi)("API_ROUTES 映射的 link 端点全部可达", async () => {
     },
     {
       legacy: "/inspection-parameter-param-interfaces",
-      query: "?parameterCode=IP-0055",
+      // REQ-2026-001 收敛后 query 同样走契约参数 inspectionParameterCode
+      // （旧 parameterCode 被 handler 忽略 → 返回全量 → 过滤断言失败）
+      query: "?inspectionParameterCode=IP-0055",
       field: "inspectionParameterCode",
       value: "IP-0055",
     },

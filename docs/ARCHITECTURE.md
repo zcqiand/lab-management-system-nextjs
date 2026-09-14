@@ -127,7 +127,7 @@ lab-management-system-nextjs/
 │   │   │   │   ├── menus/      ← GET /api/auth/menus（ADR-0009 saas 快照）
 │   │   │   │   └── permissions/   ← GET /api/auth/permissions
 │   │   │   ├── contracts/, calculation-methods/, catalog/, receipts/, samples/,
-│   │   │   ├── inspection/, inspection-param-interfaces/, org-info/,
+│   │   │   ├── inspection/, param-interfaces/, org-info/,
 │   │   │   ├── report-names/, summary/, technical-requirements/, test-records/,
 │   │   │   └── health/         ← GET /api/health
 │   │   ├── login/page.tsx      ← 登录页（server component）
@@ -250,7 +250,7 @@ lab-management-system-nextjs/
 
 #### 3.2.2 业务路由
 
-`src/app/api/{contracts, calculation-methods, catalog, receipts, samples, inspection, inspection-param-interfaces, org-info, report-names, summary, technical-requirements, test-records, audit-logs, health}/`
+`src/app/api/{contracts, calculation-methods, catalog, receipts, samples, inspection, param-interfaces, org-info, report-names, summary, technical-requirements, test-records, audit-logs, health}/`
 
 | 路由示例 | 数据源 | 备注 |
 |---|---|---|
