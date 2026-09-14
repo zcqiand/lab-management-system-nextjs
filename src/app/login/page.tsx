@@ -15,7 +15,7 @@
 // 所以这条路径在 dev 里只到 msw mock 层就停了 —— 但接口面是对的（OAuth 2.0 RFC 6749）。
 // client_secret 仅后端持（部署 env），不入 OpenAPI yaml。
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -77,6 +77,10 @@ export default function LoginPage() {
     setApiMode(getApiMode());
   }, []);
   const [status, setStatus] = useState<string>("检查登录态...");
+  // SSO authorize 防重入：StrictMode dev 双调 effect、依赖（apiMode/token）变化都会
+  // 重跑下方 effect；第二次 setItem 会覆盖第一个 state → saas 回跳比对必失败
+  // （「state 校验失败（可能 session 过期或被攻击）」）。一次登录流程只发一次。
+  const ssoStartedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -136,6 +140,10 @@ export default function LoginPage() {
     }
 
     // 3. 调 SSO authorize → 跳 saas
+    //    防重入（ssoStartedRef）：StrictMode dev 双调 effect、依赖变化重跑时，
+    //    第二次 setItem 会覆盖第一个 state → saas 回跳比对必失败。
+    if (ssoStartedRef.current) return;
+    ssoStartedRef.current = true;
     setStatus(`未登录，正在跳 saas（backend=${apiMode}）...`);
     const csrfState = generateOauthState();
     sessionStorage.setItem(SSO_STATE_STORAGE_KEY, csrfState);
@@ -157,12 +165,14 @@ export default function LoginPage() {
         } else {
           setStatus("authorizeUrl 缺失，请检查 msw / saas 配置");
           sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+          ssoStartedRef.current = false;
         }
       })
       .catch((err: unknown) => {
         console.error("[lab/login] authSsoAuthorize failed:", err);
         setStatus(`authorize 调用失败（${apiMode}）：${(err as Error).message}`);
         sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+        ssoStartedRef.current = false; // 失败后允许重试
       });
   }, [apiMode, baseUrl, router, setToken, token]);
 
