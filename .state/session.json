@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "ADR-0033 阶段三收工归档（e2e 联跑暴露缺陷已修）",
+  "current_task": "REQ-2026-001：删私生 routes + 补契约路由——已上线",
   "done": [
-    "阶段二收口：M97/M98 退役 + BASE 镜像（commit a768310）",
-    "e7eb5ec app-shell sidebar-nav DefinePlugin 动态 key 不内联修复（字面量访问）",
-    "8b69008 inspection-capability 列表刷新 reloadSignal 版本号修复——Object.is bailout 吞掉 null→setTimeout 回设的 refetch，新建/删除后列表不刷新；e2e 三端一致性实测抓出（react/vue 同场景会刷新，实现缺陷非端间分歧）",
-    "suite 5c528b3 指针 bump；e2e 套件三端全绿"
+    "删 src/app/api/inspection-param-interfaces/*；补 /api/param-interfaces、/{code}、/links 三路由（Page envelope）",
+    "跨路由写读共享走 globalThis fixtures 单例（per-route bundle 多副本实证）",
+    "file: 依赖 msw 是安装时真拷贝：rm 拷贝 + npm install 刷新后 22 行对齐；commit 01b38c7"
   ],
   "next": [
-    "GitHub 推送 8b69008",
-    "e2e 铺开新业务域时关注冷编译假红（新增路由同步进 e2e 仓 globalSetup 暖机清单）"
+    "calculation-methods 路由同款 per-route bundle bug（同款 globalThis 单例修法）——已登记 §7.1 候选"
   ],
   "open_questions": [],
   "dont": [
     "it() 标题写 Mxx.Fxx.Ixx 字面——fnReporter 正则会误吸进 alignment.json",
-    "列表刷新禁「setState(null)→setTimeout 回设」模式——Object.is bailout 会静默吞掉"
+    "列表刷新禁「setState(null)→setTimeout 回设」模式——Object.is bailout 会静默吞掉",
+    "it() 标题写 Mxx.Fxx.Ixx 字面——fnReporter 误吸",
+    "file: 依赖是拷贝不是链接——msw 侧改完必须 rm node_modules/@lab/management-system-msw + npm install"
   ],
   "active_branch": "master",
-  "last_session_at": "2026-09-13"
+  "last_session_at": "2026-09-14"
 }
