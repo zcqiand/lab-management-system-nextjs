@@ -48,6 +48,15 @@ const OAUTH_CLIENT_ID = (() => {
   return v;
 })();
 const SSO_STATE_STORAGE_KEY = "lab.sso.state";
+// 发起 authorize 的后端 baseUrl。三个 lab 后端同在 localhost 不同端口 —— cookie 按
+// host 共享不分端口、saas code 与旧后端的 authorize 配对，切后端后旧 code/state/
+// cookie 全部跨后端失效。callback 时靠这条记账识别陈旧流程，自动对新后端重走，
+// 而不是把旧 code POST 过去吃 INVALID_GRANT 死锁。
+const SSO_FLOW_BACKEND_KEY = "lab.sso.backend";
+// 自愈重启计数（sessionStorage 跨页面加载存活 —— restart 会经历整页跳转）。
+// authorize→callback→失败→再 authorize 的循环上限，防 saas 侧异常时无限打转。
+const SSO_RESTART_COUNT_KEY = "lab.sso.restarts";
+const SSO_MAX_RESTARTS = 1;
 
 // 生成 OAuth 2.0 state（防 CSRF，RFC 6749 §10.12）
 function generateOauthState(): string {
@@ -81,10 +90,78 @@ export default function LoginPage() {
   // 重跑下方 effect；第二次 setItem 会覆盖第一个 state → saas 回跳比对必失败
   // （「state 校验失败（可能 session 过期或被攻击）」）。一次登录流程只发一次。
   const ssoStartedRef = useRef(false);
+  // callback POST 已发起（本页生命周期内）。state 一次性清除后，StrictMode 第二次
+  // effect / 依赖重跑会走「state 缺失」分支 —— 若此时首发的 callback 还在途，
+  // 不能自愈重启（会跳转 saas 打断在途登录），静默返回即可。
+  const callbackStartedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
+
+    const cleanCallbackParams = () => {
+      // 清掉 URL 上的 code/state（防 reload / effect 重跑重复触发）
+      url.searchParams.delete("code");
+      url.searchParams.delete("state");
+      window.history.replaceState(
+        null,
+        "",
+        url.pathname +
+          (url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""),
+      );
+    };
+
+    const startAuthorize = () => {
+      // 防重入（ssoStartedRef）：StrictMode dev 双调 effect、依赖变化重跑时，
+      // 第二次 setItem 会覆盖第一个 state → saas 回跳比对必失败。
+      if (ssoStartedRef.current) return;
+      ssoStartedRef.current = true;
+      setStatus(`未登录，正在跳 saas（backend=${apiMode}）...`);
+      const csrfState = generateOauthState();
+      sessionStorage.setItem(SSO_STATE_STORAGE_KEY, csrfState);
+      sessionStorage.setItem(SSO_FLOW_BACKEND_KEY, baseUrl);
+      authSsoAuthorize(
+        {
+          response_type: "code",
+          client_id: OAUTH_CLIENT_ID,
+          redirect_uri: computeRedirectUri(),
+          state: csrfState,
+        },
+        { baseURL: baseUrl },
+      )
+        .then((res) => {
+          const data = res as { authorizeUrl?: string };
+          const authorizeUrl = data?.authorizeUrl;
+          console.log("[lab/login] authorizeUrl=", authorizeUrl);
+          if (authorizeUrl) {
+            window.location.href = authorizeUrl;
+          } else {
+            setStatus("authorizeUrl 缺失，请检查 msw / saas 配置");
+            sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+            ssoStartedRef.current = false;
+          }
+        })
+        .catch((err: unknown) => {
+          console.error("[lab/login] authSsoAuthorize failed:", err);
+          setStatus(`authorize 调用失败（${apiMode}）：${(err as Error).message}`);
+          sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+          ssoStartedRef.current = false; // 失败后允许重试
+        });
+    };
+
+    // 自愈：陈旧流程（后端切换 / state 过期 / 换 token 失败）不挂死，
+    // 清掉残留 code/state 直接重走一次（上限 SSO_MAX_RESTARTS 防循环）。
+    const restartAuthorize = (reason: string) => {
+      const n = Number(sessionStorage.getItem(SSO_RESTART_COUNT_KEY) ?? "0");
+      if (n >= SSO_MAX_RESTARTS) {
+        sessionStorage.removeItem(SSO_RESTART_COUNT_KEY);
+        setStatus(`${reason}；自动重试已达上限，请重新登录`);
+        return;
+      }
+      sessionStorage.setItem(SSO_RESTART_COUNT_KEY, String(n + 1));
+      setStatus(`${reason}，正在重新发起登录...`);
+      startAuthorize();
+    };
 
     // 1. URL 带 code+state（saas OAuth 2.0 回调） → 验 state → POST callback → 存 token → 跳 /
     const code = url.searchParams.get("code");
@@ -92,13 +169,25 @@ export default function LoginPage() {
     const fromParam = url.searchParams.get("from");
     if (code && stateParam) {
       const expectedState = sessionStorage.getItem(SSO_STATE_STORAGE_KEY);
+      const flowBackend = sessionStorage.getItem(SSO_FLOW_BACKEND_KEY);
       if (!expectedState || expectedState !== stateParam) {
-        setStatus("state 校验失败（可能 session 过期或被攻击），请重新登录");
+        if (callbackStartedRef.current) return;
         sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+        cleanCallbackParams();
+        restartAuthorize("state 校验失败（登录流程已过期）");
         return;
       }
-      // state 一次性：验证通过立即清掉
+      if (flowBackend !== null && flowBackend !== baseUrl && !callbackStartedRef.current) {
+        // 后端已切换：旧 code 只与旧后端的 authorize 配对（cookie 也是旧后端的
+        // —— cookie 按 host 共享不分端口），POST 新后端必 INVALID_GRANT。
+        sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+        cleanCallbackParams();
+        restartAuthorize("检测到后端已切换");
+        return;
+      }
+      // state 一次性：验证通过立即清掉（也兜住 StrictMode 双调不二次 POST）
       sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
+      callbackStartedRef.current = true;
       setStatus("拿到 saas code，正在换 token...");
       authSsoCallback(
         {
@@ -113,24 +202,20 @@ export default function LoginPage() {
         .then((resp) => {
           const data = resp as { token?: string };
           if (data.token) {
+            sessionStorage.removeItem(SSO_RESTART_COUNT_KEY);
             setToken(data.token);
-            // 清掉 URL 上的 code/state（防 reload 重复触发）
-            url.searchParams.delete("code");
-            url.searchParams.delete("state");
-            window.history.replaceState(
-              null,
-              "",
-              url.pathname +
-                (url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""),
-            );
+            cleanCallbackParams();
             router.replace(fromParam ?? "/");
           } else {
-            setStatus("code 换 token 失败：响应无 token");
+            restartAuthorize("code 换 token 失败：响应无 token");
           }
         })
-        .catch(() => setStatus("code 换 token 失败，请回到 saas 重试"));
+        .catch(() => restartAuthorize("code 换 token 失败"));
       return;
     }
+
+    // 无 code 参数 = 全新进入登录页 → 重置自愈计数（新意图重新计上限）
+    sessionStorage.removeItem(SSO_RESTART_COUNT_KEY);
 
     // 2. 已有 token → 跳 /
     if (token) {
@@ -140,40 +225,7 @@ export default function LoginPage() {
     }
 
     // 3. 调 SSO authorize → 跳 saas
-    //    防重入（ssoStartedRef）：StrictMode dev 双调 effect、依赖变化重跑时，
-    //    第二次 setItem 会覆盖第一个 state → saas 回跳比对必失败。
-    if (ssoStartedRef.current) return;
-    ssoStartedRef.current = true;
-    setStatus(`未登录，正在跳 saas（backend=${apiMode}）...`);
-    const csrfState = generateOauthState();
-    sessionStorage.setItem(SSO_STATE_STORAGE_KEY, csrfState);
-    authSsoAuthorize(
-      {
-        response_type: "code",
-        client_id: OAUTH_CLIENT_ID,
-        redirect_uri: computeRedirectUri(),
-        state: csrfState,
-      },
-      { baseURL: baseUrl },
-    )
-      .then((res) => {
-        const data = res as { authorizeUrl?: string };
-        const url = data?.authorizeUrl;
-        console.log("[lab/login] authorizeUrl=", url);
-        if (url) {
-          window.location.href = url;
-        } else {
-          setStatus("authorizeUrl 缺失，请检查 msw / saas 配置");
-          sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
-          ssoStartedRef.current = false;
-        }
-      })
-      .catch((err: unknown) => {
-        console.error("[lab/login] authSsoAuthorize failed:", err);
-        setStatus(`authorize 调用失败（${apiMode}）：${(err as Error).message}`);
-        sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
-        ssoStartedRef.current = false; // 失败后允许重试
-      });
+    startAuthorize();
   }, [apiMode, baseUrl, router, setToken, token]);
 
   return (
