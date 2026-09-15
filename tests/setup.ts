@@ -34,6 +34,13 @@ const ADR0019_TEST_ENV: Record<string, string> = {
   LAB_SAAS_SERVICE_USER: "alice",
   LAB_SAAS_SERVICE_PASSWORD: "dev123456",
   LAB_AUTH_DEV_PASSWORD: "dev123456",
+  // readLabConfig fail-fast 组（factory.ts requireKey，等同 .env.test 值）：
+  // vitest 不读 .env*，缺这些 seed 则 login/switch-tenant 路由测试全 500。
+  LAB_SSO_PROFILE: "no-sso",
+  LAB_JWT_SECRET: "dev-key-32-bytes-minimum-length!",
+  LAB_JWT_ISSUER: "lab-management-system",
+  LAB_JWT_TTL_SECONDS: "3600",
+  LAB_JWT_REFRESH_TTL_SECONDS: "604800",
   NEXT_PUBLIC_SAAS_BASE_URL: "http://localhost:5101",
   NEXT_PUBLIC_LAB_APP_CODE: "lab-management",
   NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID: "lab-management",

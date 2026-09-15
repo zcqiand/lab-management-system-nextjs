@@ -29,29 +29,46 @@ export interface LabConfig {
 }
 
 export function readLabConfig(env: NodeJS.ProcessEnv = process.env): LabConfig {
-  const profile = (env.LAB_SSO_PROFILE ?? "no-sso") as "no-sso" | "real";
-  const secret =
-    env.LAB_JWT_SECRET ?? "dev-lab-jwt-secret-dev-lab-jwt-secret-dev-lab-jwt-secret";
+  // CLAUDE.md §2 禁 env 默认值兜底（2026-09-15 存量违规修复）：以下 6 键缺失即
+  // throw——deploy lab.env 自举 + 四份 env 契约早已覆盖，静默吃 dev 字面量只会
+  // 掩盖配置漂移（param 形式 `env.X ?? "..."` 曾绕过 L0.no_fallback 的
+  // process.env 正则，是门禁盲区；tests/lib/auth/factory.test.ts 源码锁防回归）。
+  // 惰性求值：本函数只在 route handler 请求期被调，next build 的
+  // "Collecting page data" 不会踩到（勿提升到模块作用域）。
+  const profile = requireKey(env, "LAB_SSO_PROFILE") as "no-sso" | "real";
   return {
     profile,
     jwt: {
-      issuer: env.LAB_JWT_ISSUER ?? "lab-management-system",
-      secret,
-      ttlSeconds: parseInt(env.LAB_JWT_TTL_SECONDS ?? "3600", 10),
-      refreshTtlSeconds: parseInt(env.LAB_JWT_REFRESH_TTL_SECONDS ?? "604800", 10),
+      issuer: requireKey(env, "LAB_JWT_ISSUER"),
+      secret: requireKey(env, "LAB_JWT_SECRET"),
+      ttlSeconds: parseInt(requireKey(env, "LAB_JWT_TTL_SECONDS"), 10),
+      refreshTtlSeconds: parseInt(requireKey(env, "LAB_JWT_REFRESH_TTL_SECONDS"), 10),
     },
+    // LAB_SAAS_* 组不 require：no-sso profile 下合法缺省；real profile 由
+    // HttpSaasAuthClient / HttpSaasMeClient 构造器逐项 fail-fast（saas.ts），
+    // 空 ≠ 静默兜底（显式空串语义见 env-required.ts）。
     sso: {
-      saasBaseUrl: env.LAB_SAAS_BASE ?? "http://localhost:5101",
+      saasBaseUrl: env.LAB_SAAS_BASE ?? "",
       clientId: env.LAB_SAAS_CLIENT_ID ?? "",
       clientSecret: env.LAB_SAAS_CLIENT_SECRET ?? "",
       defaultTenantId: env.LAB_SAAS_DEFAULT_TENANT_ID ?? "",
-      callbackRedirectUri:
-        env.LAB_SSO_CALLBACK_REDIRECT ?? "http://localhost:5201/api/auth/sso/callback",
+      callbackRedirectUri: env.LAB_SSO_CALLBACK_REDIRECT ?? "",
     },
     auth: {
-      devPassword: env.LAB_AUTH_DEV_PASSWORD ?? "dev123456",
+      devPassword: requireKey(env, "LAB_AUTH_DEV_PASSWORD"),
     },
   };
+}
+
+function requireKey(env: NodeJS.ProcessEnv, name: string): string {
+  const v = env[name];
+  if (v === undefined) {
+    throw new Error(
+      `${name} env is required（CLAUDE.md §2 禁 env 默认值兜底）。` +
+        ` dev=.env.local / test=tests/setup.ts seed / prod=deploy lab.env。`,
+    );
+  }
+  return v;
 }
 
 export interface BuiltAuth {

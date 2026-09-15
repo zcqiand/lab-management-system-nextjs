@@ -60,17 +60,16 @@ describe("M01.F04/F05 认证管理集成层", () => {
 
   // ─────── F05.I03 SSO 统一登录 ───────
   fnTest(["M01.F05.I03"], "GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）", async () => {
-    // v0.3.45：authorize 改走真实 OAuth code 流 -- 服务端先 POST saas
-    // /api/v1/oauth/authorize 领 code，再拼 saas 登录页 URL。测试 stub fetch
-    // 模拟 saas 应答（vitest 环境没有真 saas）。
+    // 2026-09-15 对齐家族收敛（lab-springboot 2026-08-29 / lab-aspnetcore v0.2.11 同款）：
+    // authorize 返回 saas 登录页跳板 URL（redirect_uri+state+client_id），服务端
+    // **不做 code 预拿**——saas /oauth/authorize 已要求认证身份、禁匿名签 code，
+    // 旧「服务端先领 code」恒 401（生产表现为登录页 502）。code 由用户在 saas
+    // 登录后由 saas 前端带 session 领取 → 302 回跳。故本用例断言不发任何 fetch。
     const realFetch = globalThis.fetch;
     const fetchCalls: string[] = [];
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       fetchCalls.push(String(input));
-      return new Response(JSON.stringify({ code: "saas-code-test", state: "state-test" }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
+      return new Response("{}", { status: 200 });
     }) as typeof fetch;
     try {
       const req = new Request(
@@ -81,10 +80,12 @@ describe("M01.F04/F05 认证管理集成层", () => {
       const data = (await res.json()) as { authorizeUrl?: string; state?: string };
       expect(data.state).toBe("state-test");
       expect(data.authorizeUrl).toContain("/login?");
-      expect(data.authorizeUrl).toContain("code=saas-code-test");
+      expect(data.authorizeUrl).toContain("client_id=lab-management");
       expect(data.authorizeUrl).toContain("redirect_uri=");
-      // 领 code 走的是 saas 的 OAuth authorize 端点（不是浏览器直跳）
-      expect(fetchCalls[0]).toContain("/api/v1/oauth/authorize");
+      expect(data.authorizeUrl).toContain("state=state-test");
+      // 跳板语义：不在服务端预拿 code，不发任何 saas 请求
+      expect(data.authorizeUrl).not.toContain("code=");
+      expect(fetchCalls).toHaveLength(0);
     } finally {
       globalThis.fetch = realFetch;
     }

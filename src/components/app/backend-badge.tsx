@@ -21,14 +21,20 @@ import {
   resolveSelectedBackendUrl,
   setSelectedBackend,
 } from "@/api/backend-config";
+import { useAuth } from "@/state/auth-context";
 
 export function BackendBadge({ variant = "sidebar" }: { variant?: "sidebar" | "plain" }) {
   const [selected, setSelected] = useState(getSelectedBackend());
+  const { clearToken } = useAuth();
   const current = SELECTABLE_BACKENDS.find((b) => b.key === selected);
 
   function pick(key: string) {
-    setSelectedBackend(key);
+    const prev = getSelectedBackend();
+    setSelectedBackend(key); // 真切换时同层清 localStorage 的 lab.token
     setSelected(key);
+    // 内存会话同步清（auth-context 的 token state）：不清则登录页仍见旧
+    // token 直接跳 /，带着对新后端无效的凭证发请求（2026-09-15 跨后端 401）。
+    if (key !== prev) clearToken();
   }
 
   return (

@@ -19,10 +19,11 @@ import {
 } from "react";
 import { authGetCurrentUser, authSwitchTenant } from "@/api/endpoints/endpoints";
 import type { CurrentUser, MyTenant } from "@/api/endpoints/endpoints.schemas";
-import { getApiBaseUrl } from "@/api/backend-config";
+import { getApiBaseUrl, TOKEN_STORAGE_KEY } from "@/api/backend-config";
 import { installHttpClient } from "@/api/http-client";
 
-const TOKEN_KEY = "lab.token";
+// key 的 SSOT 在 backend-config（切后端清 token 的逻辑在那层）。
+const TOKEN_KEY = TOKEN_STORAGE_KEY;
 
 // axios 拦截器安装（baseURL / Bearer / withCredentials）：必须在任何 effect 发请求
 // 之前就位 —— 子组件 effect 先于父 effect 运行，放 AuthProvider 的 useEffect 会晚于

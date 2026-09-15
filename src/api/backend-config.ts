@@ -35,6 +35,10 @@ export function resolveSelectedBackendUrl(key: string): string {
 
 const BACKEND_LS_KEY = "lab.api.backend";
 
+// token 存储 key 的 SSOT（auth-context 消费）。放本文件而不是 auth-context：
+// 切后端清 token 的逻辑在这层（见 setSelectedBackend），不能反向 import tsx。
+export const TOKEN_STORAGE_KEY = "lab.token";
+
 /** 当前选中的后端 key（"" = 未选择，走 env 默认）。SSR/localStorage 不可用返回 ""。 */
 export function getSelectedBackend(): string {
   try {
@@ -46,8 +50,14 @@ export function getSelectedBackend(): string {
 
 export function setSelectedBackend(key: string): void {
   try {
+    const prev = globalThis.localStorage?.getItem(BACKEND_LS_KEY) ?? "";
     if (key) localStorage.setItem(BACKEND_LS_KEY, key);
     else localStorage.removeItem(BACKEND_LS_KEY);
+    // 切后端 = 换验签方：旧后端铸的 token 对新后端必然无效（各家 JWT key /
+    // aud 约定不互通——2026-09-15 事故：5205 自定义 key 铸的 token 带到 5204
+    // 持续 401）。真切换时清掉，让登录页自愈链路对新后端重走 SSO；
+    // 同值重复 set（dropdown 重选当前项）不清，避免误伤会话。
+    if (key !== prev) localStorage.removeItem(TOKEN_STORAGE_KEY);
   } catch {
     /* localStorage 不可用（SSR/隐私模式）：忽略 */
   }

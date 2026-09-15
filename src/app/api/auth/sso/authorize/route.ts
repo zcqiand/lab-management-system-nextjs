@@ -4,33 +4,28 @@
 // 到 saas，触发 CORS）。客户端 `window.location.href = data.authorizeUrl`
 // 是 top-level navigation，不受 CORS 限制。
 //
-// 真实链路（v0.3.45，对齐 saas-nextjs OAuth 2.0 授权码模式 RFC 6749）：
-//   1. lab 后端（confidential client）POST saas /api/v1/oauth/authorize
-//      { clientId, redirectUri, responseType:"code", scope, state, tenantId }
-//      -> { code, state }
-//   2. 拼 saas 登录页 `${SAAS_UI_BASE_URL}/login?code&redirect_uri&state`
-//   3. 浏览器去 saas 认证，成功后 saas 302 redirect_uri?code&state 回 lab /login
-//   4. lab /login 验 state -> POST /api/auth/sso/callback 换 lab 自家 JWT
+// 跳板语义（2026-09-15 对齐 lab-springboot AuthService.ssoAuthorize /
+// lab-aspnetcore v0.2.11 同款，mirror 家族标准流程）：
+//   1. 本端点只拼 saas 登录页跳板 URL：`${SAAS_UI_BASE_URL}/login?redirect_uri&state&client_id`
+//      —— 服务端**不做 code 预拿**。saas /api/v1/oauth/authorize 已收敛为必须
+//      认证身份（code 绑 Bearer sub + tenant_id claim，禁匿名签 code），
+//      服务端匿名预拿恒 401（曾表现为登录页 502 SSO_AUTHORIZE_FAILED）。
+//   2. 用户在 saas 登录 → saas 写 session cookie → saas 前端 LoginPage 跳板分支
+//      自动调 saas /oauth/authorize 拿 code → 302 回跳 redirect_uri?code&state。
+//   3. lab /login 验 state -> POST /api/auth/sso/callback 换 lab 自家 JWT。
 //
-// SAAS_IDP_URL (server-only) 与 SAAS_UI_BASE_URL (client+server) 拆分：
-//   - SAAS_IDP_URL 指向 OAuth IdP（POST /api/v1/oauth/* 端点，saas-nextjs 全栈仓同 origin）
-//   - SAAS_UI_BASE_URL 指向登录 UI 页（/login 渲染端，dev 同 saas-nextjs :3000，prod 同域）
+// SAAS_UI_BASE_URL (client+server) 指向登录 UI 页（/login 渲染端，dev=saas-nextjs :5101）。
 
 import { NextResponse } from "next/server";
 import { requireEnv } from "@/lib/env-required";
 
-// ADR-0019：所有 OAuth 凭据 (idp url / ui base / client_id / tenant_id / scope)
-// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
-// ADR-0019：所有 OAuth 凭据 (idp url / ui base / client_id / tenant_id / scope)
-// 缺失即 throw（由 requireEnv 抛 500）。不允许 fallback 到 dev 字面值。
+// ADR-0019：OAuth 凭据 (ui base / client_id) 缺失即 throw（requireEnv 抛 500）。
+// 不允许 fallback 到 dev 字面值。
 //
 // 惰性求值：顶层调 requireEnv 会让 next build 的 "Collecting page data" 崩
 // （Docker builder stage 没有 prod env）。运行时缺失仍 throw → 500。
-const SAAS_IDP_URL = () => requireEnv("SAAS_IDP_URL");
 const SAAS_UI_BASE_URL = () => requireEnv("SAAS_UI_BASE_URL");
 const SAAS_CLIENT_ID = () => requireEnv("SAAS_OAUTH_CLIENT_ID");
-const SAAS_TENANT_ID = () => requireEnv("SAAS_TENANT_ID");
-const SAAS_SCOPE = () => requireEnv("SAAS_OAUTH_SCOPE");
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -59,54 +54,13 @@ export async function GET(request: Request) {
     );
   }
 
-  // 1. 向 saas IdP 领授权码（服务端对服务端，不经浏览器）
-  let code: string;
-  try {
-    const authorizeRes = await fetch(
-      `${SAAS_IDP_URL()}/api/v1/oauth/authorize`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          clientId: SAAS_CLIENT_ID(),
-          redirectUri,
-          responseType: "code",
-          scope: SAAS_SCOPE(),
-          state,
-          tenantId: SAAS_TENANT_ID(),
-        }),
-        signal: AbortSignal.timeout(10_000),
-      },
-    );
-    const authorizeData = (await authorizeRes.json().catch(() => ({}))) as {
-      code?: string;
-      message?: string;
-    };
-    if (!authorizeRes.ok || !authorizeData.code) {
-      return NextResponse.json(
-        {
-          code: "SSO_AUTHORIZE_FAILED",
-          message: authorizeData.message ?? `saas authorize HTTP ${authorizeRes.status}`,
-        },
-        { status: 502 },
-      );
-    }
-    code = authorizeData.code;
-  } catch (err) {
-    return NextResponse.json(
-      {
-        code: "SSO_AUTHORIZE_UNREACHABLE",
-        message: `连不上 saas IdP（${SAAS_IDP_URL()}）：${(err as Error).message}`,
-      },
-      { status: 502 },
-    );
-  }
-
-  // 2. 拼 saas 登录页 URL：code + redirect_uri + state 原样透传（用 SAAS_UI_BASE_URL）
+  // 拼 saas 登录页跳板 URL：state/redirect_uri 原样透传 + client_id（RFC 6749
+  // §4.1.1——saas LoginPage 跳板分支靠它触发 authorize）。code 由用户在 saas
+  // 登录后由 saas 前端带 session 领取，本端点不预拿（2026-09-15 家族收敛）。
   const saasUrl = new URL("/login", SAAS_UI_BASE_URL());
-  saasUrl.searchParams.set("code", code);
   saasUrl.searchParams.set("redirect_uri", redirectUri);
   saasUrl.searchParams.set("state", state);
+  saasUrl.searchParams.set("client_id", SAAS_CLIENT_ID());
 
   return NextResponse.json({
     authorizeUrl: saasUrl.toString(),

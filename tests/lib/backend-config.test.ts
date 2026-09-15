@@ -102,6 +102,28 @@ describe("backend-config 运行时切换", () => {
     expect(globalThis.localStorage.getItem("lab.api.backend")).toBeNull();
   });
 
+  it("切换后端时清 lab.token（旧 token 对新验签方必然无效）；同值重复 set 不清", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("aspnetcore");
+    globalThis.localStorage.setItem("lab.token", "stale-jwt-from-old-backend");
+    // 同值 set：不重置会话（防 dropdown 重复点选误伤）
+    setSelectedBackend("aspnetcore");
+    expect(globalThis.localStorage.getItem("lab.token")).toBe("stale-jwt-from-old-backend");
+    // 真切换：token 必须清（2026-09-15 401 事故——5205 自定义 key 铸的 token 带到 5204 验不过）
+    setSelectedBackend("springboot");
+    expect(globalThis.localStorage.getItem("lab.token")).toBeNull();
+    expect(globalThis.localStorage.getItem("lab.api.backend")).toBe("springboot");
+  });
+
+  it("从已选切回 env 默认（\"\")同样清 lab.token", () => {
+    installFakeLocalStorage();
+    setSelectedBackend("msw");
+    globalThis.localStorage.setItem("lab.token", "t");
+    setSelectedBackend("");
+    expect(globalThis.localStorage.getItem("lab.token")).toBeNull();
+    expect(globalThis.localStorage.getItem("lab.api.backend")).toBeNull();
+  });
+
   it("resolveSelectedBackendUrl：key → URL，未知 key → 空串", () => {
     expect(resolveSelectedBackendUrl("msw")).toBe("http://localhost:5200");
     expect(resolveSelectedBackendUrl("nextjs-self")).toBe("");

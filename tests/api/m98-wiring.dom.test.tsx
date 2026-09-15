@@ -186,5 +186,8 @@ describe("M98 frontend 接线层", () => {
     expect(src).toMatch(/setSelectedBackend/);
     expect(src).toMatch(/SELECTABLE_BACKENDS/);
     expect(src).toMatch(/DropdownMenu/);
+    // 2026-09-15 跨后端 401 修复：真切换必须 clearToken（内存态），
+    // setSelectedBackend 层同时清 localStorage 的 lab.token。
+    expect(src).toMatch(/clearToken/);
   });
 });

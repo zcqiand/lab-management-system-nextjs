@@ -115,31 +115,59 @@ export async function POST(request: Request) {
   }
 
   // 2.5 ADR-0009：瞬时持 accessToken 时拉菜单进快照缓存（失败只 warn）
+  // 2026-09-15 租户显示名映射（声明在块外：下方 LoginResponse tenants 同源使用）
+  let tenantNameById = new Map<string, { name: string; key: string }>();
   if (me.id) {
     await cacheMenuSnapshot(me.id, tokenRes.accessToken, SAAS_BASE_URL());
     // 2026-09-03 租户体系对齐：memberships 快照（/api/auth/me 按同 key 读取）。
     // 快照与下方返回给前端的 tenants 同源 —— hydrateAuth 的 find 必命中。
-    putMembershipSnapshot(
-      me.id,
-      (me.memberships ?? [])
-        .filter((m) => m.status !== "removed")
-        .map((m) => ({
-          tenantId: m.tenantId,
-          code: m.tenantId,
-          name: m.tenantId,
-          roleIds: m.roleIds ?? [],
-        })),
-    );
+    // 2026-09-15 租户显示名：memberships 契约只有 tenantId 不带名字，趁同一
+    // 瞬时窗口拉 saas 平台租户列表（GET /api/v1/admin/tenants，guard 只验 JWT）
+    // 建 tenantId→{name, tenantKey} 映射填真名；失败只 warn，降级 name=tenantId
+    // （与菜单快照同款 best-effort 模式，不阻塞登录）。
+    try {
+      const res = await fetch(
+        `${SAAS_BASE_URL()}/api/v1/admin/tenants?page=0&pageSize=100`,
+        {
+          headers: { authorization: `Bearer ${tokenRes.accessToken}` },
+          cache: "no-store",
+          signal: AbortSignal.timeout(10_000),
+        },
+      );
+      if (res.ok) {
+        const data = (await res.json().catch(() => ({}))) as {
+          items?: Array<{ id?: string; name?: string; tenantKey?: string }>;
+        };
+        tenantNameById = new Map(
+          (data.items ?? [])
+            .filter((t): t is { id: string; name?: string; tenantKey?: string } => !!t.id)
+            .map((t) => [t.id, { name: t.name ?? t.id, key: t.tenantKey ?? t.id }]),
+        );
+      } else {
+        console.warn(`[sso/callback] tenant name lookup HTTP ${res.status}`);
+      }
+    } catch (err) {
+      console.warn(`[sso/callback] tenant name lookup failed: ${(err as Error).message}`);
+    }
   }
 
-  // 3. 映射 lab LoginResponse（旧 demo 契约形状不变，前端 authStore 无感）
+  // 3. 映射 lab LoginResponse —— 契约 MyTenant {tenantId, code, name, roleIds}
+  // （2026-09-15 收敛：旧 demo 形状 tenantCode/tenantName 与 shared OpenAPI、
+  // /api/auth/me 及 springboot/aspnetcore/msw 三仓全部不一致；前端切换器读
+  // t.name/t.code，SSO 登录后 /me 补水前切换器显示空白。）
   const tenants = (me.memberships ?? [])
     .filter((m) => m.status !== "removed")
     .map((m) => ({
       tenantId: m.tenantId,
-      tenantCode: m.tenantId,
-      tenantName: m.tenantId,
+      code: tenantNameById.get(m.tenantId)?.key ?? m.tenantId,
+      name: tenantNameById.get(m.tenantId)?.name ?? m.tenantId,
+      roleIds: m.roleIds ?? [],
     }));
+  if (me.id) {
+    // 2026-09-03 租户体系对齐：memberships 快照（/api/auth/me 按同 key 读取）。
+    // 快照与响应同源同形 —— hydrateAuth 的 find 必命中。
+    putMembershipSnapshot(me.id, tenants);
+  }
 
   return NextResponse.json({
     token: tokenRes.accessToken,
