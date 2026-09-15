@@ -84,7 +84,7 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID=lab-management\n'
     # SSO 三件套（ADR-0019：authorize/callback requireEnv,缺一 502）。
     # client_secret = saas oauth_client.client_secret 种子契约值（saas 侧同字面,对齐才有 token 交换）。
-    printf 'SAAS_OAUTH_CLIENT_SECRET=lab-mgmt-secret\n'
+    printf 'SAAS_OAUTH_CLIENT_SECRET=lab-management-secret\n'
     printf 'SAAS_TENANT_ID=00000000-0000-0000-0000-000000000001\n'
     printf 'SAAS_OAUTH_SCOPE=lab.read lab.write\n'
     # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）
@@ -146,7 +146,7 @@ if [ -f "$BASE/lab.env" ]; then
   # ADR-0019：浏览器 bundle 同样要显式声明,否则 build 时丢 key。
   append_if_missing NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID 'lab-management'
   # SSO 三件套（ADR-0019：authorize/callback requireEnv,缺一 502）
-  append_if_missing SAAS_OAUTH_CLIENT_SECRET 'lab-mgmt-secret'
+  append_if_missing SAAS_OAUTH_CLIENT_SECRET 'lab-management-secret'
   append_if_missing SAAS_TENANT_ID '00000000-0000-0000-0000-000000000001'
   append_if_missing SAAS_OAUTH_SCOPE 'lab.read lab.write'
   # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）

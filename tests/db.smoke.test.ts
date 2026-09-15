@@ -75,6 +75,9 @@ describe("DB smoke (PG)", () => {
 
   afterAll(async () => {
     if (client) {
+      // 自洁（2026-09-14 lab_dev/lab_test 残留 lab_smoke 清理）：既然 DROP/CREATE
+      // 都不碰 public，测完同样把隔离 schema 摘掉，不给目标库留残渣。
+      try { await client.query(`DROP SCHEMA IF EXISTS "${SMOKE_SCHEMA}" CASCADE`); } catch {}
       try { await client.end(); } catch {}
     }
   });
