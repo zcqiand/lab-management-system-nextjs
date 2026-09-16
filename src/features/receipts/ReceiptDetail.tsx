@@ -78,7 +78,7 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
         apiClient.get<{ items: TestParameter[] }>(API_ROUTES['/inspection-parameters'], { params: { page: '1', pageSize: '1000' } }),
         apiClient.get<{ items: InspectionStandard[] }>(API_ROUTES['/inspection-standards'], { params: { page: '1', pageSize: '500' } }),
         apiClient.get<{ items: InspectionStandardParameter[] }>(API_ROUTES['/inspection-standard-parameters'], { params: { page: '1', pageSize: '500' } }),
-        apiClient.get<{ items: InspectionTechnicalRequirement[] }>(API_ROUTES['/inspection-technical-requirements'], { params: { page: '1', pageSize: '500' } }),
+        apiClient.get<InspectionTechnicalRequirement[] | { items: InspectionTechnicalRequirement[] }>(API_ROUTES['/inspection-technical-requirements'], { params: { page: '1', pageSize: '500' } }),
         apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/inspection-param-interfaces'], { params: { page: 1, pageSize: 500 } }),
         apiClient.get<{ items: ParamInterfaceLink[] }>(API_ROUTES['/inspection-parameter-param-interfaces'], { params: { pageSize: 10000 } }),
         apiClient.get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], { params: { page: '1', pageSize: '200' } }),
@@ -91,7 +91,13 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
       setParameters(pRes.data.items ?? [])
       setStandards(stdRes.data.items ?? [])
       setStdParams(stdParamRes.data.items ?? [])
-      setTechReqs(reqRes.data.items ?? [])
+      // T11(2026-09-16)：technical-requirements list 按 SSOT 是裸数组（不分页），
+      // 兼容历史 {items} 信封形状。
+      setTechReqs(
+        Array.isArray(reqRes.data)
+          ? reqRes.data
+          : ((reqRes.data as { items?: InspectionTechnicalRequirement[] })?.items ?? []),
+      )
       setInterfaces(piRes.data.items ?? [])
       setLinks(piLinkRes.data.items ?? [])
       setExtFields(catRes.data.items?.find((r) => r.code === categoryCode)?.extFields ?? [])

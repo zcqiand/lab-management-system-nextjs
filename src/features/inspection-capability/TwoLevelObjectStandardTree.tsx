@@ -200,11 +200,17 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ items: T[] }>(route(listEndpoint), {
+      .get<T[] | { items: T[] }>(route(listEndpoint), {
         params: { page: "1", pageSize: "500", [listFilterParam]: selectedStandard },
       })
       .then((res) => {
-        let items: T[] = Array.isArray(res.data?.items) ? [...res.data.items] : [];
+        // T11(2026-09-16)：list 端点按 SSOT 是裸数组（不分页），兼容历史 {items} 信封。
+        const raw = res.data as T[] | { items?: T[] } | null;
+        let items: T[] = Array.isArray(raw)
+          ? [...raw]
+          : Array.isArray(raw?.items)
+            ? [...raw.items]
+            : [];
         // 排序：默认按 sortOrder；传 sortBy 时按指定键
         if (dragEnabled) {
           items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));

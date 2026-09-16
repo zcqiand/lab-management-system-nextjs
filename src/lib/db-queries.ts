@@ -10,7 +10,7 @@ export { TENANT, toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-ma
 // src/lib/api-helpers.ts applyFlowAction（flow 流转，2026-08-16 修订版）。
 // FK 列空串在库里是 null 不是 ''（seed 归一，carried ruling 3）：DTO 保持 null
 // 原样返回，不转回 ''。
-import { and, eq, ne, desc, inArray, sql as dsql } from "drizzle-orm";
+import { and, eq, ne, desc, inArray, or, ilike, sql as dsql } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db, schema } from "@/db";
 import { TENANT as TENANT_ID, rowToDto as toDto, toCamel } from "./db-map";
@@ -826,4 +826,95 @@ export async function deleteReportNameLinkDb(
     .map((k) => eq(t[k as keyof typeof t] as PgColumn, query.get(k) as string));
   if (conds.length === 0) return;
   await db.delete(t).where(and(...conds));
+}
+
+// ———— contracts 域（T11：msw fixtures 内存数组 → PG 迁移）————
+//
+// 三后端共库（V015 seed）：aspnetcore/springboot 的 contracts 直写 lab_dev PG，
+// nextjs fixtures 版是唯一不入库的漂移源 —— 本进程 POST 的合同 receipts POST
+// 做.contract FK 校验时 23503 → 500（gate #4 Cluster B 实证）。
+// 语义真相源 = lab-msw handlers-extra contractsExtraHandlers：status/keyword 过滤 +
+// 分页 + 必填 6 项 400；这些信封/校验语义仍由路由层持有，本层只管行读写。
+// 响应行来自 PG returning：未填可空列落 null（不是 undefined），
+// 与 aspnetcore DTO 物化形状对齐（POST shape 四方比对 Cluster E 的分叉根因）。
+
+/** 可经 POST/PUT 写的列（id/tenantId/createdAt 由路由层控制，不收 body）。 */
+const CONTRACT_COLUMNS = [
+  "contractCode",
+  "clientUnit",
+  "projectName",
+  "projectLocation",
+  "constructionUnit",
+  "inspectionSpecialtyCode",
+  "buildingUnit",
+  "supervisorUnit",
+  "inspectionPerson",
+  "inspectionPhone",
+  "witnessUnit",
+  "witness",
+  "witnessPhone",
+  "contactPerson",
+  "contactPhone",
+  "entrustedDate",
+  "status",
+] as const;
+
+export interface ListContractsQuery {
+  status?: string;
+  keyword?: string;
+}
+
+/** 列表（status / keyword 过滤；keyword 对 contractCode/projectName 做 case-insensitive contains，
+ *  与 msw toLowerCase().includes() 同语义 → SQL ilike）。分页信封由路由层 pageOf 处理。 */
+export async function listContractsDb(q: ListContractsQuery): Promise<Row[]> {
+  const t = schema.contracts;
+  const conds = [];
+  if (q.status) conds.push(eq(t.status, q.status));
+  if (q.keyword) {
+    const like = `%${q.keyword}%`;
+    conds.push(or(ilike(t.contractCode, like), ilike(t.projectName, like)));
+  }
+  const rows = conds.length
+    ? await db.select().from(t).where(and(...conds))
+    : await db.select().from(t);
+  return rows as Row[];
+}
+
+export async function getContractDb(id: string): Promise<Row | null> {
+  const rows = await db.select().from(schema.contracts).where(eq(schema.contracts.id, id));
+  return (rows[0] as Row) ?? null;
+}
+
+/** POST：白名单列 + 路由层已校验的必填 6 项；同租户 contractCode 撞
+ *  idx_contracts_tenant_code 唯一索引时 PG 23505 向上抛（路由层转 400）。 */
+export async function createContractDb(dto: Row): Promise<Row> {
+  const t = schema.contracts;
+  const values: Row = { id: dto.id, tenantId: dto.tenantId };
+  for (const k of CONTRACT_COLUMNS) {
+    if (k in dto && dto[k] !== undefined) values[k] = dto[k];
+  }
+  values.createdAt = String(dto.createdAt ?? "");
+  values.updatedAt = String(dto.updatedAt ?? "");
+  const rows = await db.insert(t).values(values as never).returning();
+  return rows[0] as Row;
+}
+
+/** PUT 语义 = msw Object.assign：只覆盖 body 给出的字段（白名单内），id/tenantId 不动。 */
+export async function updateContractDb(id: string, patch: Row): Promise<Row | null> {
+  const t = schema.contracts;
+  const sets: Row = {};
+  for (const k of CONTRACT_COLUMNS) {
+    if (k in patch && patch[k] !== undefined) sets[k] = patch[k];
+  }
+  sets.updatedAt = String(patch.updatedAt ?? "");
+  const rows = await db.update(t).set(sets).where(eq(t.id, id)).returning();
+  return (rows[0] as Row) ?? null;
+}
+
+export async function deleteContractDb(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(schema.contracts)
+    .where(eq(schema.contracts.id, id))
+    .returning();
+  return rows.length > 0;
 }

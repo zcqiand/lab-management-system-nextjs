@@ -146,7 +146,9 @@ export function EntryModal({
           API_ROUTES["/inspection-standard-parameters"],
           { params: { page: 1, pageSize: 500 } },
         ),
-        apiClient.get<{ items: InspectionTechnicalRequirement[] }>(
+        apiClient.get<
+          InspectionTechnicalRequirement[] | { items: InspectionTechnicalRequirement[] }
+        >(
           API_ROUTES["/inspection-technical-requirements"],
           { params: { page: 1, pageSize: 500 } },
         ),
@@ -160,13 +162,20 @@ export function EntryModal({
           API_ROUTES["/inspection-parameter-param-interfaces"],
           { params: { pageSize: 10000 } },
         ),
-        apiClient.get<{
-          items: Array<{
-            inspectionParameterCode: string;
-            specimenCount: number;
-            reportNameCode?: string;
-          }>;
-        }>(API_ROUTES["/inspection-calculation-methods"], {
+        apiClient.get<
+          | Array<{
+              inspectionParameterCode: string;
+              specimenCount: number;
+              reportNameCode?: string;
+            }>
+          | {
+              items: Array<{
+                inspectionParameterCode: string;
+                specimenCount: number;
+                reportNameCode?: string;
+              }>;
+            }
+        >(API_ROUTES["/inspection-calculation-methods"], {
           params: {
             page: 1,
             pageSize: 500,
@@ -198,11 +207,23 @@ export function EntryModal({
       setParameters(paramList);
       setStandards(stdRes.data.items ?? []);
       setStdParams(stdParamRes.data.items ?? []);
-      setTechReqs(reqRes.data.items ?? []);
+      // T11(2026-09-16)：technical-requirements list 按 SSOT 是裸数组（不分页），
+      // 兼容历史 {items} 信封形状。
+      setTechReqs(
+        Array.isArray(reqRes.data)
+          ? reqRes.data
+          : ((reqRes.data as { items?: InspectionTechnicalRequirement[] })?.items ?? []),
+      );
       setInterfaces(piRes.data.items ?? []);
       setCategory(cat);
       setLinks(piLinkRes.data.items ?? []);
-      setCalcRules(calcRes.data.items ?? []);
+      // T11(2026-09-16)：calculation-methods list 按 SSOT 是裸数组，兼容历史 {items} 信封。
+      setCalcRules(
+        Array.isArray(calcRes.data)
+          ? calcRes.data
+          : ((calcRes.data as { items?: Array<NonNullable<typeof calcRules>[number]> })
+              ?.items ?? []),
+      );
       setSelectedId((prev) => prev || (sampList[0]?.id ?? ""));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "加载失败");

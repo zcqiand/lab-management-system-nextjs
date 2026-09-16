@@ -1,12 +1,15 @@
 // GET /api/contracts?status=&keyword=&page=&pageSize=
 // POST /api/contracts   (CreateContractRequest body → Contract)
 //
-// 数据源：lab-msw 的 `contracts` 数组（in-memory；同进程内 4-backend 切换看到同一份）。
-// 业务逻辑跟 lab-msw/src/handlers-extra.ts 的 contractsExtraHandlers 一致：
-// status / keyword 过滤 + 分页 + push 新合同。
+// 数据源：lab_dev PG contracts 表（T11：msw fixtures 内存数组 → PG 迁移）。
+// 三后端共库（V015 seed）：aspnetcore/springboot 直写 PG，nextjs fixtures 版是
+// 唯一不入库的漂移源 —— 本进程 POST 的合同在 receipts POST 做 contract FK 校验时
+// 23503 → 500（gate #4 Cluster B 实证）。
+// 业务逻辑跟 lab-msw/src/handlers-extra.ts contractsExtraHandlers 一致：
+// status / keyword 过滤 + 分页 + 必填 6 项 400；行读写下沉 db-queries.ts contracts 域。
 
 import { NextRequest, NextResponse } from "next/server";
-import { contracts, getContract } from "@lab/management-system-msw/fixtures";
+import { createContractDb, isDbUnavailable, listContractsDb } from "@/lib/db-queries";
 import { tenantIdFromBearer } from "@/lib/auth/bearer";
 
 const NOW = () => new Date().toISOString();
@@ -21,10 +24,9 @@ function pageOf<T>(items: T[], page = 1, pageSize = 20) {
   };
 }
 
-function newId(prefix: string) {
-  const ts = Date.now().toString(36);
-  const rand = Math.floor(Math.random() * 0xffff).toString(36);
-  return `${prefix}-${ts}${rand}`;
+/** 三后端共库 → id 与 aspnetcore/springboot 同为 UUID 形态（V015 seed 约定）。 */
+function newId() {
+  return crypto.randomUUID();
 }
 
 export async function GET(req: NextRequest) {
@@ -34,17 +36,21 @@ export async function GET(req: NextRequest) {
   const page = Number(url.searchParams.get("page") ?? 1);
   const pageSize = Number(url.searchParams.get("pageSize") ?? 20);
 
-  let items = contracts;
-  if (status) items = items.filter((c) => c.status === status);
-  if (keyword) {
-    const k = keyword.toLowerCase();
-    items = items.filter(
-      (c) =>
-        c.contractCode.toLowerCase().includes(k) ||
-        c.projectName.toLowerCase().includes(k),
-    );
+  try {
+    const items = await listContractsDb({
+      status: status ?? undefined,
+      keyword: keyword || undefined,
+    });
+    return NextResponse.json(pageOf(items, page, pageSize));
+  } catch (e) {
+    if (isDbUnavailable(e)) {
+      return NextResponse.json(
+        { code: "DB_UNAVAILABLE", message: "检查 DATABASE_URL / npm run seed:db" },
+        { status: 503 },
+      );
+    }
+    throw e;
   }
-  return NextResponse.json(pageOf(items, page, pageSize));
 }
 
 export async function POST(req: NextRequest) {
@@ -60,7 +66,7 @@ export async function POST(req: NextRequest) {
     );
   }
   const newContract = {
-    id: newId("CONTRACT"),
+    id: newId(),
     tenantId,
     contractCode: String(body.contractCode ?? ""),
     clientUnit: String(body.clientUnit ?? ""),
@@ -100,8 +106,24 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  contracts.push(newContract as never);
-  // 同步内存：让同一进程内 getContract 立刻能查到
-  void getContract;
-  return NextResponse.json(newContract, { status: 201 });
+  try {
+    const row = await createContractDb(newContract);
+    // 响应行来自 PG returning：未填可空列是 null 不是 undefined —— 与
+    // aspnetcore DTO 物化形状对齐（POST shape 四方比对，buildingUnit 等列）。
+    return NextResponse.json(row, { status: 201 });
+  } catch (e) {
+    if (isDbUnavailable(e)) {
+      return NextResponse.json(
+        { code: "DB_UNAVAILABLE", message: "检查 DATABASE_URL / npm run seed:db" },
+        { status: 503 },
+      );
+    }
+    if ((e as { code?: string }).code === "23505") {
+      return NextResponse.json(
+        { code: "BAD_REQUEST", message: "contractCode already exists for tenant" },
+        { status: 400 },
+      );
+    }
+    throw e;
+  }
 }
