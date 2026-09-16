@@ -6,19 +6,14 @@
 // 目录名沿用 [id]/[parameter]：Next.js 禁止同层出现两种动态 slug 名（[id] 与
 // [object] 同层会构建期冲突），单段 [id]（派生 id 反查）已占用第一段槽位，故
 // 双段路径第一段复用 [id] 目录名 —— 语义上它是 inspectionObjectCode。
-// 数据源与 list / 单段 [id] 路由同源（msw fixtures 内存数组）。
+// 数据源与 list / 单段 [id] 路由同源：fixtures-runtime 的 globalThis 单例。
 
 import { NextRequest, NextResponse } from "next/server";
-import { inspectionCalculationMethods } from "@lab/management-system-msw/fixtures";
+import { calcMethodArr, calcMethodId, type FixtureRow } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
-import { ruleId } from "../../route";
 
-type Row = Record<string, unknown>;
-
-const arr = () => inspectionCalculationMethods as unknown as Row[];
-
-function findRow(objectCode: string, parameterCode: string): Row | undefined {
-  return arr().find(
+function findRow(objectCode: string, parameterCode: string): FixtureRow | undefined {
+  return calcMethodArr().find(
     (r) =>
       String(r["inspectionObjectCode"] ?? "") === objectCode &&
       String(r["inspectionParameterCode"] ?? "") === parameterCode,
@@ -31,7 +26,7 @@ export async function GET(
 ) {
   const row = findRow(params.id, params.parameter);
   if (!row) return notFound("CalculationMethod not found");
-  return NextResponse.json({ ...row, id: ruleId(row) });
+  return NextResponse.json({ ...row, id: calcMethodId(row) });
 }
 
 export async function PUT(
@@ -41,19 +36,20 @@ export async function PUT(
   const row = findRow(params.id, params.parameter);
   if (!row) return notFound("CalculationMethod not found");
   Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
-  return NextResponse.json({ ...row, id: ruleId(row) });
+  return NextResponse.json({ ...row, id: calcMethodId(row) });
 }
 
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string; parameter: string } },
 ) {
-  const i = arr().findIndex(
+  const arr = calcMethodArr();
+  const i = arr.findIndex(
     (r) =>
       String(r["inspectionObjectCode"] ?? "") === params.id &&
       String(r["inspectionParameterCode"] ?? "") === params.parameter,
   );
   if (i < 0) return notFound("CalculationMethod not found");
-  arr().splice(i, 1);
+  arr.splice(i, 1);
   return noContent();
 }

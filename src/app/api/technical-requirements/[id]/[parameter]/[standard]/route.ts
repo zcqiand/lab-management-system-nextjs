@@ -6,19 +6,15 @@
 //
 // 目录名沿用 [id]/[parameter]/[standard]：Next.js 禁止同层出现两种动态 slug 名，
 // 单段 [id]（派生 id 反查）已占用第一段槽位，故三段路径第一段复用 [id] 目录名 ——
-// 语义上它是 inspectionObjectCode。数据源与 list / 单段 [id] 路由同源（msw fixtures）。
+// 语义上它是 inspectionObjectCode。数据源与 list / 单段 [id] 路由同源：
+// fixtures-runtime 的 globalThis 单例（跨路由 bundle 共享）。
 
 import { NextRequest, NextResponse } from "next/server";
-import { technicalRequirements } from "@lab/management-system-msw/fixtures";
+import { techReqArr, techReqId, type FixtureRow } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
-import { techReqId } from "../../../route";
 
-type Row = Record<string, unknown>;
-
-const arr = () => technicalRequirements as unknown as Row[];
-
-function findRow(objectCode: string, parameterCode: string, standardCode: string): Row | undefined {
-  return arr().find(
+function findRow(objectCode: string, parameterCode: string, standardCode: string): FixtureRow | undefined {
+  return techReqArr().find(
     (r) =>
       String(r["inspectionObjectCode"] ?? "") === objectCode &&
       String(r["inspectionParameterCode"] ?? "") === parameterCode &&
@@ -49,13 +45,14 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string; parameter: string; standard: string } },
 ) {
-  const i = arr().findIndex(
+  const arr = techReqArr();
+  const i = arr.findIndex(
     (r) =>
       String(r["inspectionObjectCode"] ?? "") === params.id &&
       String(r["inspectionParameterCode"] ?? "") === params.parameter &&
       String(r["judgmentStandardCode"] ?? "") === params.standard,
   );
   if (i < 0) return notFound("TechnicalRequirement not found");
-  arr().splice(i, 1);
+  arr.splice(i, 1);
   return noContent();
 }

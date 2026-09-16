@@ -1,17 +1,12 @@
 // M04.F05 技术要求 PUT/DELETE /:id —— 派生 id 反查复合键行原地写。
+// T11(2026-09-16)：数据源走 fixtures-runtime 的 globalThis 单例（跨路由 bundle 共享）。
 
 import { NextRequest } from "next/server";
-import { technicalRequirements } from "@lab/management-system-msw/fixtures";
+import { techReqArr, techReqId } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
 
 function findRow(id: string): Record<string, unknown> | undefined {
-  return (technicalRequirements as unknown as Record<string, unknown>[]).find(
-    (r) =>
-      String(
-        r["id"] ??
-          `tr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}-${r["judgmentStandardCode"]}`,
-      ) === id,
-  );
+  return techReqArr().find((r) => techReqId(r) === id);
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -22,14 +17,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const arr = technicalRequirements as unknown as Record<string, unknown>[];
-  const i = arr.findIndex(
-    (r) =>
-      String(
-        r["id"] ??
-          `tr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}-${r["judgmentStandardCode"]}`,
-      ) === params.id,
-  );
+  const arr = techReqArr();
+  const i = arr.findIndex((r) => techReqId(r) === params.id);
   if (i < 0) return notFound("TechnicalRequirement not found");
   arr.splice(i, 1);
   return noContent();
