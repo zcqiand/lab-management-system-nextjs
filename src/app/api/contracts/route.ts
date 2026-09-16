@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { contracts, getContract } from "@lab/management-system-msw/fixtures";
+import { tenantIdFromBearer } from "@/lib/auth/bearer";
 
 const NOW = () => new Date().toISOString();
 
@@ -48,13 +49,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-  // ADR-0019：tenantId 是业务身份字段，缺失必须 400，不允许 fallback 到 "TENANT-001"
-  // 防止「未传租户 → 全落进同一 demo 租户」跨租户污染。
-  const tenantId = String(body.tenantId ?? "").trim();
+  // ADR-0019 + T11（2026-09-16）：租户身份取 token 的 tenant_id claim（与 aspnetcore
+  // HttpTenantContext / springboot currentTenant 同语义），不收 body.tenantId —— SSOT
+  // CreateContractRequest 无此字段，body 传入构成跨租户写风险。缺失 401，禁 demo 兜底。
+  const tenantId = tenantIdFromBearer(req.headers.get("authorization"));
   if (!tenantId) {
     return NextResponse.json(
-      { code: "BAD_REQUEST", message: "tenantId is required (ADR-0019)" },
-      { status: 400 },
+      { code: "UNAUTHORIZED", message: "tenant_id claim is required (ADR-0019)" },
+      { status: 401 },
     );
   }
   const newContract = {
