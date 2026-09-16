@@ -737,3 +737,93 @@ export const CATALOG_CFGS = {
   specs: catalogCfg(schema.inspectionSpecs),
   grades: catalogCfg(schema.inspectionGrades),
 } satisfies Record<string, DictCfg>;
+
+// ———— report-names 域（T11 fixtures→PG：nextjs dev 的 recompile 会重置
+// transpilePackages 内联模块的内存状态，fixtures 数组写入蒸发——live gate 实证
+// 「POST 201 后 [code] 路由 404」。对齐 receipts 批次做法，数据源切 lab_dev；
+// 契约面（路径/信封/状态码）不变。语义真相源 = 各 route.ts 头注引 lab-msw handler。）———
+
+
+const RN_MAIN = schema.inspectionReportNames;
+const RN_LINKS = {
+  object: schema.inspectionObjectReportNames,
+  standard: schema.inspectionReportNameStandards,
+  parameter: schema.inspectionReportNameParameters,
+} as const;
+export type ReportNameLinkKind = keyof typeof RN_LINKS;
+
+/** 主表 list（全量；keyword/分页信封仍由路由层 wrapDict 统一处理）。 */
+export async function listReportNamesDb(): Promise<Row[]> {
+  return (await db.select().from(RN_MAIN)) as Row[];
+}
+
+export async function getReportNameDb(code: string): Promise<Row | null> {
+  const rows = await db.select().from(RN_MAIN).where(eq(RN_MAIN.code, code));
+  return (rows[0] as Row) ?? null;
+}
+
+export async function createReportNameDb(dto: Row): Promise<Row> {
+  await db.insert(RN_MAIN).values({
+    code: String(dto.code ?? ""),
+    name: String(dto.name ?? ""),
+    fullName: (dto.fullName as string | null) ?? null,
+    templatePath: (dto.templatePath as string | null) ?? null,
+    summaryName: (dto.summaryName as string | null) ?? null,
+    extFields: (dto.extFields as unknown) ?? null,
+    description: (dto.description as string | null) ?? null,
+    sortOrder: (dto.sortOrder as number | undefined) ?? 0,
+    createdAt: String(dto.createdAt ?? ""),
+    updatedAt: String(dto.updatedAt ?? ""),
+  });
+  return dto;
+}
+
+/** PUT 语义 = msw Object.assign：只覆盖 body 给出的字段，code/createdAt 不动。 */
+const RN_MAIN_COLUMNS = [
+  "name",
+  "fullName",
+  "templatePath",
+  "summaryName",
+  "extFields",
+  "description",
+  "sortOrder",
+] as const;
+
+export async function updateReportNameDb(code: string, patch: Row): Promise<Row | null> {
+  const sets: Row = {};
+  for (const k of RN_MAIN_COLUMNS) {
+    if (k in patch) sets[k] = patch[k] as never;
+  }
+  sets.updatedAt = String(patch.updatedAt ?? "");
+  const rows = await db.update(RN_MAIN).set(sets).where(eq(RN_MAIN.code, code)).returning();
+  return (rows[0] as Row) ?? null;
+}
+
+export async function deleteReportNameDb(code: string): Promise<boolean> {
+  const rows = await db.delete(RN_MAIN).where(eq(RN_MAIN.code, code)).returning();
+  return rows.length > 0;
+}
+
+/** junction list（全量；query 过滤仍由路由层 wrapLinks 统一处理）。 */
+export async function listReportNameLinksDb(kind: ReportNameLinkKind): Promise<Row[]> {
+  return (await db.select().from(RN_LINKS[kind])) as Row[];
+}
+
+/** junction POST：msw 版是裸 push（204 恒定）；PG 主键冲突按幂等 upsert 处理仍 204。 */
+export async function createReportNameLinkDb(kind: ReportNameLinkKind, dto: Row): Promise<void> {
+  await db.insert(RN_LINKS[kind]).values(dto as never).onConflictDoNothing();
+}
+
+/** junction DELETE：msw linkDelete 按 query 全键匹配删一行（未命中也 204）。
+ * query 键是 camelCase DTO 字段，直接对 junction 表的 camel 属性列建等值条件。 */
+export async function deleteReportNameLinkDb(
+  kind: ReportNameLinkKind,
+  query: URLSearchParams,
+): Promise<void> {
+  const t = RN_LINKS[kind];
+  const conds = Array.from(query.keys())
+    .filter((k) => k in t)
+    .map((k) => eq(t[k as keyof typeof t] as PgColumn, query.get(k) as string));
+  if (conds.length === 0) return;
+  await db.delete(t).where(and(...conds));
+}
