@@ -75,6 +75,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(created, { status: 201 });
   } catch (e) {
     if (isDbUnavailable(e)) return dbUnavailable();
+    // contractId 不在 contracts 表（FK 23503）→ 400 契约面，不是 500
+    // （T11 gate#4 Cluster B / gate#3 sample-receipts-write 实证）。
+    if ((e as { code?: string }).code === "23503") {
+      return NextResponse.json(
+        { code: "CONTRACT_NOT_FOUND", message: "contractId 不存在" },
+        { status: 400 },
+      );
+    }
     throw e;
   }
 }

@@ -83,12 +83,16 @@ export async function POST(request: Request) {
     });
     tokenRes = (await res.json().catch(() => ({}))) as SaasTokenResponse;
     if (!res.ok || !tokenRes.accessToken) {
+      // T11(2026-09-16)：saas 4xx（code 已用/不存在 → INVALID_GRANT）是契约面，
+      // 返 401 给调用方；502 只留给 saas 5xx（基础设施故障）。此前一律 502，
+      // 四方比对「code 不可用 → 2xx/4xx」在 nextjs 侧结构性失配（gate#3 实证）。
+      const status = res.status >= 400 && res.status < 500 ? 401 : 502;
       return NextResponse.json(
         {
-          code: "SSO_TOKEN_FAILED",
+          code: status === 401 ? "SSO_INVALID_GRANT" : "SSO_TOKEN_FAILED",
           message: tokenRes.message ?? `saas token HTTP ${res.status}`,
         },
-        { status: 502 },
+        { status },
       );
     }
   } catch (err) {
