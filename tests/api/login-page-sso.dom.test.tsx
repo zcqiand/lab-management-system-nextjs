@@ -15,7 +15,7 @@ const { authorizeMock, callbackMock, routerRef, stableSetToken } = vi.hoisted(()
   stableSetToken: vi.fn(),
 }));
 
-vi.mock("@/api/endpoints/endpoints", () => ({
+vi.mock("@/api/endpoints/auth/auth", () => ({
   authSsoAuthorize: authorizeMock,
   authSsoCallback: callbackMock,
 }));

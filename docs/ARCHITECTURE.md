@@ -149,9 +149,9 @@ lab-management-system-nextjs/
 │   │   ├── contracts.ts        ← apiclient 入口（聚合 endpoints）
 │   │   ├── legacy-client.ts    ← 历史 client（保留）
 │   │   ├── mutator/custom-fetch.ts ← orval mutator（axios 1.7+ strict-mode 类型兼容）
-│   │   └── endpoints/          ← orval codegen 产物（gitignored）
-│   │       ├── endpoints.ts
-│   │       └── endpoints.schemas.ts
+│   │   └── endpoints/          ← orval codegen 产物（gitignored，spec §2.1 tags-split）
+│   │       ├── <tag>/<tag>.ts  ← 13 个 @tag 子目录（按 shared tsp 拆）
+│   │       └── model/<schema>.ts ← schemas 集中目录（1 schema 1 文件）
 │   ├── lib/
 │   │   ├── api-helpers.ts      ← 通用 helper（响应解析、错误归一）
 │   │   ├── auth/               ← auth 域 lib
@@ -221,7 +221,7 @@ lab-management-system-nextjs/
 | 通用组件 | `src/components/ConfirmModal.tsx` | 通用确认弹窗 |
 | 客户端入口 | `src/api/backend-config.ts::getApiBaseUrl() / getApiMode()` | ADR-0014 env 驱动的 3 getter（`NEXT_PUBLIC_API_BASE_URL` / `NEXT_PUBLIC_API_MODE`） |
 | HTTP 客户端 | `src/api/http-client.ts::installHttpClient(getToken)` | axios 拦截器——启动时注入 baseURL + Authorization header（**必须调一次**，否则 prod 走同 origin 被 nginx 405，详见 `memory/orval-axios-baseurl-must-be-installed.md`） |
-| Orval 客户端 | `src/api/endpoints/{endpoints.ts, endpoints.schemas.ts}` | 由 `npm run gen:shared` 产出；**gitignored**；`custom-fetch` mutator 解 AxiosResponse 外壳 |
+| Orval 客户端 | `src/api/endpoints/<tag>/<tag>.ts` + `model/<schema>.ts` | 由 `npm run gen:shared` 产出；**gitignored**；`custom-fetch` mutator 解 AxiosResponse 外壳；spec §2.1 tags-split 形态 |
 | Auth 状态 | `src/state/auth-context.tsx` + `src/lib/auth/*` | 登录态 / 选租户 / SSO callback 跳转 |
 
 **与 saas-nextjs AppShell 的差异**：
@@ -327,9 +327,9 @@ OK → src/db/schema.ts 与 git HEAD 一致
    → spawnSync('npx orval', cwd=本仓)
      本仓 orval.config.ts:
        input  = ../lab-management-system-shared/generated/openapi/openapi.yaml
-       output = ./src/api/endpoints/endpoints.ts (mode=split, client=axios-functions)
+       output = ./src/api/endpoints/ (mode=tags-split, client=axios-functions, spec §2.1)
        override.mutator = custom-fetch（axios 1.7+ strict-mode 类型兼容）
-   → 产出 src/api/endpoints/{endpoints.ts, endpoints.schemas.ts}（gitignored）
+   → 产出 src/api/endpoints/<tag>/<tag>.ts + model/<schema>.ts（gitignored）
 
 3. node scripts/borrow-pg.mjs
    → require("pg") 加载自本仓 node_modules/pg
@@ -426,7 +426,7 @@ C. L4 smoke 同款路径
 | 3 | `src/api/backend-config.ts` | ADR-0014 env 入口 | `getApiBaseUrl()` / `getApiMode()`；`isMswEnabled()` 已删除（ADR-0012 v0.3.0） |
 | 4 | `src/api/http-client.ts` | axios 拦截器 | `installHttpClient(getToken)`——bootstrap **必须调一次**；返 `ApiError`（含 status + body） |
 | 5 | `src/api/mutator/custom-fetch.ts` | orval mutator | `.then(r => r.data)` 解 AxiosResponse 外壳 + `as unknown as Promise<TData>` 桥接 strict mode |
-| 6 | `orval.config.ts` | orval codegen | `axios-functions` 客户端 + `split` 模式 + custom mutator；输出 `src/api/endpoints/{endpoints.ts, endpoints.schemas.ts}` |
+| 6 | `orval.config.ts` | orval codegen | `axios-functions` 客户端 + `tags-split` 模式（spec §2.1）+ custom mutator；输出 `src/api/endpoints/<tag>/<tag>.ts` + `model/<schema>.ts` |
 | 7 | `drizzle.config.ts` | drizzle-kit pull 配置 | PG dialect；PG_HOST/PG_PORT/PG_USER/PG_PASSWORD/PG_DATABASE 全走 env（禁默认值兜底，密码由 pull-schema.sh fail-fast 校验）；无 schema 字段（pull 不读 schema.ts） |
 | 8 | `scripts/pull-schema.sh` | DB-First pull 链主入口（`npm run pull:schema`） | 5 步：pull → move src/db/schema.ts → fix → git diff drift 检测 → ADR-0026 marker |
 | 9* | `scripts/fix-pulled-schema.mjs` | pull 产物后处理 | 修 `.default(')` → `.default('')` + unused `sql` import；幂等 |

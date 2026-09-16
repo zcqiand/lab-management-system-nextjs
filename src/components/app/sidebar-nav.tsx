@@ -40,8 +40,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/state/auth-context";
-import { authGetMenus } from "@/api/endpoints/endpoints";
-import type { MenuNode as ContractMenuNode } from "@/api/endpoints/endpoints.schemas";
+import { authGetMenus } from "@/api/endpoints/auth/auth";
+import type { MenuNode as ContractMenuNode } from "@/api/endpoints/model";
 
 // 与 saas 的 EffectiveMenuNode 对齐（手写，避免跨仓依赖）
 interface MenuNode {

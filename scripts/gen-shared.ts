@@ -1,6 +1,7 @@
 // scripts/gen-shared.ts — shared 仓 API 契约同步（ADR-0025 / ADR-0026）
 //
-// API 层：shared/tsp → shared/openapi.yaml → 本仓 src/api/endpoints/（orval）
+// API 层：shared/tsp → shared/openapi.yaml → 本仓 src/api/endpoints/<tag>/<tag>.ts +
+// src/api/endpoints/model/<schema>.ts（orval tags-split，spec §2.1）
 // DB 层：nextjs 走 DB-First（drizzle-kit pull，见 scripts/pull-schema.sh）
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";

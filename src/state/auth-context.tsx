@@ -17,8 +17,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { authGetCurrentUser, authSwitchTenant } from "@/api/endpoints/endpoints";
-import type { CurrentUser, MyTenant } from "@/api/endpoints/endpoints.schemas";
+import { authGetCurrentUser, authSwitchTenant } from "@/api/endpoints/auth/auth";
+import type { CurrentUser, MyTenant } from "@/api/endpoints/model";
 import { getApiBaseUrl, TOKEN_STORAGE_KEY } from "@/api/backend-config";
 import { installHttpClient } from "@/api/http-client";
 

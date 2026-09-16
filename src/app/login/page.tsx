@@ -27,7 +27,7 @@ import {
 import { useAuth } from "@/state/auth-context";
 import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
 import { env } from "@/api/env";
-import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/endpoints";
+import { authSsoAuthorize, authSsoCallback } from "@/api/endpoints/auth/auth";
 
 // OAuth 2.0 client_id：lab 在 saas 注册的应用标识（apps.client_id）。
 // 2026-08-28 V014/V015 seed 把 apps.client_id 从字符串 'lab-management' 收敛为固定 UUID

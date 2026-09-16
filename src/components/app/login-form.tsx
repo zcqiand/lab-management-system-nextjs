@@ -6,7 +6,7 @@
 // ADR-0014：runtime backend mode 切换已废弃；baseUrl 由 NEXT_PUBLIC_API_BASE_URL 决定。
 
 import { useState } from "react";
-import { authLogin } from "@/api/endpoints/endpoints";
+import { authLogin } from "@/api/endpoints/auth/auth";
 import { getApiBaseUrl, getApiMode } from "@/api/backend-config";
 
 export function LoginForm() {

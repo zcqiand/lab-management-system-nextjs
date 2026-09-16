@@ -11,12 +11,24 @@ import { defineConfig } from "orval";
 //   在 strict mode 下不兼容（TS2322）。
 //   override.mutator 用 customFetch 把返回类型 cast 成 any，绕过 strict-mode 推断（仅影响
 //   orval 输出，不影响运行时）。这是 orval 官方推荐的 axios 兼容性 workaround。
+//
+// Architecture (spec §2.1, saas-react PR #8 pilot):
+// - mode: "tags-split" — 按 shared tsp 的 @tag 拆成多文件，schemas 抽到 model/ 子目录
+// - target: 目录（不是文件）—— orval tags-split 必须 dir，不能 file
+// - schemas: 单独 model/ 目录—— schemas 跨 tag 复用，集中放便于 import + tree-shaking
 export default defineConfig({
   lab: {
-    input: "../lab-management-system-shared/generated/openapi/openapi.yaml",
+    input: {
+      target: "../lab-management-system-shared/generated/openapi/openapi.yaml",
+      filters: {
+        mode: "exclude",
+        tags: ["frontend-bind-meta"],
+      },
+    },
     output: {
-      mode: "split",
-      target: "./src/api/endpoints/endpoints.ts",
+      mode: "tags-split",
+      target: "./src/api/endpoints",
+      schemas: "./src/api/endpoints/model",
       client: "axios-functions",
       override: {
         useDates: false,
