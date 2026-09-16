@@ -76,8 +76,8 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 |---|---|---|---|---|---|
 | M01.F04.I01 | 动态菜单下发（GET /auth/menus） | 查询 | 前端+后端 |  | 已上线 |
 | M01.F04.I02 | 路由守卫 | 接口 | 前端+后端 | 未登录跳转登录页；角色不匹配跳转 403；三态正确拦截 | 已上线 |
-| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 前端+后端 |  | 已上线 |
-| M01.F04.I04 | 动态菜单 | 接口 | 前端+后端 | 侧边栏菜单由身份平台 GET /menus?appId=lab-management 下发，按权限码显隐；分组无可见子项则隐藏 | 已上线 |
+| M01.F04.I03 | 路由守卫（未登录/无权限拦截） | 接口 | 前端+后端 | 前端路由守卫 useRequireAuth 钩子（react/vue 仓实现）；本仓 BASE 登记仓内未挂 entry，react/vue 仓 useRequireAuth 5+ 处引用作为产品线 anchor | 已上线 |
+| M01.F04.I04 | 动态菜单（lab 侧边栏） | 接口 | 前端+后端 | 侧边栏容器锚点（nextjs 仓 `<aside>` 实现）；与 I01 共端点 /api/auth/menus（lab 本地端点，非 saas IdP /menus?appId=lab-management） | 已上线 |
 
 ### M01.F05 认证管理
 
@@ -138,7 +138,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | 子项 ID | 名称 | 类型 | 交付 | 说明 | 状态 |
 |---|---|---|---|---|---|
 | M03.F02.I01 | 任务分配 | 接口 | 前端+后端 | 接样提交后进入分配中，安排检测人员+计划日期 | 已上线 |
-| M03.F02.I02 | 任务编辑 | 接口 | 前端+后端 | 安排弹窗维护 assigneeName/assigneeId/plannedTestDate | 已上线 |
+| M03.F02.I02 | 任务编辑（客户端视角 anchor） | 接口 | 前端+后端 | 安排弹窗维护 assigneeName/assigneeId/plannedTestDate（**与 I01 共端点 PUT /api/receipts/{id}/task；保留 ID 作为客户端视角 anchor**，react/vue/nextjs 三仓 data-fn 同步从 I02 → I01） | 已上线 |
 | M03.F02.I03 | 任务取消（清空分配） | 接口 | 前端+后端 | 清空 assignee/assigneeId/plannedTestDate，把已分配单子在本阶段重置为未分配（非退回接样；退回接样走 FlowStagePage 通用退回按钮） | 已上线 |
 | M03.F02.I04 | 任务分配三态过滤器 | 接口 | 前端+后端 | 全部/未提交/已提交：按 flowStatus 过滤任务分配列表 | 已上线 |
 

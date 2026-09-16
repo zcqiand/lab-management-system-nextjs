@@ -42,8 +42,8 @@ beforeEach(() => {
 })
 
 describe('TaskAssignmentPage 任务取消（M03.F02.I03）', () => {
-  // 锚点存在性验证：页面容器（I01）+ 安排按钮（I02）+ 三态过滤器（I04）
-  fnTest(['M03.F02.I01', 'M03.F02.I02', 'M03.F02.I04'], '任务安排页 4 锚点存在', async () => {
+  // 锚点存在性验证：页面容器（I01）+ 安排按钮（I01）+ 三态过滤器（I04）
+  fnTest(['M03.F02.I01', 'M03.F02.I04'], '任务安排页 3 锚点存在', async () => {
     const { container } = render(
       <TaskAssignmentPage />,
     )
@@ -52,8 +52,6 @@ describe('TaskAssignmentPage 任务取消（M03.F02.I03）', () => {
     )
     // I01 页面容器
     expect(container.querySelector('[data-fn="M03.F02.I01"]')).not.toBeNull()
-    // I02 安排按钮
-    expect(container.querySelector('[data-fn="M03.F02.I02"]')).not.toBeNull()
     // I04 三态过滤器
     expect(container.querySelector('[data-fn="M03.F02.I04"]')).not.toBeNull()
   })
@@ -77,8 +75,8 @@ describe('TaskAssignmentPage 任务取消（M03.F02.I03）', () => {
     )
     // 「取消任务」按钮挂 data-fn="M03.F02.I03"
     expect(container.querySelector('[data-fn="M03.F02.I03"]')).not.toBeNull()
-    // 「安排」按钮也挂 I02（已存在测试，但这里一起断言）
-    expect(container.querySelector('[data-fn="M03.F02.I02"]')).not.toBeNull()
+    // 「安排」按钮也挂 I01（已存在测试，但这里一起断言）
+    expect(container.querySelector('[data-fn="M03.F02.I01"]')).not.toBeNull()
     // 点击「取消任务」触发 PUT
     const cancelBtn = container.querySelector('[data-fn="M03.F02.I03"]') as HTMLButtonElement
     cancelBtn.click()
