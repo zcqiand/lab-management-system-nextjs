@@ -26,8 +26,14 @@ interface MembershipSnapshot {
 
 const TTL_MS = 30 * 60 * 1000;
 
-/** 模块级单例：Next.js route handler 静态 export 场景下跨请求存活（dev HMR 会重置，可接受）。 */
-const store = new Map<string, MembershipSnapshot>();
+/**
+ * globalThis 单例：next dev 下每个路由 bundle 各持一份模块实例（transpilePackages
+ * TS-only file: 依赖尤甚），模块级 `new Map` 会让 login 写进 A 实例、/me 读 B 实例
+ * → 快照恒 miss → 401 MEMBERSHIP_UNAVAILABLE（T11 live 套件实证）。挂 globalThis
+ * 才是真·进程级单例。HMR 重置场景不变（globalThis 随进程存活）。
+ */
+const _g = globalThis as unknown as { __membershipSnapshotStore?: Map<string, MembershipSnapshot> };
+const store = (_g.__membershipSnapshotStore ??= new Map<string, MembershipSnapshot>());
 
 /** 写入/覆盖某用户的租户快照（userId 为 saas user id）。空参静默忽略。 */
 export function putMembershipSnapshot(

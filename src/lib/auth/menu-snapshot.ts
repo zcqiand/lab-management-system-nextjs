@@ -39,8 +39,13 @@ interface MenuSnapshot {
 
 const TTL_MS = 30 * 60 * 1000;
 
-/** 模块级单例：Next.js route handler 静态 export 场景下跨请求存活（dev HMR 会重置，可接受）。 */
-const store = new Map<string, MenuSnapshot>();
+/**
+ * globalThis 单例：next dev 下每路由 bundle 各持模块实例，模块级 Map 会让
+ * login 写 A 实例、/api/auth/menus 读 B 实例 → 恒 miss → 503（T11 live 实证，
+ * 与 membership-snapshot 同款修法）。
+ */
+const _g = globalThis as unknown as { __menuSnapshotStore?: Map<string, MenuSnapshot> };
+const store = (_g.__menuSnapshotStore ??= new Map<string, MenuSnapshot>());
 
 /** 写入/覆盖某用户的菜单快照（userId 为 JWT sub）。空参静默忽略。 */
 export function putMenuSnapshot(userId: string | null | undefined, menus: ContractMenuNode[] | null): void {
