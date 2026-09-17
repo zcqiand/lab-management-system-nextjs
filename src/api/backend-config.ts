@@ -7,12 +7,12 @@
 import { env } from "./env";
 
 // prod 分流（saas 家族 2026-09-13 裁定同款）：prod 构建下选择映射到 prod 域名。
-// lab 家族 prod 部署现状：msw（lab-msw.xiangru.uk）、nextjs-self（同源 ""）；
-// aspnetcore / springboot 无 prod 部署 → SELECTABLE_BACKENDS 在 prod 构建剔除。
+// lab 家族 prod 部署现状：nextjs-self（同源 ""）；aspnetcore / springboot 无 prod
+// 部署 → SELECTABLE_BACKENDS 在 prod 构建剔除。2026-09-17 msw 仓已删
+//（剔除设计 Phase 4 提前）：msw 切换项与 lab-msw.xiangru.uk prodBaseUrl 移除。
 const IS_PROD_BUILD = process.env.NODE_ENV === "production";
 
 export const BACKENDS = [
-  { key: "msw", baseUrl: "http://localhost:5200", prodBaseUrl: "https://lab-msw.xiangru.uk" },
   { key: "nextjs-self", baseUrl: "", prodBaseUrl: "" },
   { key: "aspnetcore", baseUrl: "http://localhost:5204", prodBaseUrl: undefined },
   { key: "springboot", baseUrl: "http://localhost:5205", prodBaseUrl: undefined },
@@ -75,11 +75,11 @@ export function getApiBaseUrl(): string {
 }
 
 export function getApiMode(): string {
-  // 显示标签跟随选中项（backend key）；未选择走 env 标签（env.ts 默认 msw-http）。
+  // 显示标签跟随选中项（backend key）；未选择走 env 标签（env.ts 默认 nextjs-self）。
   const selected = getSelectedBackend();
   if (selected) {
     const hit = SELECTABLE_BACKENDS.find((b) => b.key === selected);
     if (hit) return hit.key;
   }
-  return env.NEXT_PUBLIC_API_MODE || "msw-http";
+  return env.NEXT_PUBLIC_API_MODE || "nextjs-self";
 }

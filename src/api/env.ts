@@ -2,19 +2,19 @@
 //
 // 后端配置（ADR-0014）：
 //   NEXT_PUBLIC_API_BASE_URL   单 URL 后端地址；ADR-0019 禁 localhost 兜底
-//   NEXT_PUBLIC_API_MODE       显示标签；默认 "msw-http"
+//   NEXT_PUBLIC_API_MODE       显示标签；默认 "nextjs-self"（msw 剔除后）
 //
 // ADR-0012 v0.3.0：删除 NEXT_PUBLIC_ENABLE_MSW（Service Worker 模式已删除）。
 // ADR-0019：NEXT_PUBLIC_API_BASE_URL 缺失 throw，不允许 fallback 到 localhost。
 //   dev 期用 docker compose 注入或 .env.local；prod 由 deploy 脚本生成。
 //
-// 空串 "" 视为「显式设空」——测试同源相对 URL 模式（msw/node setupServer
+// 空串 "" 视为「显式设空」——测试同源相对 URL 模式（测试 setupServer
 // 的相对路径 handler 匹配）依赖此语义。L0.no_fallback 锁的是「未设 = 字面」兜底，
 // 不锁「显式空串」。
 // ADR-0019：NEXT_PUBLIC_API_BASE_URL 缺失 throw,不允许 fallback 到 localhost。
 // dev 期用 docker compose 注入或 .env.local;prod 由 deploy 脚本生成。
 //
-// 空串 "" 视为「显式设空」——测试同源相对 URL 模式(msw/node setupServer
+// 空串 "" 视为「显式设空」——测试同源相对 URL 模式(测试 setupServer
 // 的相对路径 handler 匹配)依赖此语义。L0.no_fallback 锁的是「未设 = 字面」兜底,
 // 不锁「显式空串」。
 //
@@ -38,5 +38,5 @@ export const env = {
   SSO_AUTHORIZE_URL: process.env.NEXT_PUBLIC_SSO_AUTHORIZE_URL || "/sso/authorize",
   OAUTH_SCOPES: process.env.NEXT_PUBLIC_OAUTH_SCOPES || "",
   NEXT_PUBLIC_API_BASE_URL: NEXT_PUBLIC_API_BASE_URL_RAW,
-  NEXT_PUBLIC_API_MODE: process.env.NEXT_PUBLIC_API_MODE || "msw-http",
+  NEXT_PUBLIC_API_MODE: process.env.NEXT_PUBLIC_API_MODE || "nextjs-self",
 } as const;
