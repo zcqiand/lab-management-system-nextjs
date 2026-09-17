@@ -30,11 +30,15 @@ function MenuLoadError({ error }: { error: Error }) {
     >
       <AlertCircle className="h-8 w-8 text-rose-700 mb-3" />
       <h2 className="text-base font-semibold text-rose-700 mb-2">菜单加载失败</h2>
-      <p className="text-xs text-slate-600 mb-4 break-all" data-testid="appshell-menu-error-msg">
+      <p
+        className="text-xs text-slate-600 mb-4 break-all"
+        data-testid="appshell-menu-error-msg"
+      >
         {error.message}
       </p>
       <p className="text-xs text-slate-500">
-        后端 /api/auth/menus miss（503 MENUS_UNAVAILABLE）；demo 兜底已删除，请重登或联系管理员。
+        后端 /api/auth/menus miss（503 MENUS_UNAVAILABLE）；demo
+        兜底已删除，请重登或联系管理员。
       </p>
     </aside>
   );
@@ -85,7 +89,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-14 bg-white border-b flex items-center px-6 gap-4">
           <h1 className="text-base font-semibold" data-testid="appshell-app-name">
-            {app?.name ?? "Lab Operational Console"}
+            {app?.name ?? "建筑工程实验室管理系统"}
           </h1>
           <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
             {token ? (

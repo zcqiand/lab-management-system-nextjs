@@ -3,8 +3,12 @@ import { useContractStore } from '@/state/contractStore'
 import { ReceiptFormModal, type ReceiptFormValues } from './ReceiptFormModal'
 import { ConfirmModal } from '@/components/ConfirmModal'
 import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
-import type { SampleReceipt } from '@/types/api'
+import type { SampleReceipt } from '@/api/endpoints/model'
+import {
+  receiptsCreateReceipt,
+  receiptsDeleteReceipt,
+  receiptsUpdateReceipt,
+} from '@/api/endpoints/receipts/receipts'
 
 /** 接样管理——流程线第一环节（flowStatus='receiving'）。
  * 显示接样中的接样单，可新建/编辑/删除；提交后进入任务安排。已提交的单不可编辑/删除。 */
@@ -69,11 +73,11 @@ export function ReceiptList() {
         remark: values.remark,
       }
       if (formMode === 'create') {
-        const res = await apiClient.post<SampleReceipt>(API_ROUTES['/receipts'], payload)
+        const created = await receiptsCreateReceipt(payload)
         setFormMode('edit')
-        setEditing(res.data)
+        setEditing(created)
       } else if (editing) {
-        await apiClient.put(`${API_ROUTES['/receipts']}/${editing.id}`, payload)
+        await receiptsUpdateReceipt(editing.id, payload)
         setFormOpen(false)
       }
       await refreshRef.current?.()
@@ -86,7 +90,7 @@ export function ReceiptList() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
-      await apiClient.delete(`${API_ROUTES['/receipts']}/${deleteTarget.id}`)
+      await receiptsDeleteReceipt(deleteTarget.id)
       setDeleteTarget(null)
       await refreshRef.current?.()
     } finally {

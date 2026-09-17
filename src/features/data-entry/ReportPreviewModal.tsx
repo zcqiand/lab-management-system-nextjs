@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
-import type { SampleReceipt, Sample, TestRecord } from "@/types/api";
+import type {
+  Sample,
+  SampleReceipt,
+  TestRecord,
+  TestRecordsListTestRecordsParams,
+} from "@/api/endpoints/model";
+import {
+  samplesListSamples,
+  samplesUpdateSample,
+} from "@/api/endpoints/samples/samples";
+import { testRecordsListTestRecords } from "@/api/endpoints/test-records/test-records";
 import { ORG_INFO, type OrgInfo } from "./org-info";
 import generatedReportNames from "@/data/generated/inspection-report-name.json";
 import { assembleReport, flattenForDocx, ensureAllDocxTagsFromBuffer } from "./reportTemplateData";
@@ -74,20 +83,18 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
       setLoading(true);
       try {
         // 机构信息（本地常量，2026-09-17 私生端点 /api/org-info 删除）+
-        // 样品 + 检测记录 + 模板文件 并发拉取
+        // 样品 + 检测记录 + 模板文件 并发拉取。
+        // test-records 契约参数集无 receiptId（spec gap，后端支持），交叉类型透传。
+        const testRecordParams: TestRecordsListTestRecordsParams & {
+          receiptId?: string;
+        } = { receiptId: receipt.id, page: 1, pageSize: 200 };
         const [org, samples, records, tplRes] = await Promise.all([
           Promise.resolve(ORG_INFO),
-          apiClient
-            .get<{ items: Sample[] }>(API_ROUTES['/samples'], {
-              params: { receiptId: receipt.id, page: 1, pageSize: 100 },
-            })
-            .then((r) => r.data.items ?? [])
+          samplesListSamples({ receiptId: receipt.id, page: 1, pageSize: 100 })
+            .then((r) => r.items ?? [])
             .catch(() => [] as Sample[]),
-          apiClient
-            .get<{ items: TestRecord[] }>(API_ROUTES['/test-records'], {
-              params: { receiptId: receipt.id, page: 1, pageSize: 200 },
-            })
-            .then((r) => r.data.items ?? [])
+          testRecordsListTestRecords(testRecordParams)
+            .then((r) => r.items ?? [])
             .catch(() => [] as TestRecord[]),
           fetch(templateUrl),
         ]);
@@ -203,7 +210,7 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
     }
     try {
       setLoading(true);
-      await apiClient.put(`${API_ROUTES['/samples']}/${target.id}`, { ext: mergedExt });
+      await samplesUpdateSample(target.id, { ext: mergedExt });
       const updatedSamples: Sample[] = [{ ...target, ext: mergedExt }];
       const templateUrl = pickTemplateUrl(receipt.categoryCode);
       if (!templateUrl) {
@@ -217,11 +224,12 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
       // 这里通过重建一次 fetch 链路最小化耦合：
       const [org, records] = await Promise.all([
         Promise.resolve(ORG_INFO),
-        apiClient
-          .get<{ items: TestRecord[] }>(API_ROUTES['/test-records'], {
-            params: { receiptId: receipt.id, page: 1, pageSize: 200 },
-          })
-          .then((r) => r.data.items ?? [])
+        testRecordsListTestRecords({
+          receiptId: receipt.id,
+          page: 1,
+          pageSize: 200,
+        } as TestRecordsListTestRecordsParams & { receiptId?: string })
+          .then((r) => r.items ?? [])
           .catch(() => [] as TestRecord[]),
       ]);
       await renderPreview({

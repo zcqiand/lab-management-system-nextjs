@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useSampleStore } from '@/state/sampleStore'
+import { useSampleStore, type SampleQuery } from '@/state/sampleStore'
 import { SampleFormModal, type SampleFormValues } from './SampleFormModal'
 import { ConfirmModal } from '@/components/ConfirmModal'
-import type { Sample, SampleStatus, SampleQuery } from '@/types/api'
+import type { Sample } from '@/api/endpoints/model'
+
+/** 样品状态（原 @/types SampleStatus = string；UI 筛选值，后端无该过滤参数） */
+type SampleStatus = string
 
 const PAGE_SIZE = 10
 
@@ -24,7 +27,6 @@ export function SampleList() {
     page: p,
     pageSize: PAGE_SIZE,
     keyword: keyword || undefined,
-    status: status || undefined,
   })
 
   useEffect(() => {
@@ -40,13 +42,9 @@ export function SampleList() {
   const handleStatusChange = (value: SampleStatus | '') => {
     setStatus(value)
     setPage(1)
-    const q: SampleQuery = {
-      page: 1,
-      pageSize: PAGE_SIZE,
-      keyword: keyword || undefined,
-      status: value || undefined,
-    }
-    fetchSamples(q)
+    // status 筛选是 UI 态：契约 SamplesListSamplesParams 无 status，
+    // 后端 /api/samples 亦不过滤（旧实现传了也被忽略，行为不变）
+    fetchSamples(buildQuery(1))
   }
 
   const openCreate = () => {

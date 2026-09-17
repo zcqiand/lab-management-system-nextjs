@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { InspectionParameter, TestRecord } from '@/types/api'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { InspectionParameter, TestRecord } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from './types'
 import { requirementLabel } from './DefaultParamCard'
 import { autoVerdict } from './cement-strength'
 import {

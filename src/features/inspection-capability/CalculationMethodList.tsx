@@ -1,26 +1,36 @@
 "use client";
 import { useEffect, useState } from "react";
 // REF src/features/inspection-capability/CalculationMethodList.tsx 移植。
-// 差异：apiClient → @/api/legacy-client + API_ROUTES。msw 计算方法主键是
-// (inspectionObjectCode, inspectionParameterCode) 复合键而非 id——组件内的
-// PUT/DELETE 走 tests 端 shape adapter 兜底（键语义不变，REF 行为保持）。
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数。
+// 计算方法主键是 (inspectionObjectCode, inspectionParameterCode) 复合键而非 id：
+// PUT/DELETE 走契约复合键端点（行内含原始字段，不反解 derived id）。
+import {
+  calculationMethodsCreateCalculationMethod,
+  calculationMethodsDeleteCalculationMethod,
+  calculationMethodsListCalculationMethods,
+  calculationMethodsUpdateCalculationMethod,
+} from "@/api/endpoints/calculation-methods/calculation-methods";
+import {
+  inspectionDictionaryListObjects,
+  inspectionDictionaryListParameters,
+} from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
+import type {
+  CalculationMethod,
+  CalculationMethodsListCalculationMethodsParams,
+  CreateCalculationMethodRequest,
+  UpdateCalculationMethodRequest,
+} from "@/api/endpoints/model";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import {
   TwoLevelObjectStandardTree,
   type TreeListItem,
 } from "./TwoLevelObjectStandardTree";
 
-interface CalcRow extends TreeListItem {
+/** 行结构 = 契约 CalculationMethod + 后端列表补列的 derived id（cr-<obj>-<param>，
+ *  仅作 React key/拖拽 id 用，不再用于寻址）。 */
+interface CalcRow extends CalculationMethod, TreeListItem {
   id: string;
-  inspectionObjectCode: string;
-  inspectionParameterCode: string;
-  testingStandardCode?: string;
-  objectName?: string;
   parameterName?: string;
-  algorithmType: string;
-  specimenCount: number;
-  remark?: string;
 }
 
 interface Opt {
@@ -47,7 +57,9 @@ const emptyForm = {
 
 export function CalculationMethodList() {
   const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
+  // 编辑中的原始行：PUT 复合键寻址用行内 inspectionObjectCode/ParameterCode，
+  // 不再持有 derived id。
+  const [editRow, setEditRow] = useState<CalcRow | null>(null);
   const [form, setForm] = useState<Record<string, string>>(emptyForm);
   const [error, setError] = useState<string | null>(null);
   const [objects, setObjects] = useState<Opt[]>([]);
@@ -57,17 +69,11 @@ export function CalculationMethodList() {
 
   // 跟踪当前选中的检测标准（树组件用内部状态，这里提升上来让保存/删除后能刷新）
   useEffect(() => {
-    apiClient
-      .get<{ items: Opt[] }>(API_ROUTES["/inspection-objects"], {
-        params: { page: 1, pageSize: "1000" },
-      })
-      .then((r) => setObjects(r.data?.items ?? []))
+    inspectionDictionaryListObjects({ page: 1, pageSize: 1000 })
+      .then((r) => setObjects((r.items ?? []) as Opt[]))
       .catch(() => {});
-    apiClient
-      .get<{ items: Opt[] }>(API_ROUTES["/inspection-parameters"], {
-        params: { page: 1, pageSize: "1000" },
-      })
-      .then((r) => setParams(r.data?.items ?? []))
+    inspectionDictionaryListParameters({ page: 1, pageSize: 1000 })
+      .then((r) => setParams((r.items ?? []) as Opt[]))
       .catch(() => {});
   }, []);
 
@@ -79,14 +85,14 @@ export function CalculationMethodList() {
   };
 
   const openCreate = () => {
-    setEditId(null);
+    setEditRow(null);
     setForm({ ...emptyForm, testingStandardCode: selectedStandard ?? "" });
     setError(null);
     setOpen(true);
   };
 
   const openEdit = (row: CalcRow) => {
-    setEditId(row.id);
+    setEditRow(row);
     setForm({
       inspectionObjectCode: row.inspectionObjectCode,
       inspectionParameterCode: row.inspectionParameterCode,
@@ -101,21 +107,33 @@ export function CalculationMethodList() {
 
   const save = async () => {
     setError(null);
-    const payload = {
-      inspectionObjectCode: form.inspectionObjectCode,
-      inspectionParameterCode: form.inspectionParameterCode,
-      testingStandardCode: form.testingStandardCode || undefined,
-      algorithmType: form.algorithmType,
-      specimenCount: Number(form.specimenCount) || 1,
-      remark: form.remark || undefined,
-    };
     try {
-      if (editId)
-        await apiClient.put(
-          `${API_ROUTES["/inspection-calculation-methods"]}/${editId}`,
+      if (editRow) {
+        // 契约 UpdateCalculationMethodRequest 不含复合键字段（键在 path 上），
+        // 检测项目/检测参数两个下拉在编辑态语义上不可改（后端按原键定位）。
+        const payload: UpdateCalculationMethodRequest = {
+          testingStandardCode: form.testingStandardCode || undefined,
+          algorithmType: (form.algorithmType ||
+            "manual") as UpdateCalculationMethodRequest["algorithmType"],
+          specimenCount: Number(form.specimenCount) || 1,
+          remark: form.remark || undefined,
+        };
+        await calculationMethodsUpdateCalculationMethod(
+          editRow.inspectionObjectCode,
+          editRow.inspectionParameterCode,
           payload,
         );
-      else await apiClient.post(API_ROUTES["/inspection-calculation-methods"], payload);
+      } else {
+        const payload: CreateCalculationMethodRequest = {
+          inspectionObjectCode: form.inspectionObjectCode,
+          inspectionParameterCode: form.inspectionParameterCode,
+          testingStandardCode: form.testingStandardCode || undefined,
+          algorithmType: form.algorithmType as CreateCalculationMethodRequest["algorithmType"],
+          specimenCount: Number(form.specimenCount) || 1,
+          remark: form.remark || undefined,
+        };
+        await calculationMethodsCreateCalculationMethod(payload);
+      }
       setOpen(false);
       if (selectedStandard) reloadList();
     } catch (err: unknown) {
@@ -126,13 +144,14 @@ export function CalculationMethodList() {
     }
   };
 
-  const remove = async (id: string) => {
+  const remove = async (row: CalcRow) => {
     if (!confirm("确定删除？")) return;
-    await apiClient.delete(`${API_ROUTES["/inspection-calculation-methods"]}/${id}`);
+    await calculationMethodsDeleteCalculationMethod(
+      row.inspectionObjectCode,
+      row.inspectionParameterCode,
+    );
     if (selectedStandard) reloadList();
   };
-
-  const buildPutBody = (_item: CalcRow, sortOrder: number) => ({ sortOrder });
 
   return (
     <div data-fn="M06.F05.I01" className="flex flex-col flex-1 min-h-0">
@@ -141,8 +160,17 @@ export function CalculationMethodList() {
       <TwoLevelObjectStandardTree<CalcRow>
         title="计算方法"
         dataFn="M06.F05.I01"
-        listEndpoint="/inspection-calculation-methods"
-        listFilterParam="testingStandardCode"
+        listName="calculation-methods"
+        listFn={(standardCode) => {
+          // 契约参数集只有 inspectionObjectCode/inspectionParameterCode；
+          // 后端支持 testingStandardCode 过滤（spec gap），交叉类型透传保持线上行为。
+          const listParams: CalculationMethodsListCalculationMethodsParams & {
+            testingStandardCode?: string;
+          } = { testingStandardCode: standardCode };
+          return calculationMethodsListCalculationMethods(listParams).then(
+            (rows) => (rows ?? []) as CalcRow[],
+          );
+        }}
         createDataFn="M06.F05.I02"
         editDataFn="M06.F05.I02"
         deleteDataFn="M06.F05.I03"
@@ -169,18 +197,17 @@ export function CalculationMethodList() {
           },
           { key: "remark", label: "下限", width: "w-24" },
         ]}
-        buildPutBody={buildPutBody}
         reloadSignal={listVersion}
         selectedStandard={selectedStandard}
         onSelectedStandardChange={setSelectedStandard}
         onCreate={openCreate}
         onEdit={openEdit}
-        onDelete={(it) => remove(it.id)}
+        onDelete={remove}
       />
 
       <ConfirmModal
         open={open}
-        title={editId ? "编辑计算方法" : "新建计算方法"}
+        title={editRow ? "编辑计算方法" : "新建计算方法"}
         message={
           <div className="space-y-3 text-left text-sm">
             {error && (
@@ -193,10 +220,11 @@ export function CalculationMethodList() {
               <select
                 aria-label="检测项目"
                 value={form.inspectionObjectCode}
+                disabled={Boolean(editRow)}
                 onChange={(e) =>
                   setForm({ ...form, inspectionObjectCode: e.target.value })
                 }
-                className="mt-1 w-full border rounded px-2 py-1.5"
+                className="mt-1 w-full border rounded px-2 py-1.5 disabled:bg-gray-100"
               >
                 <option value="">选择检测项目</option>
                 {objects.map((o) => (
@@ -211,10 +239,11 @@ export function CalculationMethodList() {
               <select
                 aria-label="检测参数"
                 value={form.inspectionParameterCode}
+                disabled={Boolean(editRow)}
                 onChange={(e) =>
                   setForm({ ...form, inspectionParameterCode: e.target.value })
                 }
-                className="mt-1 w-full border rounded px-2 py-1.5"
+                className="mt-1 w-full border rounded px-2 py-1.5 disabled:bg-gray-100"
               >
                 <option value="">选择检测参数</option>
                 {params.map((p) => (

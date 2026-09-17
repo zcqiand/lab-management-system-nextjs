@@ -1,31 +1,35 @@
 "use client";
 import { useEffect, useState } from 'react'
 // REF src/features/inspection-capability/TechnicalRequirementList.tsx 移植。
-// 差异：apiClient → @/api/legacy-client + API_ROUTES。msw 技术要求主键是
-// (object, parameter, judgmentStandard) 复合键而非 id——组件内 PUT/DELETE 走
-// tests 端 shape adapter 兜底（键语义不变，REF 行为保持）。
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数。
+// 技术要求主键是 (object, parameter, judgmentStandard) 三段复合键而非 id：
+// PUT/DELETE 走契约复合键端点（行内含原始字段，不反解 derived id）。
+import {
+  technicalRequirementsCreateTechnicalRequirement,
+  technicalRequirementsDeleteTechnicalRequirement,
+  technicalRequirementsListTechnicalRequirements,
+  technicalRequirementsUpdateTechnicalRequirement,
+} from '@/api/endpoints/technical-requirements/technical-requirements'
+import {
+  inspectionDictionaryListObjects,
+  inspectionDictionaryListParameters,
+} from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+import type {
+  CreateTechnicalRequirementRequest,
+  TechnicalRequirement,
+  UpdateTechnicalRequirementRequest,
+} from '@/api/endpoints/model'
 import { ConfirmModal } from '@/components/ConfirmModal'
 import {
   TwoLevelObjectStandardTree,
   type TreeListItem,
 } from './TwoLevelObjectStandardTree'
 
-interface TechRow extends TreeListItem {
+/** 行结构 = 契约 TechnicalRequirement + 后端列表补列的 derived id
+ *  （tr-<obj>-<param>-<std>，仅作 React key/拖拽 id 用，不再用于寻址）。 */
+interface TechRow extends TechnicalRequirement, TreeListItem {
   id: string
-  inspectionObjectCode: string
-  inspectionParameterCode: string
-  objectName?: string
   parameterName?: string
-  judgmentStandardCode: string
-  brand?: string
-  model?: string
-  grade?: string
-  spec?: string
-  minValue?: number
-  maxValue?: number
-  comparison: string
-  remark?: string
 }
 
 interface Opt {
@@ -60,7 +64,8 @@ export function TechnicalRequirementList({
   deleteDataFn?: string
 } = {}) {
   const [open, setOpen] = useState(false)
-  const [editId, setEditId] = useState<string | null>(null)
+  // 编辑中的原始行：PUT 复合键寻址用行内三段键，不再持有 derived id。
+  const [editRow, setEditRow] = useState<TechRow | null>(null)
   const [form, setForm] = useState<Record<string, string>>(emptyForm)
   const [error, setError] = useState<string | null>(null)
   const [objects, setObjects] = useState<Opt[]>([])
@@ -69,8 +74,8 @@ export function TechnicalRequirementList({
   const [listVersion, setListVersion] = useState(0)
 
   useEffect(() => {
-    apiClient.get<{ items: Opt[] }>(API_ROUTES['/inspection-objects'], { params: { page: 1, pageSize: '1000' } }).then((r) => setObjects(r.data?.items ?? [])).catch(() => {})
-    apiClient.get<{ items: Opt[] }>(API_ROUTES['/inspection-parameters'], { params: { page: 1, pageSize: '1000' } }).then((r) => setParams(r.data?.items ?? [])).catch(() => {})
+    inspectionDictionaryListObjects({ page: 1, pageSize: 1000 }).then((r) => setObjects((r.items ?? []) as Opt[])).catch(() => {})
+    inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }).then((r) => setParams((r.items ?? []) as Opt[])).catch(() => {})
   }, [])
 
   const reloadList = () => {
@@ -81,14 +86,14 @@ export function TechnicalRequirementList({
   }
 
   const openCreate = () => {
-    setEditId(null)
+    setEditRow(null)
     setForm({ ...emptyForm, judgmentStandardCode: selectedStandard ?? '' })
     setError(null)
     setOpen(true)
   }
 
   const openEdit = (row: TechRow) => {
-    setEditId(row.id)
+    setEditRow(row)
     setForm({
       inspectionObjectCode: row.inspectionObjectCode,
       inspectionParameterCode: row.inspectionParameterCode,
@@ -108,22 +113,42 @@ export function TechnicalRequirementList({
 
   const save = async () => {
     setError(null)
-    const payload = {
-      inspectionObjectCode: form.inspectionObjectCode,
-      inspectionParameterCode: form.inspectionParameterCode,
-      judgmentStandardCode: form.judgmentStandardCode,
-      brand: form.brand || undefined,
-      model: form.model || undefined,
-      grade: form.grade || undefined,
-      spec: form.spec || undefined,
-      minValue: form.minValue === '' ? undefined : Number(form.minValue),
-      maxValue: form.maxValue === '' ? undefined : Number(form.maxValue),
-      comparison: form.comparison,
-      remark: form.remark || undefined,
-    }
     try {
-      if (editId) await apiClient.put(`${API_ROUTES['/inspection-technical-requirements']}/${editId}`, payload)
-      else await apiClient.post(API_ROUTES['/inspection-technical-requirements'], payload)
+      if (editRow) {
+        // 契约 UpdateTechnicalRequirementRequest 不含三段键字段（键在 path 上），
+        // 检测项目/检测参数在编辑态语义上不可改（后端按原键定位）。
+        const payload: UpdateTechnicalRequirementRequest = {
+          brand: form.brand || undefined,
+          model: form.model || undefined,
+          grade: form.grade || undefined,
+          spec: form.spec || undefined,
+          minValue: form.minValue === '' ? undefined : Number(form.minValue),
+          maxValue: form.maxValue === '' ? undefined : Number(form.maxValue),
+          comparison: form.comparison as UpdateTechnicalRequirementRequest['comparison'],
+          remark: form.remark || undefined,
+        }
+        await technicalRequirementsUpdateTechnicalRequirement(
+          editRow.inspectionObjectCode,
+          editRow.inspectionParameterCode,
+          editRow.judgmentStandardCode,
+          payload,
+        )
+      } else {
+        const payload: CreateTechnicalRequirementRequest = {
+          inspectionObjectCode: form.inspectionObjectCode,
+          inspectionParameterCode: form.inspectionParameterCode,
+          judgmentStandardCode: form.judgmentStandardCode,
+          brand: form.brand || undefined,
+          model: form.model || undefined,
+          grade: form.grade || undefined,
+          spec: form.spec || undefined,
+          minValue: form.minValue === '' ? undefined : Number(form.minValue),
+          maxValue: form.maxValue === '' ? undefined : Number(form.maxValue),
+          comparison: form.comparison as CreateTechnicalRequirementRequest['comparison'],
+          remark: form.remark || undefined,
+        }
+        await technicalRequirementsCreateTechnicalRequirement(payload)
+      }
       setOpen(false)
       if (selectedStandard) reloadList()
     } catch (err: unknown) {
@@ -131,13 +156,15 @@ export function TechnicalRequirementList({
     }
   }
 
-  const remove = async (id: string) => {
+  const remove = async (row: TechRow) => {
     if (!confirm('确定删除？')) return
-    await apiClient.delete(`${API_ROUTES['/inspection-technical-requirements']}/${id}`)
+    await technicalRequirementsDeleteTechnicalRequirement(
+      row.inspectionObjectCode,
+      row.inspectionParameterCode,
+      row.judgmentStandardCode,
+    )
     if (selectedStandard) reloadList()
   }
-
-  const buildPutBody = (_item: TechRow, sortOrder: number) => ({ sortOrder })
 
   return (
     // @entry M06.F06.I01 技术要求列表页（检测能力模块的「技术要求」路由 /inspection-technical-requirements）
@@ -147,8 +174,12 @@ export function TechnicalRequirementList({
       <TwoLevelObjectStandardTree<TechRow>
         title="技术要求"
         dataFn={dataFn}
-        listEndpoint="/inspection-technical-requirements"
-        listFilterParam="judgmentStandardCode"
+        listName="technical-requirements"
+        listFn={(standardCode) =>
+          technicalRequirementsListTechnicalRequirements({
+            judgmentStandardCode: standardCode,
+          }).then((rows) => (rows ?? []) as TechRow[])
+        }
         createDataFn={createDataFn}
         editDataFn={editDataFn}
         deleteDataFn={deleteDataFn}
@@ -164,38 +195,37 @@ export function TechnicalRequirementList({
           { key: 'maxValue', label: '上限', width: 'w-20', align: 'right' },
           { key: 'minValue', label: '下限', width: 'w-20', align: 'right' },
         ]}
-        buildPutBody={buildPutBody}
         reloadSignal={listVersion}
         selectedStandard={selectedStandard}
         onSelectedStandardChange={setSelectedStandard}
         onCreate={openCreate}
         onEdit={openEdit}
-        onDelete={(it) => remove(it.id)}
+        onDelete={remove}
       />
 
       <ConfirmModal
         open={open}
-        title={editId ? '编辑技术要求' : '新建技术要求'}
+        title={editRow ? '编辑技术要求' : '新建技术要求'}
         message={
           <div className="space-y-3 text-left text-sm">
             {error && <div role="alert" className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</div>}
             <label className="block">
               <span className="text-xs text-gray-600">检测项目</span>
-              <select aria-label="检测项目" value={form.inspectionObjectCode} onChange={(e) => setForm({ ...form, inspectionObjectCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5">
+              <select aria-label="检测项目" value={form.inspectionObjectCode} disabled={Boolean(editRow)} onChange={(e) => setForm({ ...form, inspectionObjectCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5 disabled:bg-gray-100">
                 <option value="">选择检测项目</option>
                 {objects.map((o) => <option key={o.code} value={o.code}>{o.name}</option>)}
               </select>
             </label>
             <label className="block">
               <span className="text-xs text-gray-600">检测参数</span>
-              <select aria-label="检测参数" value={form.inspectionParameterCode} onChange={(e) => setForm({ ...form, inspectionParameterCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5">
+              <select aria-label="检测参数" value={form.inspectionParameterCode} disabled={Boolean(editRow)} onChange={(e) => setForm({ ...form, inspectionParameterCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5 disabled:bg-gray-100">
                 <option value="">选择检测参数</option>
                 {params.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}
               </select>
             </label>
             <label className="block">
               <span className="text-xs text-gray-600">判定标准</span>
-              <input aria-label="判定标准" value={form.judgmentStandardCode} onChange={(e) => setForm({ ...form, judgmentStandardCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5 font-mono" placeholder="如 GB/T 228.1-2021" />
+              <input aria-label="判定标准" value={form.judgmentStandardCode} disabled={Boolean(editRow)} onChange={(e) => setForm({ ...form, judgmentStandardCode: e.target.value })} className="mt-1 w-full border rounded px-2 py-1.5 font-mono disabled:bg-gray-100" placeholder="如 GB/T 228.1-2021" />
             </label>
             <div className="grid grid-cols-2 gap-2">
               <label className="block">

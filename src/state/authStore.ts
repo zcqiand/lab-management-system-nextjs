@@ -1,11 +1,28 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { AuthState } from '@/types/store'
-import type { User } from '@/types/api'
-import { identityClient, setToken, API_ROUTES } from '@/api/legacy-client'
+import type { CurrentUser } from '@/api/endpoints/model'
+import { authLogin, authGetPermissions } from '@/api/endpoints/auth/auth'
+
+/**
+ * 认证会话的用户视图（lab 侧）——契约 CurrentUser 加 permissions 快照。
+ * permissions 由 GET /api/auth/permissions 在 SSO 会话建立时并入（M01.F05.I04），
+ * 契约里它属于 PermissionSet 端点而非 CurrentUser 本体，故在此扩展而非改契约镜像。
+ */
+export type User = CurrentUser & { permissions?: string[] }
+
+/** 认证状态机 */
+type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error'
+
+/** 认证状态切片（原 @/types/store AuthState，TSOT 清理 Phase C2 内联） */
+interface AuthState {
+  user: User | null
+  token: string | null
+  status: AuthStatus
+  error: string | null
+}
 
 interface AuthActions {
-  /** 登录（用户名+密码）→ POST saas /auth/login（同 SSO 同源）；成功后存 token/user 并同步 apiClient */
+  /** 登录（用户名+密码）→ POST /api/auth/login；成功后存 token/user 并同步 axios 拦截器 token 源（localStorage） */
   login: (username: string, password: string) => Promise<void>
   /** SSO 会话：用身份平台签发的 token+user 建立会话，并拉取权限集 */
   acceptSsoSession: (token: string, user: User) => Promise<void>
@@ -38,17 +55,11 @@ export const useAuthStore = create<AuthStore>()(
       login: async (username, password) => {
         set({ status: 'loading', error: null })
         try {
-          // 委托 saas 身份平台：用户名密码登录走 identityClient（同 SSO 同源），
-          // lab 不持有用户密码、改密归 saas（M01.F03.I04 已废弃）。
-          const res = await identityClient.post<{ token: string; user: User }>(
-            API_ROUTES['/auth/login'],
-            { username, password },
-          )
-          const { token, user } = res.data
-          setToken(token)
-          set({ user, token, status: 'authenticated', error: null })
+          // 委托身份端点：用户名密码登录走 orval authLogin（全局 axios 拦截器
+          // 注入 baseURL；lab 不持有用户密码、改密归 saas，M01.F03.I04 已废弃）。
+          const { token, user } = await authLogin({ username, password })
+          set({ user: { ...user, permissions: [] }, token, status: 'authenticated', error: null })
         } catch (err) {
-          setToken(null)
           set({
             user: null,
             token: null,
@@ -62,16 +73,9 @@ export const useAuthStore = create<AuthStore>()(
       //   SSO 回调（/login?code=&state=）拿到 token+user 后建会话：写 token，
       //   拉 /auth/permissions 拿权限集并入 user，标记 authenticated。
       acceptSsoSession: async (token, user) => {
-        setToken(token)
         try {
-          const res = await identityClient.get<{ permissions: string[] }>(
-            API_ROUTES['/auth/permissions'],
-            // saas v0.3.0.1 契约：租户键名从 orgId 改为 departmentId。
-            // 同 tenantId 兼容读（payload.departmentId ?? payload.tenantId ?? payload.orgId），
-            // 这里只负责发起请求，兼容读在 ssoClient/jwt 层处理。
-            { params: { departmentId: 'org-lab-root' } },
-          )
-          const permissions = res.data.permissions ?? user.permissions
+          const resp = await authGetPermissions()
+          const permissions = resp.permissions ?? user.permissions
           set({
             user: { ...user, permissions },
             token,
@@ -84,7 +88,6 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
-        setToken(null)
         set({ user: null, token: null, status: 'idle', error: null })
       },
 

@@ -1,4 +1,4 @@
-import type { ParamInterfaceRow, ParamInterfaceLink } from '@/types/common'
+import type { ParamInterface as ParamInterfaceRow, ParamInterfaceLink } from '@/api/endpoints/model'
 
 /**
  * 把「参数↔界面」关联派发成「参数 → 界面组件」查找表。

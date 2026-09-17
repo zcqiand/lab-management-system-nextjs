@@ -1,7 +1,20 @@
 import { create } from 'zustand'
-import type { ContractState } from '@/types/store'
-import type { Contract, ContractStatus } from '@/types/api'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
+import type { Contract, ContractStatus } from '@/api/endpoints/model'
+import {
+  contractsListContracts,
+  contractsCreateContract,
+  contractsUpdateContract,
+  contractsDeleteContract,
+} from '@/api/endpoints/contracts/contracts'
+
+/** 合同 store 状态切片（原 @/types/store ContractState，TSOT 清理 Phase C2 内联） */
+interface ContractState {
+  list: Contract[]
+  total: number
+  current: Contract | null
+  loading: boolean
+  error: string | null
+}
 
 interface ContractActions {
   fetchContracts: (query: { page: number; pageSize: number; keyword?: string; status?: ContractStatus }) => Promise<void>
@@ -33,17 +46,13 @@ export const useContractStore = create<ContractStore>()((set, get) => ({
   fetchContracts: async (query) => {
     set({ loading: true, error: null })
     try {
-      const params: Record<string, string> = {
-        page: String(query.page),
-        pageSize: String(query.pageSize),
-      }
-      if (query.keyword) params.keyword = query.keyword
-      if (query.status) params.status = query.status
-      const res = await apiClient.get<{ items: Contract[]; total: number; page: number; pageSize: number }>(
-        API_ROUTES['/contracts'],
-        { params },
-      )
-      set({ list: res.data.items, total: res.data.total, loading: false, error: null })
+      const res = await contractsListContracts({
+        page: query.page,
+        pageSize: query.pageSize,
+        keyword: query.keyword,
+        status: query.status,
+      })
+      set({ list: res.items, total: res.total, loading: false, error: null })
     } catch (err) {
       set({ loading: false, error: extractErrorMessage(err) })
     }
@@ -52,8 +61,8 @@ export const useContractStore = create<ContractStore>()((set, get) => ({
   createContract: async (input) => {
     set({ error: null })
     try {
-      const res = await apiClient.post<Contract>(API_ROUTES['/contracts'], input)
-      set({ list: [res.data, ...get().list], total: get().total + 1, error: null })
+      const created = await contractsCreateContract(input)
+      set({ list: [created, ...get().list], total: get().total + 1, error: null })
     } catch (err) {
       set({ error: extractErrorMessage(err) })
     }
@@ -62,10 +71,10 @@ export const useContractStore = create<ContractStore>()((set, get) => ({
   updateContract: async (id, input) => {
     set({ error: null })
     try {
-      const res = await apiClient.put<Contract>(`${API_ROUTES['/contracts']}/${id}`, input)
+      const updated = await contractsUpdateContract(id, input)
       set({
-        list: get().list.map((c) => (c.id === id ? res.data : c)),
-        current: get().current?.id === id ? res.data : get().current,
+        list: get().list.map((c) => (c.id === id ? updated : c)),
+        current: get().current?.id === id ? updated : get().current,
         error: null,
       })
     } catch (err) {
@@ -76,7 +85,7 @@ export const useContractStore = create<ContractStore>()((set, get) => ({
   deleteContract: async (id) => {
     set({ error: null })
     try {
-      await apiClient.delete(`${API_ROUTES['/contracts']}/${id}`)
+      await contractsDeleteContract(id)
       set({
         list: get().list.filter((c) => c.id !== id),
         total: Math.max(0, get().total - 1),

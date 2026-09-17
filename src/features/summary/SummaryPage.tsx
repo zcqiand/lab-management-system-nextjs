@@ -7,34 +7,19 @@
 //
 // UI 顺序：仪表盘容器(I02) → 核心指标(I03) → 任务漏斗(I04) → 报告类别筛选 + 汇总表(I01)
 import { useEffect, useState } from "react";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
-import type { SummaryColumn, SummaryData } from "@/types/process/summary";
-import type { InspectionReportName } from "@/types/inspection/inspection-report-name";
+import type {
+  DashboardStats,
+  InspectionReportName,
+  SummaryColumn,
+  SummaryData,
+} from "@/api/endpoints/model";
+import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
+import {
+  summaryGetDashboardStats,
+  summaryGetReportSummary,
+} from "@/api/endpoints/summary/summary";
 
-// ——— stats 端点形状 ———
-interface StatsResponse {
-  todayTestCount: number;
-  qualifiedRateByMaterial: {
-    concrete: { total: number; pass: number; rate: number };
-    rebar: { total: number; pass: number; rate: number };
-    sand: { total: number; pass: number; rate: number };
-  };
-  reportOutputByStatus: {
-    generated: number;
-    pending: number;
-    issued: number;
-  };
-  funnelByStage: {
-    pending_collect: number;
-    received: number;
-    testing: number;
-    reporting: number;
-    reviewing: number;
-    issued: number;
-  };
-}
-
-const FUNNEL_LABELS: Array<{ key: keyof StatsResponse["funnelByStage"]; label: string }> = [
+const FUNNEL_LABELS: Array<{ key: keyof DashboardStats["funnelByStage"]; label: string }> = [
   { key: "pending_collect", label: "待取样" },
   { key: "received", label: "已收样" },
   { key: "testing", label: "试验中" },
@@ -44,7 +29,7 @@ const FUNNEL_LABELS: Array<{ key: keyof StatsResponse["funnelByStage"]; label: s
 ];
 
 const MATERIAL_LABELS: Array<{
-  key: keyof StatsResponse["qualifiedRateByMaterial"];
+  key: keyof DashboardStats["qualifiedRateByMaterial"];
   label: string;
 }> = [
   { key: "concrete", label: "混凝土" },
@@ -56,19 +41,11 @@ function pct(n: number): string {
   return `${(n * 100).toFixed(1)}%`;
 }
 
-function pickItems(body: unknown): InspectionReportName[] {
-  if (Array.isArray(body)) return body;
-  if (body && typeof body === "object" && "items" in body && Array.isArray((body as { items: unknown }).items)) {
-    return (body as { items: InspectionReportName[] }).items;
-  }
-  return [];
-}
-
 export function SummaryPage() {
   const [reportNames, setReportNames] = useState<InspectionReportName[]>([]);
   const [categoryCode, setCategoryCode] = useState<string>("ALL");
   const [data, setData] = useState<SummaryData | null>(null);
-  const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,8 +54,8 @@ export function SummaryPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await apiClient.get(API_ROUTES["/report-names"]);
-        if (!cancelled) setReportNames(pickItems(res.data));
+        const res = await reportNamesListReportNames();
+        if (!cancelled) setReportNames(res.items ?? []);
       } catch (e) {
         if (!cancelled) setError(String(e));
       }
@@ -91,8 +68,8 @@ export function SummaryPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await apiClient.get(API_ROUTES["/summary/stats"]);
-        if (!cancelled) setStats(res.data as StatsResponse);
+        const res = await summaryGetDashboardStats();
+        if (!cancelled) setStats(res);
       } catch (e) {
         if (!cancelled) setError(String(e));
       }
@@ -107,9 +84,8 @@ export function SummaryPage() {
     setError(null);
     (async () => {
       try {
-        const url = `${API_ROUTES["/summary"]}?categoryCode=${encodeURIComponent(categoryCode)}`;
-        const res = await apiClient.get(url);
-        if (!cancelled) setData(res.data as SummaryData);
+        const res = await summaryGetReportSummary({ categoryCode });
+        if (!cancelled) setData(res);
       } catch (e) {
         if (!cancelled) setError(String(e));
       } finally {
@@ -299,7 +275,7 @@ function MetricCard({
 }
 
 // ——— FunnelChart 子组件（水平条形 + 累计计数）———
-function FunnelChart({ counts }: { counts: StatsResponse["funnelByStage"] }) {
+function FunnelChart({ counts }: { counts: DashboardStats["funnelByStage"] }) {
   const total = FUNNEL_LABELS.reduce((acc, s) => acc + counts[s.key], 0);
   if (total === 0) {
     return (

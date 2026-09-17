@@ -1,19 +1,30 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
 import { useAuthStore } from "@/state/authStore";
-import {
-  FLOW_STAGE_LABELS,
-  FLOW_STAGE_ORDER,
-  type FlowAction,
-  type FlowActionResult,
-  type FlowStage,
-  type SampleReceipt,
-  type Contract,
-  type InspectionReportName,
-} from "@/types/api";
+import { contractsListContracts } from "@/api/endpoints/contracts/contracts";
+import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
+import { receiptsListReceipts } from "@/api/endpoints/receipts/receipts";
+import type {
+  Contract,
+  FlowAction,
+  FlowStatus,
+  InspectionReportName,
+  ReceiptsListReceiptsParams,
+  SampleReceipt,
+} from "@/api/endpoints/model";
+import { ACT_BY_STAGE, FLOW_STAGE_LABELS, FLOW_STAGE_ORDER } from "./flow-stages";
 
 const PAGE_SIZE = 10;
+
+/**
+ * receipts list 的查询参数（shared 契约 ReceiptsListReceiptsParams 之外的后端支持项）：
+ * filter（三态过滤）/ lastSubmittedBy（「我提交的」撤回视图）在后端 route 已实现，
+ * 但尚未进 shared tsp —— 先在消费侧以交集类型显式声明（非字面量兜底，见汇报）。
+ */
+type ReceiptListQuery = ReceiptsListReceiptsParams & {
+  filter?: string;
+  lastSubmittedBy?: string;
+};
 
 function ResultLabel({ result }: { result?: string }) {
   if (result === "pass") return <span className="text-green-600">合格</span>;
@@ -21,18 +32,13 @@ function ResultLabel({ result }: { result?: string }) {
   return <span className="text-gray-400">—</span>;
 }
 
-interface PageResp {
-  items: SampleReceipt[];
-  total: number;
-}
-
 export type StageFilter = "all" | "not_yet" | "submitted";
 
 export interface FlowStagePageProps {
   /** 页面标题（如「报告审核」） */
   title: string;
-  /** 本页面对应的流程阶段（不填则显示全部，不按阶段过滤） */
-  stage?: FlowStage;
+  /** 本页面对应的流程阶段（不填则显示全部，不按阶段过滤；act 动作按 receiving 端点） */
+  stage?: FlowStatus;
   /** 三态过滤器：有 stage 时默认 not_yet，无 stage 时默认 all */
   defaultFilter?: StageFilter;
   /** 标题右侧说明文字 */
@@ -92,15 +98,17 @@ export function FlowStagePage({
   nextStageLabel,
 }: FlowStagePageProps) {
   const user = useAuthStore((s) => s.user);
-  const operator = user?.id ?? user?.username ?? "anonymous";
+  // operator 取登录态（id/username 二选一）；缺失不兜底字面量（ADR-0019）——
+  // runFlow 入口 fail-fast 提示，按钮照常可点但动作被拦。
+  const operator = user?.id ?? user?.username ?? null;
   const navigate = useRouter();
 
   const stageIdx = stage ? FLOW_STAGE_ORDER.indexOf(stage) : -1;
   const nextStage = stage
-    ? (FLOW_STAGE_ORDER[stageIdx + 1] as FlowStage | undefined)
+    ? (FLOW_STAGE_ORDER[stageIdx + 1] as FlowStatus | undefined)
     : undefined;
   const prevStage = stage
-    ? (FLOW_STAGE_ORDER[stageIdx - 1] as FlowStage | undefined)
+    ? (FLOW_STAGE_ORDER[stageIdx - 1] as FlowStatus | undefined)
     : undefined;
   const allowSubmit = canSubmit ?? Boolean(nextStage);
   const allowReturn = canReturn ?? Boolean(prevStage);
@@ -128,13 +136,11 @@ export function FlowStagePage({
   const [reportNames, setReportNames] = useState<InspectionReportName[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
   useEffect(() => {
-    apiClient
-      .get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], { params: { page: 1, pageSize: 200 } })
-      .then((r) => setReportNames(Array.isArray(r.data?.items) ? r.data.items : []))
+    reportNamesListReportNames({ page: 1, pageSize: 200 })
+      .then((r) => setReportNames(Array.isArray(r?.items) ? r.items : []))
       .catch(() => setReportNames([]));
-    apiClient
-      .get<{ items: Contract[] }>(API_ROUTES['/contracts'], { params: { page: 1, pageSize: 200 } })
-      .then((r) => setContracts(Array.isArray(r.data?.items) ? r.data.items : []))
+    contractsListContracts({ page: 1, pageSize: 200 })
+      .then((r) => setContracts(Array.isArray(r?.items) ? r.items : []))
       .catch(() => setContracts([]));
   }, []);
   // 老种子数据 categoryCode 仍是 MaterialType 编码（steel/concrete/...），非 RN-xxx，
@@ -160,17 +166,17 @@ export function FlowStagePage({
       setLoading(true);
       setError(null);
       try {
-        const params: Record<string, string> = {
-          page: String(p),
-          pageSize: String(PAGE_SIZE),
+        const params: ReceiptListQuery = {
+          page: p,
+          pageSize: PAGE_SIZE,
         };
         if (stage) params.flowStatus = stage;
         if (kw) params.keyword = kw;
         if (filter !== "all") params.filter = filter;
-        const res = await apiClient.get<PageResp>(API_ROUTES['/receipts'], { params });
-        // 防御：非 JSON 响应（如 HTML fallback 页）时 res.data.items 为 undefined
-        setList(Array.isArray(res.data?.items) ? res.data.items : []);
-        setTotal(res.data?.total ?? 0);
+        const res = await receiptsListReceipts(params);
+        // 防御：非 JSON 响应（如 HTML fallback 页）时 items 为 undefined
+        setList(Array.isArray(res?.items) ? res.items : []);
+        setTotal(res?.total ?? 0);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "加载失败");
       } finally {
@@ -181,20 +187,19 @@ export function FlowStagePage({
   );
 
   const fetchSubmitted = useCallback(async () => {
-    if (!nextStage) {
+    if (!nextStage || !operator) {
       setSubmittedList([]);
       return;
     }
     try {
-      const res = await apiClient.get<PageResp>(API_ROUTES['/receipts'], {
-        params: {
-          page: "1",
-          pageSize: "100",
-          flowStatus: nextStage,
-          lastSubmittedBy: operator,
-        },
-      });
-      setSubmittedList(Array.isArray(res.data?.items) ? res.data.items : []);
+      const params: ReceiptListQuery = {
+        page: 1,
+        pageSize: 100,
+        flowStatus: nextStage,
+        lastSubmittedBy: operator,
+      };
+      const res = await receiptsListReceipts(params);
+      setSubmittedList(Array.isArray(res?.items) ? res.items : []);
     } catch {
       setSubmittedList([]);
     }
@@ -221,19 +226,18 @@ export function FlowStagePage({
 
   const runFlow = async (action: FlowAction, ids: string[]) => {
     if (ids.length === 0) return;
+    if (!operator) {
+      setError("未登录：缺少操作人身份，无法执行流程操作");
+      return;
+    }
     setProcessing(true);
     setError(null);
     setNotice(null);
     try {
-      const res = await apiClient.post<{ results: FlowActionResult[] }>(
-        API_ROUTES['/receipts/flow'],
-        {
-          action,
-          ids,
-          operator,
-        },
-      );
-      const results = res.data.results;
+      // M03 7 阶段全 act 模式（ADR-0035）：按本页 stage 调对应 act 端点，
+      // 后端 stage-guard 校验单据必须停在本阶段；响应是 FlowActionResult[] 裸数组。
+      const act = ACT_BY_STAGE[stage ?? "receiving"];
+      const results = await act({ action, ids, operator });
       const failed = results.filter((r) => !r.ok);
       const okCount = results.length - failed.length;
       const actionLabel =

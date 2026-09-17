@@ -1,14 +1,145 @@
 "use client";
 // REF src/features/inspection-capability/AssociationManager.tsx 移植。
-// 差异：apiClient → @/api/legacy-client；REF 字面路由经 route() 查 API_ROUTES
-// （junction 端点映射到 lab-msw /api/inspection/links/* 等，键与 REF 字面量一致）。
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数。
+// REF 字面 junction/主表路由 → 契约端点的分发表在文件顶部（键封闭，4 类 junction
+// + 3 张主表）；组件 Props 形状保持不变（调用方 ReportNameList / ParamInterfaceList
+// 不感知迁移）。unlink 按 SSOT 走 @body（不再带 query 双发）。
 import { useEffect, useState } from "react";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
+import {
+  inspectionDictionaryLinkObjectParameter,
+  inspectionDictionaryLinkObjectStandard,
+  inspectionDictionaryLinkSpecialtyObject,
+  inspectionDictionaryLinkStandardParameter,
+  inspectionDictionaryListObjectParameterLinks,
+  inspectionDictionaryListObjectStandardLinks,
+  inspectionDictionaryListObjects,
+  inspectionDictionaryListParameters,
+  inspectionDictionaryListSpecialtyObjectLinks,
+  inspectionDictionaryListStandardParameterLinks,
+  inspectionDictionaryListStandards,
+  inspectionDictionaryUnlinkObjectParameter,
+  inspectionDictionaryUnlinkObjectStandard,
+  inspectionDictionaryUnlinkSpecialtyObject,
+  inspectionDictionaryUnlinkStandardParameter,
+} from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
+import {
+  paramInterfacesLinkParamInterface,
+  paramInterfacesListParamInterfaceLinks,
+  paramInterfacesUnlinkParamInterface,
+} from "@/api/endpoints/param-interfaces/param-interfaces";
+import {
+  reportNamesLinkObjectReportName,
+  reportNamesLinkReportNameParameter,
+  reportNamesLinkReportNameStandard,
+  reportNamesListObjectReportNameLinks,
+  reportNamesListReportNameParameterLinks,
+  reportNamesListReportNameStandardLinks,
+  reportNamesUnlinkObjectReportName,
+  reportNamesUnlinkReportNameParameter,
+  reportNamesUnlinkReportNameStandard,
+} from "@/api/endpoints/report-names/report-names";
+import type {
+  ObjectParameterLink,
+  ObjectReportNameLink,
+  ObjectStandardLink,
+  ParamInterfaceLink,
+  ParamInterfacesUnlinkParamInterfaceBody,
+  ReportNameParameterLink,
+  ReportNameStandardLink,
+  ReportNamesListObjectReportNameLinksParams,
+  ReportNamesListReportNameParameterLinksParams,
+  ReportNamesListReportNameStandardLinksParams,
+  ReportNamesUnlinkObjectReportNameBody,
+  ReportNamesUnlinkReportNameParameterBody,
+  ReportNamesUnlinkReportNameStandardBody,
+  SpecialtyObjectLink,
+  StandardParameterLink,
+} from "@/api/endpoints/model";
 
-/** REF 字面路由 → lab-msw 路由；未登记的回退原样（防御）。 */
-function route(p: string): string {
-  return (API_ROUTES as Record<string, string>)[p] ?? p;
-}
+type Row = Record<string, string>;
+
+/** 8 类 junction 的契约 link CRUD（list 已按 parentCode 过滤）。 */
+const JUNCTION_API: Record<
+  string,
+  {
+    list: (parentCode: string) => Promise<Row[]>;
+    add: (payload: Row) => Promise<unknown>;
+    remove: (payload: Row) => Promise<unknown>;
+  }
+> = {
+  "/inspection-object-report-names": {
+    list: (parentCode) =>
+      reportNamesListObjectReportNameLinks({
+        reportNameCode: parentCode,
+      } satisfies ReportNamesListObjectReportNameLinksParams).then(
+        (r) => (r.items ?? []) as Row[],
+      ),
+    add: (p) =>
+      reportNamesLinkObjectReportName(p as unknown as ObjectReportNameLink),
+    remove: (p) =>
+      reportNamesUnlinkObjectReportName(
+        p as unknown as ReportNamesUnlinkObjectReportNameBody,
+      ),
+  },
+  "/inspection-report-name-standards": {
+    list: (parentCode) =>
+      reportNamesListReportNameStandardLinks({
+        reportNameCode: parentCode,
+      } satisfies ReportNamesListReportNameStandardLinksParams).then(
+        (r) => (r.items ?? []) as Row[],
+      ),
+    add: (p) =>
+      reportNamesLinkReportNameStandard(p as unknown as ReportNameStandardLink),
+    remove: (p) =>
+      reportNamesUnlinkReportNameStandard(
+        p as unknown as ReportNamesUnlinkReportNameStandardBody,
+      ),
+  },
+  "/inspection-report-name-parameters": {
+    list: (parentCode) =>
+      reportNamesListReportNameParameterLinks({
+        reportNameCode: parentCode,
+      } satisfies ReportNamesListReportNameParameterLinksParams).then(
+        (r) => (r.items ?? []) as Row[],
+      ),
+    add: (p) =>
+      reportNamesLinkReportNameParameter(
+        p as unknown as ReportNameParameterLink,
+      ),
+    remove: (p) =>
+      reportNamesUnlinkReportNameParameter(
+        p as unknown as ReportNamesUnlinkReportNameParameterBody,
+      ),
+  },
+  "/inspection-parameter-param-interfaces": {
+    list: (parentCode) =>
+      paramInterfacesListParamInterfaceLinks({
+        paramInterfaceCode: parentCode,
+      }).then((r) => (r.items ?? []) as Row[]),
+    add: (p) =>
+      paramInterfacesLinkParamInterface(p as unknown as ParamInterfaceLink),
+    remove: (p) =>
+      paramInterfacesUnlinkParamInterface(
+        p as unknown as ParamInterfacesUnlinkParamInterfaceBody,
+      ),
+  },
+};
+
+/** 下拉数据源主表（契约 list 端点，1 页大页拉全量）。 */
+const MASTER_LIST: Record<string, () => Promise<Row[]>> = {
+  "/inspection-objects": () =>
+    inspectionDictionaryListObjects({ page: 1, pageSize: 1000 }).then(
+      (r) => (r.items ?? []) as Row[],
+    ),
+  "/inspection-standards": () =>
+    inspectionDictionaryListStandards({ page: 1, pageSize: 1000 }).then(
+      (r) => (r.items ?? []) as Row[],
+    ),
+  "/inspection-parameters": () =>
+    inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }).then(
+      (r) => (r.items ?? []) as Row[],
+    ),
+};
 
 interface ExtraField {
   name: string;
@@ -27,19 +158,19 @@ interface ExtraField {
 
 /**
  * prefilter：在 target 下拉之前加一层过滤（如 先选「检测项目」再选「检测参数」）。
- * 工作机制：选 prefilter 值 → 拉 `filterEndpoint?{filterParamKey}=value` → 拿到 filterResultKey 集合 → 用来过滤 target 下拉。
+ * 工作机制：选 prefilter 值 → 按 filterEndpoint 反查 filterResultKey 集合 → 用来过滤 target 下拉。
  * 实际写入目标的 payload 不含 prefilter 字段——prefilter 只是 UI 收敛手段，不改 API 契约。
  */
 interface PrefilterConfig {
   /** prefilter 下拉的标签，如 "检测项目" */
   label: string;
-  /** prefilter 列表的 endpoint，如 /inspection-objects */
+  /** prefilter 列表来源（当前唯一用法：/inspection-objects） */
   endpoint: string;
   /** prefilter 选项 value 字段，如 code */
   valueKey: string;
   /** prefilter 选项显示字段，如 name */
   textKey: string;
-  /** prefilter 选中后，用来反查允许 target 集合的 endpoint，如 /inspection-object-parameters */
+  /** prefilter 选中后，用来反查允许 target 集合的 endpoint（当前唯一用法：/inspection-object-parameters） */
   filterEndpoint: string;
   /** 反查时用的 query param key（prefilter value 字段名），如 inspectionObjectCode */
   filterParamKey: string;
@@ -49,11 +180,11 @@ interface PrefilterConfig {
 
 interface Props {
   ariaLabel: string;
-  endpoint: string; // 如 /inspection-object-parameters
-  parentParam: string; // 如 inspectionObjectCode
+  endpoint: string; // 如 /inspection-object-report-names（查 JUNCTION_API）
+  parentParam: string; // 如 reportNameCode
   parentCode: string;
   targetLabel: string; // 如 "检测参数"
-  targetEndpoint: string; // 如 /inspection-parameters
+  targetEndpoint: string; // 如 /inspection-parameters（查 MASTER_LIST）
   targetParam: string; // 如 inspectionParameterCode
   targetValueKey: string; // 目标下拉 value 字段（通常 code）
   targetTextKey: string; // 目标下拉 显示字段（通常 name）
@@ -63,8 +194,8 @@ interface Props {
   /** 可选：先选 prefilter 再选 target；设了就启用两级下拉 */
   prefilter?: PrefilterConfig;
   /**
-   * 可选：行渲染追加「· 对象名」。开启后会额外拉 `/inspection-object-parameters?pageSize=10000`
-   * 和 `/inspection-objects?pageSize=1000` 全量构建 parameterCode → objectNames[] 映射。
+   * 可选：行渲染追加「· 对象名」。开启后会额外拉 object-parameter links 和
+   * /api/inspection/objects 全量构建 parameterCode → objectNames[] 映射。
    * 用于"参数跨多对象"场景（如报告名称/参数界面的关联参数页签），让用户看到该参数所归属的检测项目。
    * 同一参数跨多对象时按对象名顺序拼接「· A · B」。默认 false（不拉不渲染）。
    */
@@ -89,9 +220,9 @@ export function AssociationManager(props: Props) {
     showParameterObjects = false,
     fnId,
   } = props;
-  const [rows, setRows] = useState<Array<Record<string, string>>>([]);
-  const [targets, setTargets] = useState<Array<Record<string, string>>>([]);
-  const [prefilterOptions, setPrefilterOptions] = useState<Array<Record<string, string>>>([]);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [targets, setTargets] = useState<Row[]>([]);
+  const [prefilterOptions, setPrefilterOptions] = useState<Row[]>([]);
   const [prefilterSelected, setPrefilterSelected] = useState("");
   const [allowedTargetCodes, setAllowedTargetCodes] = useState<Set<string> | null>(null);
   const [parameterObjectNames, setParameterObjectNames] = useState<Map<string, string[]>>(new Map());
@@ -101,46 +232,44 @@ export function AssociationManager(props: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const loadAll = () => {
-    apiClient
-      .get<{ items: Array<Record<string, string>> }>(route(endpoint), {
-        params: { [parentParam]: parentCode, page: 1, pageSize: "200" },
-      })
-      .then((res) => setRows(Array.isArray(res.data?.items) ? res.data.items : []))
+    const junction = JUNCTION_API[endpoint];
+    if (!junction) {
+      setError(`未知关联端点：${endpoint}`);
+      setRows([]);
+      return;
+    }
+    junction
+      .list(parentCode)
+      .then((items) => setRows(items))
       .catch(() => setError("加载失败"));
-    apiClient
-      .get<{ items: Array<Record<string, string>> }>(route(targetEndpoint), {
-        params: { page: 1, pageSize: "1000" },
-      })
-      .then((res) => setTargets(Array.isArray(res.data?.items) ? res.data.items : []))
-      .catch(() => {});
-    if (prefilter) {
-      apiClient
-        .get<{ items: Array<Record<string, string>> }>(route(prefilter.endpoint), {
-          params: { page: 1, pageSize: "1000" },
-        })
-        .then((res) =>
-          setPrefilterOptions(Array.isArray(res.data?.items) ? res.data.items : []),
-        )
+    const listTargets = MASTER_LIST[targetEndpoint];
+    if (listTargets) {
+      listTargets()
+        .then((items) => setTargets(items))
         .catch(() => {});
     }
+    if (prefilter) {
+      const listPrefilter = MASTER_LIST[prefilter.endpoint];
+      if (listPrefilter) {
+        listPrefilter()
+          .then((items) => setPrefilterOptions(items))
+          .catch(() => {});
+      }
+    }
     if (showParameterObjects) {
-      // 拉 inspection-object-parameters + inspection-objects 全量构建 parameterCode → objectNames[] 映射
+      // 拉 object-parameter links + /api/inspection/objects 全量构建 parameterCode → objectNames[] 映射
       Promise.all([
-        apiClient.get<{ items: Array<Record<string, string>> }>(route("/inspection-object-parameters"), {
-          params: { page: 1, pageSize: "10000" },
-        }),
-        apiClient.get<{ items: Array<Record<string, string>> }>(route("/inspection-objects"), {
-          params: { page: 1, pageSize: "1000" },
-        }),
+        inspectionDictionaryListObjectParameterLinks({}),
+        inspectionDictionaryListObjects({ page: 1, pageSize: 1000 }),
       ])
         .then(([iop, io]) => {
           const objectNameByCode = new Map<string, string>();
-          for (const o of io.data?.items ?? []) {
+          for (const o of (io.items ?? []) as Row[]) {
             const c = String(o.code ?? "");
             if (c) objectNameByCode.set(c, String(o.name ?? c));
           }
           const m = new Map<string, string[]>();
-          for (const r of iop.data?.items ?? []) {
+          for (const r of (iop.items ?? []) as Row[]) {
             const p = String(r.inspectionParameterCode ?? "");
             const o = String(r.inspectionObjectCode ?? "");
             if (!p || !o) continue;
@@ -162,7 +291,7 @@ export function AssociationManager(props: Props) {
   /* eslint-disable react-hooks/exhaustive-deps -- prefilter 是配置块 */
   useEffect(loadAll, [endpoint, parentParam, parentCode, targetEndpoint, prefilter?.endpoint, showParameterObjects]);
 
-  // prefilter 选中后，按 filterEndpoint 反查允许的 target 集合
+  // prefilter 选中后，反查允许的 target 集合（当前唯一形态：检测项目 → object-parameter links）
   useEffect(() => {
     if (!prefilter) {
       setAllowedTargetCodes(null);
@@ -173,13 +302,12 @@ export function AssociationManager(props: Props) {
       setSelected("");
       return;
     }
-    apiClient
-      .get<{ items: Array<Record<string, string>> }>(route(prefilter.filterEndpoint), {
-        params: { [prefilter.filterParamKey]: prefilterSelected, pageSize: "10000" },
-      })
+    inspectionDictionaryListObjectParameterLinks({
+      inspectionObjectCode: prefilterSelected,
+    })
       .then((res) => {
         const codes = new Set<string>();
-        for (const r of res.data?.items ?? []) {
+        for (const r of (res.items ?? []) as Row[]) {
           const c = r[prefilter.filterResultKey];
           if (c) codes.add(String(c));
         }
@@ -194,19 +322,25 @@ export function AssociationManager(props: Props) {
     if (!selected) return;
     setBusy(true);
     setError(null);
-    const payload: Record<string, unknown> = {
+    const junction = JUNCTION_API[endpoint];
+    if (!junction) {
+      setError(`未知关联端点：${endpoint}`);
+      setBusy(false);
+      return;
+    }
+    const payload: Row = {
       [parentParam]: parentCode,
       [targetParam]: selected,
       ...extra,
     };
     try {
-      const res = await apiClient.post(route(endpoint), payload);
+      const body = (await junction.add(payload)) as unknown;
       if (
-        res.data &&
-        typeof res.data === "object" &&
-        "message" in (res.data as { message?: string })
+        body &&
+        typeof body === "object" &&
+        "message" in (body as { message?: string })
       ) {
-        setError((res.data as { message: string }).message);
+        setError((body as { message: string }).message);
       } else {
         setSelected("");
         setExtra({});
@@ -222,21 +356,26 @@ export function AssociationManager(props: Props) {
     }
   };
 
-  const remove = async (targetCode: string, row: Record<string, string>) => {
+  const remove = async (targetCode: string, row: Row) => {
     setBusy(true);
     setError(null);
-    const params: Record<string, string> = {
+    const junction = JUNCTION_API[endpoint];
+    if (!junction) {
+      setError(`未知关联端点：${endpoint}`);
+      setBusy(false);
+      return;
+    }
+    const payload: Row = {
       [parentParam]: parentCode,
       [targetParam]: targetCode,
     };
     for (const f of extraFields) {
       const v = row[f.name];
-      if (v !== undefined) params[f.name] = v;
+      if (v !== undefined) payload[f.name] = v;
     }
     try {
-      // 契约 unlink（如 DELETE /api/param-interfaces/links）是 @body 语义；
-      // 同时带 query 兼容仍读 query 的消费方（REQ-2026-001）。
-      await apiClient.delete(route(endpoint), { params, data: params });
+      // 契约 unlink 是 @body 语义（REQ-2026-001 SSOT），不再双发 query。
+      await junction.remove(payload);
       loadAll();
     } catch (err: unknown) {
       setError(
@@ -262,7 +401,7 @@ export function AssociationManager(props: Props) {
           const groupingField = extraFields.find((f) => f.groupBy);
           if (groupingField) {
             // 按 groupingField 值聚合行；空值排到最后
-            const groups = new Map<string, Array<Record<string, string>>>();
+            const groups = new Map<string, Row[]>();
             for (const r of rows) {
               const k = r[groupingField.name] ?? "";
               const arr = groups.get(k) ?? [];

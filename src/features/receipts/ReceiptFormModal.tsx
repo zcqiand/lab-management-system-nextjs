@@ -1,14 +1,25 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
 import { useAuthStore } from '@/state/authStore'
 import { SampleManagerModal } from '@/features/samples/SampleManagerModal'
 import type {
   Contract,
-  SampleReceipt,
   InspectionParameter,
   InspectionReportName,
-} from '@/types/api'
-import type { InspectionStandard } from '@/types/inspection/inspection-standard'
+  InspectionStandard,
+  InspectionStandardRole,
+  SampleReceipt,
+  StandardParameterLink,
+} from '@/api/endpoints/model'
+import {
+  inspectionDictionaryListParameters,
+  inspectionDictionaryListStandardParameterLinks,
+  inspectionDictionaryListStandards,
+} from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+import {
+  reportNamesListReportNameParameterLinks,
+  reportNamesListReportNameStandardLinks,
+  reportNamesListReportNames,
+} from '@/api/endpoints/report-names/report-names'
 
 /** 接样表单提交值。categoryCode = 报告名称 code（FK→InspectionReportName.code）。 */
 export interface ReceiptFormValues {
@@ -101,24 +112,18 @@ export function ReceiptFormModal({
 
   // 报告名称 / 全部标准 / 全部参数（启动加载一次）
   useEffect(() => {
-    apiClient
-      .get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], {
-        params: { page: 1, pageSize: 200 },
-      })
-      .then((r) => setReportNames(Array.isArray(r.data?.items) ? r.data.items : []))
+    reportNamesListReportNames({ page: 1, pageSize: 200 })
+      .then((r) => setReportNames(Array.isArray(r?.items) ? r.items : []))
       .catch(() => setReportNames([]))
-    apiClient
-      .get<{ items: InspectionStandard[] }>(API_ROUTES['/inspection-standards'], {
-        params: { page: 1, pageSize: 200 },
-      })
-      .then((r) => setAllStandards(Array.isArray(r.data?.items) ? r.data.items : []))
+    inspectionDictionaryListStandards({ page: 1, pageSize: 200 })
+      .then((r) => setAllStandards(Array.isArray(r?.items) ? r.items : []))
       .catch(() => setAllStandards([]))
-    apiClient
-      .get<{ items: InspectionParameter[] }>(API_ROUTES['/inspection-parameters'], {
-        // 全部参数（>500 条）一次拉齐，否则报告关联的高位编码参数(如 IP-0548..)被分页截断，勾不到。
-        params: { page: 1, pageSize: 1000 },
-      })
-      .then((r) => setAllParameters(Array.isArray(r.data?.items) ? r.data.items : []))
+    inspectionDictionaryListParameters({
+      // 全部参数（>500 条）一次拉齐，否则报告关联的高位编码参数(如 IP-0548..)被分页截断，勾不到。
+      page: 1,
+      pageSize: 1000,
+    })
+      .then((r) => setAllParameters(Array.isArray(r?.items) ? r.items : []))
       .catch(() => setAllParameters([]))
   }, [])
 
@@ -129,18 +134,13 @@ export function ReceiptFormModal({
       setTestingStandardCodes(new Set())
       return
     }
-    const load = async (role: 'JUDGMENT' | 'TESTING') => {
+    const load = async (role: InspectionStandardRole) => {
       try {
-        const res = await apiClient.get<{
-          items: {
-            reportNameCode: string
-            inspectionStandardCode: string
-            role: string
-          }[]
-        }>(API_ROUTES['/inspection-report-name-standards'], {
-          params: { reportNameCode: categoryCode, role, page: 1, pageSize: 200 },
+        const res = await reportNamesListReportNameStandardLinks({
+          reportNameCode: categoryCode,
+          role,
         })
-        return new Set(res.data.items.map((i) => i.inspectionStandardCode))
+        return new Set(res.items.map((i) => i.inspectionStandardCode))
       } catch {
         return new Set<string>()
       }
@@ -157,12 +157,8 @@ export function ReceiptFormModal({
       setReportParamCodes(new Set())
       return
     }
-    apiClient
-      .get<{ items: { reportNameCode: string; inspectionParameterCode: string }[] }>(
-        API_ROUTES['/inspection-report-name-parameters'],
-        { params: { reportNameCode: categoryCode, page: 1, pageSize: 500 } },
-      )
-      .then((r) => setReportParamCodes(new Set(r.data.items.map((i) => i.inspectionParameterCode))))
+    reportNamesListReportNameParameterLinks({ reportNameCode: categoryCode })
+      .then((r) => setReportParamCodes(new Set(r.items.map((i) => i.inspectionParameterCode))))
       .catch(() => setReportParamCodes(new Set()))
   }, [categoryCode])
 
@@ -175,15 +171,9 @@ export function ReceiptFormModal({
     }
     Promise.all(
       selected.map((code) =>
-        apiClient
-          .get<{ items: { inspectionStandardCode: string; inspectionParameterCode: string }[] }>(
-            API_ROUTES['/standard-parameters'],
-            {
-              params: { standardCode: code, page: 1, pageSize: 200 },
-            },
-          )
-          .then((r) => r.data.items)
-          .catch(() => [] as { inspectionStandardCode: string; inspectionParameterCode: string }[]),
+        inspectionDictionaryListStandardParameterLinks({ inspectionStandardCode: code })
+          .then((r) => r.items)
+          .catch(() => [] as StandardParameterLink[]),
       ),
     ).then((results) => {
       const set = new Set<string>()
@@ -257,7 +247,7 @@ export function ReceiptFormModal({
       witnessPhone: witnessPhone.trim() || undefined,
       inspector: inspector.trim() || undefined,
       inspectorPhone: inspectorPhone.trim() || undefined,
-      receivedBy: currentUser?.displayName ?? currentUser?.username ?? '系统',
+      receivedBy: currentUser?.displayName ?? currentUser?.username ?? '',
       sampleSource,
       testCategory,
       judgmentBasis: judgmentBasis.length > 0 ? judgmentBasis : undefined,

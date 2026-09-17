@@ -1,42 +1,33 @@
 "use client";
 import { useEffect, useState } from "react";
 // REF src/features/inspection-capability/ReportNameList.tsx 移植。
-// 差异：apiClient → @/api/legacy-client + API_ROUTES（junction 端点映射到
-// /api/report-names/links/*）；ExtFieldDef 从 @/types/common 取。
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数；
+// 报告名称按 code 寻址（契约 /api/report-names/{code}，不再用行 id）。
+import {
+  reportNamesCreateReportName,
+  reportNamesDeleteReportName,
+  reportNamesListReportNameParameterLinks,
+  reportNamesListReportNameStandardLinks,
+  reportNamesListReportNames,
+  reportNamesUpdateReportName,
+} from "@/api/endpoints/report-names/report-names";
+import { inspectionDictionaryListParameters } from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
+import type {
+  CreateInspectionReportNameRequest,
+  ExtFieldDef,
+  InspectionParameter,
+  InspectionReportName,
+  ReportNameParameterLink,
+  ReportNameStandardLink,
+  UpdateInspectionReportNameRequest,
+} from "@/api/endpoints/model";
 import { AssociationManager } from "./AssociationManager";
-import type { ExtFieldDef } from "@/types/common/ext-field-def";
 
-interface ReportName {
-  id: string;
-  code: string;
-  name: string;
-  fullName?: string;
-  templatePath?: string;
-  description?: string;
-  extFields?: ExtFieldDef[];
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ReportNameStandardLink {
-  reportNameCode: string;
-  inspectionStandardCode: string;
-  role: "TESTING" | "JUDGMENT";
-}
-interface ReportNameParameterLink {
-  reportNameCode: string;
-  inspectionParameterCode: string;
-}
-interface InspectionParameter {
-  code: string;
-  name: string;
-}
+type ReportName = InspectionReportName;
 
 const PAGE_SIZE = 50;
 /** 拉全量关联用的大页（当前量级：557 标准 / 1836 参数 / 1133 参数主表）。 */
-const BIG_PAGE = "10000";
+const BIG_PAGE = 10000;
 
 type TabKey = "basic" | "objects" | "standards" | "parameters" | "extFields";
 
@@ -79,6 +70,7 @@ export function ReportNameList() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
+  // 编辑中的报告名称 code（契约按 code 寻址；新建后暂存 code 让关联页签立即可用）
   const [editId, setEditId] = useState<string | null>(null);
   const [savedCode, setSavedCode] = useState<string | null>(null); // 用于关联页签
   const [activeTab, setActiveTab] = useState<TabKey>("basic");
@@ -92,13 +84,10 @@ export function ReportNameList() {
 
   const load = () => {
     setLoading(true);
-    apiClient
-      .get<{ items: ReportName[]; total: number }>(API_ROUTES["/report-names"], {
-        params: { page, pageSize: String(PAGE_SIZE) },
-      })
+    reportNamesListReportNames({ page, pageSize: PAGE_SIZE })
       .then((res) => {
-        setRows(Array.isArray(res.data?.items) ? res.data.items : []);
-        setTotal(typeof res.data?.total === "number" ? res.data.total : 0);
+        setRows(Array.isArray(res?.items) ? res.items : []);
+        setTotal(typeof res?.total === "number" ? res.total : 0);
       })
       .finally(() => setLoading(false));
   };
@@ -106,24 +95,12 @@ export function ReportNameList() {
 
   const loadAssociations = () => {
     Promise.all([
-      apiClient.get<{ items: ReportNameStandardLink[] }>(
-        API_ROUTES["/inspection-report-name-standards"],
-        {
-          params: { pageSize: BIG_PAGE },
-        },
-      ),
-      apiClient.get<{ items: ReportNameParameterLink[] }>(
-        API_ROUTES["/inspection-report-name-parameters"],
-        {
-          params: { pageSize: BIG_PAGE },
-        },
-      ),
-      apiClient.get<{ items: InspectionParameter[] }>(API_ROUTES["/inspection-parameters"], {
-        params: { pageSize: BIG_PAGE },
-      }),
+      reportNamesListReportNameStandardLinks(),
+      reportNamesListReportNameParameterLinks(),
+      inspectionDictionaryListParameters({ page: 1, pageSize: BIG_PAGE }),
     ]).then(([stdRes, paramRes, paramMasterRes]) => {
       const stdMap: Record<string, string[]> = {};
-      for (const link of stdRes.data?.items ?? []) {
+      for (const link of (stdRes?.items ?? []) as ReportNameStandardLink[]) {
         const arr = stdMap[link.reportNameCode] ?? [];
         if (link.inspectionStandardCode && !arr.includes(link.inspectionStandardCode))
           arr.push(link.inspectionStandardCode);
@@ -133,7 +110,7 @@ export function ReportNameList() {
       setStdByRn(stdMap);
 
       const paramMap: Record<string, string[]> = {};
-      for (const link of paramRes.data?.items ?? []) {
+      for (const link of (paramRes?.items ?? []) as ReportNameParameterLink[]) {
         const arr = paramMap[link.reportNameCode] ?? [];
         if (!arr.includes(link.inspectionParameterCode))
           arr.push(link.inspectionParameterCode);
@@ -142,7 +119,7 @@ export function ReportNameList() {
       setParamByRn(paramMap);
 
       const nameMap: Record<string, string> = {};
-      for (const p of paramMasterRes.data?.items ?? []) nameMap[p.code] = p.name;
+      for (const p of (paramMasterRes?.items ?? []) as InspectionParameter[]) nameMap[p.code] = p.name;
       setParamNameByCode(nameMap);
     });
   };
@@ -158,7 +135,7 @@ export function ReportNameList() {
     setFormOpen(true);
   };
   const openEdit = (row: ReportName) => {
-    setEditId(row.id);
+    setEditId(row.code);
     setSavedCode(row.code);
     setForm({
       code: row.code,
@@ -176,20 +153,29 @@ export function ReportNameList() {
 
   const save = async () => {
     setError(null);
-    const payload = {
-      code: form.code,
-      name: form.name,
-      fullName: form.fullName || undefined,
-      templatePath: form.templatePath || undefined,
-      description: form.description || undefined,
-      sortOrder: Number(form.sortOrder) || 0,
-      extFields: extFields,
-    };
     try {
       if (editId) {
-        await apiClient.put(`${API_ROUTES["/report-names"]}/${editId}`, payload);
+        // 契约 UpdateInspectionReportNameRequest 不含 code（code 在 path 上）。
+        const payload: UpdateInspectionReportNameRequest = {
+          name: form.name,
+          fullName: form.fullName || undefined,
+          templatePath: form.templatePath || undefined,
+          description: form.description || undefined,
+          sortOrder: Number(form.sortOrder) || 0,
+          extFields: extFields,
+        };
+        await reportNamesUpdateReportName(editId, payload);
       } else {
-        await apiClient.post(API_ROUTES["/report-names"], payload);
+        const payload: CreateInspectionReportNameRequest = {
+          code: form.code,
+          name: form.name,
+          fullName: form.fullName || undefined,
+          templatePath: form.templatePath || undefined,
+          description: form.description || undefined,
+          sortOrder: Number(form.sortOrder) || 0,
+          extFields: extFields,
+        };
+        await reportNamesCreateReportName(payload);
       }
       // 首次保存后允许跳转关联页签
       setSavedCode(form.code || null);
@@ -203,9 +189,9 @@ export function ReportNameList() {
     }
   };
 
-  const remove = async (id: string) => {
+  const remove = async (code: string) => {
     try {
-      await apiClient.delete(`${API_ROUTES["/report-names"]}/${id}`);
+      await reportNamesDeleteReportName(code);
       load();
     } catch (err: unknown) {
       setError(
@@ -270,7 +256,7 @@ export function ReportNameList() {
                 (c) => paramNameByCode[c] ?? c,
               );
               return (
-                <tr key={r.id} className="border-t hover:bg-gray-50 align-top">
+                <tr key={r.code} className="border-t hover:bg-gray-50 align-top">
                   <td className="px-4 py-2 font-mono text-xs">{r.code}</td>
                   <td className="px-4 py-2 whitespace-nowrap">{r.name}</td>
                   <td className="px-4 py-2 text-xs text-gray-700">
@@ -290,16 +276,16 @@ export function ReportNameList() {
                       type="button"
                       onClick={() => openEdit(r)}
                       data-fn="M06.F07.I02"
-                      aria-label={`编辑 ${r.id}`}
+                      aria-label={`编辑 ${r.code}`}
                       className="text-blue-600 hover:underline mr-3"
                     >
                       编辑
                     </button>
                     <button
                       type="button"
-                      onClick={() => remove(r.id)}
+                      onClick={() => remove(r.code)}
                       data-fn="M06.F07.I03"
-                      aria-label={`删除 ${r.id}`}
+                      aria-label={`删除 ${r.code}`}
                       className="text-red-600 hover:underline"
                     >
                       删除

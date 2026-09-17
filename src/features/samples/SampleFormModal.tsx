@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import type { Sample } from '@/types/api'
+import type { Sample } from '@/api/endpoints/model'
 
 export interface SampleFormValues {
   id?: string

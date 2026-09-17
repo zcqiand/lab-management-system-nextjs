@@ -2,22 +2,50 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlowStagePage } from "../flow-pipeline/FlowStagePage";
 import { ReportPreviewModal } from "./ReportPreviewModal";
 import { ConfirmModal } from "@/components/ConfirmModal";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
 import type {
-  SampleReceipt,
-  Sample,
-  TestRecord,
+  ExtFieldDef,
   InspectionParameter,
   InspectionReportName,
-} from "@/types/api";
-import type { InspectionStandard } from "@/types/inspection/inspection-standard";
-import type { InspectionStandardParameter } from "@/types/inspection/inspection-standard-parameter";
-import type { InspectionTechnicalRequirement } from "@/types/inspection/inspection-technical-requirement";
-import type { ExtFieldDef } from "@/types/common/ext-field-def";
+  InspectionStandard,
+  ParamInterface as ParamInterfaceRow,
+  ParamInterfaceLink,
+  Sample,
+  SampleReceipt,
+  TestRecord,
+  TestRecordsListTestRecordsParams,
+  UpdateSampleReceiptRequest,
+} from "@/api/endpoints/model";
+import {
+  inspectionDictionaryListParameters,
+  inspectionDictionaryListStandardParameterLinks,
+  inspectionDictionaryListStandards,
+} from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
+import { calculationMethodsListCalculationMethods } from "@/api/endpoints/calculation-methods/calculation-methods";
+import {
+  paramInterfacesListParamInterfaceLinks,
+  paramInterfacesListParamInterfaces,
+} from "@/api/endpoints/param-interfaces/param-interfaces";
+import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
+import { receiptsUpdateReceipt } from "@/api/endpoints/receipts/receipts";
+import {
+  samplesDeleteSample,
+  samplesListSamples,
+} from "@/api/endpoints/samples/samples";
+import {
+  technicalRequirementsListTechnicalRequirements,
+} from "@/api/endpoints/technical-requirements/technical-requirements";
+import {
+  testRecordsCreateTestRecord,
+  testRecordsListTestRecords,
+  testRecordsUpdateTestRecord,
+} from "@/api/endpoints/test-records/test-records";
+import type {
+  InspectionStandardParameter,
+  TechnicalRequirementRow as InspectionTechnicalRequirement,
+} from "./models/types";
 import { resolveParamInterfaceModel } from "./models/registry";
 import { resolveInterfaceByParam } from "./models/resolveInterfaceByParam";
 import { strengthsFromRecordResult } from "./models/rebar-mechanics";
-import type { ParamInterfaceRow, ParamInterfaceLink } from "@/types/common";
 
 /** 数据录入——流程线第三环节（flowStatus='data_entry'）。
  * 列表用 FlowStagePage；点「录入结果」打开双栏弹窗：左样品 / 右该样品全部检测参数平铺。
@@ -112,80 +140,41 @@ export function EntryModal({
   const load = useCallback(async () => {
     setError(null);
     try {
+      // test-records 契约参数集无 receiptId（spec gap，后端 /api/test-records 支持），
+      // 用交叉类型变量透传，避免 TS 多余属性检查。
+      const testRecordParams: TestRecordsListTestRecordsParams & { receiptId?: string } = {
+        receiptId: receipt.id,
+        page: 1,
+        pageSize: 200,
+      };
       const [
         sampRes,
         recRes,
         paramRes,
         stdRes,
         stdParamRes,
-        reqRes,
+        reqList,
         piRes,
         piLinkRes,
-        calcRes,
+        calcList,
       ] = await Promise.all([
-        apiClient.get<{ items: Sample[] }>(API_ROUTES["/samples"], {
-          params: { receiptId: receipt.id, page: 1, pageSize: 100 },
-        }),
-        apiClient.get<{ items: TestRecord[] }>(API_ROUTES["/test-records"], {
-          params: { receiptId: receipt.id, page: 1, pageSize: 200 },
-        }),
-        apiClient.get<{ items: InspectionParameter[] }>(
-          API_ROUTES["/inspection-parameters"],
-          {
-            // 全部参数一次拉齐（>500 条），否则接样单选中的高位编码参数(IP-0548..)被分页截断，录入卡缺失。
-            params: { page: 1, pageSize: 1000 },
-          },
-        ),
-        apiClient.get<{ items: InspectionStandard[] }>(
-          API_ROUTES["/inspection-standards"],
-          {
-            params: { page: 1, pageSize: 500 },
-          },
-        ),
-        apiClient.get<{ items: InspectionStandardParameter[] }>(
-          API_ROUTES["/inspection-standard-parameters"],
-          { params: { page: 1, pageSize: 500 } },
-        ),
-        apiClient.get<
-          InspectionTechnicalRequirement[] | { items: InspectionTechnicalRequirement[] }
-        >(
-          API_ROUTES["/inspection-technical-requirements"],
-          { params: { page: 1, pageSize: 500 } },
-        ),
-        apiClient.get<{ items: ParamInterfaceRow[] }>(
-          API_ROUTES["/inspection-param-interfaces"],
-          {
-            params: { page: 1, pageSize: 500 },
-          },
-        ),
-        apiClient.get<{ items: ParamInterfaceLink[] }>(
-          API_ROUTES["/inspection-parameter-param-interfaces"],
-          { params: { pageSize: 10000 } },
-        ),
-        apiClient.get<
-          | Array<{
-              inspectionParameterCode: string;
-              specimenCount: number;
-              reportNameCode?: string;
-            }>
-          | {
-              items: Array<{
-                inspectionParameterCode: string;
-                specimenCount: number;
-                reportNameCode?: string;
-              }>;
-            }
-        >(API_ROUTES["/inspection-calculation-methods"], {
-          params: {
-            page: 1,
-            pageSize: 500,
-            reportNameCode: receipt.categoryCode ?? undefined,
-          },
-        }),
+        samplesListSamples({ receiptId: receipt.id, page: 1, pageSize: 100 }),
+        testRecordsListTestRecords(testRecordParams),
+        // 全部参数一次拉齐（>500 条），否则接样单选中的高位编码参数(IP-0548..)被分页截断，录入卡缺失。
+        inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }),
+        inspectionDictionaryListStandards({ page: 1, pageSize: 500 }),
+        inspectionDictionaryListStandardParameterLinks(),
+        technicalRequirementsListTechnicalRequirements(),
+        paramInterfacesListParamInterfaces({ page: 1, pageSize: 500 }),
+        paramInterfacesListParamInterfaceLinks(),
+        // 旧实现传的 reportNameCode/page/pageSize 是后端忽略的 no-op
+        // （GET 只认 inspectionObjectCode/inspectionParameterCode/testingStandardCode），
+        // 迁移后拉全量，前端按 reportNameCode 就近匹配。
+        calculationMethodsListCalculationMethods(),
       ]);
-      const sampList = sampRes.data.items ?? [];
-      const recList = recRes.data.items ?? [];
-      let paramList = paramRes.data.items ?? [];
+      const sampList = sampRes.items ?? [];
+      const recList = recRes.items ?? [];
+      let paramList = paramRes.items ?? [];
       if (receipt.testParameters && receipt.testParameters.length > 0) {
         const allowed = new Set(receipt.testParameters);
         paramList = paramList.filter((p) => allowed.has(p.code));
@@ -194,36 +183,24 @@ export function EntryModal({
       // 按 receipt.categoryCode 精确查一次即可。
       let cat: InspectionReportName | null = null;
       try {
-        const catRes = await apiClient.get<{ items: InspectionReportName[] }>(
-          API_ROUTES["/report-names"],
-          { params: { page: 1, pageSize: 500 } },
-        );
-        cat = catRes.data?.items?.find((r) => r.code === receipt.categoryCode) ?? null;
+        const catRes = await reportNamesListReportNames({ page: 1, pageSize: 500 });
+        cat = catRes?.items?.find((r) => r.code === receipt.categoryCode) ?? null;
       } catch {
         cat = null;
       }
       setSamples(sampList);
       setRecords(recList);
       setParameters(paramList);
-      setStandards(stdRes.data.items ?? []);
-      setStdParams(stdParamRes.data.items ?? []);
-      // T11(2026-09-16)：technical-requirements list 按 SSOT 是裸数组（不分页），
-      // 兼容历史 {items} 信封形状。
-      setTechReqs(
-        Array.isArray(reqRes.data)
-          ? reqRes.data
-          : ((reqRes.data as { items?: InspectionTechnicalRequirement[] })?.items ?? []),
-      );
-      setInterfaces(piRes.data.items ?? []);
+      setStandards(stdRes.items ?? []);
+      setStdParams(stdParamRes.items ?? []);
+      // technical-requirements list 按 SSOT 是裸数组（不分页）；
+      // 后端在响应上附加派生 id（契约镜像见 models/types TechnicalRequirementRow）。
+      setTechReqs((reqList ?? []) as InspectionTechnicalRequirement[]);
+      setInterfaces(piRes.items ?? []);
       setCategory(cat);
-      setLinks(piLinkRes.data.items ?? []);
-      // T11(2026-09-16)：calculation-methods list 按 SSOT 是裸数组，兼容历史 {items} 信封。
-      setCalcRules(
-        Array.isArray(calcRes.data)
-          ? calcRes.data
-          : ((calcRes.data as { items?: Array<NonNullable<typeof calcRules>[number]> })
-              ?.items ?? []),
-      );
+      setLinks(piLinkRes.items ?? []);
+      // calculation-methods list 按 SSOT 是裸数组。
+      setCalcRules(calcList ?? []);
       setSelectedId((prev) => prev || (sampList[0]?.id ?? ""));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "加载失败");
@@ -294,32 +271,30 @@ export function EntryModal({
     const basisSel = bases[k];
     const reqSel = reqCodes[k];
     if (!existing && input === "" && !v && !basisSel && !reqSel) return;
-    const payload: Record<string, unknown> = {
+    // 契约 CreateTestRecordRequest.requirement 必填；后端对缺失值 coerce 为 ""，
+    // 这里显式给 ""（或既有记录值）保持线上行为。
+    const payload = {
       sampleId: sid,
       parameterCode: paramCode,
       result: input,
+      requirement: existing?.requirement ?? "",
+      ...(v ? { verdict: v } : {}),
+      ...(basisSel ? { standardCode: basisSel } : {}),
+      ...(reqSel
+        ? {
+            requirementCode: reqSel,
+            requirement: (() => {
+              const found = reqByCode.get(reqSel);
+              return found ? requirementLabel(found) : (existing?.requirement ?? "");
+            })(),
+          }
+        : {}),
     };
-    if (v) {
-      payload.verdict = v;
-    }
-    if (basisSel) {
-      payload.standardCode = basisSel;
-    }
-    if (reqSel) {
-      const found = reqByCode.get(reqSel);
-      payload.requirementCode = reqSel;
-      if (found) payload.requirement = requirementLabel(found);
-    }
     let saved: TestRecord;
     if (existing) {
-      const res = await apiClient.put<TestRecord>(
-        `${API_ROUTES["/test-records"]}/${existing.id}`,
-        payload,
-      );
-      saved = res.data;
+      saved = await testRecordsUpdateTestRecord(existing.id, payload);
     } else {
-      const res = await apiClient.post<TestRecord>(API_ROUTES["/test-records"], payload);
-      saved = res.data;
+      saved = await testRecordsCreateTestRecord(payload);
     }
     setRecords((prev) => {
       const others = prev.filter(
@@ -394,7 +369,7 @@ export function EntryModal({
     setSaving(true);
     setError(null);
     try {
-      await apiClient.put(`${API_ROUTES["/receipts"]}/${receipt.id}`, info);
+      await receiptsUpdateReceipt(receipt.id, info);
       const dirty = parameters.filter((p) => {
         const k = `${sid}#${p.code}`;
         return (
@@ -419,7 +394,7 @@ export function EntryModal({
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await apiClient.delete(`${API_ROUTES["/samples"]}/${deleteTarget.id}`);
+      await samplesDeleteSample(deleteTarget.id);
       setSamples((prev) => prev.filter((s) => s.id !== deleteTarget.id));
       setRecords((prev) => prev.filter((r) => r.sampleId !== deleteTarget.id));
       // 清空与该样品相关的 dirty 缓冲
@@ -445,20 +420,22 @@ export function EntryModal({
     }
   };
 
-  // I06 人工改判：PUT /receipts/:id { result: 'pass'|'fail' } → 改判定结果
+  // I06 人工改判：PUT /receipts/:id { result: 'pass'|'fail' } → 改判定结果。
+  // 契约 UpdateSampleReceiptRequest 不含 result 字段（spec gap），用交叉类型透传保线上行为。
   const handleOverride = async () => {
     if (!overrideResult) return;
     setOverriding(true);
     try {
-      const updated = await apiClient.put(`${API_ROUTES["/receipts"]}/${receipt.id}`, {
+      const body: UpdateSampleReceiptRequest & { result: "pass" | "fail" } = {
         result: overrideResult,
-      });
+      };
+      const updated = await receiptsUpdateReceipt(receipt.id, body);
       // 触发上层 refetch —— 这里通过 receipt onClose 让上游重新 fetch
       setOverrideResult("");
       // 立即更新显示
       onClose();
       // 上层可通过弹窗方式重新打开；这里用 window.dispatchEvent 触发 refetch
-      window.dispatchEvent(new CustomEvent("receipt:updated", { detail: updated.data }));
+      window.dispatchEvent(new CustomEvent("receipt:updated", { detail: updated }));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "改判失败");
     } finally {

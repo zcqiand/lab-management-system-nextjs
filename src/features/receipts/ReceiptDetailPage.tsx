@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
-import { FLOW_STAGE_LABELS, type SampleReceipt, type InspectionParameter as TestParameter, type InspectionReportName } from '@/types/api'
-import type { InspectionStandard } from '@/types/inspection'
+import type {
+  InspectionParameter as TestParameter,
+  InspectionReportName,
+  InspectionStandard,
+  SampleReceipt,
+} from '@/api/endpoints/model'
+import { FLOW_STAGE_LABELS } from '@/features/flow-pipeline/flow-stages'
+import {
+  inspectionDictionaryListParameters,
+  inspectionDictionaryListStandards,
+} from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+import { reportNamesListReportNames } from '@/api/endpoints/report-names/report-names'
+import { receiptsGetReceipt } from '@/api/endpoints/receipts/receipts'
 import { ReceiptDetail } from './ReceiptDetail'
 import { ReportPreviewModal } from '@/features/data-entry/ReportPreviewModal'
 import { paramLabel, categoryLabel, standardLabels } from './detailLabels'
@@ -23,16 +33,16 @@ export function ReceiptDetailPage() {
     setLoading(true)
     setError(null)
     try {
-      const [receiptRes, paramRes, rnRes, stdRes] = await Promise.all([
-        apiClient.get<SampleReceipt>(`${API_ROUTES['/receipts']}/${id}`),
-        apiClient.get<{ items: TestParameter[] }>(API_ROUTES['/inspection-parameters'], { params: { page: 1, pageSize: 1000 } }),
-        apiClient.get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], { params: { page: 1, pageSize: 200 } }),
-        apiClient.get<{ items: InspectionStandard[] }>(API_ROUTES['/inspection-standards'], { params: { page: 1, pageSize: 500 } }),
+      const [receipt, paramRes, rnRes, stdRes] = await Promise.all([
+        receiptsGetReceipt(id),
+        inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }),
+        reportNamesListReportNames({ page: 1, pageSize: 200 }),
+        inspectionDictionaryListStandards({ page: 1, pageSize: 500 }),
       ])
-      setReceipt(receiptRes.data)
-      setParameters(paramRes.data.items ?? [])
-      setReportNames(rnRes.data.items ?? [])
-      setStandards(stdRes.data.items ?? [])
+      setReceipt(receipt)
+      setParameters(paramRes.items ?? [])
+      setReportNames(rnRes.items ?? [])
+      setStandards(stdRes.items ?? [])
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '加载失败')
     } finally {

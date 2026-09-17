@@ -1,35 +1,31 @@
 "use client";
 import { useEffect, useState } from 'react'
 // REF src/features/inspection-capability/ParamInterfaceList.tsx 移植。
-// 差异：apiClient → @/api/legacy-client + API_ROUTES（link 端点映射到
-// 契约路径 /api/param-interfaces/links，REQ-2026-001）。
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数；
+// 参数界面按 code 寻址（契约 /api/param-interfaces/{code}）。
+import {
+  paramInterfacesCreateParamInterface,
+  paramInterfacesDeleteParamInterface,
+  paramInterfacesListParamInterfaceLinks,
+  paramInterfacesListParamInterfaces,
+  paramInterfacesUpdateParamInterface,
+} from '@/api/endpoints/param-interfaces/param-interfaces'
+import { inspectionDictionaryListParameters } from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+import type {
+  CreateParamInterfaceRequest,
+  InspectionParameter,
+  ParamInterface as InspectionParamInterface,
+  ParamInterfaceLink,
+  UpdateParamInterfaceRequest,
+} from '@/api/endpoints/model'
 import { AssociationManager } from './AssociationManager'
 import { ParamInterfacePreviewModal } from './ParamInterfacePreviewModal'
 
-interface InspectionParamInterface {
-  code: string
-  name: string
-  componentPath?: string
-  config?: Record<string, unknown> | null
-  description?: string
-  sortOrder: number
-  createdAt: string
-  updatedAt: string
-}
-
-interface ParamInterfaceParameterLink {
-  paramInterfaceCode: string
-  inspectionParameterCode: string
-}
-interface InspectionParameter {
-  code: string
-  name: string
-}
+type ParamInterfaceParameterLink = ParamInterfaceLink
 
 const PAGE_SIZE = 50
 /** 拉全量关联用的大页。 */
-const BIG_PAGE = '10000'
+const BIG_PAGE = 10000
 
 type TabKey = 'basic' | 'parameters'
 
@@ -81,13 +77,10 @@ export function ParamInterfaceList() {
 
   const load = () => {
     setLoading(true)
-    apiClient
-      .get<{ items: InspectionParamInterface[]; total: number }>(API_ROUTES['/inspection-param-interfaces'], {
-        params: { page, pageSize: String(PAGE_SIZE) },
-      })
+    paramInterfacesListParamInterfaces({ page, pageSize: PAGE_SIZE })
       .then((res) => {
-        setRows(Array.isArray(res.data?.items) ? res.data.items : [])
-        setTotal(typeof res.data?.total === 'number' ? res.data.total : 0)
+        setRows(Array.isArray(res?.items) ? res.items : [])
+        setTotal(typeof res?.total === 'number' ? res.total : 0)
       })
       .finally(() => setLoading(false))
   }
@@ -95,15 +88,11 @@ export function ParamInterfaceList() {
 
   const loadAssociations = () => {
     Promise.all([
-      apiClient.get<{ items: ParamInterfaceParameterLink[] }>(API_ROUTES['/inspection-parameter-param-interfaces'], {
-        params: { pageSize: BIG_PAGE },
-      }),
-      apiClient.get<{ items: InspectionParameter[] }>(API_ROUTES['/inspection-parameters'], {
-        params: { pageSize: BIG_PAGE },
-      }),
+      paramInterfacesListParamInterfaceLinks(),
+      inspectionDictionaryListParameters({ page: 1, pageSize: BIG_PAGE }),
     ]).then(([paramRes, paramMasterRes]) => {
       const paramMap: Record<string, string[]> = {}
-      for (const link of paramRes.data?.items ?? []) {
+      for (const link of (paramRes?.items ?? []) as ParamInterfaceParameterLink[]) {
         const pk = link.paramInterfaceCode ?? ''
         const arr = paramMap[pk] ?? []
         if (link.inspectionParameterCode && !arr.includes(link.inspectionParameterCode)) arr.push(link.inspectionParameterCode)
@@ -113,7 +102,7 @@ export function ParamInterfaceList() {
       setParamByPi(paramMap)
 
       const nameMap: Record<string, string> = {}
-      for (const p of paramMasterRes.data?.items ?? []) nameMap[p.code] = p.name
+      for (const p of (paramMasterRes?.items ?? []) as InspectionParameter[]) nameMap[p.code] = p.name
       setParamNameByCode(nameMap)
     })
   }
@@ -132,7 +121,7 @@ export function ParamInterfaceList() {
     setSavedCode(row.code)
     setForm({
       code: row.code,
-      name: row.name,
+      name: row.name ?? '',
       componentPath: row.componentPath ?? '',
       config: JSON.stringify(row.config ?? '', null, 2),
       description: row.description ?? '',
@@ -154,19 +143,28 @@ export function ParamInterfaceList() {
         return
       }
     }
-    const payload = {
-      code: form.code,
-      name: form.name,
-      componentPath: form.componentPath,
-      config: configParsed,
-      description: form.description || undefined,
-      sortOrder: Number(form.sortOrder) || 0,
-    }
     try {
       if (editId) {
-        await apiClient.put(`${API_ROUTES['/inspection-param-interfaces']}/${editId}`, payload)
+        // 契约 UpdateParamInterfaceRequest 不含 code（code 在 path 上）；
+        // config 是自由 JSON，字符串键对象按契约形状透传。
+        const payload: UpdateParamInterfaceRequest = {
+          name: form.name || undefined,
+          componentPath: form.componentPath,
+          config: configParsed as UpdateParamInterfaceRequest['config'],
+          description: form.description || undefined,
+          sortOrder: Number(form.sortOrder) || 0,
+        }
+        await paramInterfacesUpdateParamInterface(editId, payload)
       } else {
-        await apiClient.post(API_ROUTES['/inspection-param-interfaces'], payload)
+        const payload: CreateParamInterfaceRequest = {
+          code: form.code,
+          name: form.name || undefined,
+          componentPath: form.componentPath,
+          config: (configParsed ?? undefined) as CreateParamInterfaceRequest['config'],
+          description: form.description || undefined,
+          sortOrder: Number(form.sortOrder) || 0,
+        }
+        await paramInterfacesCreateParamInterface(payload)
       }
       // 首次保存后允许跳转关联页签
       setSavedCode(form.code || null)
@@ -179,7 +177,7 @@ export function ParamInterfaceList() {
 
   const remove = async (code: string) => {
     try {
-      await apiClient.delete(`${API_ROUTES['/inspection-param-interfaces']}/${code}`)
+      await paramInterfacesDeleteParamInterface(code)
       load()
     } catch (err: unknown) {
       setError((err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '删除失败')

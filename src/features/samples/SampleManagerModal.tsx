@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
 import { ConfirmModal } from "@/components/ConfirmModal";
-import type { InspectionReportName, Sample, SampleReceipt } from "@/types/api";
-
-// 4 字典通用行
-interface DictItem {
-  id: string;
-  code: string;
-  name: string;
-  inspectionObjectCode?: string;
-  remark?: string;
-  sortOrder?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { InspectionReportName, Sample, SampleReceipt } from "@/api/endpoints/model";
+import {
+  catalogListBrands,
+  catalogListGrades,
+  catalogListModels,
+  catalogListSpecs,
+} from "@/api/endpoints/inspection-catalog/inspection-catalog";
+import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
+import {
+  samplesCreateSample,
+  samplesDeleteSample,
+  samplesListSamples,
+  samplesUpdateSample,
+} from "@/api/endpoints/samples/samples";
 
 interface Props {
   receipt: SampleReceipt;
@@ -113,10 +113,12 @@ export function SampleManagerModal({ receipt, onClose, readOnly, inline }: Props
     setLoading(true);
     setError(null);
     try {
-      const res = await apiClient.get<{ items: Sample[] }>(API_ROUTES['/samples'], {
-        params: { receiptId: receipt.id, page: 1, pageSize: 100 },
+      const res = await samplesListSamples({
+        receiptId: receipt.id,
+        page: 1,
+        pageSize: 100,
       });
-      setSamples(res.data.items);
+      setSamples(res.items);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "加载失败");
     } finally {
@@ -126,32 +128,28 @@ export function SampleManagerModal({ receipt, onClose, readOnly, inline }: Props
 
   useEffect(() => {
     fetchSamples();
-    // 报告类别（决定扩展属性）+ 四个码表（按类别过滤，供组合框选项）
-    apiClient
-      .get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], {
-        params: { page: 1, pageSize: 200 },
-      })
+    // 报告类别（决定扩展属性）+ 四个码表（供组合框选项）
+    reportNamesListReportNames({ page: 1, pageSize: 200 })
       .then((res) =>
-        setCategory(res.data.items?.find((r) => r.code === receipt.categoryCode) ?? null),
+        setCategory(res.items?.find((r) => r.code === receipt.categoryCode) ?? null),
       )
       .catch(() => setCategory(null));
-    const loadDict = async (endpoint: string): Promise<string[]> => {
-      try {
-        const res = await apiClient.get<{ items: DictItem[] }>(endpoint, {
-          params: { categoryCode: receipt.categoryCode, page: 1, pageSize: 200 },
-        });
-        return res.data.items.map((i) => i.name);
-      } catch {
-        return [];
-      }
-    };
+    // 旧实现按 categoryCode 过滤码表是后端忽略的 no-op（契约参数是 inspectionObjectCode，
+    // 语义也不同），迁移后不过滤、拉全量码表，行为与旧线上一致。
+    const toNames = (items: { name?: string }[]): string[] =>
+      items.map((i) => i.name ?? "");
     Promise.all([
-      loadDict(API_ROUTES['/models']),
-      loadDict(API_ROUTES['/specifications']),
-      loadDict(API_ROUTES['/grades']),
-      loadDict(API_ROUTES['/brands']),
+      catalogListModels({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
+      catalogListSpecs({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
+      catalogListGrades({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
+      catalogListBrands({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
     ]).then(([models, specifications, grades, brands]) =>
-      setDicts({ models, specifications, grades, brands }),
+      setDicts({
+        models: toNames(models.items ?? []),
+        specifications: toNames(specifications.items ?? []),
+        grades: toNames(grades.items ?? []),
+        brands: toNames(brands.items ?? []),
+      }),
     );
   }, [fetchSamples, receipt.categoryCode]);
 
@@ -197,9 +195,9 @@ export function SampleManagerModal({ receipt, onClose, readOnly, inline }: Props
     try {
       const payload = { ...form, ext, receiptId: receipt.id };
       if (editing) {
-        await apiClient.put(`${API_ROUTES['/samples']}/${editing.id}`, payload);
+        await samplesUpdateSample(editing.id, payload);
       } else {
-        await apiClient.post(API_ROUTES['/samples'], payload);
+        await samplesCreateSample(payload);
       }
       setFormOpen(false);
       await fetchSamples();
@@ -216,7 +214,7 @@ export function SampleManagerModal({ receipt, onClose, readOnly, inline }: Props
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await apiClient.delete(`${API_ROUTES['/samples']}/${deleteTarget.id}`);
+      await samplesDeleteSample(deleteTarget.id);
       setDeleteTarget(null);
       await fetchSamples();
     } finally {

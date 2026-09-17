@@ -16,14 +16,13 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 // REF src/features/inspection-capability/TwoLevelObjectStandardTree.tsx 移植。
-// 差异：apiClient → @/api/legacy-client + API_ROUTES（listEndpoint/objectsEndpoint/
-// standardsEndpoint 由父组件传 REF 字面路由，经 route() 查 API_ROUTES 映射）。
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
-
-/** REF 字面路由 → lab-msw 路由；未登记的回退原样（防御）。 */
-function route(p: string): string {
-  return (API_ROUTES as Record<string, string>)[p] ?? p;
-}
+// TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数；
+// 列表拉取与拖拽 PUT 由父组件注入（计算方法/技术要求的复合键寻址不同）。
+import {
+  inspectionDictionaryListObjects,
+  inspectionDictionaryListStandards,
+} from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
+import type { InspectionDictionaryListStandardsParams } from "@/api/endpoints/model";
 
 /** 检测项目节点（1 级） */
 export interface ObjectNode {
@@ -49,14 +48,13 @@ export interface TreeListItem {
 }
 
 interface Props<T extends TreeListItem> {
-  /** 列表 API 路径：inspection-calculation-methods / inspection-technical-requirements */
-  listEndpoint: string;
-  /** 列表 GET 过滤时使用的 query 参数名（不同时可定制；默认 testingStandardCode） */
-  listFilterParam?: string;
-  /** 检测项目 GET 路径（默认 /inspection-objects） */
-  objectsEndpoint?: string;
-  /** 检测标准 GET 路径（默认 /inspection-standards） */
-  standardsEndpoint?: string;
+  /** 列表拉取（选中检测标准后调用；返回裸数组或历史 {items} 信封均可） */
+  listFn: (standardCode: string) => Promise<T[] | { items?: T[] }>;
+  /** data-testid 基名（仅用于列表容器 testid） */
+  listName?: string;
+  /** 拖拽排序持久化；不传时拖拽把手仍渲染但 PUT 缺失（当前两个父组件
+   *  都传非默认 sortBy，拖拽本身禁用，此 prop 仅为契约完整保留） */
+  putFn?: (item: T, sortOrder: number) => Promise<unknown>;
   /** 列定义（按顺序渲染在「#」与「操作」之间） */
   columns: Array<{
     key: string;
@@ -83,8 +81,6 @@ interface Props<T extends TreeListItem> {
   onDelete: (item: T) => void;
   /** 把右侧行 ID 提取出来（用于稳定可拖拽） */
   getItemId: (item: T) => string;
-  /** 把行数据 PUT 时的 body 构造（默认透传 { sortOrder }） */
-  buildPutBody?: (item: T, sortOrder: number) => Record<string, unknown>;
   /** 自定义排序键数组；默认 ['sortOrder']。传非默认时拖拽手柄自动隐藏 */
   sortBy?: string[];
   /** 父组件控制的选中标准（受控）；传 undefined 走内部状态 */
@@ -104,10 +100,9 @@ interface Props<T extends TreeListItem> {
  */
 export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<T>) {
   const {
-    listEndpoint,
-    listFilterParam = "testingStandardCode",
-    objectsEndpoint = "/inspection-objects",
-    standardsEndpoint = "/inspection-standards",
+    listFn,
+    listName = "tree",
+    putFn,
     columns,
     createDataFn,
     editDataFn,
@@ -118,7 +113,6 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     onEdit,
     onDelete,
     getItemId,
-    buildPutBody,
     selectedStandard: selectedStandardProp,
     onSelectedStandardChange,
     onListLoaded,
@@ -151,27 +145,26 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
 
   // 加载检测项目
   useEffect(() => {
-    apiClient
-      .get<{ items: ObjectNode[] }>(route(objectsEndpoint), {
-        params: { page: "1", pageSize: "500" },
-      })
+    inspectionDictionaryListObjects({ page: 1, pageSize: 500 })
       .then((r) => {
-        const items = Array.isArray(r.data?.items) ? r.data.items : [];
+        const items = Array.isArray(r?.items) ? (r.items as ObjectNode[]) : [];
         items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setObjects(items);
       })
       .catch(() => {});
-  }, [objectsEndpoint]);
+  }, []);
 
-  // 展开某个检测项目时，按需加载它下面的检测标准
+  // 展开某个检测项目时，按需加载它下面的检测标准。
+  // 契约 InspectionDictionaryListStandardsParams 无 inspectionObjectCode（spec gap，
+  // 后端支持一跳反查），交叉类型变量透传保持线上行为。
   const ensureStandardsLoaded = (objectCode: string) => {
     if (standardsByObject[objectCode]) return;
-    apiClient
-      .get<{ items: StandardNode[] }>(route(standardsEndpoint), {
-        params: { page: "1", pageSize: "500", inspectionObjectCode: objectCode },
-      })
+    const params: InspectionDictionaryListStandardsParams & {
+      inspectionObjectCode?: string;
+    } = { page: 1, pageSize: 500, inspectionObjectCode: objectCode };
+    inspectionDictionaryListStandards(params)
       .then((r) => {
-        const items = Array.isArray(r.data?.items) ? r.data.items : [];
+        const items = Array.isArray(r?.items) ? (r.items as StandardNode[]) : [];
         items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setStandardsByObject((prev) => ({ ...prev, [objectCode]: items }));
       })
@@ -199,13 +192,10 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     }
     setLoading(true);
     setError(null);
-    apiClient
-      .get<T[] | { items: T[] }>(route(listEndpoint), {
-        params: { page: "1", pageSize: "500", [listFilterParam]: selectedStandard },
-      })
-      .then((res) => {
+    listFn(selectedStandard)
+      .then((rawOrEnvelope) => {
         // T11(2026-09-16)：list 端点按 SSOT 是裸数组（不分页），兼容历史 {items} 信封。
-        const raw = res.data as T[] | { items?: T[] } | null;
+        const raw = rawOrEnvelope as T[] | { items?: T[] } | null;
         let items: T[] = Array.isArray(raw)
           ? [...raw]
           : Array.isArray(raw?.items)
@@ -248,7 +238,7 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
       .finally(() => setLoading(false));
     // onListLoaded 是回调引用，故意省略以避免无限重渲
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listEndpoint, listFilterParam, selectedStandard, reloadSignal]);
+  }, [listFn, selectedStandard, reloadSignal]);
 
   const selectedStandardObj = useMemo(() => {
     for (const arr of Object.values(standardsByObject)) {
@@ -266,12 +256,16 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     if (oldIndex < 0 || newIndex < 0) return;
     const next = arrayMove(list, oldIndex, newIndex);
     setList(next);
+    if (!putFn) {
+      // 契约上 putFn 可选；当前两个父组件都传非默认 sortBy（拖拽禁用），
+      // 此分支实际不可达，仅为类型完整保留。
+      return;
+    }
     try {
       await Promise.all(
         next.map((item, idx) => {
           const sortOrder = (idx + 1) * 10;
-          const body = buildPutBody ? buildPutBody(item, sortOrder) : { sortOrder };
-          return apiClient.put(`${route(listEndpoint)}/${getItemId(item)}`, body);
+          return putFn(item, sortOrder);
         }),
       );
     } catch (e: unknown) {
@@ -416,7 +410,7 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
                     ))}
                     <span className="ml-auto pl-3 shrink-0">操作</span>
                   </div>
-                  <ul data-testid={`${listEndpoint}-list`} className="min-w-max">
+                  <ul data-testid={`${listName}-list`} className="min-w-max">
                     {list.map((item) => (
                       <SortableRow
                         key={getItemId(item)}

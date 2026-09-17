@@ -1,9 +1,23 @@
 import type { ReactElement } from 'react'
-import type { InspectionParameter } from '@/types/api'
-import type { TestRecord } from '@/types/process/test-record'
-import type { InspectionStandard } from '@/types/inspection/inspection-standard'
-import type { InspectionStandardParameter } from '@/types/inspection/inspection-standard-parameter'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type {
+  InspectionParameter,
+  InspectionStandard,
+  StandardParameterLink,
+  TechnicalRequirement,
+  TestRecord,
+} from '@/api/endpoints/model'
+
+/**
+ * 契约 TechnicalRequirement 不含 id，但 lab 后端 list 响应会附加派生 id
+ * （fixtures-runtime 的 techReqId：`tr-<obj>-<param>-<std>`）。
+ * 数据录入/详情页的「技术要求」选择器与 TestRecord.requirementCode 依赖该字段，
+ * 故在此对契约镜像做本地扩展（不改 shared 契约，ADR-0029）。
+ */
+export type TechnicalRequirementRow = TechnicalRequirement & { id: string }
+
+/** 原 @/types/inspection InspectionStandardParameter 的迁移别名：
+ * 契约 StandardParameterLink 只有双 code（无 id/createdAt），消费方只用这两个字段。 */
+export type InspectionStandardParameter = StandardParameterLink
 
 /**
  * 钢筋力学性能「比值卡」（强屈比/超强比）跨记录联立入参：
@@ -25,7 +39,7 @@ export interface ParamModelProps {
   sampleId: string
   standards: InspectionStandard[]
   stdParams: InspectionStandardParameter[]
-  techReqs: InspectionTechnicalRequirement[]
+  techReqs: TechnicalRequirementRow[]
   config: Record<string, unknown> | undefined
   /**
    * 该参数的计算方法（M06.F05，按项目+参数+检测依据）。仅取 specimenCount 驱动「做几组数据」。

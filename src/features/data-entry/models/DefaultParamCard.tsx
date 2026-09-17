@@ -1,7 +1,6 @@
 import type { ParamModelProps } from './types'
-import type { TestRecord } from '@/types/process/test-record'
-import type { InspectionStandard } from '@/types/inspection/inspection-standard'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { InspectionStandard, TestRecord } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from './types'
 
 const VERDICT_OPTIONS = ['合格', '不合格', '符合', '不符合'] as const
 type Verdict = (typeof VERDICT_OPTIONS)[number]

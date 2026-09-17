@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ParamModelProps } from './types'
-import type { TestRecord } from '@/types/process/test-record'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { TestRecord } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from './types'
 import { requirementLabel } from './DefaultParamCard'
 import { autoVerdict, parseStrengthRecord, type StrengthResult } from './cement-strength'
 

@@ -1,5 +1,8 @@
-import type { InspectionParameter, InspectionReportName } from '@/types/api'
-import type { InspectionStandard } from '@/types/inspection'
+import type {
+  InspectionParameter,
+  InspectionReportName,
+  InspectionStandard,
+} from '@/api/endpoints/model'
 
 /**
  * 检测参数显示标签：名称(单位)。

@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react'
 import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
 import { ConfirmModal } from '@/components/ConfirmModal'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
-import type { SampleReceipt } from '@/types/api'
+import type { SampleReceipt } from '@/api/endpoints/model'
+import { receiptsAssignTask } from '@/api/endpoints/receipts/receipts'
 
 /** 任务安排——流程线第二环节（flowStatus='task_assignment'）。
  * 为接样单指定检测人员与计划检测日期；提交（支持批量）后进入「数据录入」；
@@ -46,10 +46,10 @@ export function TaskAssignmentPage() {
   }
 
   const cancelAssignment = async (r: SampleReceipt, refresh: () => Promise<void>) => {
-    await apiClient.put(`${API_ROUTES['/receipts']}/${r.id}`, {
+    // 任务字段走契约专用端点 PUT /api/receipts/{id}/task
+    // （UpdateSampleReceiptRequest 不含 assignee* 字段）
+    await receiptsAssignTask(r.id, {
       assigneeName: '',
-      assigneeId: undefined,
-      plannedTestDate: undefined,
     })
     await refresh()
   }
@@ -65,7 +65,7 @@ export function TaskAssignmentPage() {
     if (!target) return
     setSaving(true)
     try {
-      await apiClient.put(`${API_ROUTES['/receipts']}/${target.id}`, {
+      await receiptsAssignTask(target.id, {
         assigneeName: assigneeName.trim(),
         assigneeId: assigneeName.trim() ? `u-${assigneeName.trim()}` : undefined,
         plannedTestDate,

@@ -1,10 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
-import { apiClient, API_ROUTES } from '@/api/legacy-client'
-import type { SampleReceipt, InspectionParameter as TestParameter, InspectionReportName } from '@/types/api'
-import type { InspectionStandard } from '@/types/inspection/inspection-standard'
-import type { InspectionStandardParameter } from '@/types/inspection/inspection-standard-parameter'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
-import type { ParamInterfaceRow, ParamInterfaceLink } from '@/types/common'
+import type {
+  InspectionParameter as TestParameter,
+  InspectionStandard,
+  ParamInterface as ParamInterfaceRow,
+  ParamInterfaceLink,
+  StandardParameterLink as InspectionStandardParameter,
+  TechnicalRequirement as InspectionTechnicalRequirement,
+  TestRecordsListTestRecordsParams,
+} from '@/api/endpoints/model'
+import {
+  inspectionDictionaryListParameters,
+  inspectionDictionaryListStandardParameterLinks,
+  inspectionDictionaryListStandards,
+} from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+import {
+  paramInterfacesListParamInterfaceLinks,
+  paramInterfacesListParamInterfaces,
+} from '@/api/endpoints/param-interfaces/param-interfaces'
+import { reportNamesListReportNames } from '@/api/endpoints/report-names/report-names'
+import { receiptsGetReceipt } from '@/api/endpoints/receipts/receipts'
+import { samplesListSamples } from '@/api/endpoints/samples/samples'
+import { technicalRequirementsListTechnicalRequirements } from '@/api/endpoints/technical-requirements/technical-requirements'
+import { testRecordsListTestRecords } from '@/api/endpoints/test-records/test-records'
 import { resolveInterfaceByParam } from '@/features/data-entry/models/resolveInterfaceByParam'
 import { resolveParamInterfaceModel } from '@/features/data-entry/models/registry'
 import generatedParameters from '@/data/generated/inspection-parameter.json'
@@ -72,37 +89,39 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
     setLoading(true)
     setError(null)
     try {
+      // test-records 契约参数集无 receiptId（spec gap，后端 /api/test-records 支持），
+      // 用交叉类型变量透传，避免 TS 多余属性检查。
+      const testRecordParams: TestRecordsListTestRecordsParams & { receiptId?: string } = {
+        receiptId,
+        page: 1,
+        pageSize: 500,
+      }
       const [sRes, tiRes, pRes, stdRes, stdParamRes, reqRes, piRes, piLinkRes, catRes, recRes] = await Promise.all([
-        apiClient.get(API_ROUTES['/samples'], { params: { receiptId, page: '1', pageSize: '200' } }),
-        apiClient.get(API_ROUTES['/test-records'], { params: { receiptId, page: '1', pageSize: '500' } }),
-        apiClient.get<{ items: TestParameter[] }>(API_ROUTES['/inspection-parameters'], { params: { page: '1', pageSize: '1000' } }),
-        apiClient.get<{ items: InspectionStandard[] }>(API_ROUTES['/inspection-standards'], { params: { page: '1', pageSize: '500' } }),
-        apiClient.get<{ items: InspectionStandardParameter[] }>(API_ROUTES['/inspection-standard-parameters'], { params: { page: '1', pageSize: '500' } }),
-        apiClient.get<InspectionTechnicalRequirement[] | { items: InspectionTechnicalRequirement[] }>(API_ROUTES['/inspection-technical-requirements'], { params: { page: '1', pageSize: '500' } }),
-        apiClient.get<{ items: ParamInterfaceRow[] }>(API_ROUTES['/inspection-param-interfaces'], { params: { page: 1, pageSize: 500 } }),
-        apiClient.get<{ items: ParamInterfaceLink[] }>(API_ROUTES['/inspection-parameter-param-interfaces'], { params: { pageSize: 10000 } }),
-        apiClient.get<{ items: InspectionReportName[] }>(API_ROUTES['/report-names'], { params: { page: '1', pageSize: '200' } }),
-        apiClient.get<SampleReceipt>(`${API_ROUTES['/receipts']}/${receiptId}`),
+        samplesListSamples({ receiptId, page: 1, pageSize: 200 }),
+        testRecordsListTestRecords(testRecordParams),
+        inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }),
+        inspectionDictionaryListStandards({ page: 1, pageSize: 500 }),
+        inspectionDictionaryListStandardParameterLinks(),
+        technicalRequirementsListTechnicalRequirements(),
+        paramInterfacesListParamInterfaces({ page: 1, pageSize: 500 }),
+        paramInterfacesListParamInterfaceLinks(),
+        reportNamesListReportNames({ page: 1, pageSize: 200 }),
+        receiptsGetReceipt(receiptId),
       ])
-      const sItems: Sample[] = sRes.data.items ?? []
-      const tiItems: TestRecord[] = tiRes.data.items ?? []
+      const sItems: Sample[] = sRes.items ?? []
+      const tiItems: TestRecord[] = tiRes.items ?? []
       setSamples(sItems)
       setTestRecords(tiItems)
-      setParameters(pRes.data.items ?? [])
-      setStandards(stdRes.data.items ?? [])
-      setStdParams(stdParamRes.data.items ?? [])
-      // T11(2026-09-16)：technical-requirements list 按 SSOT 是裸数组（不分页），
-      // 兼容历史 {items} 信封形状。
-      setTechReqs(
-        Array.isArray(reqRes.data)
-          ? reqRes.data
-          : ((reqRes.data as { items?: InspectionTechnicalRequirement[] })?.items ?? []),
-      )
-      setInterfaces(piRes.data.items ?? [])
-      setLinks(piLinkRes.data.items ?? [])
-      setExtFields(catRes.data.items?.find((r) => r.code === categoryCode)?.extFields ?? [])
+      setParameters(pRes.items ?? [])
+      setStandards(stdRes.items ?? [])
+      setStdParams(stdParamRes.items ?? [])
+      // technical-requirements list 按 SSOT 是裸数组（不分页）。
+      setTechReqs(Array.isArray(reqRes) ? reqRes : [])
+      setInterfaces(piRes.items ?? [])
+      setLinks(piLinkRes.items ?? [])
+      setExtFields(catRes.items?.find((r) => r.code === categoryCode)?.extFields ?? [])
       // 接样单显式声明的检测参数集合——为空时回退到全部 test-records（旧数据兼容）。
-      setTestParameterCodes(recRes.data?.testParameters ?? null)
+      setTestParameterCodes(recRes?.testParameters ?? null)
       if (sItems.length > 0 && !activeSampleId) {
         setActiveSampleId(sItems[0]!.id)
       }
