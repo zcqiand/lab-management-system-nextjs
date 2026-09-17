@@ -1,7 +1,7 @@
 {
-  "api_synced_sha": "b114f344f266180412493f94e6239cf4eb86a82f",
-  "api_synced_at": "2026-09-16T16:53:04.981Z",
+  "api_synced_sha": "5d7466e0878d0a579fa8a661d49095244706f79d",
+  "api_synced_at": "2026-09-17T14:33:08.901Z",
   "api_synced_cmd": "gen-shared.ts",
-  "shared_sha": "b114f344f266180412493f94e6239cf4eb86a82f",
+  "shared_sha": "5d7466e0878d0a579fa8a661d49095244706f79d",
   "consumer_repo": "lab-management-system-nextjs"
 }

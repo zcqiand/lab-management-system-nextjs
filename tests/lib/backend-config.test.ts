@@ -43,15 +43,14 @@ describe("backend-config 运行时切换", () => {
     uninstallFakeLocalStorage();
   });
 
-  it("dev 构建下 4 后端全部可选（端口表 = multi-repo-family §6）", () => {
-    expect(SELECTABLE_BACKENDS).toHaveLength(4);
+  it("dev 构建下 3 后端全部可选（端口表 = multi-repo-family §6；msw 仓 2026-09-17 已删）", () => {
+    expect(SELECTABLE_BACKENDS).toHaveLength(3);
     expect(BACKENDS.map((b) => b.key)).toEqual([
-      "msw",
       "nextjs-self",
       "aspnetcore",
       "springboot",
     ]);
-    expect(BACKENDS.find((b) => b.key === "msw")?.baseUrl).toBe("http://localhost:5200");
+    expect(BACKENDS.find((b) => b.key === "nextjs-self")?.baseUrl).toBe("");
     expect(BACKENDS.find((b) => b.key === "aspnetcore")?.baseUrl).toBe("http://localhost:5204");
     expect(BACKENDS.find((b) => b.key === "springboot")?.baseUrl).toBe("http://localhost:5205");
   });
@@ -60,16 +59,16 @@ describe("backend-config 运行时切换", () => {
     installFakeLocalStorage();
     expect(getSelectedBackend()).toBe("");
     expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
-    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "msw-http");
+    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "nextjs-self");
   });
 
-  it("选择 msw → baseURL/mode 跟随选中项，且持久化到 localStorage", () => {
+  it("选择 aspnetcore → baseURL/mode 跟随选中项，且持久化到 localStorage", () => {
     installFakeLocalStorage();
-    setSelectedBackend("msw");
-    expect(getSelectedBackend()).toBe("msw");
-    expect(getApiBaseUrl()).toBe("http://localhost:5200");
-    expect(getApiMode()).toBe("msw");
-    expect(globalThis.localStorage.getItem("lab.api.backend")).toBe("msw");
+    setSelectedBackend("aspnetcore");
+    expect(getSelectedBackend()).toBe("aspnetcore");
+    expect(getApiBaseUrl()).toBe("http://localhost:5204");
+    expect(getApiMode()).toBe("aspnetcore");
+    expect(globalThis.localStorage.getItem("lab.api.backend")).toBe("aspnetcore");
   });
 
   it("选择 nextjs-self → 空串 baseURL（同源）必须原样返回，不能 || 吞掉", () => {
@@ -90,12 +89,12 @@ describe("backend-config 运行时切换", () => {
     globalThis.localStorage.setItem("lab.api.backend", "retired-backend");
     expect(getSelectedBackend()).toBe("retired-backend");
     expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
-    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "msw-http");
+    expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "nextjs-self");
   });
 
   it("setSelectedBackend(\"\") 清除选择 → 回 env 默认", () => {
     installFakeLocalStorage();
-    setSelectedBackend("msw");
+    setSelectedBackend("springboot");
     setSelectedBackend("");
     expect(getSelectedBackend()).toBe("");
     expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
@@ -117,7 +116,7 @@ describe("backend-config 运行时切换", () => {
 
   it("从已选切回 env 默认（\"\")同样清 lab.token", () => {
     installFakeLocalStorage();
-    setSelectedBackend("msw");
+    setSelectedBackend("aspnetcore");
     globalThis.localStorage.setItem("lab.token", "t");
     setSelectedBackend("");
     expect(globalThis.localStorage.getItem("lab.token")).toBeNull();
@@ -125,7 +124,7 @@ describe("backend-config 运行时切换", () => {
   });
 
   it("resolveSelectedBackendUrl：key → URL，未知 key → 空串", () => {
-    expect(resolveSelectedBackendUrl("msw")).toBe("http://localhost:5200");
+    expect(resolveSelectedBackendUrl("aspnetcore")).toBe("http://localhost:5204");
     expect(resolveSelectedBackendUrl("nextjs-self")).toBe("");
     expect(resolveSelectedBackendUrl("nope")).toBe("");
   });
@@ -143,7 +142,7 @@ describe("backend-config 运行时切换", () => {
       },
     };
     expect(getSelectedBackend()).toBe("");
-    expect(() => setSelectedBackend("msw")).not.toThrow();
+    expect(() => setSelectedBackend("springboot")).not.toThrow();
     expect(getApiBaseUrl()).toBe(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
   });
 });
