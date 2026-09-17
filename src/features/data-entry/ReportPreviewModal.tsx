@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiClient, API_ROUTES } from "@/api/legacy-client";
-import type { SampleReceipt, Sample, TestRecord, OrgInfo } from "@/types/api";
+import type { SampleReceipt, Sample, TestRecord } from "@/types/api";
+import { ORG_INFO, type OrgInfo } from "./org-info";
 import generatedReportNames from "@/data/generated/inspection-report-name.json";
 import { assembleReport, flattenForDocx, ensureAllDocxTagsFromBuffer } from "./reportTemplateData";
 import { SampleExtFieldsModal } from "./SampleExtFieldsModal";
@@ -72,12 +73,10 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
       setNoTemplate(false);
       setLoading(true);
       try {
-        // 机构信息 + 样品 + 检测记录 + 模板文件 并发拉取
+        // 机构信息（本地常量，2026-09-17 私生端点 /api/org-info 删除）+
+        // 样品 + 检测记录 + 模板文件 并发拉取
         const [org, samples, records, tplRes] = await Promise.all([
-          apiClient
-            .get<OrgInfo>(API_ROUTES['/org-info'])
-            .then((r) => r.data)
-            .catch(() => null),
+          Promise.resolve(ORG_INFO),
           apiClient
             .get<{ items: Sample[] }>(API_ROUTES['/samples'], {
               params: { receiptId: receipt.id, page: 1, pageSize: 100 },
@@ -217,10 +216,7 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
       // —— 用现有 receipt / samples / records / org 重新组装 + 渲染。
       // 这里通过重建一次 fetch 链路最小化耦合：
       const [org, records] = await Promise.all([
-        apiClient
-          .get<OrgInfo>(API_ROUTES['/org-info'])
-          .then((r) => r.data)
-          .catch(() => null),
+        Promise.resolve(ORG_INFO),
         apiClient
           .get<{ items: TestRecord[] }>(API_ROUTES['/test-records'], {
             params: { receiptId: receipt.id, page: 1, pageSize: 200 },

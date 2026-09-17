@@ -1,5 +1,5 @@
 import type { SampleReceipt, Sample, TestRecord } from "@/types/api";
-import type { OrgInfo } from "@/types/system/org-info";
+import type { OrgInfo } from "./org-info";
 import generatedReportNameParameters from "@/data/generated/inspection-report-name-parameter.json";
 import generatedReportNames from "@/data/generated/inspection-report-name.json";
 import generatedParameters from "@/data/generated/inspection-parameter.json";

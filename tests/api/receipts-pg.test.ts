@@ -12,7 +12,7 @@
 // 本文件本身不再 skip，由 CI workflow 决定是否跑。
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import postgres from "postgres";
-import { listReceiptsDb, getReceiptDb, applyFlowActionDb, TENANT } from "@/lib/db-queries";
+import { listReceiptsDb, getReceiptDb, actForStageDb, TENANT } from "@/lib/db-queries";
 
 // postgres-js 是仓 dependencies（不是 devDep），缺包即 module-load 失败，
 // 无需运行时 hasPg 探测 —— 与 db.smoke.test.ts 的 devDep pg 探测不是同一回事。
@@ -176,46 +176,59 @@ describe("receipts 三态流转（pg, lab_test, requireReachable）", { timeout:
     }
   });
 
-  it("applyFlowActionDb: submit 前进一阶并 append history", async () => {
-    const res = await applyFlowActionDb(SEEDED_RECEIVING_ID, "submit", "tester");
-    expect(res.ok).toBe(true);
+  // ———— actForStageDb（M03 7 阶段 stage-guard；2026-09-17 SSOT 清理后唯一流转写路径）————
+
+  it("actForStageDb: submit 前进一阶并 append history（返回裸数组）", async () => {
+    const res = await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
+    expect(res).toHaveLength(1);
+    const one = res[0]!;
+    expect(one.ok).toBe(true);
     const after = await getReceiptDb(SEEDED_RECEIVING_ID);
     expect(after!.flowStatus).toBe("task_assignment");
     expect(after!.lastSubmittedBy).toBe("tester");
     const hist = after!.flowHistory as FlowHistoryEntry[];
     expect(hist[hist.length - 1]!.action).toBe("submit");
-    // 还原（撤回 = 回退 + 清 lastSubmittedBy）
-    await applyFlowActionDb(SEEDED_RECEIVING_ID, "withdraw", "tester");
+    // 还原（return = 后退一阶，走所在阶段的 act 路径）
+    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
   });
 
-  it("withdraw 仅限本人", async () => {
-    const res = await applyFlowActionDb(SEEDED_RECEIVING_ID, "withdraw", "someone-else");
-    // seed 后状态 = receiving, lastSubmittedBy=null，所以 someone-else 不匹配 → ok:false
-    expect(res.ok).toBe(false);
+  it("stage 不匹配 / 不存在 → ok:false 单条失败不拖垮整批", async () => {
+    const res = await actForStageDb(
+      "review",
+      [SEEDED_RECEIVING_ID, "no-such-receipt-id"],
+      "submit",
+      "tester",
+    );
+    expect(res).toHaveLength(2);
+    const mismatch = res[0]!;
+    expect(mismatch.ok).toBe(false);
+    if (!mismatch.ok)
+      expect(mismatch.message).toContain("Stage mismatch: requires review but is receiving");
+    expect(res[1]).toMatchObject({ id: "no-such-receipt-id", ok: false });
   });
 
-  it("return 不清空 lastSubmittedBy，withdraw 还原", async () => {
-    // submit ×2 → receiving → data_entry，记录提交人
-    const s1 = await applyFlowActionDb(SEEDED_RECEIVING_ID, "submit", "tester");
-    expect(s1.ok).toBe(true);
-    const s2 = await applyFlowActionDb(SEEDED_RECEIVING_ID, "submit", "tester");
-    expect(s2.ok).toBe(true);
+  it("return 不清空 lastSubmittedBy；withdraw 在 receiving = 自转移并清提交人", async () => {
+    // submit ×2 → receiving → data_entry（逐阶段走自己的 act 路径）
+    await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
+    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
     let after = await getReceiptDb(SEEDED_RECEIVING_ID);
     expect(after!.flowStatus).toBe("data_entry");
     expect(after!.lastSubmittedBy).toBe("tester");
     // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
-    const ret = await applyFlowActionDb(SEEDED_RECEIVING_ID, "return", "reviewer", "材料不齐");
-    expect(ret.ok).toBe(true);
-    if (ret.ok) expect(ret.flowStatus).toBe("task_assignment");
+    const ret = await actForStageDb("data-entry", [SEEDED_RECEIVING_ID], "return", "reviewer", "材料不齐");
+    const r0 = ret[0]!;
+    expect(r0.ok).toBe(true);
+    if (r0.ok) expect(r0.flowStatus).toBe("task_assignment");
     after = await getReceiptDb(SEEDED_RECEIVING_ID);
     expect(after!.lastSubmittedBy).toBe("tester");
     const hist = after!.flowHistory as FlowHistoryEntry[];
     expect(hist[hist.length - 1]!.action).toBe("return");
-    // withdraw → 后退一阶 + 清 lastSubmittedBy，还原数据（回到 receiving）
-    const w = await applyFlowActionDb(SEEDED_RECEIVING_ID, "withdraw", "tester");
-    expect(w.ok).toBe(true);
+    // 回到 receiving 后 withdraw：自转移（原地不动）+ 清 lastSubmittedBy，还原数据
+    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+    const w = await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "withdraw", "tester");
+    expect(w[0]!.ok).toBe(true);
     after = await getReceiptDb(SEEDED_RECEIVING_ID);
-    expect(after!.lastSubmittedBy).toBeNull();
     expect(after!.flowStatus).toBe("receiving");
+    expect(after!.lastSubmittedBy).toBeNull();
   });
 });

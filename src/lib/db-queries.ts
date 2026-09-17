@@ -125,7 +125,9 @@ export async function getReceiptDb(id: string): Promise<Row | undefined> {
   return rows[0] ? receiptToDto(rows[0] as Row) : undefined;
 }
 
-// ———— flow 状态流转（事务版；语义照抄 api-helpers.ts applyFlowAction）————
+// ———— flow 状态流转（M03 7 阶段全 act 模式；stage-guard 版 actForStageDb 是
+// 唯一写路径——2026-09-17 SSOT 清理删除了 stage 无关的 applyFlowActionDb
+// 及其私生路由 POST /api/receipts/flow）————
 
 export const FLOW_ORDER_FULL = [
   "receiving",
@@ -146,17 +148,48 @@ export type FlowActionResult =
   | { id: string; ok: false; message: string };
 
 /**
- * submit/return/withdraw 单条流转（事务 + select for update）。
- * 语义逐字段对齐 api-helpers.ts applyFlowAction（2026-08-16 修订版）：
- *   - submit：前进一阶 + lastSubmittedBy=operator + to==='issuance' 补 issuedAt
- *   - return：后退一阶，不动 lastSubmittedBy（msw 版同款）
- *   - withdraw：后退一阶 + 清 lastSubmittedBy，仅限 lastSubmittedBy===operator
- *   - history：append { action, from, to, operator, at, reason }（JS 读出→push→整列写回）
- *   - updatedAt：重写为 now
- * 成功/失败都以值返回（不 throw），与 msw 版 applyFlowAction 的返回形状一致。
+ * M03 7 阶段全 act 模式（2026-09-17 SSOT 清理 Phase B1）：stage-guard 版批量流转。
+ * 语义对齐 springboot ReportFlowService.actForStage / aspnetcore ReportFlowService.ActForStage
+ * （契约 SSOT = shared sample-receipts.tsp 7 个 act op；本仓此前用私生
+ * POST /api/receipts/flow 实现 stage 无关版本，已删）：
+ *   - receipt 必须处于路径 stage 对应的 flowStatus，不匹配该条 ok:false
+ *     "Stage mismatch: requires X but is Y"
+ *   - submit→下一阶 / return→上一阶；withdraw 仅 receiving 合法（自转移）
+ *   - archived 终态只收 submit（自转移，history 追加当 audit，reason 缺省
+ *     "archived: post-archive audit"）
+ *   - 每条独立事务（select for update），单条失败不拖垮整批
+ * 附加维护（nextjs 侧既有约定，不影响跨后端比对面）：submit 写 lastSubmittedBy、
+ * 进入 issuance 补 issuedAt；withdraw 清 lastSubmittedBy。
  */
-export async function applyFlowActionDb(
+const ACT_STAGE_TO_STATUS: Record<string, FlowStatusFull> = {
+  receiving: "receiving",
+  assigning: "task_assignment",
+  "data-entry": "data_entry",
+  review: "review",
+  approve: "approval",
+  issuance: "issuance",
+  archived: "archived",
+};
+
+export async function actForStageDb(
+  stagePath: string,
+  ids: string[],
+  action: FlowActionFull,
+  operator: string,
+  reason?: string,
+): Promise<FlowActionResult[]> {
+  const required = ACT_STAGE_TO_STATUS[stagePath];
+  if (!required) throw new Error(`Unknown act stage: ${stagePath}`);
+  const results: FlowActionResult[] = [];
+  for (const id of ids) {
+    results.push(await actOneForStage(id, required, action, operator, reason));
+  }
+  return results;
+}
+
+async function actOneForStage(
   id: string,
+  required: FlowStatusFull,
   action: FlowActionFull,
   operator: string,
   reason?: string,
@@ -178,27 +211,58 @@ export async function applyFlowActionDb(
           flowHistory: unknown[];
         })
       | undefined;
-    if (!r) return { id, ok: false as const, message: "Receipt not found" };
-    const idx = FLOW_ORDER_FULL.indexOf(r.flowStatus as FlowStatusFull);
-    if (idx < 0)
-      return { id, ok: false as const, message: `Unknown flowStatus: ${r.flowStatus}` };
-    const to = action === "submit" ? FLOW_ORDER_FULL[idx + 1] : FLOW_ORDER_FULL[idx - 1];
-    if (!to) {
+    if (!r) return { id, ok: false as const, message: `Receipt not found: ${id}` };
+    const current = r.flowStatus as FlowStatusFull;
+    if (current !== required) {
       return {
         id,
         ok: false as const,
-        message:
-          action === "submit" ? "Already at final stage" : "Already at first stage",
+        message: `Stage mismatch: requires ${required} but is ${current}`,
       };
     }
-    // withdraw 仅限本人最近提交的单据（提交人主动收回）
-    if (action === "withdraw" && r.lastSubmittedBy !== operator) {
-      return { id, ok: false as const, message: "只能撤回本人提交的单据" };
+    // 终态 archived：只收 submit，自转移写 history 当 audit（springboot 同款）
+    let to: FlowStatusFull | undefined;
+    if (required === "archived") {
+      if (action !== "submit") {
+        return {
+          id,
+          ok: false as const,
+          message: `Invalid transition from ${current} with ${action}`,
+        };
+      }
+      to = "archived";
+    } else {
+      const idx = FLOW_ORDER_FULL.indexOf(current);
+      to =
+        action === "submit"
+          ? FLOW_ORDER_FULL[idx + 1]
+          : action === "return"
+            ? FLOW_ORDER_FULL[idx - 1]
+            : // withdraw 仅 receiving 合法（自转移，对齐 springboot/aspnetcore）
+              current === "receiving"
+              ? "receiving"
+              : (undefined as never);
+      if (!to) {
+        return {
+          id,
+          ok: false as const,
+          message: `Invalid transition from ${current} with ${action}`,
+        };
+      }
     }
-    const from = r.flowStatus;
     const hist = [
       ...(Array.isArray(r.flowHistory) ? r.flowHistory : []),
-      { action, from, to, operator, at: now, reason },
+      {
+        action,
+        from: current,
+        to,
+        operator,
+        at: now,
+        reason:
+          required === "archived" && reason === undefined
+            ? "archived: post-archive audit"
+            : reason,
+      },
     ];
     const updated = await tx
       .update(t)
@@ -210,7 +274,8 @@ export async function applyFlowActionDb(
             : action === "withdraw"
               ? null
               : (r.lastSubmittedBy as never),
-        issuedAt: action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
+        issuedAt:
+          action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
         flowHistory: hist as never,
         updatedAt: now,
       })
