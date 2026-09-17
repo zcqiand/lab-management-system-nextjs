@@ -1,0 +1,20 @@
+[
+  {
+    "tenantId": "TENANT-001",
+    "code": "city-lab",
+    "name": "市住建工程质量检测中心",
+    "roleIds": ["admin"]
+  },
+  {
+    "tenantId": "TENANT-002",
+    "code": "district-lab",
+    "name": "区检测站",
+    "roleIds": ["technician"]
+  },
+  {
+    "tenantId": "TENANT-003",
+    "code": "third-party",
+    "name": "第三方检测实验室",
+    "roleIds": ["viewer"]
+  }
+]

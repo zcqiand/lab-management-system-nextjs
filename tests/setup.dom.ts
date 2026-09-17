@@ -26,7 +26,7 @@ let serverRef: NodeMockServer | null = null;
 
 if (isDom) {
   beforeAll(async () => {
-    const { setupNodeMocks } = await import("../../lab-management-system-msw/src/node");
+    const { setupNodeMocks } = await import("@lab/management-system-msw/node");
     serverRef = setupNodeMocks() as unknown as NodeMockServer;
     serverRef.listen({ onUnhandledRequest: "error" });
   });

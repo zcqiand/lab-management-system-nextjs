@@ -60,7 +60,7 @@ describe("test-records API (M03.F03.I08 / I09)", () => {
     expect(afterBody.total).toBe(1);
 
     // 清理：in-memory fixtures 是跨测试共享的，pop 掉本条避免污染其他测试
-    const { testRecords } = await import("../../../lab-management-system-msw/src/fixtures/seed");
+    const { testRecords } = await import("@lab/management-system-msw/fixtures");
     const idx = testRecords.findIndex((t) => t.id === created.id);
     if (idx >= 0) testRecords.splice(idx, 1);
   });

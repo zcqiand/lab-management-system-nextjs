@@ -64,14 +64,7 @@ jobs:
       # multi-repo-family.md §2 强制 sibling 引用,不以包依赖 import
       - name: Checkout shared sibling
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
-      - name: Checkout msw sibling
-        run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw
-      # 测试基建相对路径引 msw sibling 源码,sibling handler 链 import msw/axios/jose
-      # ——从 sibling 目录向上解析够不到本仓 node_modules,必须给 sibling 装依赖
-      # (--omit=dev:链上所需全在 dependencies)
-      - name: Install msw sibling dependencies
-        run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-        working-directory: ../lab-management-system-msw
+      # msw 仓已删（msw 剔除 Phase 4 提前）：@lab/management-system-msw 走仓内 vendor/msw
       - name: Install dependencies
         run: npm ci
       # shared-openapi.yaml 生成 src/api/endpoints/(gitignored,见 CLAUDE.md §3)
@@ -136,12 +129,11 @@ jobs:
           node-version: "24"
           cache: "npm"
           registry-url: https://registry.npmmirror.com/
-      # shared + msw 仓作为 sibling 被 checkout(file: 依赖需要 sibling 存在)
+      # shared 仓作为 sibling 被 checkout(gen:shared 读它)
       # multi-repo-family.md §2 强制 sibling 引用,不以包依赖 import
+      # msw 仓已删（msw 剔除 Phase 4 提前）：file: 依赖指向仓内 vendor/msw
       - name: Checkout shared sibling
         run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
-      - name: Checkout msw sibling
-        run: git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw
       - name: Install dependencies
         run: npm ci
 

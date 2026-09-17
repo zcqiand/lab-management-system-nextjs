@@ -52,7 +52,7 @@ import {
   inspectionObjectReportNames,
   inspectionCalculationMethods,
   technicalRequirements,
-} from "../../../lab-management-system-msw/src/fixtures/seed";
+} from "@lab/management-system-msw/fixtures";
 import { mockResult, requirementFor } from "@/features/data-entry/reportTemplateSeed";
 import { computeCementFlexural, computeCementCompress } from "@/features/data-entry/models/cement-strength";
 import { tensileStrength } from "@/features/data-entry/models/rebar-welding";
