@@ -127,7 +127,7 @@ lab-management-system-nextjs/
 │   │   │   │   ├── menus/      ← GET /api/auth/menus（ADR-0009 saas 快照）
 │   │   │   │   └── permissions/   ← GET /api/auth/permissions
 │   │   │   ├── contracts/, calculation-methods/, catalog/, receipts/, samples/,
-│   │   │   ├── inspection/, param-interfaces/, org-info/,
+│   │   │   ├── inspection/, param-interfaces/,
 │   │   │   ├── report-names/, summary/, technical-requirements/, test-records/,
 │   │   │   └── health/         ← GET /api/health
 │   │   ├── login/page.tsx      ← 登录页（server component）
@@ -250,7 +250,10 @@ lab-management-system-nextjs/
 
 #### 3.2.2 业务路由
 
-`src/app/api/{contracts, calculation-methods, catalog, receipts, samples, inspection, param-interfaces, org-info, report-names, summary, technical-requirements, test-records, audit-logs, health}/`
+`src/app/api/{contracts, calculation-methods, catalog, receipts/{7 阶段 act}, samples, inspection, param-interfaces, report-names, summary, technical-requirements, test-records, health}/`
+
+> 2026-09-17 SSOT 清理：`org-info`（静态数据常量化 `src/features/data-entry/org-info.ts`）、
+> `audit-logs`（功能删除）、`receipts/flow`(+`flow/queue`)（私生端点，迁 7 阶段 act 契约端点）已删除。
 
 | 路由示例 | 数据源 | 备注 |
 |---|---|---|
