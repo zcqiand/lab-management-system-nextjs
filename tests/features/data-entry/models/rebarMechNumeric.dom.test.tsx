@@ -3,8 +3,8 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
 import { RebarMechNumericCard } from '@/features/data-entry/models/RebarMechNumericCard'
 import type { ParamModelProps } from '@/features/data-entry/models/types'
-import type { InspectionParameter } from '@/types/api'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { InspectionParameter } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from '@/features/data-entry/models/types'
 
 afterEach(() => cleanup())
 

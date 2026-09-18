@@ -59,7 +59,9 @@ describe('TaskAssignmentPage 任务取消（M03.F02.I03）', () => {
   fnTest(['M03.F02.I03'], '已安排的接样单显示「取消任务」按钮 + 点击触发 PUT 清空 assignee', async () => {
     let putCalled = false
     server.use(
-      http.put('*/api/receipts/r-assigned', async ({ request }) => {
+      // 契约端点是 PUT /api/receipts/{id}/task（receiptsAssignTask；任务字段
+      // 不在 UpdateSampleReceiptRequest 里），旧 stub 打 /receipts/{id} 恒 404。
+      http.put('*/api/receipts/r-assigned/task', async ({ request }) => {
         const body = (await request.json()) as Record<string, unknown>
         putCalled = true
         // 验证请求体清空 assignee

@@ -210,24 +210,43 @@ function wrapLinks(
   return HttpResponse.json({ items, total: items.length });
 }
 
-/** M06 junction DELETE：REF 组件发 query 参数（apiClient.delete(url, { params })），
- * lab-msw handler 读 request body。这里把 query 参数镜像成 body 按 handlers 同款
- * 键匹配语义原地删除（含 extraFields 键如 role）。 */
+/** M06 junction DELETE：契约 unlink 是 @body（REQ-2026-001 SSOT），兼容旧 query 形态
+ * （apiClient.delete(url, { params })）。过滤键 = body 字段 ∪ query 参数，按行精确
+ * 匹配原地删除（含 extraFields 键如 role）。无任何过滤键时不删——否则
+ * keys.every() 空集恒真会误删数组首行（2026-09-18 SDK @body DELETE 实证：
+ * 目标行没删、IP-0001 被吃）。 */
 function linkDelete(arr: Array<Record<string, unknown>>) {
   return async ({ request }: { request: Request }) => {
     const url = new URL(request.url);
-    const keys = Array.from(url.searchParams.keys());
-    let idx = -1;
-    for (let i = 0; i < arr.length; i++) {
-      const row = arr[i];
-      if (!row) continue;
-      const hit = keys.every((k) => String(row[k] ?? "") === url.searchParams.get(k));
-      if (hit) {
-        idx = i;
-        break;
-      }
+    const filter: Record<string, string> = {};
+    for (const k of Array.from(url.searchParams.keys())) {
+      const v = url.searchParams.get(k);
+      if (v != null) filter[k] = v;
     }
-    if (idx >= 0) arr.splice(idx, 1);
+    try {
+      const body = (await request.json()) as Record<string, unknown> | null;
+      if (body && typeof body === "object") {
+        for (const [k, v] of Object.entries(body)) {
+          if (v != null) filter[k] = String(v);
+        }
+      }
+    } catch {
+      // 无 body / 非 JSON：仅按 query 过滤
+    }
+    const keys = Object.keys(filter);
+    if (keys.length > 0) {
+      let idx = -1;
+      for (let i = 0; i < arr.length; i++) {
+        const row = arr[i];
+        if (!row) continue;
+        const hit = keys.every((k) => String(row[k] ?? "") === filter[k]);
+        if (hit) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx >= 0) arr.splice(idx, 1);
+    }
     return new HttpResponse(null, { status: 204 });
   };
 }
@@ -362,10 +381,13 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       );
     }),
 
-    // —— POST /receipts/flow：REF 形状 {results} + 完整流转语义（Task 11）——
-    // lab-msw 返回裸数组且 withdraw no-op；组件 runFlow 读 res.data.results。
-    // 对同一 sampleReceipts fixtures 原地流转，flowHistory push（数据同源）。
-    http.post("*/api/receipts/flow", async ({ request }) => {
+    // —— POST /receipts/{stage}/act：FlowActionResult[] 裸数组 + 完整流转语义 ——
+    // ADR-0035 7 阶段全 act 模式后契约按阶段拆端点（receiving/assigning/data-entry/
+    // review/approve/issuance/archived），响应是裸数组（不再 {results} 信封）。
+    // 这里对同一 sampleReceipts fixtures 原地流转，flowHistory push（数据同源）；
+    // lab-msw 无这些端点。stage-guard 不做（按行实际 flowStatus 流转，与旧
+    // /receipts/flow 适配层语义一致——测试都从正确阶段页发起动作）。
+    http.post("*/api/receipts/:stage/act", async ({ request }) => {
       const body = (await request.json()) as {
         ids: string[];
         action: "submit" | "return" | "withdraw";
@@ -415,7 +437,7 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
         r.updatedAt = now;
         return { id, ok: true, flowStatus: r.flowStatus };
       });
-      return HttpResponse.json({ results });
+      return HttpResponse.json(results);
     }),
 
     // ———— Task 13 扩展（M06 检测能力 10 组件）————
@@ -606,7 +628,10 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       let items = (inspectionCalculationMethods as unknown as Array<Record<string, unknown>>)
         .map((r): Record<string, unknown> => ({ ...r, id: String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) }));
       if (std) items = items.filter((r) => r["testingStandardCode"] === std);
-      return HttpResponse.json(pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), items.length || 1)));
+      // calculation-methods list 按契约（orval customFetch<CalculationMethod[]>）是裸数组；
+      // 历史上这里包 pageOf {items} 信封，SSOT 清理后与 DataEntryPage 的裸数组消费相撞
+      //（calcRules for-of 直接抛非可迭代）。树组件双形状兼容不受影响。
+      return HttpResponse.json(items);
     }),
     // 计算方法 PUT/DELETE /:id → 复合键转发（REF 组件以 id 调用，msw 是复合键路由）
     http.put("*/api/calculation-methods/:id", async ({ params, request }) => {
@@ -631,7 +656,9 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       let items = (technicalRequirements as unknown as Array<Record<string, unknown>>)
         .map((r): Record<string, unknown> => ({ ...r, id: String(r["id"] ?? `tr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}-${r["judgmentStandardCode"]}`) }));
       if (std) items = items.filter((r) => r["judgmentStandardCode"] === std);
-      return HttpResponse.json(pageOf(items, num(url.searchParams.get("page"), 1), num(url.searchParams.get("pageSize"), items.length || 1)));
+      // technical-requirements list 按契约（orval customFetch<TechnicalRequirement[]>）
+      // 是裸数组，不包 pageOf（同上 calculation-methods 的事故形态）。
+      return HttpResponse.json(items);
     }),
     http.put("*/api/technical-requirements/:id", async ({ params, request }) => {
       const row = (technicalRequirements as unknown as Array<Record<string, unknown>>)

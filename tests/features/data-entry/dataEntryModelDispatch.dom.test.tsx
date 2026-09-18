@@ -5,12 +5,13 @@ import { fnTest } from '../../fn'
 import {installShapeAdapters, resetFixtures, seedMasterDataIntoMockDb, seedParamInterfaces, tablesOf} from '../../helpers/seed'
 const { sampleTable } = tablesOf(server)
 import { EntryModal } from '@/features/data-entry/DataEntryPage'
-import type { SampleReceipt } from '@/types/api'
+import type { SampleReceipt } from '@/api/endpoints/model'
 
 /** 构造一个 data_entry 阶段的接样单（testParameters 同时含 已绑定界面的 IP-0055 与 未绑定的 IP-0001）。 */
 function buildReceipt(): SampleReceipt {
   return {
     id: 'rc-dispatch-test',
+    tenantId: 'TENANT-001',
     contractId: 'c-seed',
     commissionCode: 'RC-DISPATCH-01',
     commissionDate: '2024-07-01',
@@ -20,7 +21,7 @@ function buildReceipt(): SampleReceipt {
     testCategory: '委托检验',
     flowStatus: 'data_entry',
     flowHistory: [],
-    lastSubmittedBy: null,
+    lastSubmittedBy: undefined,
     testParameters: ['IP-0055', 'IP-0001'],
     createdAt: '2024-07-01T00:00:00Z',
     updatedAt: '2024-07-01T00:00:00Z',

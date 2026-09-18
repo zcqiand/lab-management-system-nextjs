@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { assembleReport, reportAxis, flattenForDocx, hasGridManifest } from '@/features/data-entry/reportTemplateData'
-import type { SampleReceipt, Sample, TestRecord } from '@/types/api'
+import type { SampleReceipt, Sample, TestRecord } from '@/api/endpoints/model'
 
 const receipt = (categoryCode: string): SampleReceipt =>
   ({

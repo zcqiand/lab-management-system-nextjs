@@ -12,9 +12,9 @@ import reportNames from "@/data/generated/inspection-report-name.json";
 import rnParams from "@/data/generated/inspection-report-name-parameter.json";
 import inspectionParamInterfaces from "@/data/generated/inspection-param-interface.json";
 import inspectionParamInterfaceLinks from "@/data/generated/inspection-parameter-param-interface.json";
-import type { SampleReceipt, Sample, TestRecord } from "@/types/api";
-import type { OrgInfo } from "@/types/api";
-import type { ParamInterfaceRow, ParamInterfaceLink } from "@/types/common";
+import type { SampleReceipt, Sample, TestRecord } from "@/api/endpoints/model";
+import type { OrgInfo } from "@/features/data-entry/org-info";
+import type { ParamInterface as ParamInterfaceRow, ParamInterfaceLink } from "@/api/endpoints/model";
 
 /**
  * 录入 → 报告 链路回归。

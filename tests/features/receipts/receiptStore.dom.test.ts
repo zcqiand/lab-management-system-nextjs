@@ -116,6 +116,7 @@ describe('receiptStore 状态流转', () => {
     await useReceiptStore.getState().createReceipt({
       contractId: 'contract-bj-001',
       commissionCode: 'RC-NEW-001',
+      commissionDate: '2026-01-01',
       categoryCode: 'steel',
       receivedBy: '王五',
       sampleSource: '施工送检',
@@ -131,6 +132,7 @@ describe('receiptStore 状态流转', () => {
     await useReceiptStore.getState().createReceipt({
       contractId: '',
       commissionCode: '',
+      commissionDate: '',
       categoryCode: '',
       receivedBy: '',
       sampleSource: '',

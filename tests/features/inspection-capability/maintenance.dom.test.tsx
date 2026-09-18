@@ -21,7 +21,6 @@ function loginAsAdmin() {
       id: "u-admin",
       username: "labadmin",
       displayName: "实验室管理员",
-      role: { id: "role-admin", name: "admin", permissions: [] },
       permissions: ["user:read", "report:read", "report:write", "report:issue"],
     },
     token: "test-token",

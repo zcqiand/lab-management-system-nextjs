@@ -1,7 +1,7 @@
 import { describe, expect } from "vitest";
 import { fnTest } from "../../fn";
 import { applyComposedSampleName } from "@/features/data-entry/ReportPreviewModal";
-import type { Sample } from "@/types/api";
+import type { Sample } from "@/api/endpoints/model";
 
 describe("applyComposedSampleName（预览合成样品名称）", () => {
   fnTest(["M03.F09.I03"], "空数组：原样返回", () => {

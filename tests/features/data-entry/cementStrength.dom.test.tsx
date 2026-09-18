@@ -12,8 +12,8 @@ import {
 import { CementFlexuralCard } from '@/features/data-entry/models/CementFlexuralCard'
 import { CementCompressCard } from '@/features/data-entry/models/CementCompressCard'
 import type { ParamModelProps } from '@/features/data-entry/models/types'
-import type { InspectionParameter } from '@/types/api'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { InspectionParameter } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from '@/features/data-entry/models/types'
 
 /** REQ-2026-014：水泥胶砂强度参数界面（抗折/抗压），GB/T 17671 公式 + ±10% 剔除 + 均值自动判。 */
 
@@ -146,6 +146,7 @@ function makeProps(over: Partial<ParamModelProps> = {}): ParamModelProps {
 }
 
 const verifiedReq: InspectionTechnicalRequirement = {
+  tenantId: 'TENANT-001',
   id: 'req-42.5',
   inspectionObjectCode: 'OBJ-SP01-P1',
   inspectionParameterCode: 'IP-0556',

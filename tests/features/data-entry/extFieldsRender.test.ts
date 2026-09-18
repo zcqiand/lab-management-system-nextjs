@@ -6,7 +6,7 @@ import {
   resolveSourceByTag,
   ensureAllDocxTags,
 } from "@/features/data-entry/reportTemplateData";
-import type { SampleReceipt, Sample } from "@/types/api";
+import type { SampleReceipt, Sample } from "@/api/endpoints/model";
 
 const receipt = (categoryCode: string): SampleReceipt =>
   ({

@@ -5,13 +5,14 @@ import { fnTest } from '../../fn'
 import {installShapeAdapters, resetFixtures, seedData, seedMasterDataIntoMockDb, tablesOf} from '../../helpers/seed'
 const { sampleTable } = tablesOf(server)
 import { EntryModal } from '@/features/data-entry/DataEntryPage'
-import type { SampleReceipt } from '@/types/api'
+import type { SampleReceipt } from '@/api/endpoints/model'
 
 /** 模拟 RC-2024-0705-01-S1（seedData 后该接样单应已迁 testParameters=['IP-0055']）。
  *  这里直接用 'IP-0055'，断言 seed 后真能渲染参数卡，而不是「无可录入的检测参数」。 */
 function buildRc00701(): SampleReceipt {
   return {
     id: 'rc-007-01',
+    tenantId: 'TENANT-001',
     contractId: 'c-007',
     commissionCode: 'RC-2024-0705-01',
     commissionDate: '2024-07-05',
@@ -21,7 +22,7 @@ function buildRc00701(): SampleReceipt {
     testCategory: '委托检验',
     flowStatus: 'data_entry',
     flowHistory: [],
-    lastSubmittedBy: null,
+    lastSubmittedBy: undefined,
     testParameters: ['IP-0055'],
     createdAt: '2024-07-05T00:00:00Z',
     updatedAt: '2024-07-05T00:00:00Z',

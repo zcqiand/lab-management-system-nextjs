@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
-import type { SampleReceipt, Sample, TestRecord, OrgInfo } from '@/types/api'
+import type { SampleReceipt, Sample, TestRecord } from '@/api/endpoints/model'
+import type { OrgInfo } from '@/features/data-entry/org-info'
 import { assembleReport, flattenForDocx, hasGridManifest } from '@/features/data-entry/reportTemplateData'
 
 // 集成验证：对每份带 grid manifest 的模板，用 mock 数据装配 → docxtemplater 渲染，

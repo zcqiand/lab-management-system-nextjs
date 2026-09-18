@@ -6,12 +6,13 @@ import { fnTest } from '../../fn'
 import {installShapeAdapters, resetFixtures, seedMasterDataIntoMockDb, seedParamInterfaces, tablesOf} from '../../helpers/seed'
 const { sampleTable } = tablesOf(server)
 import { EntryModal } from '@/features/data-entry/DataEntryPage'
-import type { SampleReceipt } from '@/types/api'
+import type { SampleReceipt } from '@/api/endpoints/model'
 
 /** 两个样品的接样单——验证 dirty 缓冲按 (sampleId, paramCode) 联合键隔离。 */
 function buildReceiptWithTwoSamples(): SampleReceipt {
   return {
     id: 'rc-switch-test',
+    tenantId: 'TENANT-001',
     contractId: 'c-seed',
     commissionCode: 'RC-SWITCH-01',
     commissionDate: '2024-07-01',
@@ -21,7 +22,7 @@ function buildReceiptWithTwoSamples(): SampleReceipt {
     testCategory: '委托检验',
     flowStatus: 'data_entry',
     flowHistory: [],
-    lastSubmittedBy: null,
+    lastSubmittedBy: undefined,
     testParameters: ['IP-0055'],
     createdAt: '2024-07-01T00:00:00Z',
     updatedAt: '2024-07-01T00:00:00Z',

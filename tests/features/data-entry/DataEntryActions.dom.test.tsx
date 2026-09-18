@@ -7,6 +7,7 @@ import { EntryModal } from '@/features/data-entry/DataEntryPage'
 
 const MOCK_RECEIPT = {
   id: 'r-test',
+  tenantId: 'TENANT-001',
   commissionCode: 'C-2026-001',
   commissionDate: '2026-07-01',
   categoryCode: 'steel',
@@ -49,8 +50,10 @@ beforeEach(() => {
     http.get('*/api/param-interfaces/links*', () =>
       HttpResponse.json({ items: [] }),
     ),
+    // calculation-methods / technical-requirements list 契约是裸数组（orval
+    // customFetch<T[]>），不能 stub 成 {items} 信封——DataEntryPage 按裸数组消费。
     http.get('*/api/calculation-methods*', () =>
-      HttpResponse.json({ items: [] }),
+      HttpResponse.json([]),
     ),
     http.get('*/api/inspection/objects*', () =>
       HttpResponse.json({ items: [], total: 0 }),
@@ -59,7 +62,7 @@ beforeEach(() => {
       HttpResponse.json({ items: [] }),
     ),
     http.get('*/api/technical-requirements*', () =>
-      HttpResponse.json({ items: [] }),
+      HttpResponse.json([]),
     ),
   )
 })

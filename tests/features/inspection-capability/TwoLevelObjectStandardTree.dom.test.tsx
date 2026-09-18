@@ -18,12 +18,27 @@ import {
   type TreeListItem,
 } from "@/features/inspection-capability/TwoLevelObjectStandardTree";
 import { fnTest } from "../../fn";
+import { calculationMethodsListCalculationMethods } from "@/api/endpoints/calculation-methods/calculation-methods";
+import { technicalRequirementsListTechnicalRequirements } from "@/api/endpoints/technical-requirements/technical-requirements";
 
 interface DemoItem extends TreeListItem {
   id: string;
   algorithmType: string;
   specimenCount: number;
 }
+
+// 组件 Props 已从 listEndpoint/listFilterParam 收敛为 listFn（TSOT Phase C2）：
+// 测试侧 orval 生成函数直连 msw 拦截的 /api/* 路由，query 参数语义不变。
+// calc 契约参数集无 testingStandardCode（spec gap），交叉类型透传同 src 用法。
+const listCalc = (std: string | null) =>
+  calculationMethodsListCalculationMethods({
+    testingStandardCode: std ?? undefined,
+  } as never).then((rows) => (rows ?? []) as unknown as DemoItem[]);
+
+const listTechReqs = (std: string | null) =>
+  technicalRequirementsListTechnicalRequirements({
+    judgmentStandardCode: std ?? undefined,
+  } as never).then((rows) => (rows ?? []) as unknown as DemoItem[]);
 
 const OBJECTS = [
   { id: "o1", code: "steel", name: "钢材", sortOrder: 1 },
@@ -66,7 +81,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
     render(
       <TwoLevelObjectStandardTree<DemoItem>
         title="计算方法"
-        listEndpoint="/inspection-calculation-methods"
+        listFn={listCalc}
         getItemId={(it) => it.id}
         columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
         onCreate={() => {}}
@@ -93,7 +108,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
     render(
       <TwoLevelObjectStandardTree<DemoItem>
         title="计算方法"
-        listEndpoint="/inspection-calculation-methods"
+        listFn={listCalc}
         getItemId={(it) => it.id}
         columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
         onCreate={() => {}}
@@ -145,7 +160,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
       render(
         <TwoLevelObjectStandardTree<DemoItem>
           title="计算方法"
-          listEndpoint="/inspection-calculation-methods"
+          listFn={listCalc}
           getItemId={(it) => it.id}
           columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
           onCreate={() => {}}
@@ -185,8 +200,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
       render(
         <TwoLevelObjectStandardTree<DemoItem>
           title="技术要求"
-          listEndpoint="/inspection-technical-requirements"
-          listFilterParam="judgmentStandardCode"
+          listFn={listTechReqs}
           getItemId={(it) => it.id}
           columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
           onCreate={() => {}}
@@ -248,8 +262,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
       render(
         <TwoLevelObjectStandardTree<DemoItem & { testingStandardCode?: string }>
           title="计算方法"
-          listEndpoint="/inspection-calculation-methods"
-          listFilterParam="testingStandardCode"
+          listFn={listCalc}
           getItemId={(it) => it.id}
           columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
           onCreate={() => {}}
@@ -286,7 +299,7 @@ describe("TwoLevelObjectStandardTree 2 级树 + 拖拽列表", () => {
     render(
       <TwoLevelObjectStandardTree<DemoItem>
         title="计算方法"
-        listEndpoint="/inspection-calculation-methods"
+        listFn={listCalc}
         getItemId={(it) => it.id}
         columns={[{ key: "algorithmType", label: "类型", width: "w-24" }]}
         onCreate={() => {}}

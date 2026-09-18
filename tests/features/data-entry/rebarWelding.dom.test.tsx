@@ -13,13 +13,12 @@ import {
 import { RebarWeldingTensileCard } from '@/features/data-entry/models/RebarWeldingTensileCard'
 import { RebarWeldingBendCard } from '@/features/data-entry/models/RebarWeldingBendCard'
 import type { ParamModelProps } from '@/features/data-entry/models/types'
-import type { InspectionParameter } from '@/types/inspection/inspection-parameter'
-import type { InspectionTechnicalRequirement } from '@/types/inspection/inspection-technical-requirement'
+import type { InspectionParameter } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from '@/features/data-entry/models/types'
 
 /** REQ-2026-015：钢筋焊接接头参数界面（抗拉强度 1 样品 = 3 试件 / 弯曲性能 4 试件 × 3 次），JGJ/T 27-2014 公式。 */
 
 const PARAM: InspectionParameter = {
-  id: 'p-ip-0087',
   code: 'IP-0087',
   name: '抗拉强度',
   rawName: '抗拉强度',
@@ -34,6 +33,7 @@ const PARAM: InspectionParameter = {
 
 const REQ: InspectionTechnicalRequirement = {
   id: 'req-540',
+  tenantId: 'TENANT-001',
   inspectionObjectCode: 'OBJ-SP99',
   inspectionParameterCode: 'IP-0087',
   judgmentStandardCode: 'JGJ/T 27-2014',
@@ -50,7 +50,6 @@ const REQ: InspectionTechnicalRequirement = {
 
 const BEND_PARAM: InspectionParameter = {
   ...PARAM,
-  id: 'p-ip-0155',
   code: 'IP-0155',
   name: '弯曲性能',
   canonicalName: '弯曲性能',

@@ -7,7 +7,7 @@ const { sampleTable, testRecordTable, receiptTable } = tablesOf(server)
 ;
 import { EntryModal } from "@/features/data-entry/DataEntryPage";
 import { ReceiptDetail } from "@/features/receipts/ReceiptDetail";
-import type { SampleReceipt } from "@/types/api";
+import type { SampleReceipt } from "@/api/endpoints/model";
 import { useAuthStore } from "@/state/authStore";
 
 /**
@@ -23,7 +23,6 @@ function loginAsAdmin() {
       id: "u-admin",
       username: "labadmin",
       displayName: "实验室管理员",
-      role: { id: "role-admin", name: "admin", permissions: [] },
       permissions: ["user:read", "report:read", "report:write", "report:issue"],
     },
     token: "test-token",
@@ -34,6 +33,7 @@ function loginAsAdmin() {
 function buildRc2024071202(): SampleReceipt {
   return {
     id: "rc-2024-0712-02",
+    tenantId: 'TENANT-001',
     contractId: "c-2024-0712",
     commissionCode: "RC-2024-0712-02",
     commissionDate: "2024-07-12",
@@ -43,7 +43,7 @@ function buildRc2024071202(): SampleReceipt {
     testCategory: "委托检验",
     flowStatus: "data_entry",
     flowHistory: [],
-    lastSubmittedBy: null,
+    lastSubmittedBy: undefined,
     testParameters: ["IP-0190"],
     createdAt: "2024-07-12T00:00:00Z",
     updatedAt: "2024-07-12T00:00:00Z",
@@ -65,7 +65,7 @@ function ensureRcSample(): void {
       testCategory: "委托检验",
       flowStatus: "data_entry",
       flowHistory: [],
-      lastSubmittedBy: null,
+      lastSubmittedBy: undefined,
       testParameters: ["IP-0190"],
       createdAt: "2024-07-12T00:00:00Z",
       updatedAt: "2024-07-12T00:00:00Z",

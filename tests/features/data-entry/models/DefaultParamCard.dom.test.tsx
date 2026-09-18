@@ -4,7 +4,7 @@ import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DefaultParamCard } from '@/features/data-entry/models/DefaultParamCard'
 import type { ParamModelProps } from '@/features/data-entry/models/types'
-import type { TestRecord } from '@/types/process/test-record'
+import type { TestRecord } from '@/api/endpoints/model'
 
 function baseProps(overrides: Partial<ParamModelProps> = {}): ParamModelProps {
   return {

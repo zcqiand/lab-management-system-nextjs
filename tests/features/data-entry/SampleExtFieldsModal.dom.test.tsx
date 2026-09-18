@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SampleExtFieldsModal } from "@/features/data-entry/SampleExtFieldsModal";
-import type { ExtFieldDef } from "@/types/common/ext-field-def";
+import type { ExtFieldDef } from "@/api/endpoints/model";
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 
@@ -99,7 +99,7 @@ describe("SampleExtFieldsModal（M03.F01.I07 类别参数补录）", () => {
   it("必填已填 + 取消 → 不回调 onSubmit；提交 → onSubmit 收到合并后的 ext", async () => {
     const fields: ExtFieldDef[] = [
       { key: "volume", label: "混凝土方量（m³）", type: "number", required: true },
-      { key: "remark", label: "备注" },
+      { key: "remark", label: "备注", type: "text" },
     ];
     const initial: Record<string, string> = { remark: "已有备注" };
     let received: Record<string, string> | null = null;
@@ -130,7 +130,7 @@ describe("SampleExtFieldsModal（M03.F01.I07 类别参数补录）", () => {
     render(
       <SampleExtFieldsModal
         open={false}
-        extFields={[{ key: "a", label: "A" }]}
+        extFields={[{ key: "a", label: "A", type: "text" }]}
         initialExt={{}}
         onSubmit={() => {}}
         onCancel={() => {}}

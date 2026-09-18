@@ -1,7 +1,7 @@
 import { describe, expect } from 'vitest'
 import { fnTest } from '../../fn'
 import { paramLabel, categoryLabel } from '@/features/receipts/detailLabels'
-import type { InspectionParameter, InspectionReportName } from '@/types/api'
+import type { InspectionParameter, InspectionReportName } from '@/api/endpoints/model'
 
 const params = (overrides: Partial<InspectionParameter>[] = []): InspectionParameter[] =>
   overrides.map((o, i) => ({

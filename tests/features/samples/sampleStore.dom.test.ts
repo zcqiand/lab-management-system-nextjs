@@ -3,6 +3,7 @@ import { tablesOf, installShapeAdapters, resetFixtures } from '../../helpers/see
 import { http, HttpResponse } from "msw";
 import { server } from '../../setup.dom';
 import { useSampleStore } from "@/state/sampleStore";
+import type { SampleQuery } from "@/state/sampleStore";
 import { resetApiClient } from "@/api/legacy-client";
 const { receiptTable, inspectionReportNameTable, sampleTable } = tablesOf()
 ;
@@ -88,9 +89,12 @@ describe("sampleStore", () => {
   fnTest(["M03.F03.I01"], "fetchSamples status 过滤", async () => {
     insertSample("rc-default", "S-PENDING");
     insertSample("rc-default", "S-COMPLETED");
+    // status 不在契约 SamplesListSamplesParams（SampleQuery：page/pageSize/
+    // receiptId/keyword），store 从不转发它；保留旧断言——多传未知键不炸、
+    // 列表不按 status 过滤
     await useSampleStore
       .getState()
-      .fetchSamples({ page: 1, pageSize: 10, status: "pending" });
+      .fetchSamples({ page: 1, pageSize: 10, status: "pending" } as SampleQuery);
     // 列表返回但不按 status 过滤（仅 keyword/分页）
     expect(useSampleStore.getState().list.length).toBeGreaterThanOrEqual(0);
   });

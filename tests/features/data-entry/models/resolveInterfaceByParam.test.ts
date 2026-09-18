@@ -5,7 +5,7 @@ const interfaces = [
   { code: 'default', componentPath: 'default', sortOrder: 10 },
   { code: 'cc', componentPath: 'concrete-compress', sortOrder: 5, config: { specimenCount: 3, area: 22500 } },
   { code: 'cc100', componentPath: 'concrete-compress', sortOrder: 20, config: { specimenCount: 3, area: 10000 } },
-]
+] as never[]
 
 describe('resolveInterfaceByParam', () => {
   it('一个参数绑一个界面 → 返回其 componentPath + config', () => {
@@ -35,7 +35,7 @@ describe('resolveInterfaceByParam 报告作用域', () => {
     { code: 'weld', componentPath: 'rebar-welding-tensile', sortOrder: 6 },
     { code: 'mech', componentPath: 'rebar-mech-numeric', sortOrder: 8, config: { formulaKey: 'tensile_strength' } },
     { code: 'conn', componentPath: 'rebar-mech-numeric', sortOrder: 9, config: { formulaKey: 'tensile_strength', connection: true } },
-  ]
+  ] as never[]
   const links = [
     { inspectionParameterCode: 'IP-0087', paramInterfaceCode: 'weld' }, // 通用（无作用域）= 焊接兜底
     { inspectionParameterCode: 'IP-0087', paramInterfaceCode: 'mech', reportNameCode: 'RN-102-1' },
