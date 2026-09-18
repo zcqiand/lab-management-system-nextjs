@@ -633,21 +633,9 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       //（calcRules for-of 直接抛非可迭代）。树组件双形状兼容不受影响。
       return HttpResponse.json(items);
     }),
-    // 计算方法 PUT/DELETE /:id → 复合键转发（REF 组件以 id 调用，msw 是复合键路由）
-    http.put("*/api/calculation-methods/:id", async ({ params, request }) => {
-      const row = (inspectionCalculationMethods as unknown as Array<Record<string, unknown>>)
-        .find((r) => String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) === params.id);
-      if (!row) return HttpResponse.json({ message: "CalculationMethod not found" }, { status: 404 });
-      Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
-      return HttpResponse.json(row);
-    }),
-    http.delete("*/api/calculation-methods/:id", ({ params }) => {
-      const arr = inspectionCalculationMethods as unknown as Array<Record<string, unknown>>;
-      const i = arr.findIndex((r) => String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`) === params.id);
-      if (i < 0) return HttpResponse.json({ message: "CalculationMethod not found" }, { status: 404 });
-      arr.splice(i, 1);
-      return new HttpResponse(null, { status: 204 });
-    }),
+    // 计算方法 PUT/DELETE /:id 单段派生 id 处理器已删（2026-09-18 ADR-0029：
+    // nextjs 后端单段路由零消费即删；前端组件全部走契约复合键端点，
+    // msw `:id` 单段处理器本就匹配不到两段复合键请求，属死代码一并清）。
 
     // —— 技术要求 GET：+ judgmentStandardCode 过滤（msw 只支持 object/parameter）——
     http.get("*/api/technical-requirements", ({ request }) => {
@@ -660,20 +648,7 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       // 是裸数组，不包 pageOf（同上 calculation-methods 的事故形态）。
       return HttpResponse.json(items);
     }),
-    http.put("*/api/technical-requirements/:id", async ({ params, request }) => {
-      const row = (technicalRequirements as unknown as Array<Record<string, unknown>>)
-        .find((r) => String(r.id ?? `tr-${r.inspectionObjectCode}-${r.inspectionParameterCode}-${r.judgmentStandardCode}`) === params.id);
-      if (!row) return HttpResponse.json({ message: "TechnicalRequirement not found" }, { status: 404 });
-      Object.assign(row, (await request.json()) as object, { updatedAt: new Date().toISOString() });
-      return HttpResponse.json(row);
-    }),
-    http.delete("*/api/technical-requirements/:id", ({ params }) => {
-      const arr = technicalRequirements as unknown as Array<Record<string, unknown>>;
-      const i = arr.findIndex((r) => String(r.id ?? `tr-${r.inspectionObjectCode}-${r.inspectionParameterCode}-${r.judgmentStandardCode}`) === params.id);
-      if (i < 0) return HttpResponse.json({ message: "TechnicalRequirement not found" }, { status: 404 });
-      arr.splice(i, 1);
-      return new HttpResponse(null, { status: 204 });
-    }),
+    // 技术要求 PUT/DELETE /:id 单段派生 id 处理器同上已删（ADR-0029 零消费即删）。
 
     // —— GET /audit-logs：从 flowHistory 派生审计条目（Task 11；lab-msw 无此端点）——
     // 组件 catch 兜底是 error 提示而非崩溃，但列表页 smoke 取「空数据也正常渲染」
