@@ -157,7 +157,7 @@ export function ReportNameList() {
       if (editId) {
         // 契约 UpdateInspectionReportNameRequest 不含 code（code 在 path 上）。
         const payload: UpdateInspectionReportNameRequest = {
-          name: form.name,
+          name: form.name ?? "",
           fullName: form.fullName || undefined,
           templatePath: form.templatePath || undefined,
           description: form.description || undefined,
@@ -167,8 +167,8 @@ export function ReportNameList() {
         await reportNamesUpdateReportName(editId, payload);
       } else {
         const payload: CreateInspectionReportNameRequest = {
-          code: form.code,
-          name: form.name,
+          code: form.code ?? "",
+          name: form.name ?? "",
           fullName: form.fullName || undefined,
           templatePath: form.templatePath || undefined,
           description: form.description || undefined,

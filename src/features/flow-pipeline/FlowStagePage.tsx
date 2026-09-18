@@ -236,7 +236,12 @@ export function FlowStagePage({
     try {
       // M03 7 阶段全 act 模式（ADR-0035）：按本页 stage 调对应 act 端点，
       // 后端 stage-guard 校验单据必须停在本阶段；响应是 FlowActionResult[] 裸数组。
-      const act = ACT_BY_STAGE[stage ?? "receiving"];
+      // completed 是终态只读视图（无 act 端点，7 阶段全 act 模式不含它），
+      // 收窄到 Exclude<FlowStatus, "completed"> 与 ACT_BY_STAGE 键集对齐。
+      const act =
+        ACT_BY_STAGE[
+          (stage ?? "receiving") as Exclude<FlowStatus, "completed">
+        ];
       const results = await act({ action, ids, operator });
       const failed = results.filter((r) => !r.ok);
       const okCount = results.length - failed.length;

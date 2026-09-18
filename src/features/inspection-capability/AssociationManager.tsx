@@ -8,19 +8,13 @@ import { useEffect, useState } from "react";
 import {
   inspectionDictionaryLinkObjectParameter,
   inspectionDictionaryLinkObjectStandard,
-  inspectionDictionaryLinkSpecialtyObject,
-  inspectionDictionaryLinkStandardParameter,
   inspectionDictionaryListObjectParameterLinks,
-  inspectionDictionaryListObjectStandardLinks,
   inspectionDictionaryListObjects,
+  inspectionDictionaryListObjectStandardLinks,
   inspectionDictionaryListParameters,
-  inspectionDictionaryListSpecialtyObjectLinks,
-  inspectionDictionaryListStandardParameterLinks,
   inspectionDictionaryListStandards,
   inspectionDictionaryUnlinkObjectParameter,
   inspectionDictionaryUnlinkObjectStandard,
-  inspectionDictionaryUnlinkSpecialtyObject,
-  inspectionDictionaryUnlinkStandardParameter,
 } from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
 import {
   paramInterfacesLinkParamInterface,
@@ -39,6 +33,10 @@ import {
   reportNamesUnlinkReportNameStandard,
 } from "@/api/endpoints/report-names/report-names";
 import type {
+  InspectionDictionaryListObjectParameterLinksParams,
+  InspectionDictionaryListObjectStandardLinksParams,
+  InspectionDictionaryUnlinkObjectParameterBody,
+  InspectionDictionaryUnlinkObjectStandardBody,
   ObjectParameterLink,
   ObjectReportNameLink,
   ObjectStandardLink,
@@ -52,8 +50,6 @@ import type {
   ReportNamesUnlinkObjectReportNameBody,
   ReportNamesUnlinkReportNameParameterBody,
   ReportNamesUnlinkReportNameStandardBody,
-  SpecialtyObjectLink,
-  StandardParameterLink,
 } from "@/api/endpoints/model";
 
 type Row = Record<string, string>;
@@ -67,12 +63,44 @@ const JUNCTION_API: Record<
     remove: (payload: Row) => Promise<unknown>;
   }
 > = {
+  // 项目↔参数（含资质级别）——InspectionCapabilityFormModal「关联检测参数」页签用
+  "/inspection-object-parameters": {
+    list: (parentCode) =>
+      inspectionDictionaryListObjectParameterLinks({
+        inspectionObjectCode: parentCode,
+      } satisfies InspectionDictionaryListObjectParameterLinksParams).then(
+        (r) => (r.items ?? []) as unknown as Row[],
+      ),
+    add: (p) =>
+      inspectionDictionaryLinkObjectParameter(p as unknown as ObjectParameterLink),
+    remove: (p) =>
+      inspectionDictionaryUnlinkObjectParameter(
+        p as unknown as InspectionDictionaryUnlinkObjectParameterBody,
+      ),
+  },
+  // 项目↔标准（含 role 检测/判定依据）——InspectionCapabilityFormModal「关联检测标准」页签用
+  "/inspection-object-standards": {
+    list: (parentCode) =>
+      inspectionDictionaryListObjectStandardLinks({
+        inspectionObjectCode: parentCode,
+      } satisfies InspectionDictionaryListObjectStandardLinksParams).then(
+        (r) => (r.items ?? []) as unknown as Row[],
+      ),
+    add: (p) =>
+      inspectionDictionaryLinkObjectStandard(p as unknown as ObjectStandardLink),
+    remove: (p) =>
+      inspectionDictionaryUnlinkObjectStandard(
+        p as unknown as InspectionDictionaryUnlinkObjectStandardBody,
+      ),
+  },
   "/inspection-object-report-names": {
     list: (parentCode) =>
       reportNamesListObjectReportNameLinks({
         reportNameCode: parentCode,
       } satisfies ReportNamesListObjectReportNameLinksParams).then(
-        (r) => (r.items ?? []) as Row[],
+        // ObjectReportNameLink（纯可选性接口）与 Row 无结构重叠，
+        // 需经 unknown 中转（同款 add/remove 的 as unknown as 惯例）
+        (r) => (r.items ?? []) as unknown as Row[],
       ),
     add: (p) =>
       reportNamesLinkObjectReportName(p as unknown as ObjectReportNameLink),
@@ -86,7 +114,7 @@ const JUNCTION_API: Record<
       reportNamesListReportNameStandardLinks({
         reportNameCode: parentCode,
       } satisfies ReportNamesListReportNameStandardLinksParams).then(
-        (r) => (r.items ?? []) as Row[],
+        (r) => (r.items ?? []) as unknown as Row[],
       ),
     add: (p) =>
       reportNamesLinkReportNameStandard(p as unknown as ReportNameStandardLink),
@@ -100,7 +128,7 @@ const JUNCTION_API: Record<
       reportNamesListReportNameParameterLinks({
         reportNameCode: parentCode,
       } satisfies ReportNamesListReportNameParameterLinksParams).then(
-        (r) => (r.items ?? []) as Row[],
+        (r) => (r.items ?? []) as unknown as Row[],
       ),
     add: (p) =>
       reportNamesLinkReportNameParameter(
@@ -115,7 +143,7 @@ const JUNCTION_API: Record<
     list: (parentCode) =>
       paramInterfacesListParamInterfaceLinks({
         paramInterfaceCode: parentCode,
-      }).then((r) => (r.items ?? []) as Row[]),
+      }).then((r) => (r.items ?? []) as unknown as Row[]),
     add: (p) =>
       paramInterfacesLinkParamInterface(p as unknown as ParamInterfaceLink),
     remove: (p) =>
@@ -129,15 +157,15 @@ const JUNCTION_API: Record<
 const MASTER_LIST: Record<string, () => Promise<Row[]>> = {
   "/inspection-objects": () =>
     inspectionDictionaryListObjects({ page: 1, pageSize: 1000 }).then(
-      (r) => (r.items ?? []) as Row[],
+      (r) => (r.items ?? []) as unknown as Row[],
     ),
   "/inspection-standards": () =>
     inspectionDictionaryListStandards({ page: 1, pageSize: 1000 }).then(
-      (r) => (r.items ?? []) as Row[],
+      (r) => (r.items ?? []) as unknown as Row[],
     ),
   "/inspection-parameters": () =>
     inspectionDictionaryListParameters({ page: 1, pageSize: 1000 }).then(
-      (r) => (r.items ?? []) as Row[],
+      (r) => (r.items ?? []) as unknown as Row[],
     ),
 };
 
@@ -264,12 +292,12 @@ export function AssociationManager(props: Props) {
       ])
         .then(([iop, io]) => {
           const objectNameByCode = new Map<string, string>();
-          for (const o of (io.items ?? []) as Row[]) {
+          for (const o of (io.items ?? []) as unknown as Row[]) {
             const c = String(o.code ?? "");
             if (c) objectNameByCode.set(c, String(o.name ?? c));
           }
           const m = new Map<string, string[]>();
-          for (const r of (iop.items ?? []) as Row[]) {
+          for (const r of (iop.items ?? []) as unknown as Row[]) {
             const p = String(r.inspectionParameterCode ?? "");
             const o = String(r.inspectionObjectCode ?? "");
             if (!p || !o) continue;
@@ -307,7 +335,7 @@ export function AssociationManager(props: Props) {
     })
       .then((res) => {
         const codes = new Set<string>();
-        for (const r of (res.items ?? []) as Row[]) {
+        for (const r of (res.items ?? []) as unknown as Row[]) {
           const c = r[prefilter.filterResultKey];
           if (c) codes.add(String(c));
         }

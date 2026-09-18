@@ -10,7 +10,7 @@ export { TENANT, toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-ma
 // src/lib/api-helpers.ts applyFlowAction（flow 流转，2026-08-16 修订版）。
 // FK 列空串在库里是 null 不是 ''（seed 归一，carried ruling 3）：DTO 保持 null
 // 原样返回，不转回 ''。
-import { and, eq, ne, desc, inArray, or, ilike, sql as dsql } from "drizzle-orm";
+import { and, asc, eq, ne, desc, inArray, or, ilike, sql as dsql } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db, schema } from "@/db";
 import { TENANT as TENANT_ID, rowToDto as toDto, toCamel } from "./db-map";
@@ -394,6 +394,8 @@ export interface DictCfg {
   /** tenant 列：catalog 4 表有 tenant_id；dict 4 表 schema 无此列（SSOT schema.ts），
    * fixture 版本本就无 tenant 过滤，dict 侧保持全局可见（种子行全部 TENANT-001 域）。 */
   tenantCol?: PgColumn;
+  /** 排序列：缺省按 code 单键。两键合一仍是全序（code 唯一）。 */
+  sortCol?: PgColumn;
   /** POST 重复 code 的 400 文案（fixture 版 getSpecialty(code) 分支原句） */
   dupMessage: string;
 }
@@ -483,8 +485,11 @@ function dictRowToDto(row: Row, patchId: boolean): Row {
 /**
  * 列表查询（tenant 隔离[若有列] + keyword + 直列/junction 反查过滤 + count 先行 + 分页）。
  * 响应 = wrapDict 的 Page<T> 4 字段 {items, page, pageSize, total}。
- * 无 ORDER BY：Postgres 静态表堆序 = 入库序 = msw fixture 数组序（种子即 fixture 灌入），
- * 与 fixture 版「数组原序返回」对齐；字典行无可靠业务排序列（sort_order 同段内重复）。
+ * ORDER BY (sortCol, code)：与 springboot/aspnetcore 家族约定一致（两者均
+ * OrderBy(SortOrder).ThenBy(Code)）。「堆序 = 入库序 = fixture 数组序」的原假设
+ * 在测试写路径（DELETE/POST 清场回收）长期搅动堆后失稳——同名检测项目
+ * （OBJ-SP01-P2 / OBJ-SP07-P11）在树里的先后随机翻转，前端「首个匹配」点击
+ * 不再确定（2026-09-18 react gate 牌号种子穿透用例实证）。
  */
 export async function listDictDb(
   cfg: DictCfg,
@@ -502,6 +507,7 @@ export async function listDictDb(
     .select()
     .from(cfg.table)
     .where(where)
+    .orderBy(...(cfg.sortCol ? [asc(cfg.sortCol), asc(cfg.code)] : [asc(cfg.code)]))
     .limit(pageSize)
     .offset((q.page - 1) * pageSize)) as Row[];
   const items = rows.map((r) => dictRowToDto(r, true));
@@ -656,6 +662,7 @@ export const DICT_CFGS = {
     table: sp,
     code: sp.code,
     name: sp.name,
+    sortCol: sp.sortOrder,
     direct: {},
     reverse: {},
     aggregate: [],
@@ -665,6 +672,7 @@ export const DICT_CFGS = {
     table: obj,
     code: obj.code,
     name: obj.name,
+    sortCol: obj.sortOrder,
     direct: { inspectionSpecialtyCode: obj.inspectionSpecialtyCode },
     reverse: {},
     aggregate: [
@@ -688,6 +696,7 @@ export const DICT_CFGS = {
     table: param,
     code: param.code,
     name: param.name,
+    sortCol: param.sortOrder,
     direct: {},
     reverse: {
       inspectionSpecialtyCode: [
@@ -738,6 +747,7 @@ export const DICT_CFGS = {
     table: std,
     code: std.code,
     name: std.name,
+    sortCol: std.sortOrder,
     direct: {},
     reverse: {
       inspectionSpecialtyCode: [
@@ -778,6 +788,7 @@ function catalogCfg(
   table: PgTable & {
     code: PgColumn;
     name: PgColumn;
+    sortOrder: PgColumn;
     inspectionObjectCode: PgColumn;
     tenantId: PgColumn;
   },
@@ -786,6 +797,7 @@ function catalogCfg(
     table,
     code: table.code,
     name: table.name,
+    sortCol: table.sortOrder,
     // catalogGet 只认 inspectionObjectCode 直列过滤（keyword 不支持——fixture 版静默忽略）
     direct: { inspectionObjectCode: table.inspectionObjectCode },
     reverse: {},

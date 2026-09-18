@@ -1,7 +1,9 @@
 // REF 同名文件移植（类型引用改 @/ 别名）。
-import type { ParamModelProps } from "@/features/data-entry/models/types"
-import type { InspectionParameter } from "@/types/api"
-import type { InspectionTechnicalRequirement } from "@/types/inspection/inspection-technical-requirement"
+import type {
+  ParamModelProps,
+  TechnicalRequirementRow as InspectionTechnicalRequirement,
+} from "@/features/data-entry/models/types"
+import type { InspectionParameter } from "@/api/endpoints/model"
 
 /** 参数界面预览的最小输入：一行参数界面（componentPath + config + name）。 */
 export interface PreviewInterfaceRow {
@@ -37,6 +39,8 @@ export function buildPreviewProps(row: PreviewInterfaceRow): ParamModelProps {
   const specimenCount = typeof cfg?.specimenCount === 'number' ? (cfg.specimenCount as number) : 3
   const techReq: InspectionTechnicalRequirement = {
     id: 'preview-req',
+    // 纯预览 mock（不落库）；tenantId 用种子域字面量占位，非运行时身份兜底
+    tenantId: 'TENANT-001',
     inspectionObjectCode: 'PREVIEW',
     inspectionParameterCode: 'PREVIEW',
     judgmentStandardCode: 'GB/T 228.1-2021',

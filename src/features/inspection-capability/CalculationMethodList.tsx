@@ -31,6 +31,9 @@ import {
 interface CalcRow extends CalculationMethod, TreeListItem {
   id: string;
   parameterName?: string;
+  // 契约 CalculationMethod.sortOrder 必填 vs TreeListItem.sortOrder 可选，
+  // 双继承冲突以契约必填侧显式重申收窄
+  sortOrder: number;
 }
 
 interface Opt {
@@ -107,6 +110,13 @@ export function CalculationMethodList() {
 
   const save = async () => {
     setError(null);
+    // 新建路径复合键两段必填（PUT 路径键取自 editRow 行内原值，不经 form）
+    const objectCode = form.inspectionObjectCode ?? "";
+    const paramCode = form.inspectionParameterCode ?? "";
+    if (!editRow && (!objectCode || !paramCode)) {
+      setError("检测项目与检测参数为必填");
+      return;
+    }
     try {
       if (editRow) {
         // 契约 UpdateCalculationMethodRequest 不含复合键字段（键在 path 上），
@@ -125,8 +135,8 @@ export function CalculationMethodList() {
         );
       } else {
         const payload: CreateCalculationMethodRequest = {
-          inspectionObjectCode: form.inspectionObjectCode,
-          inspectionParameterCode: form.inspectionParameterCode,
+          inspectionObjectCode: objectCode,
+          inspectionParameterCode: paramCode,
           testingStandardCode: form.testingStandardCode || undefined,
           algorithmType: form.algorithmType as CreateCalculationMethodRequest["algorithmType"],
           specimenCount: Number(form.specimenCount) || 1,

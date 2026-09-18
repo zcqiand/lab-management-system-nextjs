@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type {
+  ExtFieldDef,
   Sample,
   SampleReceipt,
   TestRecord,
@@ -56,17 +57,9 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
   const [extModalOpen, setExtModalOpen] = useState(false);
   const [extDraftReady, setExtDraftReady] = useState<Record<string, string> | null>(null);
   const [extDraftSample, setExtDraftSample] = useState<Sample | null>(null);
-  const [extDraftFields, setExtDraftFields] = useState<
-    Array<{
-      key: string;
-      label: string;
-      type?: "text" | "number" | "date" | "select";
-      required?: boolean;
-      options?: string[];
-      tag?: string;
-      source?: "sample" | "receipt";
-    }>
-  >([]);
+  // 扩展字段定义走 orval 生成物 ExtFieldDef（C3：不手写平行类型——
+  // 手写版 type 可选 vs 生成物必填曾因此赋值不兼容）。
+  const [extDraftFields, setExtDraftFields] = useState<ExtFieldDef[]>([]);
 
   useEffect(() => {
     if (!open) return;
@@ -103,17 +96,9 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
         // 类别级扩展属性补录决策：当前类别若有 extFields 且首个样品未覆盖，
         // 弹窗先开；保存后再继续渲染。
         const rname = (
-          generatedReportNames as Array<{
+          generatedReportNames as unknown as Array<{
             code: string;
-            extFields?: Array<{
-              key: string;
-              label: string;
-              type?: "text" | "number" | "date" | "select";
-              required?: boolean;
-              options?: string[];
-              tag?: string;
-              source?: "sample" | "receipt";
-            }>;
+            extFields?: ExtFieldDef[];
           }>
         ).find((r) => r.code === receipt.categoryCode);
         const extFields = rname?.extFields ?? [];

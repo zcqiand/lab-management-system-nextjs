@@ -149,7 +149,7 @@ export function ParamInterfaceList() {
         // config 是自由 JSON，字符串键对象按契约形状透传。
         const payload: UpdateParamInterfaceRequest = {
           name: form.name || undefined,
-          componentPath: form.componentPath,
+          componentPath: form.componentPath ?? "",
           config: configParsed as UpdateParamInterfaceRequest['config'],
           description: form.description || undefined,
           sortOrder: Number(form.sortOrder) || 0,
@@ -157,9 +157,9 @@ export function ParamInterfaceList() {
         await paramInterfacesUpdateParamInterface(editId, payload)
       } else {
         const payload: CreateParamInterfaceRequest = {
-          code: form.code,
+          code: form.code ?? "",
           name: form.name || undefined,
-          componentPath: form.componentPath,
+          componentPath: form.componentPath ?? "",
           config: (configParsed ?? undefined) as CreateParamInterfaceRequest['config'],
           description: form.description || undefined,
           sortOrder: Number(form.sortOrder) || 0,

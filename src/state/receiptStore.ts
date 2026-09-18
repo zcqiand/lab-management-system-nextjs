@@ -4,6 +4,7 @@ import type {
   FlowAction,
   FlowActionResult,
   FlowStatus,
+  CreateSampleReceiptRequest,
   ReceiptsListReceiptsParams,
   UpdateSampleReceiptRequest,
 } from '@/api/endpoints/model'
@@ -48,16 +49,7 @@ type ReceiptListQuery = ReceiptsListReceiptsParams & {
 
 interface ReceiptActions {
   fetchReceipts: (query: ReceiptQueryInput) => Promise<void>
-  createReceipt: (input: {
-    contractId: string
-    commissionCode: string
-    categoryCode: string
-    receivedBy: string
-    sampleSource: string
-    testCategory: string
-    commissionDate?: string
-    remark?: string
-  }) => Promise<void>
+  createReceipt: (input: CreateSampleReceiptRequest) => Promise<void>
   updateReceipt: (id: string, input: Partial<SampleReceipt>) => Promise<void>
   deleteReceipt: (id: string) => Promise<void>
   /**

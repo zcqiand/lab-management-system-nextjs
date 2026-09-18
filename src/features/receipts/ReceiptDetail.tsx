@@ -5,9 +5,9 @@ import type {
   ParamInterface as ParamInterfaceRow,
   ParamInterfaceLink,
   StandardParameterLink as InspectionStandardParameter,
-  TechnicalRequirement as InspectionTechnicalRequirement,
   TestRecordsListTestRecordsParams,
 } from '@/api/endpoints/model'
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from '@/features/data-entry/models/types'
 import {
   inspectionDictionaryListParameters,
   inspectionDictionaryListStandardParameterLinks,
@@ -30,6 +30,8 @@ interface ExtField { key: string; label: string }
 
 interface TestRecord {
   id: string
+  // 契约 TestRecord.tenantId 必填（orval 生成物），本地下游 Model 卡直接消费
+  tenantId: string
   sampleId: string
   parameterCode: string
   requirementCode?: string
@@ -116,7 +118,7 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
       setStandards(stdRes.items ?? [])
       setStdParams(stdParamRes.items ?? [])
       // technical-requirements list 按 SSOT 是裸数组（不分页）。
-      setTechReqs(Array.isArray(reqRes) ? reqRes : [])
+      setTechReqs((Array.isArray(reqRes) ? reqRes : []) as unknown as InspectionTechnicalRequirement[])
       setInterfaces(piRes.items ?? [])
       setLinks(piLinkRes.items ?? [])
       setExtFields(catRes.items?.find((r) => r.code === categoryCode)?.extFields ?? [])
