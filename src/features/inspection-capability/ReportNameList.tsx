@@ -284,7 +284,7 @@ export function ReportNameList() {
                     <button
                       type="button"
                       onClick={() => remove(r.code)}
-                      data-fn="M06.F07.I03"
+                      data-fn="M06.F07.I09"
                       aria-label={`删除 ${r.code}`}
                       className="text-red-600 hover:underline"
                     >

@@ -4,29 +4,59 @@
   "functions": {
     "modules": 7,
     "features": 26,
-    "items": 109
+    "items": 172
   },
-  "warnings_total": 14,
+  "warnings_total": 40,
   "warnings": {
     "已上线但无设计映射": [
       "M00.F01.I01",
       "M00.F02.I01",
       "M01.F04.I03",
+      "M02.F01.I06",
+      "M03.F01.I08",
+      "M03.F02.I05",
+      "M03.F03.I12",
       "M05.F01.I06"
     ],
     "已上线但无测试引用": [
       "M01.F04.I03",
-      "M05.F01.I06"
+      "M02.F01.I06",
+      "M03.F01.I08",
+      "M03.F02.I02",
+      "M03.F02.I05",
+      "M03.F03.I12",
+      "M05.F01.I06",
+      "M06.F01.I06",
+      "M06.F01.I07",
+      "M06.F02.I08",
+      "M06.F02.I09",
+      "M06.F02.I10",
+      "M06.F03.I06",
+      "M06.F03.I07",
+      "M06.F03.I08",
+      "M06.F04.I05",
+      "M06.F04.I06",
+      "M06.F04.I07",
+      "M06.F06.I04"
     ],
     "已上线但不在任何流程且非孤儿白名单": [
       "M00.F01.I01",
       "M00.F02.I01",
       "M01.F04.I01",
       "M01.F04.I03",
+      "M02.F01.I06",
+      "M03.F02.I05",
       "M05.F01.I02",
       "M05.F01.I03",
       "M05.F01.I04",
       "M05.F01.I06"
+    ],
+    "开发中但无需求文档引用": [
+      "M02.F01.I07",
+      "M03.F03.I15"
+    ],
+    "开发中但代码里无 UI 入口(用户还点不到)": [
+      "M03.F03.I15"
     ]
   },
   "unreachable_shipped": [],
@@ -41,19 +71,18 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::AppShell header 挂 user-display-name（displayName，/api/auth/me hydrate）",
         "output\\lab-management-system-contract-test\\tests\\auth-me.test.ts:586 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:531 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:807 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:515 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:1130 (annot)",
         "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:1907 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:3971 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:4452 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:1603 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:1419 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:1906 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-flow-write.test.ts:509 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:2323 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2837 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:1999 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:2475 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:731 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples.test.ts:1843 (annot)",
         "output\\lab-management-system-contract-test\\tests\\summary.test.ts:1722 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:868 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:1116 (annot)",
         "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1798 (annot)",
         "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:661 (annot)",
         "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:1844 (annot)"
@@ -87,17 +116,17 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在",
-        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:1848 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2034 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:6320 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:1837 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2283 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7200 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3048 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2874 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1114 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:1729 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4493 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1107 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2956 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2554 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:1964 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2095 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:1875 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2315 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:1863 (annot)"
       ],
       "entry": [
         "src\\app\\api\\auth\\menus\\route.ts"
@@ -126,14 +155,13 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:960 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1766 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:3529 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:4766 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:2573 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1750 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:3513 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:3207 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:2447 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2250 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:2774 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:792 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3869 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:2867 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2019 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:1977 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:1923 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:756 (annot)"
@@ -153,7 +181,7 @@
       "entry": []
     },
     "M01.F04.I04": {
-      "name": "动态菜单",
+      "name": "动态菜单（lab 侧边栏）",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -196,14 +224,13 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:877 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:873 (annot)",
         "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:970 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1174 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2278 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2208 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1707 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2548 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2337 (annot)",
         "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:913 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-flow.test.ts:743 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:1356 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:1508 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:922 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples.test.ts:850 (annot)",
         "output\\lab-management-system-contract-test\\tests\\summary.test.ts:673 (annot)",
@@ -225,18 +252,18 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer",
-        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:2950 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1281 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2712 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:6894 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2972 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2629 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2098 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2323 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:3204 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1265 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2961 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7861 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3242 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2758 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2091 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3550 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:3055 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2535 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2728 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2438 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2948 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2426 (annot)"
       ],
       "entry": [
         "src\\api\\legacy-client.ts"
@@ -316,7 +343,7 @@
       ]
     },
     "M02.F01.I02": {
-      "name": "合同新建/编辑",
+      "name": "合同详情",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -335,20 +362,15 @@
     },
     "M02.F01.I03": {
       "name": "合同删除",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
+      "designs": [],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:134 (annot)"
       ],
-      "entry": [
-        "src\\app\\(console)\\contracts\\page.tsx"
-      ]
+      "entry": []
     },
     "M02.F01.I04": {
       "name": "合同汇总",
@@ -360,6 +382,43 @@
       "tests": [
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:166 (annot)"
       ],
+      "entry": []
+    },
+    "M02.F01.I05": {
+      "name": "删除合同",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:189 (annot)"
+      ],
+      "entry": [
+        "src\\app\\(console)\\contracts\\page.tsx"
+      ]
+    },
+    "M02.F01.I06": {
+      "name": "创建合同",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M02.F01.I07": {
+      "name": "更新合同",
+      "status": "开发中",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
       "entry": []
     },
     "M03.F01.I01": {
@@ -489,11 +548,44 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：manifest 含 ext:qualityCertNo 时走 ext 源而非 mock",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext: 命中但 sample 无 ext → 解析失败回退 —（不在此路径渲染）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext:qualityCertNo 取 samples[0].ext[qualityCertNo]",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3078 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3125 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3321 (annot)"
       ],
       "entry": [
         "src\\features\\data-entry\\SampleExtFieldsModal.tsx"
       ]
+    },
+    "M03.F01.I08": {
+      "name": "接样-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F01.I09": {
+      "name": "接样-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F01.I10": {
+      "name": "接样-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F02.I01": {
       "name": "任务分配",
@@ -507,14 +599,14 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
       ]
     },
     "M03.F02.I02": {
-      "name": "任务编辑",
+      "name": "任务编辑（客户端视角 anchor）",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -524,12 +616,8 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
-      ],
-      "entry": [
-        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
-      ]
+      "tests": [],
+      "entry": []
     },
     "M03.F02.I03": {
       "name": "任务取消（清空分配）",
@@ -561,14 +649,44 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 4 锚点存在"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
       ],
       "entry": [
         "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
       ]
     },
+    "M03.F02.I05": {
+      "name": "任务分配-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F02.I06": {
+      "name": "任务分配-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F02.I07": {
+      "name": "任务分配-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
     "M03.F03.I01": {
-      "name": "数据录入页面",
+      "name": "样品列表",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -591,7 +709,7 @@
       ]
     },
     "M03.F03.I02": {
-      "name": "检测数据保存",
+      "name": "样品详情",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -619,7 +737,7 @@
       ]
     },
     "M03.F03.I03": {
-      "name": "检测项编辑",
+      "name": "创建样品",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -654,23 +772,13 @@
     },
     "M03.F03.I04": {
       "name": "检测项删除",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::侧栏样品卡右上角「×」按钮挂 M03.F03.I04 + 点击弹 ConfirmModal",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 不存在时 error 填充",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除"
-      ],
-      "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
-      ]
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F03.I05": {
       "name": "自动评定",
@@ -684,22 +792,15 @@
     },
     "M03.F03.I06": {
       "name": "人工改判",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
+      "flows": [],
+      "designs": [],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用",
         "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:119 (annot)"
       ],
-      "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
-      ]
+      "entry": []
     },
     "M03.F03.I07": {
       "name": "数据录入三态过滤器",
@@ -730,7 +831,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13472 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:15672 (annot)"
       ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
@@ -751,6 +852,104 @@
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
       ]
+    },
+    "M03.F03.I10": {
+      "name": "删除检测记录",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::侧栏样品卡右上角「×」按钮挂删除锚点 + 点击弹 ConfirmModal",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 不存在时 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除"
+      ],
+      "entry": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    "M03.F03.I11": {
+      "name": "检测记录改判",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂改判锚点 + 选 pass 后应用"
+      ],
+      "entry": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    "M03.F03.I12": {
+      "name": "数据录入-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F03.I13": {
+      "name": "数据录入-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F03.I14": {
+      "name": "数据录入-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F03.I15": {
+      "name": "数据录入三态过滤器",
+      "status": "开发中",
+      "type": "按钮",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F03.I16": {
+      "name": "更新样品",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F03.I17": {
+      "name": "删除样品",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F05.I01": {
       "name": "报告审核页面",
@@ -791,23 +990,13 @@
     },
     "M03.F05.I03": {
       "name": "审核操作",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::flow 适配多阶段连续流转：data_entry → review → approval",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节"
-      ],
-      "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
-      ]
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F05.I04": {
       "name": "报告审核三态过滤器",
@@ -826,6 +1015,66 @@
       "entry": [
         "src\\features\\reports\\ReportReviewPage.tsx"
       ]
+    },
+    "M03.F05.I05": {
+      "name": "报告审核-批量提交（已废）",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F05.I06": {
+      "name": "报告审核-批量退回（已废）",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F05.I07": {
+      "name": "报告审核-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::flow 适配多阶段连续流转：data_entry → review → approval",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节"
+      ],
+      "entry": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    "M03.F05.I08": {
+      "name": "报告审核-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F05.I09": {
+      "name": "报告审核-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F06.I01": {
       "name": "报告批准页面",
@@ -866,21 +1115,13 @@
     },
     "M03.F06.I03": {
       "name": "批准操作",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
-      ],
-      "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
-      ]
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F06.I04": {
       "name": "报告批准三态过滤器",
@@ -899,6 +1140,44 @@
       "entry": [
         "src\\features\\reports\\ReportApprovePage.tsx"
       ]
+    },
+    "M03.F06.I05": {
+      "name": "报告批准-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+      ],
+      "entry": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    "M03.F06.I06": {
+      "name": "报告批准-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F06.I07": {
+      "name": "报告批准-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F07.I01": {
       "name": "报告发放页面",
@@ -939,21 +1218,13 @@
     },
     "M03.F07.I03": {
       "name": "发放操作",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
-      ],
-      "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
-      ]
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F07.I04": {
       "name": "报告发放三态过滤器",
@@ -972,6 +1243,44 @@
       "entry": [
         "src\\features\\reports\\ReportIssuePage.tsx"
       ]
+    },
+    "M03.F07.I05": {
+      "name": "报告发放-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+      ],
+      "entry": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    "M03.F07.I06": {
+      "name": "报告发放-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F07.I07": {
+      "name": "报告发放-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F08.I01": {
       "name": "报告归档页面",
@@ -1012,21 +1321,13 @@
     },
     "M03.F08.I03": {
       "name": "归档操作",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
-      "flows": [
-        "docs\\design\\flow-function-map.md"
-      ],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
-      ],
-      "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
-      ]
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F08.I04": {
       "name": "报告归档三态过滤器",
@@ -1045,6 +1346,44 @@
       "entry": [
         "src\\features\\reports\\ReportArchivePage.tsx"
       ]
+    },
+    "M03.F08.I05": {
+      "name": "报告归档-提交",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [
+        "docs\\design\\flow-function-map.md"
+      ],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+      ],
+      "entry": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    "M03.F08.I06": {
+      "name": "报告归档-退回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M03.F08.I07": {
+      "name": "报告归档-撤回",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M03.F09.I01": {
       "name": "查看按钮",
@@ -1155,16 +1494,31 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3825 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3444 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2708 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3090 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5063 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2701 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3242 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:2791 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2960 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2948 (annot)"
       ],
       "entry": []
     },
     "M04.F06.I03": {
       "name": "型号删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4482 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6132 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3236 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4187 (annot)"
+      ],
+      "entry": []
+    },
+    "M04.F06.I04": {
+      "name": "删除型号",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1174,10 +1528,10 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4482 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4237 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3243 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4035 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5083 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6738 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:4032 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:5137 (annot)"
       ],
       "entry": []
     },
@@ -1208,14 +1562,28 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3665 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3041 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2892 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3935 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3170 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4143 (annot)"
       ],
       "entry": []
     },
     "M04.F07.I03": {
       "name": "规格删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5641 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:7296 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4694 (annot)"
+      ],
+      "entry": []
+    },
+    "M04.F07.I04": {
+      "name": "删除规格",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1225,9 +1593,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5641 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5401 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3414 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6291 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8208 (annot)"
       ],
       "entry": []
     },
@@ -1259,13 +1626,27 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6887 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6795 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3942 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8829 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5251 (annot)"
       ],
       "entry": []
     },
     "M04.F08.I03": {
       "name": "等级删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4624 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3590 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5852 (annot)"
+      ],
+      "entry": []
+    },
+    "M04.F08.I04": {
+      "name": "删除等级",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1275,9 +1656,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4354 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3461 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4514 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:7441 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9400 (annot)"
       ],
       "entry": []
     },
@@ -1313,6 +1693,16 @@
     },
     "M04.F09.I03": {
       "name": "牌号删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M04.F09.I04": {
+      "name": "删除牌号",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1453,6 +1843,16 @@
     },
     "M06.F01.I03": {
       "name": "检测专项删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F01.I04": {
+      "name": "删除专项",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1466,6 +1866,50 @@
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
       ]
+    },
+    "M06.F01.I05": {
+      "name": "项目↔标准 link",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值"
+      ],
+      "entry": [
+        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    "M06.F01.I06": {
+      "name": "项目↔标准 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F01.I07": {
+      "name": "项目↔标准 列表",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
     },
     "M06.F02.I01": {
       "name": "检测项目列表",
@@ -1497,8 +1941,8 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8098 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8132 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5091 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10166 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:6458 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1506,6 +1950,100 @@
     },
     "M06.F02.I03": {
       "name": "检测项目删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8699 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10782 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:7030 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F02.I04": {
+      "name": "关联检测依据",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11495 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F02.I05": {
+      "name": "关联判定依据",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4019 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F02.I06": {
+      "name": "关联检测参数",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I07": {
+      "name": "关联检测专项",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I08": {
+      "name": "项目↔参数 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I09": {
+      "name": "专项↔项目 列表",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I10": {
+      "name": "项目↔参数 列表",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I11": {
+      "name": "删除项目",
       "status": "规划",
       "type": "接口",
       "requirements": [],
@@ -1513,17 +2051,23 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8699 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8748 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5634 (annot)"
-      ],
+      "tests": [],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
       ]
     },
-    "M06.F02.I04": {
-      "name": "关联检测依据",
+    "M06.F02.I12": {
+      "name": "更新项目",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F02.I13": {
+      "name": "专项↔项目 link",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1532,36 +2076,14 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9461 (annot)"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
       ]
     },
-    "M06.F02.I05": {
-      "name": "关联判定依据",
-      "status": "已上线",
-      "type": "接口",
-      "requirements": [],
-      "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3890 (annot)"
-      ],
-      "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
-      ]
-    },
-    "M06.F02.I06": {
-      "name": "关联检测参数",
+    "M06.F02.I14": {
+      "name": "项目↔参数 link",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1583,21 +2105,15 @@
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
       ]
     },
-    "M06.F02.I07": {
-      "name": "关联检测专项",
-      "status": "已上线",
+    "M06.F02.I15": {
+      "name": "专项↔项目 unlink",
+      "status": "规划",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
-      ],
-      "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
-      ]
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M06.F03.I01": {
       "name": "检测参数列表",
@@ -1627,7 +2143,7 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4345 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4474 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1635,6 +2151,16 @@
     },
     "M06.F03.I03": {
       "name": "检测参数删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F03.I04": {
+      "name": "删除参数",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1648,6 +2174,56 @@
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
       ]
+    },
+    "M06.F03.I05": {
+      "name": "标准↔参数 link",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:5382 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F03.I06": {
+      "name": "标准↔参数 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F03.I07": {
+      "name": "参数↔界面 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F03.I08": {
+      "name": "标准↔参数 列表",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
     },
     "M06.F04.I01": {
       "name": "检测标准列表",
@@ -1676,7 +2252,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4799 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4928 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1684,21 +2260,17 @@
     },
     "M06.F04.I03": {
       "name": "检测标准删除",
-      "status": "规划",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
+      "designs": [],
       "tests": [],
-      "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
-      ]
+      "entry": []
     },
     "M06.F04.I04": {
       "name": "关联检测参数",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1711,6 +2283,66 @@
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    "M06.F04.I05": {
+      "name": "项目↔报告名称 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F04.I06": {
+      "name": "报告名称↔参数 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F04.I07": {
+      "name": "报告名称↔标准 unlink",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F04.I08": {
+      "name": "更新标准",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F04.I09": {
+      "name": "删除标准",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F05.I01": {
@@ -1753,6 +2385,18 @@
     },
     "M06.F05.I03": {
       "name": "计算方法删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13922 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F05.I04": {
+      "name": "更新计算方法",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1761,8 +2405,22 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11722 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:14510 (annot)"
+      ],
+      "entry": []
+    },
+    "M06.F05.I05": {
+      "name": "删除计算方法",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:15105 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationMethodList.tsx"
@@ -1804,6 +2462,28 @@
     },
     "M06.F06.I03": {
       "name": "技术要求删除",
+      "status": "已废弃",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F06.I04": {
+      "name": "更新技术要求",
+      "status": "已上线",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [],
+      "entry": []
+    },
+    "M06.F06.I05": {
+      "name": "删除技术要求",
       "status": "已上线",
       "type": "接口",
       "requirements": [],
@@ -1812,7 +2492,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn=I03 锚点"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点"
       ],
       "entry": [
         "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
@@ -1854,19 +2534,13 @@
     },
     "M06.F07.I03": {
       "name": "报告名称删除",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
-      ],
-      "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
-      ]
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M06.F07.I04": {
       "name": "关联检测项目",
@@ -1879,7 +2553,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10601 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:12635 (annot)"
       ],
       "entry": []
     },
@@ -1894,7 +2568,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11160 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13360 (annot)"
       ],
       "entry": []
     },
@@ -1947,6 +2621,22 @@
       ],
       "entry": []
     },
+    "M06.F07.I09": {
+      "name": "删除报告名称",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
+      ],
+      "entry": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
     "M06.F08.I01": {
       "name": "参数界面列表",
       "status": "已上线",
@@ -1981,19 +2671,13 @@
     },
     "M06.F08.I03": {
       "name": "参数界面删除",
-      "status": "已上线",
+      "status": "已废弃",
       "type": "接口",
       "requirements": [],
       "flows": [],
-      "designs": [
-        "docs\\design\\design-function-map.md"
-      ],
-      "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
-      ],
-      "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
-      ]
+      "designs": [],
+      "tests": [],
+      "entry": []
     },
     "M06.F08.I04": {
       "name": "关联检测参数",
@@ -2046,10 +2730,26 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10029 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:12063 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
+      ]
+    },
+    "M06.F08.I07": {
+      "name": "删除参数界面",
+      "status": "规划",
+      "type": "接口",
+      "requirements": [],
+      "flows": [],
+      "designs": [
+        "docs\\design\\design-function-map.md"
+      ],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
+      ],
+      "entry": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
       ]
     }
   }

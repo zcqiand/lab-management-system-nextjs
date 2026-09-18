@@ -1,16 +1,215 @@
 {
   "schema": 1,
-  "approved": false,
-  "base_sha": "d8abbda8a105a308",
-  "summary": "Task 3 spec §1 三级定义统一（表头说明文字重写，无 ID 变更）",
+  "approved": true,
+  "base_sha": "e8da9fffbe9cdad5",
+  "summary": "批次 2 编号收敛：M02.F01/M03.F03/M06.F02/F04/F07/F08 撞号行废弃+BASE 对齐行新增（编号被废弃行占用则顺延并注记），M03.F05-F08.I03 双胞废弃收敛至 act 行——全部以 shared TSP 路由注释的 BASE 编号为准（ADR-0025 状态核验过）",
   "changes": [
     {
-      "id": "M00",
+      "id": "M02.F01.I02",
       "action": "变更",
-      "name": "三级表头说明文字重写",
-      "reason": "spec §1 三级定义统一（与 ID 集合无关，apply 阶段走正则替换）"
+      "name": "合同详情",
+      "reason": "BASE I02=合同详情 GET /api/contracts/{id}；原「合同新建/编辑」语义迁至新增 I06/I07"
+    },
+    {
+      "id": "M02.F01.I06",
+      "action": "新增",
+      "name": "创建合同",
+      "reason": "BASE I03 编号被废弃行占用顺延 I06；POST /api/contracts：code/clientUnit/projectName/constructionUnit/witnessUnit/witness 必填"
+    },
+    {
+      "id": "M02.F01.I07",
+      "action": "新增",
+      "name": "更新合同",
+      "reason": "BASE I04 顺延 I07；PUT /api/contracts/{id} PATCH 语义；状态开发中（随 BASE）"
+    },
+    {
+      "id": "M03.F03.I01",
+      "action": "变更",
+      "name": "样品列表",
+      "reason": "BASE I01 对齐：GET /api/samples?receiptId=&keyword=；原「数据录入页面」语义由页面 data-fn 锚点并入本行与 I06"
+    },
+    {
+      "id": "M03.F03.I02",
+      "action": "变更",
+      "name": "样品详情",
+      "reason": "BASE I02 对齐：GET /api/samples/{id}；原「检测数据保存」语义并入 I08/I09"
+    },
+    {
+      "id": "M03.F03.I03",
+      "action": "变更",
+      "name": "创建样品",
+      "reason": "BASE I03 对齐：POST /api/samples：receipt_id FK 必存在；ext 默认 {}；原「检测项编辑」语义并入 I09"
+    },
+    {
+      "id": "M03.F03.I16",
+      "action": "新增",
+      "name": "更新样品",
+      "reason": "BASE I04 编号被废弃行（原检测项删除→I10）占用顺延 I16；PUT /api/samples/{id} PATCH 语义"
+    },
+    {
+      "id": "M03.F03.I17",
+      "action": "新增",
+      "name": "删除样品",
+      "reason": "BASE I05 同上顺延 I17；DELETE /api/samples/{id}：204"
+    },
+    {
+      "id": "M03.F05.I03",
+      "action": "废弃",
+      "name": "审核操作",
+      "reason": "双胞收敛（同 react/vue 批次 1）：端点锚定收敛至 M03.F05.I07（act 共端点），本行无独立端点"
+    },
+    {
+      "id": "M03.F06.I03",
+      "action": "废弃",
+      "name": "批准操作",
+      "reason": "双胞收敛：端点锚定收敛至 M03.F06.I05（act 共端点）"
+    },
+    {
+      "id": "M03.F07.I03",
+      "action": "废弃",
+      "name": "发放操作",
+      "reason": "双胞收敛：端点锚定收敛至 M03.F07.I05（act 共端点）"
+    },
+    {
+      "id": "M03.F08.I03",
+      "action": "废弃",
+      "name": "归档操作",
+      "reason": "双胞收敛：端点锚定收敛至 M03.F08.I05（act 共端点）"
+    },
+    {
+      "id": "M06.F02.I03",
+      "action": "废弃",
+      "name": "检测项目删除",
+      "reason": "编号错位（BASE I03=更新项目）；删除语义迁至新增 I11"
+    },
+    {
+      "id": "M06.F02.I11",
+      "action": "新增",
+      "name": "删除项目",
+      "reason": "BASE I04 编号被废弃行占用顺延 I11；DELETE /api/inspection/objects/{code}：204 if exists"
+    },
+    {
+      "id": "M06.F02.I12",
+      "action": "新增",
+      "name": "更新项目",
+      "reason": "BASE I03 语义顺延补齐 I12；PUT /api/inspection/objects/{code} PATCH 语义"
+    },
+    {
+      "id": "M06.F02.I06",
+      "action": "废弃",
+      "name": "关联检测参数",
+      "reason": "编号错位（BASE I06=专项↔项目 unlink）；link 语义迁至新增 I14"
+    },
+    {
+      "id": "M06.F02.I07",
+      "action": "废弃",
+      "name": "关联检测专项",
+      "reason": "编号错位（BASE I05=专项↔项目 link）；语义迁至新增 I13"
+    },
+    {
+      "id": "M06.F02.I13",
+      "action": "新增",
+      "name": "专项↔项目 link",
+      "reason": "BASE I05 顺延 I13；POST /api/inspection/links/specialty-object（实现即原 I07）"
+    },
+    {
+      "id": "M06.F02.I14",
+      "action": "新增",
+      "name": "项目↔参数 link",
+      "reason": "BASE I07 顺延 I14；POST /api/inspection/links/object-parameter（实现即原 I06，含资质必备/可选 + prefilter）"
+    },
+    {
+      "id": "M06.F02.I15",
+      "action": "新增",
+      "name": "专项↔项目 unlink",
+      "reason": "BASE I06 顺延 I15；DELETE /api/inspection/links/specialty-object：404 if 不存在"
+    },
+    {
+      "id": "M06.F04.I03",
+      "action": "废弃",
+      "name": "检测标准删除",
+      "reason": "编号错位（BASE I03=更新标准）；删除语义迁至新增 I09"
+    },
+    {
+      "id": "M06.F04.I08",
+      "action": "新增",
+      "name": "更新标准",
+      "reason": "BASE I03 顺延 I08；PUT /api/inspection/standards/{code} PATCH 语义"
+    },
+    {
+      "id": "M06.F04.I09",
+      "action": "新增",
+      "name": "删除标准",
+      "reason": "BASE I04 顺延 I09；DELETE /api/inspection/standards/{code}：204 if exists"
+    },
+    {
+      "id": "M06.F04.I04",
+      "action": "废弃",
+      "name": "关联检测参数",
+      "reason": "编号错位（BASE I04=删除标准）；语义已在 M06.F03.I05/I06（标准↔参数 link/unlink），无新行"
+    },
+    {
+      "id": "M06.F07.I03",
+      "action": "废弃",
+      "name": "报告名称删除",
+      "reason": "编号错位（BASE I03=创建报告名称）；删除语义迁至新增 I09"
+    },
+    {
+      "id": "M06.F07.I09",
+      "action": "新增",
+      "name": "删除报告名称",
+      "reason": "BASE I05 顺延 I09；DELETE /api/report-names/{code}：204 if exists"
+    },
+    {
+      "id": "M06.F07.I04",
+      "action": "变更",
+      "name": "关联检测项目",
+      "reason": "说明补 BASE 顺延注记：BASE I06=项目↔报告名称 link，本仓号顺延不变"
+    },
+    {
+      "id": "M06.F07.I05",
+      "action": "变更",
+      "name": "关联检测依据",
+      "reason": "说明补 BASE 顺延注记：BASE I07=报告名称↔标准 link（role=TESTING）"
+    },
+    {
+      "id": "M06.F07.I06",
+      "action": "变更",
+      "name": "关联判定依据",
+      "reason": "说明补 BASE 顺延注记：BASE I07=报告名称↔标准 link（role=JUDGMENT）"
+    },
+    {
+      "id": "M06.F07.I07",
+      "action": "变更",
+      "name": "关联检测参数",
+      "reason": "说明补 BASE 顺延注记：BASE I08=报告名称↔参数 link"
+    },
+    {
+      "id": "M06.F07.I08",
+      "action": "变更",
+      "name": "扩展属性维护",
+      "reason": "说明补 BASE 顺延注记：BASE 无本行（本仓 extFields 补录弹窗本地功能）"
+    },
+    {
+      "id": "M06.F08.I03",
+      "action": "废弃",
+      "name": "参数界面删除",
+      "reason": "编号错位（BASE I03=创建参数界面）；删除语义迁至新增 I07"
+    },
+    {
+      "id": "M06.F08.I07",
+      "action": "新增",
+      "name": "删除参数界面",
+      "reason": "BASE I05 顺延 I07；DELETE /api/param-interfaces/{code}：204 if exists"
+    },
+    {
+      "id": "M06.F08.I04",
+      "action": "变更",
+      "name": "关联检测参数",
+      "reason": "说明补 BASE 顺延注记：BASE I06=参数↔界面 link"
     }
   ],
-  "sync_files": [],
-  "applied_at": "2026-09-06T01:13:42+0800"
+  "sync_files": [
+    "docs/design/design-function-map.md"
+  ]
 }

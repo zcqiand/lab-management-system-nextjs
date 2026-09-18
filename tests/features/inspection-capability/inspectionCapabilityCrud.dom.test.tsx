@@ -172,7 +172,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     },
   );
 
-  fnTest(["M06.F03.I03"], "检测参数删除被引用时展示错误", async () => {
+  fnTest(["M06.F03.I04"], "检测参数删除被引用时展示错误", async () => {
     renderPage("parameters");
     await flush();
     const user = userEvent.setup();
@@ -183,7 +183,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect((delBtn as HTMLButtonElement).disabled).toBe(true);
   });
 
-  fnTest(["M06.F01.I03"], "检测专项删除自定义未引用专项成功", async () => {
+  fnTest(["M06.F01.I04"], "检测专项删除自定义未引用专项成功", async () => {
     await apiClient.post(API_ROUTES["/inspection-specialties"], {
       code: "SP91",
       name: "可删专项",
@@ -261,7 +261,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     },
   );
 
-  fnTest(["M06.F02.I06"], "AssociationManager 列出/添加/移除关联", async () => {
+  fnTest(["M06.F02.I14"],"AssociationManager 列出/添加/移除关联", async () => {
     // 给 OBJ-SP01-P1 建一条自定义参数关联用于移除
     await apiClient.post(API_ROUTES["/inspection-parameters"], {
       code: "IP-AM-1",
@@ -297,7 +297,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     );
   });
 
-  fnTest(["M06.F02.I06"], "AssociationManager 行内前缀：必备参数以 * 呈现", async () => {
+  fnTest(["M06.F02.I14"],"AssociationManager 行内前缀：必备参数以 * 呈现", async () => {
     render(
       <AssociationManager
         ariaLabel="OBJ-SP01-P1 关联检测参数"
@@ -326,7 +326,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(await within(list).findByText("*凝结时间")).toBeTruthy();
   });
 
-  fnTest(["M06.F02.I04"], "AssociationManager 行内前缀：检测标准性质以【】呈现", async () => {
+  fnTest(["M06.F01.I05"], "AssociationManager 行内前缀：检测标准性质以【】呈现", async () => {
     render(
       <AssociationManager
         ariaLabel="OBJ-SP01-P1 关联检测标准"
@@ -356,7 +356,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(rows.length).toBeGreaterThan(0);
   });
 
-  fnTest(["M06.F02.I06"], "检测项目编辑弹窗出现 关联检测参数 页签", async () => {
+  fnTest(["M06.F02.I14"],"检测项目编辑弹窗出现 关联检测参数 页签", async () => {
     renderPage("objects");
     await flush();
     const user = userEvent.setup();
@@ -374,7 +374,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(await screen.findByRole("button", { name: "关联检测参数" })).toBeTruthy();
   });
 
-  fnTest(["M06.F02.I04", "M06.F02.I05"], "检测标准关联 标准性质 下拉以中文呈现", async () => {
+  fnTest(["M06.F01.I05"], "检测标准关联 标准性质 下拉以中文呈现", async () => {
     renderPage("objects");
     await flush();
     const user = userEvent.setup();
@@ -386,7 +386,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(within(select).getByRole("option", { name: "判定依据" })).toBeTruthy();
   });
 
-  fnTest(["M06.F02.I06"], "检测参数关联 资质级别 下拉以中文呈现", async () => {
+  fnTest(["M06.F02.I14"],"检测参数关联 资质级别 下拉以中文呈现", async () => {
     renderPage("objects");
     await flush();
     const user = userEvent.setup();

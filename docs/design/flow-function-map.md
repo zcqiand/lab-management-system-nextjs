@@ -23,11 +23,11 @@ flowchart LR
 |---|---|---|---|---|---|---|
 | S01 | 接样 | 接样员 | 委托单 + 样品信息 | sample_receipt + samples | `pending` → `submitted` | M03.F01.I01, M03.F01.I02, M03.F01.I03, M03.F01.I04, M03.F01.I06, M03.F01.I07 |
 | S02 | 任务分配 | 任务分配员 | sample_receipt | sample_receipt.assignee/date | `submitted` → `assigned` | M03.F02.I01, M03.F02.I02, M03.F02.I03, M03.F02.I04 |
-| S03 | 数据录入 | 检测员 | 样品 + 检测项目 | test_records | `assigned` → `data_entered` | M03.F03.I01, M03.F03.I02, M03.F03.I03, M03.F03.I04, M03.F03.I06, M03.F03.I07 |
-| S04 | 报告审核 | 审核员 | sample_receipt + 检测数据 | sample_receipt.flowStatus | `data_entered` → `review_passed` 或 驳回 → `data_entered` | M03.F05.I01, M03.F05.I02, M03.F05.I03, M03.F05.I04 |
-| S05 | 报告批准 | 批准人 | sample_receipt | sample_receipt.flowStatus | `review_passed` → `approved` 或 驳回 → `data_entered` | M03.F06.I01, M03.F06.I02, M03.F06.I03, M03.F06.I04 |
-| S06 | 报告发放 | 发放员 | sample_receipt | sample_receipt.flowStatus | `approved` → `issued` | M03.F07.I01, M03.F07.I02, M03.F07.I03, M03.F07.I04 |
-| S07 | 报告归档 | 档案员 | sample_receipt | sample_receipt.flowStatus | `issued` → `archived` | M03.F08.I01, M03.F08.I02, M03.F08.I03, M03.F08.I04 |
+| S03 | 数据录入 | 检测员 | 样品 + 检测项目 | test_records | `assigned` → `data_entered` | M03.F03.I01, M03.F03.I02, M03.F03.I03, M03.F03.I10, M03.F03.I11, M03.F03.I07 |
+| S04 | 报告审核 | 审核员 | sample_receipt + 检测数据 | sample_receipt.flowStatus | `data_entered` → `review_passed` 或 驳回 → `data_entered` | M03.F05.I01, M03.F05.I02, M03.F05.I07, M03.F05.I04 |
+| S05 | 报告批准 | 批准人 | sample_receipt | sample_receipt.flowStatus | `review_passed` → `approved` 或 驳回 → `data_entered` | M03.F06.I01, M03.F06.I02, M03.F06.I05, M03.F06.I04 |
+| S06 | 报告发放 | 发放员 | sample_receipt | sample_receipt.flowStatus | `approved` → `issued` | M03.F07.I01, M03.F07.I02, M03.F07.I05, M03.F07.I04 |
+| S07 | 报告归档 | 档案员 | sample_receipt | sample_receipt.flowStatus | `issued` → `archived` | M03.F08.I01, M03.F08.I02, M03.F08.I05, M03.F08.I04 |
 | S08 | 详情查看 | 任意角色 | sample_receipt.id | 完整详情页 | – | M03.F09.I01, M03.F09.I02, M03.F09.I03 |
 
 ### 评审时问这四个问题
@@ -45,17 +45,17 @@ flowchart LR
 |---|---|
 | M02.F01.I01 | 合同管理是上游资源池，所有接样单通过 contractId 引用；本身不参与流程转换 |
 | M02.F01.I02 | 同上（合同新建/编辑） |
-| M02.F01.I03 | 同上（合同删除；与试验流程解耦） |
+| M02.F01.I05 | 同上（删除合同；与试验流程解耦） |
 | M05.F01.I01 | 试验报告汇总表：按报告名称（categoryCode）聚合 sample_receipts，是流程末端读视图（不参与状态流转） |
 | M06.F05.I01 | 计算方法维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
 | M06.F05.I02 | 同上（计算方法新建/编辑） |
-| M06.F05.I03 | 同上（计算方法删除） |
+| M06.F05.I05 | 同上（删除计算方法） |
 | M06.F06.I01 | 技术要求维护是 M06 字典子域，被数据录入（M03.F03）读取，但本身不参与流程状态 |
 | M06.F06.I02 | 同上（技术要求新建/编辑） |
-| M06.F06.I03 | 同上（技术要求删除） |
+| M06.F06.I05 | 同上（删除技术要求） |
 | M06.F07.I01 | 报告名称维护是 M06 字典子域，被接样（M03.F01.I07 ext 字段补录）+ 数据录入读取 |
 | M06.F07.I02 | 同上（报告名称新建/编辑） |
-| M06.F07.I03 | 同上（报告名称删除） |
+| M06.F07.I09 | 同上（报告名称删除） |
 | M06.F07.I04 | 同上（关联检测项目） |
 | M06.F07.I05 | 同上（关联检测依据 role=TESTING） |
 | M06.F07.I06 | 同上（关联判定依据 role=JUDGMENT） |
@@ -63,21 +63,21 @@ flowchart LR
 | M06.F07.I08 | 同上（报告名称扩展属性维护） |
 | M06.F08.I01 | 参数界面维护是 M06 字典子域，被数据录入（M03.F03 录入卡路由）读取，但本身不参与流程状态 |
 | M06.F08.I02 | 同上（参数界面新建/编辑） |
-| M06.F08.I03 | 同上（参数界面删除） |
+| M06.F08.I07 | 同上（参数界面删除） |
 | M06.F08.I05 | 同上（参数界面预览） |
 | M06.F08.I06 | 同上（参数界面预览弹窗） |
 | M04.F06.I01 | 型号码表维护是 M04 基础数据子域，被接样（M03.F01 样品型号下拉）读取，但本身不参与流程状态 |
 | M04.F06.I02 | 同上（型号新建/编辑） |
-| M04.F06.I03 | 同上（型号删除） |
+| M04.F06.I04 | 同上（删除型号） |
 | M04.F07.I01 | 规格码表维护是 M04 基础数据子域，被接样（M03.F01 样品规格下拉）读取，但本身不参与流程状态 |
 | M04.F07.I02 | 同上（规格新建/编辑） |
-| M04.F07.I03 | 同上（规格删除） |
+| M04.F07.I04 | 同上（删除规格） |
 | M04.F08.I01 | 等级码表维护是 M04 基础数据子域，被接样（M03.F01 样品等级下拉）读取，但本身不参与流程状态 |
 | M04.F08.I02 | 同上（等级新建/编辑） |
-| M04.F08.I03 | 同上（等级删除） |
+| M04.F08.I04 | 同上（删除等级） |
 | M04.F09.I01 | 牌号码表维护是 M04 基础数据子域，被接样（M03.F01 样品牌号下拉）读取，但本身不参与流程状态 |
 | M04.F09.I02 | 同上（牌号新建/编辑） |
-| M04.F09.I03 | 同上（牌号删除） |
+| M04.F09.I04 | 同上（删除牌号） |
 
 ---
 
@@ -92,8 +92,8 @@ flowchart TD
 
 | 步骤 | 名称 | 角色 | 触发条件 | 操作 | 支撑功能子项 |
 |---|---|---|---|---|---|
-| A01 | 审核驳回 | 审核员 | 报告数据不合格 | flowStatus → `data_entered`，保留 test_records | M03.F05.I03 |
-| A02 | 批准驳回 | 批准人 | 报告签发前需改 | flowStatus → `data_entered`，保留 test_records | M03.F06.I03 |
+| A01 | 审核驳回 | 审核员 | 报告数据不合格 | flowStatus → `data_entered`，保留 test_records | M03.F05.I07 |
+| A02 | 批准驳回 | 批准人 | 报告签发前需改 | flowStatus → `data_entered`，保留 test_records | M03.F06.I05 |
 
 ---
 

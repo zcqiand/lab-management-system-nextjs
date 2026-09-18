@@ -56,7 +56,7 @@ export function TechnicalRequirementList({
   dataFn = 'M06.F06.I01',
   createDataFn = 'M06.F06.I02',
   editDataFn = 'M06.F06.I02',
-  deleteDataFn = 'M06.F06.I03',
+  deleteDataFn = 'M06.F06.I05',
 }: {
   dataFn?: string
   createDataFn?: string
@@ -170,7 +170,7 @@ export function TechnicalRequirementList({
     // @entry M06.F06.I01 技术要求列表页（检测能力模块的「技术要求」路由 /inspection-technical-requirements）
     <div data-fn={dataFn} className="flex flex-col flex-1 min-h-0">
       {/* @entry M06.F06.I02 技术要求新建/编辑按钮（TwoLevelObjectStandardTree 内"新建"+"编辑"） */}
-      {/* @entry M06.F06.I03 技术要求删除按钮（TwoLevelObjectStandardTree 内行"删除"） */}
+      {/* @entry M06.F06.I05 技术要求删除按钮（TwoLevelObjectStandardTree 内行"删除"） */}
       <TwoLevelObjectStandardTree<TechRow>
         title="技术要求"
         dataFn={dataFn}

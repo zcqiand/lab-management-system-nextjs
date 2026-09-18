@@ -56,10 +56,10 @@ const FN_CREATE: Record<ResourceKey, string> = {
 };
 
 const FN_DELETE: Record<ResourceKey, string> = {
-  specialties: "M06.F01.I03", // @entry M06.F01.I03 删除专项按钮（行内"删除"，触发 ConfirmModal）
-  objects: "M06.F02.I03", // @entry M06.F02.I03 删除项目按钮
-  parameters: "M06.F03.I03", // @entry M06.F03.I03 删除参数按钮
-  standards: "M06.F04.I03", // @entry M06.F04.I03 删除标准按钮
+  specialties: "M06.F01.I04", // @entry M06.F01.I04 删除专项按钮（行内"删除"，触发 ConfirmModal）
+  objects: "M06.F02.I11", // @entry M06.F02.I11 删除项目按钮
+  parameters: "M06.F03.I04", // @entry M06.F03.I04 删除参数按钮
+  standards: "M06.F04.I09", // @entry M06.F04.I09 删除标准按钮
 };
 
 interface ResourceState {

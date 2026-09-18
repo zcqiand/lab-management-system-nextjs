@@ -1,4 +1,4 @@
-// M02.F01.I02 / M02.F01.I03 — 合同新建/编辑 + 删除
+// M02.F01.I02 / M02.F01.I05 — 合同新建/编辑 + 删除
 //
 // 直接走 lab-msw 的 fixtures（同进程内 4-backend 切换共享同一份数组）；
 // POST 后立刻 GET 该 id 拿回，再 DELETE 验证 204 / 数组收缩。
@@ -19,7 +19,7 @@ const NEW_BODY = {
   status: "active" as const,
 };
 
-describe("contracts CRUD (M02.F01.I02 / I03)", () => {
+describe("contracts CRUD (M02.F01.I02 / I05)", () => {
   fnTest(["M02.F01.I02"], "新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到", async () => {
     const post = await apiClient.post(BASE, NEW_BODY);
     expect(post.status).toBe(201);
@@ -41,7 +41,7 @@ describe("contracts CRUD (M02.F01.I02 / I03)", () => {
     expect((put.data as { witness: string }).witness).toBe("见证人乙");
   });
 
-  fnTest(["M02.F01.I03"], "删除合同：DELETE 后 GET 列表不再包含该 id", async () => {
+  fnTest(["M02.F01.I05"], "删除合同：DELETE 后 GET 列表不再包含该 id", async () => {
     const post = await apiClient.post(BASE, NEW_BODY);
     const id = (post.data as { id: string }).id;
     const del = await apiClient.delete(`${BASE}/${id}`);

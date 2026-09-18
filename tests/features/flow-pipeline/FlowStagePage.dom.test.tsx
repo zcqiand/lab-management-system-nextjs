@@ -52,7 +52,7 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
   // 用 querySelectorAll 查 I02/I03 data-fn 锚点元素 —— 长度 ≥ 1 即 props 传入成功。
   // （列表非空 + viewDataFn/actionDataFn 传到位 → 按钮渲染并带正确 data-fn）
 
-  fnTest(['M03.F05.I01', 'M03.F05.I02', 'M03.F05.I03', 'M03.F05.I04'], '审核页：查看详情 + 审核通过 按钮挂 data-fn', async () => {
+  fnTest(['M03.F05.I01', 'M03.F05.I02', 'M03.F05.I07', 'M03.F05.I04'], '审核页：查看详情 + 审核通过 按钮挂 data-fn', async () => {
     mockReceiptAt('review')
     const { container } = render(
       <FlowStagePage
@@ -62,22 +62,22 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
         dataFn="M03.F05.I01"
         filterDataFn="M03.F05.I04"
         viewDataFn="M03.F05.I02"
-        actionDataFn="M03.F05.I03"
+        actionDataFn="M03.F05.I07"
       />,
     )
     // 列表 fetch 是异步的：waitFor 阶段 1 等 I04 filter select 渲染，
-    // 阶段 2 等 row 内 action 列按钮挂上 I02/I03 data-fn（CI 异步时序比本机慢一拍，
+    // 阶段 2 等 row 内 action 列按钮挂上 I02/I07 data-fn（CI 异步时序比本机慢一拍，
     // 同步 expect 容易抓到 useEffect 之 setList 还没回的瞬间）
     await waitFor(() => {
       expect(container.querySelector('[data-fn="M03.F05.I04"]')).not.toBeNull()
     })
     await waitFor(() => {
       expect(container.querySelectorAll('[data-fn="M03.F05.I02"]').length).toBeGreaterThan(0)
-      expect(container.querySelectorAll('[data-fn="M03.F05.I03"]').length).toBeGreaterThan(0)
+      expect(container.querySelectorAll('[data-fn="M03.F05.I07"]').length).toBeGreaterThan(0)
     })
   })
 
-  fnTest(['M03.F06.I01', 'M03.F06.I02', 'M03.F06.I03', 'M03.F06.I04'], '批准页：查看详情 + 批准 按钮挂 data-fn', async () => {
+  fnTest(['M03.F06.I01', 'M03.F06.I02', 'M03.F06.I05', 'M03.F06.I04'], '批准页：查看详情 + 批准 按钮挂 data-fn', async () => {
     mockReceiptAt('approval')
     const { container } = render(
       <FlowStagePage
@@ -87,7 +87,7 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
         dataFn="M03.F06.I01"
         filterDataFn="M03.F06.I04"
         viewDataFn="M03.F06.I02"
-        actionDataFn="M03.F06.I03"
+        actionDataFn="M03.F06.I05"
       />,
     )
     await waitFor(() => {
@@ -95,11 +95,11 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
     })
     await waitFor(() => {
       expect(container.querySelectorAll('[data-fn="M03.F06.I02"]').length).toBeGreaterThan(0)
-      expect(container.querySelectorAll('[data-fn="M03.F06.I03"]').length).toBeGreaterThan(0)
+      expect(container.querySelectorAll('[data-fn="M03.F06.I05"]').length).toBeGreaterThan(0)
     })
   })
 
-  fnTest(['M03.F07.I01', 'M03.F07.I02', 'M03.F07.I03', 'M03.F07.I04'], '发放页：查看详情 + 发放 按钮挂 data-fn', async () => {
+  fnTest(['M03.F07.I01', 'M03.F07.I02', 'M03.F07.I05', 'M03.F07.I04'], '发放页：查看详情 + 发放 按钮挂 data-fn', async () => {
     mockReceiptAt('issuance')
     const { container } = render(
       <FlowStagePage
@@ -109,7 +109,7 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
         dataFn="M03.F07.I01"
         filterDataFn="M03.F07.I04"
         viewDataFn="M03.F07.I02"
-        actionDataFn="M03.F07.I03"
+        actionDataFn="M03.F07.I05"
       />,
     )
     await waitFor(() => {
@@ -117,11 +117,11 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
     })
     await waitFor(() => {
       expect(container.querySelectorAll('[data-fn="M03.F07.I02"]').length).toBeGreaterThan(0)
-      expect(container.querySelectorAll('[data-fn="M03.F07.I03"]').length).toBeGreaterThan(0)
+      expect(container.querySelectorAll('[data-fn="M03.F07.I05"]').length).toBeGreaterThan(0)
     })
   })
 
-  fnTest(['M03.F08.I01', 'M03.F08.I02', 'M03.F08.I03', 'M03.F08.I04'], '归档页：查看详情 + 归档 按钮挂 data-fn', async () => {
+  fnTest(['M03.F08.I01', 'M03.F08.I02', 'M03.F08.I05', 'M03.F08.I04'], '归档页：查看详情 + 归档 按钮挂 data-fn', async () => {
     mockReceiptAt('archived')
     const { container } = render(
       <FlowStagePage
@@ -131,7 +131,7 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
         dataFn="M03.F08.I01"
         filterDataFn="M03.F08.I04"
         viewDataFn="M03.F08.I02"
-        actionDataFn="M03.F08.I03"
+        actionDataFn="M03.F08.I05"
       />,
     )
     await waitFor(() => {
@@ -139,7 +139,7 @@ describe('FlowStagePage 行级按钮 data-fn 锚点（4 个 Report 页面共用�
     })
     await waitFor(() => {
       expect(container.querySelectorAll('[data-fn="M03.F08.I02"]').length).toBeGreaterThan(0)
-      expect(container.querySelectorAll('[data-fn="M03.F08.I03"]').length).toBeGreaterThan(0)
+      expect(container.querySelectorAll('[data-fn="M03.F08.I05"]').length).toBeGreaterThan(0)
     })
   })
 

@@ -13,7 +13,7 @@ export function ReportApprovePage() {
       dataFn="M03.F06.I01"
       filterDataFn="M03.F06.I04"
       viewDataFn="M03.F06.I02"
-      actionDataFn="M03.F06.I03"
+      actionDataFn="M03.F06.I05"
     />
   )
 }

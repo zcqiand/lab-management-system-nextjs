@@ -330,7 +330,7 @@ export function InspectionCapabilityFormModal({
           </div>
         )}
         {editing && tab === "assocObject" && resource === "specialties" && (
-          // @entry M06.F02.I07 关联检测专项（专项↔项目多对多）
+          // @entry M06.F02.I13 关联检测专项（专项↔项目多对多）
           <AssociationManager
             ariaLabel="关联检测项目"
             endpoint="/inspection-specialty-objects"
@@ -341,11 +341,11 @@ export function InspectionCapabilityFormModal({
             targetParam="inspectionObjectCode"
             targetValueKey="code"
             targetTextKey="name"
-            fnId="M06.F02.I07"
+            fnId="M06.F02.I13"
           />
         )}
         {editing && tab === "assocStandard" && resource === "objects" && (
-          // @entry M06.F02.I04 关联检测依据(role=TESTING) / @entry M06.F02.I05 关联判定依据(role=JUDGMENT)
+          // @entry M06.F01.I05 关联检测依据(role=TESTING) / 关联判定依据(role=JUDGMENT)
           <AssociationManager
             ariaLabel="关联检测标准"
             endpoint="/inspection-object-standards"
@@ -367,11 +367,11 @@ export function InspectionCapabilityFormModal({
                 groupBy: true, // 按 role 分组显示（"检测依据" / "判定依据" 各自一段）
               },
             ]}
-            fnId="M06.F02.I04"
+            fnId="M06.F01.I05"
           />
         )}
         {editing && tab === "assocParameter" && resource === "objects" && (
-          // @entry M06.F02.I06 关联检测参数（项目↔参数多对多，含资质级别）
+          // @entry M06.F02.I14 关联检测参数（项目↔参数多对多，含资质级别）
           // prefilter 设计：项目上下文天然按 inspectionObjectCode 过滤参数列表，与"先选检测项目→过滤参数"等效；
           // 故未启用组件层 prefilter。详见 REQ-2026-011 §「没把握的地方」#5。
           <AssociationManager
@@ -395,7 +395,7 @@ export function InspectionCapabilityFormModal({
                 rowPrefix: { QUALIFIED: "*", RESTRICTED: "" },
               },
             ]}
-            fnId="M06.F02.I06"
+            fnId="M06.F02.I14"
           />
         )}
         {editing && tab === "assocParameter" && resource === "standards" && (

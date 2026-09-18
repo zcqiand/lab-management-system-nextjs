@@ -1,4 +1,4 @@
-// M03.F03.I06 人工改判：PATCH /api/test-records/:id/verdict {verdict}
+// M03.F03.I11 人工改判：PATCH /api/test-records/:id/verdict {verdict}
 
 import { NextRequest } from "next/server";
 import { getTestRecord } from "@lab/management-system-msw/fixtures";

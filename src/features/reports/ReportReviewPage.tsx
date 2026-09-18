@@ -13,7 +13,7 @@ export function ReportReviewPage() {
       dataFn="M03.F05.I01"
       filterDataFn="M03.F05.I04"
       viewDataFn="M03.F05.I02"
-      actionDataFn="M03.F05.I03"
+      actionDataFn="M03.F05.I07"
     />
   )
 }

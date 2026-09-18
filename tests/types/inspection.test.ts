@@ -92,7 +92,7 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(std.sourceDocumentId).toContain("raw/standards/pdf/");
   });
 
-  fnTest(["M06.F02.I06"], "InspectionObjectParameter 关系必备字段", () => {
+  fnTest(["M06.F02.I14"],"InspectionObjectParameter 关系必备字段", () => {
     const rel: InspectionObjectParameter = {
       id: "iop-001",
       inspectionObjectCode: "OBJ-SP01-P03-FINE",
@@ -105,7 +105,7 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(rel.qualificationLevel).toBe("QUALIFIED");
   });
 
-  fnTest(["M06.F02.I04"], "InspectionObjectStandard role=TESTING 表示检测依据", () => {
+  fnTest(["M06.F01.I05"], "InspectionObjectStandard role=TESTING 表示检测依据", () => {
     const rel: InspectionObjectStandard = {
       id: "ios-001",
       inspectionObjectCode: "OBJ-SP01-P03-FINE",
@@ -117,7 +117,7 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(rel.role).toBe("TESTING");
   });
 
-  fnTest(["M06.F02.I05"], "InspectionObjectStandard role=JUDGMENT 表示判定依据", () => {
+  fnTest(["M06.F01.I05"],"InspectionObjectStandard role=JUDGMENT 表示判定依据", () => {
     const rel: InspectionObjectStandard = {
       id: "ios-002",
       inspectionObjectCode: "OBJ-SP01-P03-FINE",
@@ -191,7 +191,7 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(INSPECTION_STANDARD_ROLES).toEqual(["TESTING", "JUDGMENT"]);
   });
 
-  fnTest(["M06.F02.I06"], "枚举常量：资质等级 QUALIFIED/RESTRICTED", () => {
+  fnTest(["M06.F02.I14"],"枚举常量：资质等级 QUALIFIED/RESTRICTED", () => {
     expect(INSPECTION_QUALIFICATION_LEVELS).toEqual(["QUALIFIED", "RESTRICTED"]);
   });
 
@@ -207,12 +207,12 @@ describe("types/inspection M06 检测能力领域", () => {
     expect(typed).not.toHaveProperty("projectId");
   });
 
-  fnTest(["M06.F02.I06"], "InspectionObjectParameter 不再持有 projectId", () => {
+  fnTest(["M06.F02.I14"],"InspectionObjectParameter 不再持有 projectId", () => {
     const rel = {} as Record<string, unknown>;
     expect("projectId" in rel).toBe(false);
   });
 
-  fnTest(["M06.F02.I07"], "InspectionSpecialtyObject 中间表维持多对多关系", () => {
+  fnTest(["M06.F02.I13"], "InspectionSpecialtyObject 中间表维持多对多关系", () => {
     const rel: InspectionSpecialtyObject = {
       id: "iso-001",
       inspectionSpecialtyCode: "SP01",
@@ -231,13 +231,13 @@ describe("types/inspection M06 检测能力领域", () => {
     expect([s1, s2, s3]).toHaveLength(3);
   });
 
-  fnTest(["M06.F02.I05"], "InspectionStandardRole 联合类型只接受枚举值", () => {
+  fnTest(["M06.F01.I05"],"InspectionStandardRole 联合类型只接受枚举值", () => {
     const r1: InspectionStandardRole = "TESTING";
     const r2: InspectionStandardRole = "JUDGMENT";
     expect([r1, r2]).toHaveLength(2);
   });
 
-  fnTest(["M06.F02.I06"], "InspectionQualificationLevel 联合类型只接受枚举值", () => {
+  fnTest(["M06.F02.I14"],"InspectionQualificationLevel 联合类型只接受枚举值", () => {
     const r1: InspectionQualificationLevel = "QUALIFIED";
     const r2: InspectionQualificationLevel = "RESTRICTED";
     expect([r1, r2]).toHaveLength(2);

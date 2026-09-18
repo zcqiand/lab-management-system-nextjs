@@ -85,15 +85,15 @@ describe('EntryModal 数据录入 3 锚点（M03.F03.I02/I04/I06）', () => {
     await waitFor(() => expect(putCalled).toBe(true))
   })
 
-  fnTest(['M03.F03.I04'], '侧栏样品卡右上角「×」按钮挂 M03.F03.I04 + 点击弹 ConfirmModal', async () => {
+  fnTest(['M03.F03.I10'], '侧栏样品卡右上角「×」按钮挂删除锚点 + 点击弹 ConfirmModal', async () => {
     const { container } = render(
         <EntryModal receipt={MOCK_RECEIPT} onClose={() => {}} />
     )
     await waitFor(() =>
       expect(screen.getAllByText('S-001').length).toBeGreaterThan(0),
     )
-    expect(container.querySelector('[data-fn="M03.F03.I04"]')).not.toBeNull()
-    const delBtn = container.querySelector('[data-fn="M03.F03.I04"]') as HTMLButtonElement
+    expect(container.querySelector('[data-fn="M03.F03.I10"]')).not.toBeNull()
+    const delBtn = container.querySelector('[data-fn="M03.F03.I10"]') as HTMLButtonElement
     fireEvent.click(delBtn)
     // ConfirmModal 弹出，含「删除」确认按钮
     await waitFor(() =>
@@ -101,7 +101,7 @@ describe('EntryModal 数据录入 3 锚点（M03.F03.I02/I04/I06）', () => {
     )
   })
 
-  fnTest(['M03.F03.I06'], 'footer「改判」select 挂 M03.F03.I06 + 选 pass 后应用', async () => {
+  fnTest(['M03.F03.I11'], 'footer「改判」select 挂改判锚点 + 选 pass 后应用', async () => {
     let putCalled = false
     server.use(
       http.put('*/api/receipts/r-test', async ({ request }) => {
@@ -116,8 +116,8 @@ describe('EntryModal 数据录入 3 锚点（M03.F03.I02/I04/I06）', () => {
     await waitFor(() =>
       expect(screen.getAllByText('S-001').length).toBeGreaterThan(0),
     )
-    expect(container.querySelector('[data-fn="M03.F03.I06"]')).not.toBeNull()
-    const sel = container.querySelector('[data-fn="M03.F03.I06"]') as HTMLSelectElement
+    expect(container.querySelector('[data-fn="M03.F03.I11"]')).not.toBeNull()
+    const sel = container.querySelector('[data-fn="M03.F03.I11"]') as HTMLSelectElement
     fireEvent.change(sel, { target: { value: 'fail' } })
     // 应用按钮在 select 之后
     const applyBtn = screen.getByText('应用改判')

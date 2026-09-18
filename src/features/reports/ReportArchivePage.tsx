@@ -14,7 +14,7 @@ export function ReportArchivePage() {
       dataFn="M03.F08.I01"
       filterDataFn="M03.F08.I04"
       viewDataFn="M03.F08.I02"
-      actionDataFn="M03.F08.I03"
+      actionDataFn="M03.F08.I05"
     />
   )
 }

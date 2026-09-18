@@ -492,13 +492,13 @@ export function EntryModal({
                       )}
                     </button>
                     <button
-                      // @entry M03.F03.I04 检测项删除（侧栏样品卡右上角「×」按钮 → DELETE /samples/:id）
+                      // @entry M03.F03.I10 检测项删除（侧栏样品卡右上角「×」按钮 → DELETE /samples/:id）
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteTarget(s);
                       }}
-                      data-fn="M03.F03.I04"
+                      data-fn="M03.F03.I10"
                       title={`删除样品 ${s.sampleCode ?? s.id}`}
                       className="absolute top-0.5 right-0.5 px-1 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100"
                     >
@@ -623,12 +623,12 @@ export function EntryModal({
               </span>
               <div className="flex items-center gap-2 mr-auto ml-4">
                 <select
-                  // @entry M03.F03.I06 人工改判（footer 改判 select + 应用按钮）
+                  // @entry M03.F03.I11 人工改判（footer 改判 select + 应用按钮）
                   value={overrideResult}
                   onChange={(e) =>
                     setOverrideResult(e.target.value as "pass" | "fail" | "")
                   }
-                  data-fn="M03.F03.I06"
+                  data-fn="M03.F03.I11"
                   className="border rounded px-2 py-1 text-xs"
                 >
                   <option value="">改判...</option>

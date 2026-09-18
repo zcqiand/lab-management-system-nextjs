@@ -61,7 +61,7 @@ export interface FlowStagePageProps {
   filterDataFn?: string;
   /** 行级「查看详情」按钮的 data-fn ID，如 M03.F05.I02 */
   viewDataFn?: string;
-  /** 行级「提交/退回」按钮的 data-fn ID，如 M03.F05.I03（审核通过/批准/发放/归档等共用） */
+  /** 行级「提交/退回」按钮的 data-fn ID，如 M03.F05.I07（审核通过/批准/发放/归档等共用） */
   actionDataFn?: string;
   /** 下一阶段的自定义标签（用于「提交后进入」文案覆盖，如 issuance→已归档） */
   nextStageLabel?: string;
@@ -73,13 +73,13 @@ export interface FlowStagePageProps {
  * 「我提交的（可撤回）」区块列出本人已提交至下一环节且未被处理的单据，支持批量撤回。
  */
 // @entry M03.F05.I02 报告审核 查看详情按钮
-// @entry M03.F05.I03 报告审核 审核通过/退回按钮
+// @entry M03.F05.I07 报告审核 审核通过/退回按钮
 // @entry M03.F06.I02 报告批准 查看详情按钮
-// @entry M03.F06.I03 报告批准 批准/退回按钮
+// @entry M03.F06.I05 报告批准 批准/退回按钮
 // @entry M03.F07.I02 报告发放 查看详情按钮
-// @entry M03.F07.I03 报告发放 发放/退回按钮
+// @entry M03.F07.I05 报告发放 发放/退回按钮
 // @entry M03.F08.I02 报告归档 查看详情按钮
-// @entry M03.F08.I03 报告归档 归档/退回按钮
+// @entry M03.F08.I05 报告归档 归档/退回按钮
 export function FlowStagePage({
   title,
   stage,

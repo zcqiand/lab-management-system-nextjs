@@ -147,7 +147,7 @@ describe("sampleStore", () => {
     expect(useSampleStore.getState().error).toBeTruthy();
   });
 
-  fnTest(["M03.F03.I04"], "deleteSample 成功后从 list 移除", async () => {
+  fnTest(["M03.F03.I10"], "deleteSample 成功后从 list 移除", async () => {
     insertSample("rc-default", "S-DEL-1");
     insertSample("rc-default", "S-DEL-2");
     await useSampleStore.getState().fetchSamples({ page: 1, pageSize: 10 });
@@ -158,7 +158,7 @@ describe("sampleStore", () => {
     ).toBe(false);
   });
 
-  fnTest(["M03.F03.I04"], "deleteSample 不存在时 error 填充", async () => {
+  fnTest(["M03.F03.I10"], "deleteSample 不存在时 error 填充", async () => {
     await useSampleStore.getState().deleteSample("nonexistent");
     expect(useSampleStore.getState().error).toBeTruthy();
   });

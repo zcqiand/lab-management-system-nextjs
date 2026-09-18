@@ -188,6 +188,7 @@ export default function ContractsPage() {
                       variant="outline"
                       size="sm"
                       className="ml-2 text-red-600 hover:text-red-700"
+                      data-fn="M02.F01.I05"
                       onClick={(e) => {
                         e.stopPropagation();
                         if (confirm(`确认删除合同 ${c.contractCode}？`)) {
@@ -401,7 +402,6 @@ function ContractFormBody({
           type="button"
           disabled={submitting}
           onClick={() => onSubmit(body)}
-          data-fn="M02.F01.I03"
         >
           {submitting ? "提交中…" : initial ? "保存" : "创建"}
         </Button>

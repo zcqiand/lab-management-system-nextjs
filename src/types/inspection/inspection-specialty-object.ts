@@ -1,5 +1,5 @@
 /**
- * 检测专项 ↔ 检测项目 多对多关联（InspectionSpecialtyObject）— M06.F02.I07
+ * 检测专项 ↔ 检测项目 多对多关联（InspectionSpecialtyObject）— M06.F02.I13
  *
  * 一个项目可以归属多个专项；一个专项可以包含多个项目。
  * 与 `InspectionObject.inspectionSpecialtyCode` 单值字段不重复，

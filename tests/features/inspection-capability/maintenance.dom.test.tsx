@@ -84,7 +84,7 @@ describe("M06.F05 计算方法维护", () => {
     expect(await screen.findByText("编辑计算方法")).toBeTruthy();
   });
 
-  fnTest(["M06.F05.I03"], "行删除按钮挂 deleteDataFn=I03 锚点", async () => {
+  fnTest(["M06.F05.I05"], "行删除按钮挂 deleteDataFn 锚点", async () => {
     render(<CalculationMethodList />);
     await selectStandard("object-OBJ-SP01-P5", "GB/T 50081-2019");
     const delBtn = await waitFor(() => {
@@ -92,7 +92,7 @@ describe("M06.F05 计算方法维护", () => {
       expect(btn).toBeTruthy();
       return btn;
     });
-    expect(delBtn.getAttribute("data-fn")).toBe("M06.F05.I03");
+    expect(delBtn.getAttribute("data-fn")).toBe("M06.F05.I05");
   });
 });
 
@@ -120,7 +120,7 @@ describe("M06.F06 技术要求维护", () => {
     expect(await screen.findByText(/编辑技术要求/)).toBeTruthy();
   });
 
-  fnTest(["M06.F06.I03"], "行删除按钮挂 deleteDataFn=I03 锚点", async () => {
+  fnTest(["M06.F06.I05"], "行删除按钮挂 deleteDataFn 锚点", async () => {
     render(<TechnicalRequirementList />);
     await selectStandard("object-OBJ-SP01-P1", "GB 175-2023");
     const delBtn = await waitFor(() => {
@@ -128,7 +128,7 @@ describe("M06.F06 技术要求维护", () => {
       expect(btn).toBeTruthy();
       return btn;
     });
-    expect(delBtn.getAttribute("data-fn")).toBe("M06.F06.I03");
+    expect(delBtn.getAttribute("data-fn")).toBe("M06.F06.I05");
   });
 });
 
@@ -165,7 +165,7 @@ describe("M06.F07 报告名称维护面", () => {
   });
 
   fnTest(
-    ["M06.F07.I03"],
+    ["M06.F07.I09"],
     "行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）",
     async () => {
       render(<ReportNameList />);
@@ -231,7 +231,7 @@ describe("M06.F08 参数界面维护面", () => {
   );
 
   fnTest(
-    ["M06.F08.I03"],
+    ["M06.F08.I07"],
     "行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）",
     async () => {
       render(<ParamInterfaceList />);

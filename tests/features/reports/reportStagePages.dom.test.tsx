@@ -84,7 +84,7 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
   // flow 动作穿透：审核页对 review 单据点行级「审核通过」→ submit 状态流转
   // review → approval。单据离开 review 主列表，同时出现在「我提交的（可撤回）」
   // 区块（flowStatus=approval + lastSubmittedBy=本人）。
-  fnTest(['M03.F05.I03'], '审核通过动作穿透：review 单据 submit 后流入批准环节', async () => {
+  fnTest(['M03.F05.I07'], '审核通过动作穿透：review 单据 submit 后流入批准环节', async () => {
     render(<ReportReviewPage />)
     // seedData：rc-002-01（RC-2024-0510-01）在 review 环节
     const code = 'RC-2024-0510-01'
@@ -92,7 +92,7 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
       expect(screen.getByText(code)).toBeTruthy()
     })
     const row = screen.getByText(code).closest('tr')!
-    const approveBtn = row.querySelector('[data-fn="M03.F05.I03"]') as HTMLButtonElement
+    const approveBtn = row.querySelector('[data-fn="M03.F05.I07"]') as HTMLButtonElement
     expect(approveBtn).not.toBeNull()
     expect(approveBtn.textContent).toContain('审核通过')
     await userEvent.click(approveBtn)
@@ -111,7 +111,7 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
   // submit → review 双动作穿透：data_entry 单据先提交入 review，再审核通过入 approval。
   // 用数据录入 stage 的 FlowStagePage 参数化形态（同组件，不同 stage）验证
   // flow POST 适配的多阶段连续流转（同一 fixtures 数组原地流转，数据同源）。
-  fnTest(['M03.F05.I03'], 'flow 适配多阶段连续流转：data_entry → review → approval', async () => {
+  fnTest(['M03.F05.I07'], 'flow 适配多阶段连续流转：data_entry → review → approval', async () => {
     const { FlowStagePage } = await import('@/features/flow-pipeline/FlowStagePage')
     // seedData：rc-003-02（RC-2024-0526-01）在 data_entry 环节
     const code = 'RC-2024-0526-01'
@@ -145,7 +145,7 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
       expect(screen.getByText(code)).toBeTruthy()
     })
     const reviewRow = screen.getByText(code).closest('tr')!
-    const approveBtn = reviewRow.querySelector('[data-fn="M03.F05.I03"]') as HTMLButtonElement
+    const approveBtn = reviewRow.querySelector('[data-fn="M03.F05.I07"]') as HTMLButtonElement
     await userEvent.click(approveBtn)
     await waitFor(() => {
       expect(screen.getByText('已提交 1 条')).toBeTruthy()

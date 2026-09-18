@@ -12,7 +12,7 @@ export default function Page() {
         dataFn="M04.F06.I01"
         createDataFn="M04.F06.I02"
         editDataFn="M04.F06.I02"
-        deleteDataFn="M04.F06.I03"
+        deleteDataFn="M04.F06.I04"
       />
   );
 }

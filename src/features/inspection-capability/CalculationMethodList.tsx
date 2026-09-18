@@ -156,7 +156,7 @@ export function CalculationMethodList() {
   return (
     <div data-fn="M06.F05.I01" className="flex flex-col flex-1 min-h-0">
       {/* @entry M06.F05.I02 计算方法新建/编辑按钮（TwoLevelObjectStandardTree 内"新建"+"编辑"） */}
-      {/* @entry M06.F05.I03 计算方法删除按钮（TwoLevelObjectStandardTree 内行"删除"） */}
+      {/* @entry M06.F05.I05 计算方法删除按钮（TwoLevelObjectStandardTree 内行"删除"） */}
       <TwoLevelObjectStandardTree<CalcRow>
         title="计算方法"
         dataFn="M06.F05.I01"
@@ -173,7 +173,7 @@ export function CalculationMethodList() {
         }}
         createDataFn="M06.F05.I02"
         editDataFn="M06.F05.I02"
-        deleteDataFn="M06.F05.I03"
+        deleteDataFn="M06.F05.I05"
         sortBy={["inspectionParameterCode", "spec", "model", "brand", "grade"]}
         getItemId={(it) => it.id}
         columns={[

@@ -1,5 +1,5 @@
 /**
- * 检测项目 ↔ 检测参数 多对多关系（InspectionObjectParameter）— M06.F02.I06
+ * 检测项目 ↔ 检测参数 多对多关系（InspectionObjectParameter）— M06.F02.I14
  *
  * qualificationLevel 记录资质等级（QUALIFIED/RESTRICTED），并不自动决定每张接样单必须/可选测。
  */

@@ -256,7 +256,7 @@ export function ParamInterfaceList() {
                     <button
                       type="button"
                       onClick={() => remove(r.code)}
-                      data-fn="M06.F08.I03"
+                      data-fn="M06.F08.I07"
                       aria-label={`删除 ${r.code}`}
                       className="text-red-600 hover:underline"
                     >
