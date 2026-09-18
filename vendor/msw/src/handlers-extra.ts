@@ -717,7 +717,7 @@ export const testRecordsExtraHandlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  // M03.F03.I06 人工改判
+  // M03.F03.I11 人工改判（原 M03.F03.I06，2026-09-18 编号错位收敛已废弃并迁至 I11；PATCH /test-records/{id}/verdict 同 shared tsp）
   http.patch(`${BASE}/test-records/:id/verdict`, async ({ params, request }) => {
     const t = getTestRecord(String(params.id));
     if (!t) return notFound("TestRecord not found");

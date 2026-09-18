@@ -29,19 +29,19 @@
 | M03.F03.I07 | src/app/data-entry/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F03.I07 | – | 已上线 |
 | M03.F03.I08 | src/app/api/test-records/route.ts (GET) | GET /api/test-records?sampleId=&receiptId= | test_records | M03.F03.I08 | – | 已上线 |
 | M03.F03.I09 | src/app/api/test-records/route.ts (POST) | POST /api/test-records | test_records | M03.F03.I09 | – | 已上线 |
-| M03.F05.I01 | src/app/report-review/page.tsx | GET /api/sample-receipts?stage=review | sample_receipts | M03.F05.I01 | – | 已上线 |
+| M03.F05.I01 | src/app/report-review/page.tsx | GET /api/receipts?flowStatus=review（listReceipts 共享列表；per-stage 队列端点 2026-09-17 已删，队列数据走前端） | sample_receipts | M03.F05.I01 | – | 已上线 |
 | M03.F05.I02 | src/app/report-review/page.tsx (查看报告) | GET /api/sample-receipts/:id?with=report | sample_receipts | M03.F05.I02 | – | 已上线 |
 | M03.F05.I07 | src/features/reports/* (审核通过/驳回) | POST /api/receipts/review/act (ADR-0035) | sample_receipts + audit_events | M03.F05.I07 | – | 已上线 |
 | M03.F05.I04 | src/app/report-review/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F05.I04 | – | 已上线 |
-| M03.F06.I01 | src/app/report-approve/page.tsx | GET /api/sample-receipts?stage=approve | sample_receipts | M03.F06.I01 | – | 已上线 |
+| M03.F06.I01 | src/app/report-approve/page.tsx | GET /api/receipts?flowStatus=approval（listReceipts 共享列表；per-stage 队列端点 2026-09-17 已删，队列数据走前端） | sample_receipts | M03.F06.I01 | – | 已上线 |
 | M03.F06.I02 | src/app/report-approve/page.tsx (查看报告) | GET /api/sample-receipts/:id?with=report | sample_receipts | M03.F06.I02 | – | 已上线 |
 | M03.F06.I05 | src/features/reports/* (批准通过/驳回) | POST /api/receipts/approve/act (ADR-0035) | sample_receipts + audit_events | M03.F06.I05 | – | 已上线 |
 | M03.F06.I04 | src/app/report-approve/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F06.I04 | – | 已上线 |
-| M03.F07.I01 | src/app/report-issue/page.tsx | GET /api/sample-receipts?stage=issue | sample_receipts | M03.F07.I01 | – | 已上线 |
+| M03.F07.I01 | src/app/report-issue/page.tsx | GET /api/receipts?flowStatus=issuance（listReceipts 共享列表；per-stage 队列端点 2026-09-17 已删，队列数据走前端） | sample_receipts | M03.F07.I01 | – | 已上线 |
 | M03.F07.I02 | src/app/report-issue/page.tsx (查看报告) | GET /api/sample-receipts/:id?with=report | sample_receipts | M03.F07.I02 | – | 已上线 |
 | M03.F07.I05 | src/features/reports/* (报告发放) | POST /api/receipts/issuance/act (ADR-0035) | sample_receipts + audit_events | M03.F07.I05 | – | 已上线 |
 | M03.F07.I04 | src/app/report-issue/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F07.I04 | – | 已上线 |
-| M03.F08.I01 | src/app/report-archive/page.tsx | GET /api/sample-receipts?stage=archive | sample_receipts | M03.F08.I01 | – | 已上线 |
+| M03.F08.I01 | src/app/report-archive/page.tsx | GET /api/receipts?flowStatus=archived（listReceipts 共享列表；per-stage 队列端点 2026-09-17 已删，队列数据走前端） | sample_receipts | M03.F08.I01 | – | 已上线 |
 | M03.F08.I02 | src/app/report-archive/page.tsx (查看报告) | GET /api/sample-receipts/:id?with=report | sample_receipts | M03.F08.I02 | – | 已上线 |
 | M03.F08.I05 | src/features/reports/* (报告归档) | POST /api/receipts/archived/act (ADR-0035) | sample_receipts + audit_events | M03.F08.I05 | – | 已上线 |
 | M03.F08.I04 | src/app/report-archive/page.tsx (FilterBar) | GET /api/sample-receipts?flowStatus= | sample_receipts | M03.F08.I04 | – | 已上线 |
