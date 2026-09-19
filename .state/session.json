@@ -1,17 +1,16 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "批次 2 功能树变更全链路收口——三门已绿，全部改动未提交",
+  "current_task": "2026-09-19 family-leftovers wave 收口（Task 6）：--all R1 db.smoke PG 超时判环境假红（R2/R3 两轮绿）；B 段 live 栈 5201 在用",
   "done": [
     "docs/functions/function-tree.md 批次 1+2 落盘（编号错位收敛 + act-merge + M03.F05-F08.I03 双胞收敛 34 处）；中途大 CJK Write 散点损坏经 scratch 目标重合成修复，落盘 diff 逐字节为零",
     "全仓悬空锚点迁移 30 文件 ~110 处（data-fn/@entry/测试 fn 数组/design+flow map）；contracts/page.tsx M02.F01.I05 锚点移到真删除按钮；含 `['M06.F02.I04','M06.F02.I05']`→`['M06.F01.I05']` 合并",
     ".state/trace.json 再生成：488 tests / 98 fn ids / 废弃 ID 0 命中 / 新 ID 全在场",
-    "gate.py exit 0 全绿（L0-L5，205 条目引用完整，软告警 40 条为已知存量）"
+    "gate.py exit 0 全绿（L0-L5，205 条目引用完整，软告警 40 条为已知存量）",
+    "Task 6：db.smoke 假红定性（R2/R3 绿证据 gate-snapshots-r2/r3）"
   ],
   "next": [
-    "提交：docs 三件 + src 锚点 + tests + .state 一批（工作树另有更早会话遗留未提交改动 db-queries.ts/receiptStore.ts 等，分组时注意甄别）",
-    "遗留小项：vendor/msw handlers-extra.ts:720 `M03.F03.I06` 注释待 msw 仓收敛时同步；docs/design/design-function-map.md 4 行 act 改写行的 legacy endpoint 列待端点迁移",
-    "suite 级欠账（非本仓）：根 CLAUDE.md 64 行超 L0 上限 4 行、lab-aspnetcore ReportFlowServiceTest red-first 等实现、lab+saas contract-test SSOT marker 落后 1 commit、nextjs 3 私生端点待落 .tsp"
+    "无代码欠账；剩余项见 docs/superpowers/plans/2026-09-18-family-leftovers-remediation.md"
   ],
   "open_questions": [
     "gate.py --all exit 2：saas family-env.json members 仍列 msw 但本地无 saas-identity-platform-msw 仓（lab-msw 同样本地不在）——删 member 还是建仓，需人裁",
@@ -22,8 +21,10 @@
     "隔离复跑部分测试文件时带 TRACE_MAP=1 会把 trace.json 覆盖成部分版——要隔离复跑先去掉 TRACE_MAP，或跑完全量再隔",
     "到 PG VPS 链路丢包 10-40% 时真链路 dom 测试轮换假红——先 ping 100.79.128.25 看丢包，0% 窗口再跑 gate，别怀疑 selector",
     "it() 标题禁写 Mxx.Fxx.Ixx 字面（fnReporter 误吸）",
-    "file: 依赖是拷贝——msw 侧改完必须 rm node_modules/@lab/management-system-msw + npm install"
+    "file: 依赖是拷贝——msw 侧改完必须 rm node_modules/@lab/management-system-msw + npm install",
+    "db.smoke 单轮 PG 超时先查 VPS RTT/丢包再动代码——R1 假红 R2/R3 即绿（Task 6 实证）"
   ],
   "active_branch": "master",
-  "last_session_at": "2026-09-18"
+  "last_session_at": "2026-09-19",
+  "last_session_summary": "无本批代码改动：R1 L4 db.smoke PG timeout 单轮红，R2/R3 同环境绿——轮换成立定环境假红（VPS RTT 抖动类）"
 }
