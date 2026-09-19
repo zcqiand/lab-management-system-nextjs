@@ -9,7 +9,7 @@
 // 失败映射(与 SpringBoot / aspnetcore 子类对齐):
 //   400 → InvalidGrant     401 → UnauthorizedClient     5xx → UpstreamUnavailable
 //
-// 客户端:接口 + HttpRealClient + NoopClient(profile 切换 dev 不启 saas)。
+// 客户端:接口 + Http 实现（2026-09-20 人裁：no-sso/Noop 模式已退役，恒真链路）。
 import { config as loadEnv } from "node:process";
 
 export class SaasAuthError extends Error {
@@ -191,65 +191,8 @@ export class HttpSaasMeClient implements SaasMeClient {
   }
 }
 
-// === Noop impl (dev / no-sso profile) ===
-
-export class NoopSaasAuthClient implements SaasAuthClient {
-  async authorize(_redirectUri: string, _scope: string, state: string): Promise<AuthorizeCodeResponse> {
-    // NoopSaasAuthClient 是 dev 环境替身：authorize 返固定 dev-code，参数被接口签名
-    // 强制要求但不在响应里出现。签名同步对齐 SaasAuthClient 接口（M01.F05.I05 契约）。
-    void _redirectUri;
-    void _scope;
-    return { code: "dev-code", state };
-  }
-  async token(
-    _grantType: "authorization_code" | "refresh_token",
-    _code: string | null,
-    _refreshToken: string | null,
-    _redirectUri: string | null,
-  ): Promise<TokenResponse> {
-    // NoopSaasAuthClient.token：同上，返固定 dev token 不消费 OAuth grant 字段。
-    void _grantType;
-    void _code;
-    void _refreshToken;
-    void _redirectUri;
-    return {
-      accessToken: "dev-access-token",
-      refreshToken: "dev-refresh-token",
-      tokenType: "Bearer",
-      expiresIn: 3600,
-      scope: "openid",
-    };
-  }
-}
-
-export class NoopSaasMeClient implements SaasMeClient {
-  async whoami(_saasAccessToken: string): Promise<SaasCurrentUser> {
-    // Noop 替身：返固定 USER-A，saasAccessToken 在 dev 环境不参与校验。
-    void _saasAccessToken;
-    return {
-      id: "USER-A",
-      // 2026-09-02 契约收敛：与 directory DEMO_USER.username=alice 对齐（refresh 路径
-      // findByEmail(email) 必须命中目录行，否则 unknown user）
-      email: "alice",
-      displayName: "管理员",
-      memberships: [
-        { id: "m1", userId: "USER-A", tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },
-        { id: "m2", userId: "USER-A", tenantId: "TENANT-002", roleIds: ["technician"], status: "active" },
-        { id: "m3", userId: "USER-A", tenantId: "TENANT-003", roleIds: ["viewer"], status: "active" },
-      ],
-    };
-  }
-  async listMyTenants(_saasAccessToken: string): Promise<SaasTenantMembership[]> {
-    void _saasAccessToken;
-    return [
-      { id: "m1", userId: "USER-A", tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },
-      { id: "m2", userId: "USER-A", tenantId: "TENANT-002", roleIds: ["technician"], status: "active" },
-      { id: "m3", userId: "USER-A", tenantId: "TENANT-003", roleIds: ["viewer"], status: "active" },
-    ];
-  }
-}
-
 // === Client factory (LabConfig 决定 inline) ===
+// 2026-09-20 起 no-sso 分支已删：恒 Http 实现，构造器逐项 fail-fast。
 
 export interface SaasConfig {
   baseUrl: string;
@@ -257,11 +200,9 @@ export interface SaasConfig {
   clientSecret: string;
   defaultTenantId: string;
   callbackRedirectUri: string;
-  profile: "no-sso" | "real";
 }
 
 export function createSaasAuthClient(cfg: SaasConfig): SaasAuthClient {
-  if (cfg.profile === "no-sso") return new NoopSaasAuthClient();
   return new HttpSaasAuthClient({
     baseUrl: cfg.baseUrl,
     clientId: cfg.clientId,
@@ -272,7 +213,6 @@ export function createSaasAuthClient(cfg: SaasConfig): SaasAuthClient {
 }
 
 export function createSaasMeClient(cfg: SaasConfig): SaasMeClient {
-  if (cfg.profile === "no-sso") return new NoopSaasMeClient();
   return new HttpSaasMeClient(cfg.baseUrl);
 }
 

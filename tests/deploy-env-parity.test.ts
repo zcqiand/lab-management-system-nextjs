@@ -95,9 +95,8 @@ describe("deploy lab.env ↔ .env.example key parity", () => {
     ).toBe(true);
   });
 
-  it("LAB_SSO_PROFILE 枚举值合法（no-sso | real，历史值 sso 是非法枚举）", () => {
-    const m = /^LAB_SSO_PROFILE=(.+)$/m.exec(envExample);
-    expect(m, ".env.example 必须显式声明 LAB_SSO_PROFILE").toBeTruthy();
-    expect(["no-sso", "real"]).toContain((m?.[1] ?? "").trim());
+  it("LAB_SSO_PROFILE 已删（2026-09-20 no-sso 模式退役）且 deploy 脚本不再引用", () => {
+    expect(envKeys(envExample).has("LAB_SSO_PROFILE")).toBe(false);
+    expect(deployScriptKeys(deployScript).has("LAB_SSO_PROFILE")).toBe(false);
   });
 });

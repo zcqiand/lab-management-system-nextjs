@@ -98,7 +98,7 @@ export async function cacheMenuSnapshot(
       return;
     }
     const body = (await resp.json()) as Record<string, SaasMenuNode[] | undefined>;
-    const tree = body[appCode] ?? []; // appCode 不在响应里 → 空快照（与 no-sso 兜底对齐）
+    const tree = body[appCode] ?? []; // appCode 不在响应里 → 空快照（saas 未返回本 app 菜单的合法形态）
     putMenuSnapshot(userId, tree.map(mapSaasMenu));
   } catch (err) {
     console.warn(`[menu-snapshot] fetch failed for user ${userId}: ${(err as Error).message}`);

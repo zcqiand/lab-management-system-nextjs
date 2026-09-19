@@ -77,7 +77,6 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'LAB_JWT_ISSUER=lab-management-system\n'
     printf 'LAB_JWT_TTL_SECONDS=3600\n'
     printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
-    printf 'LAB_SSO_PROFILE=real\n'
     # 2026-09-13 saas pivot: client_id = oauth_client.client_id 字符串 code（行 UUID 必 404）
     printf 'SAAS_OAUTH_CLIENT_ID=lab-management\n'
     # ADR-0019：浏览器侧 client_id 必须从 env 注入,bundle 不再 fallback 字面。
@@ -140,7 +139,6 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing LAB_JWT_ISSUER 'lab-management-system'
   append_if_missing LAB_JWT_TTL_SECONDS '3600'
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
-  append_if_missing LAB_SSO_PROFILE 'real'
   # 2026-09-13 saas pivot: client_id = oauth_client.client_id 字符串 code（行 UUID 必 404）
   append_if_missing SAAS_OAUTH_CLIENT_ID 'lab-management'
   # ADR-0019：浏览器 bundle 同样要显式声明,否则 build 时丢 key。

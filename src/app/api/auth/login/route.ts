@@ -1,6 +1,6 @@
 // POST /api/auth/login
 //
-// 2026-09-04 (ADR-0019 配套 + P2 debt 清): demo 模式(login 默认 no-sso profile)也走真
+// 2026-09-04 (ADR-0019 配套 + P2 debt 清): 密码登录入口（dev/demo）也走真
 // HS256 token 签发（LabJwtSigner），不再用 mock-jwt-${username} opaque token。
 // 与 msw/aspnetcore/springboot 真后端 token 形态对齐 → contract-test 4-way 一致。
 //
@@ -97,15 +97,15 @@ export async function POST(req: Request) {
   }
   const user = directory.findByUsername(username)!;
   // 密码登录用户无 saas 身份 -> 服务账号拉菜单快照（失败只 warn，不阻塞登录）。
-  // 2026-09-02 契约对齐：saas 不可达（no-sso）也写**空快照**——与 msw/springboot/aspnetcore
-  // noop 语义一致（login 写空快照 → GET /menus 200 [] 而非 503），四方契约面不分叉。
+  // 2026-09-02 契约对齐：saas 不可达也写**空快照**——与 msw/springboot/aspnetcore
+  // 语义一致（login 写空快照 → GET /menus 200 [] 而非 503），四方契约面不分叉。
   const saasToken = await serviceLogin();
   if (saasToken) {
     await cacheMenuSnapshot(user.id, saasToken, SAAS_BASE_URL());
   } else {
     putMenuSnapshot(user.id, []);
   }
-  // no-sso demo 模式也写真 JWT 形态（与 msw/aspnetcore/springboot 对齐 → contract-test 4-way 一致）。
+  // 密码登录路径也写真 JWT 形态（与 msw/aspnetcore/springboot 对齐 → contract-test 4-way 一致）。
   // membership-snapshot 同步写,让 /api/auth/me 走 snapshot hit 路径而非 401 miss。
   // 这与 sso/callback 写 saas 真实 memberships 同语义,只是数据来自 DEMO_TENANTS。
   putMembershipSnapshot(

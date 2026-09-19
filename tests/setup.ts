@@ -25,7 +25,11 @@ if (process.env.NEXT_PUBLIC_API_BASE_URL === undefined) {
 // ADR-0019：以下 env 在 src/ 顶层 requireEnv,测试模块 import 时就 throw。
 // 显式 seed dev 值,等同 .env.test 同步覆盖。dev/prod 真值由 deploy 脚本注入。
 const ADR0019_TEST_ENV: Record<string, string> = {
-  SAAS_IDP_URL: "http://localhost:5101",
+  // 黑洞端口（照 CT start-family.sh / ci.yml 先例）：no-sso 模式删除（2026-09-20）
+  // 后走 buildAuth/login route 的 API/DOM 测试会真发 fetch——压到 127.0.0.1:9
+  // 连接立即被拒，serviceLogin/menu-snapshot catch warn → 空快照，契约面不变
+  // 且无真实网络尝试外溢。需要 saas 真响应的测试自行 mock/stub fetch。
+  SAAS_IDP_URL: "http://127.0.0.1:9",
   SAAS_UI_BASE_URL: "http://localhost:5101",
   SAAS_OAUTH_CLIENT_ID: "lab-management",
   SAAS_OAUTH_CLIENT_SECRET: "lab-management-secret",
@@ -36,7 +40,7 @@ const ADR0019_TEST_ENV: Record<string, string> = {
   LAB_AUTH_DEV_PASSWORD: "dev123456",
   // readLabConfig fail-fast 组（factory.ts requireKey，等同 .env.test 值）：
   // vitest 不读 .env*，缺这些 seed 则 login/switch-tenant 路由测试全 500。
-  LAB_SSO_PROFILE: "no-sso",
+  // LAB_SSO_PROFILE 已随 no-sso 模式退役（2026-09-20），不再 seed。
   LAB_JWT_SECRET: "dev-key-32-bytes-minimum-length!",
   LAB_JWT_ISSUER: "lab-management-system",
   LAB_JWT_TTL_SECONDS: "3600",

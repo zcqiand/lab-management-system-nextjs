@@ -162,7 +162,7 @@ describe("cacheMenuSnapshot：saas /me/menus Record<appCode, EffectiveMenuNode[]
     });
   });
 
-  fnTest(["M01.F04.I04"], "Record 形状：appCode 不在响应里 → 写空快照（与 no-sso 兜底四方对齐）", async () => {
+  fnTest(["M01.F04.I04"], "Record 形状：appCode 不在响应里 → 写空快照（saas 无本 app 菜单的合法形态）", async () => {
     mockSaas({ erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }] });
 
     await cacheMenuSnapshot("user-y", "tok", "http://saas", "lab-management");
