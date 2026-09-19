@@ -51,6 +51,10 @@ export function SummaryPage() {
   const [error, setError] = useState<string | null>(null);
   // B6 加载态：报告名称源是否已落定（空列表是合法结果，不能只看 reportNames.length）
   const [namesReady, setNamesReady] = useState(false);
+  // B6 修复 R1：stats 源是否已落定（成败都算落定）——stats 失败不与共享 error 混用，
+  // 否则切 categoryCode 时汇总表 effect 开头 setError(null) 清掉 error，stats 永不重试
+  // 仍 null → 门控恒真 → 整页 PageLoading 永久卡死
+  const [statsReady, setStatsReady] = useState(false);
 
   // 拉报告名称下拉（一次性）
   useEffect(() => {
@@ -78,6 +82,9 @@ export function SummaryPage() {
         if (!cancelled) setStats(res);
       } catch (e) {
         if (!cancelled) setError(String(e));
+      } finally {
+        // B6 修复 R1：无论成败都要落定，参照 namesReady 的落定语义
+        if (!cancelled) setStatsReady(true);
       }
     })();
     return () => { cancelled = true; };
@@ -102,8 +109,9 @@ export function SummaryPage() {
   }, [categoryCode]);
 
   // B6 加载态：三源（报告名称/仪表盘 stats/汇总表）任一未到即整页加载；
-  // 出过数据后 categoryCode 切换 refetch 不再整页回退（error 也解除门控）
-  if ((!namesReady || !stats || !data) && !error) return <PageLoading />;
+  // 出过数据后 categoryCode 切换 refetch 不再整页回退（error 也解除门控）；
+  // B6 修复 R1：stats 用落定位 statsReady 门控（失败也算落定），不依赖共享 error
+  if ((!namesReady || !statsReady || !data) && !error) return <PageLoading />;
 
   return (
     // @entry M05.F01.I02 — 仪表盘容器（包裹 I03/I04 + 汇总表）

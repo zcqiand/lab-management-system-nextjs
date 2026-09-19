@@ -64,7 +64,6 @@ export default function ContractsPage() {
   //（TanStack Query isLoading 自带聚合语义；refetch（isFetching）不回空页）
   if (list.isLoading) return <PageLoading />;
 
-
   const editingContract =
     mode.kind === "edit" ? (items.find((c) => c.id === mode.id) ?? null) : null;
 
