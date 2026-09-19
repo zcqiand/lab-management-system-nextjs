@@ -4,6 +4,7 @@ import { useAuthStore } from "@/state/authStore";
 import { contractsListContracts } from "@/api/endpoints/contracts/contracts";
 import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
 import { receiptsListReceipts } from "@/api/endpoints/receipts/receipts";
+import { PageLoading } from "@/components/app/page-loading";
 import type {
   Contract,
   FlowAction,
@@ -118,7 +119,8 @@ export function FlowStagePage({
   const [page, setPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  // B6 加载态：首屏即视为加载中（首帧不渲染空表壳；refetch 时列表保持旧数据，不回空页）
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -272,6 +274,9 @@ export function FlowStagePage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const finalSubmitLabel = submitLabel ?? "提交";
   const colSpan = 11 + extraColumns.length;
+
+  // B6 加载态：首载未到齐整页 PageLoading，不渲染空壳（列表为空且仍在加载才门控）
+  if (loading && list.length === 0) return <PageLoading />;
 
   return (
     <div className="space-y-4" data-fn={dataFn}>

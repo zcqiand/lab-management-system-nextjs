@@ -30,6 +30,7 @@ import {
   useUpdateContract,
   type Contract,
 } from "@/api/contracts";
+import { PageLoading } from "@/components/app/page-loading";
 
 type Mode = { kind: "idle" } | { kind: "create" } | { kind: "edit"; id: string };
 
@@ -58,6 +59,11 @@ export default function ContractsPage() {
   const remove = useDeleteContract();
 
   const items = list.data?.items ?? [];
+
+  // B6 加载态：首载未到齐整页 PageLoading，不渲染空壳
+  //（TanStack Query isLoading 自带聚合语义；refetch（isFetching）不回空页）
+  if (list.isLoading) return <PageLoading />;
+
 
   const editingContract =
     mode.kind === "edit" ? (items.find((c) => c.id === mode.id) ?? null) : null;

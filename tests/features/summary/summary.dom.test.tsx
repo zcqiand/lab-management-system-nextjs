@@ -26,8 +26,11 @@ describe("M05.F01 试验报告汇总表 + 仪表盘", () => {
     "data-fn=M05.F01.I02 锚点存在（仪表盘容器，包裹 I03/I04/I01 三区块）",
     async () => {
       const { container } = mount();
-      const root = container.querySelector('[data-fn="M05.F01.I02"]');
-      expect(root).not.toBeNull();
+      // B6 加载态：整页 PageLoading 门控后，锚点随数据一起出现 → waitFor 断言
+      await waitFor(() => {
+        const root = container.querySelector('[data-fn="M05.F01.I02"]');
+        expect(root).not.toBeNull();
+      });
     },
   );
 
@@ -98,8 +101,11 @@ describe("M05.F01 试验报告汇总表 + 仪表盘", () => {
     "data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
     async () => {
       const { container } = mount();
-      const root = container.querySelector('[data-fn="M05.F01.I01"]');
-      expect(root).not.toBeNull();
+      // B6 加载态：整页 PageLoading 门控后，锚点随数据一起出现 → waitFor 断言
+      await waitFor(() => {
+        const root = container.querySelector('[data-fn="M05.F01.I01"]');
+        expect(root).not.toBeNull();
+      });
       // 等 /api/summary 拉回
       await waitFor(() => {
         expect(screen.getByTestId("summary-table")).toBeInTheDocument();

@@ -48,7 +48,10 @@ beforeEach(() => {
 describe('reports 4 阶段页（M03.F05-F08）', () => {
   fnTest(['M03.F05.I01'], '审核页壳 smoke：渲染标题「报告审核」不炸', async () => {
     render(<ReportReviewPage />)
-    expect(screen.getByText('报告审核')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('报告审核')).toBeTruthy()
+    })
     // 副标题来自 props（FlowStagePage 标题栏下方说明行）
     await waitFor(() => {
       expect(screen.getByText(/审核通过后进入报告批准/)).toBeTruthy()
@@ -57,7 +60,10 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
 
   fnTest(['M03.F06.I01'], '批准页壳 smoke：渲染标题「报告批准」不炸', async () => {
     render(<ReportApprovePage />)
-    expect(screen.getByText('报告批准')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('报告批准')).toBeTruthy()
+    })
     await waitFor(() => {
       expect(screen.getByText(/批准后进入报告发放/)).toBeTruthy()
     })
@@ -65,7 +71,10 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
 
   fnTest(['M03.F07.I01'], '发放页壳 smoke：渲染标题「报告发放」不炸', async () => {
     render(<ReportIssuePage />)
-    expect(screen.getByText('报告发放')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('报告发放')).toBeTruthy()
+    })
     // seedData 有 issuance 单据（如 RC-2024-0502-01），等待列表行渲染
     await waitFor(() => {
       expect(screen.getByText('RC-2024-0502-01')).toBeTruthy()
@@ -74,7 +83,10 @@ describe('reports 4 阶段页（M03.F05-F08）', () => {
 
   fnTest(['M03.F08.I01'], '归档页壳 smoke：渲染标题「报告归档」不炸', async () => {
     render(<ReportArchivePage />)
-    expect(screen.getByText('报告归档')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('报告归档')).toBeTruthy()
+    })
     await waitFor(() => {
       expect(screen.getByText(/归档后流程结束/)).toBeTruthy()
     })

@@ -58,25 +58,37 @@ describe('M04.F06-F09 码表维护 4 页', () => {
 
   fnTest(['M04.F06.I01'], '型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表', async () => {
     render(<CategoryDictList endpoint="/models" title="型号维护" dataFn="M04.F06.I01" />)
-    expect(screen.getByText('型号维护')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('型号维护')).toBeTruthy()
+    })
     await waitForTree()
   })
 
   fnTest(['M04.F07.I01'], '规格维护：渲染标题不炸', async () => {
     render(<CategoryDictList endpoint="/specifications" title="规格维护" dataFn="M04.F07.I01" />)
-    expect(screen.getByText('规格维护')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('规格维护')).toBeTruthy()
+    })
     await waitForTree()
   })
 
   fnTest(['M04.F08.I01'], '等级维护：渲染标题不炸', async () => {
     render(<CategoryDictList endpoint="/grades" title="等级维护" dataFn="M04.F08.I01" />)
-    expect(screen.getByText('等级维护')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('等级维护')).toBeTruthy()
+    })
     await waitForTree()
   })
 
   fnTest(['M04.F09.I01'], '牌号维护：牌号种子行渲染（fixtures 真数据穿透）', async () => {
     render(<CategoryDictList endpoint="/brands" title="牌号维护" dataFn="M04.F09.I01" />)
-    expect(screen.getByText('牌号维护')).toBeTruthy()
+    // B6 加载态：整页 PageLoading 门控后，标题随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      expect(screen.getByText('牌号维护')).toBeTruthy()
+    })
     // 树加载后默认选中首个检测项目，其下牌号行渲染（fixtures 真数据穿透）
     await waitForTree()
   })

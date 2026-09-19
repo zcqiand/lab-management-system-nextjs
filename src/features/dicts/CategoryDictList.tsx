@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { PageLoading } from "@/components/app/page-loading";
 import {
   DndContext,
   PointerSensor,
@@ -135,7 +136,10 @@ export function CategoryDictList({
   const [objects, setObjects] = useState<InspectionObject[]>([]);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [list, setList] = useState<DictItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  // B6 加载态：首屏即视为加载中（首帧不渲染空壳；refetch 时列表保持旧数据，不回空页）
+  const [loading, setLoading] = useState(true);
+  // B6 加载态：检测项目树未就绪也视为整页加载中（树与列表都到齐才出界面）
+  const [objectsReady, setObjectsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [formOpen, setFormOpen] = useState(false);
@@ -153,13 +157,17 @@ export function CategoryDictList({
     inspectionDictionaryListObjects({ page: 1, pageSize: 200 })
       .then((r) => {
         const items: InspectionObject[] = (r.items ?? []) as InspectionObject[];
-        // 检测项目按 sortOrder 升序展示
+        // 检测项目树按 sortOrder 升序展示
         items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setObjects(items);
         // 默认选中第一个
         setSelectedCode((prev) => prev ?? items[0]?.code ?? null);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        // B6 加载态：树就绪即落定（树与列表都到齐才出界面）；失败也要解除门控
+        setObjectsReady(true);
+      });
   }, []);
 
   const selectedObject = useMemo(
@@ -172,6 +180,8 @@ export function CategoryDictList({
   const fetchList = useCallback(async () => {
     if (!selectedCode) {
       setList([]);
+      // B6 加载态：loading 初值改 true 后，无选中对象分支也必须落定，避免整页加载态卡死
+      setLoading(false);
       return;
     }
     setLoading(true);
@@ -279,6 +289,10 @@ export function CategoryDictList({
       await fetchList();
     }
   };
+
+  // B6 加载态：检测项目树 + 码表列表都到齐才出界面（loading 由 loading init true 覆盖
+  // 首载，objectsReady 覆盖树未就绪窗口；二者任一未定且列表为空 → 整页加载态）
+  if ((loading || !objectsReady) && list.length === 0) return <PageLoading />;
 
   return (
     <div className="flex flex-col flex-1 min-h-0" data-fn={dataFn}>

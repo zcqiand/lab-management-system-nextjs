@@ -18,6 +18,7 @@ import {
   summaryGetDashboardStats,
   summaryGetReportSummary,
 } from "@/api/endpoints/summary/summary";
+import { PageLoading } from "@/components/app/page-loading";
 
 const FUNNEL_LABELS: Array<{ key: keyof DashboardStats["funnelByStage"]; label: string }> = [
   { key: "pending_collect", label: "待取样" },
@@ -48,6 +49,8 @@ export function SummaryPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // B6 加载态：报告名称源是否已落定（空列表是合法结果，不能只看 reportNames.length）
+  const [namesReady, setNamesReady] = useState(false);
 
   // 拉报告名称下拉（一次性）
   useEffect(() => {
@@ -58,6 +61,9 @@ export function SummaryPage() {
         if (!cancelled) setReportNames(res.items ?? []);
       } catch (e) {
         if (!cancelled) setError(String(e));
+      } finally {
+        // B6 加载态：无论成败都要落定，否则整页门控卡死
+        if (!cancelled) setNamesReady(true);
       }
     })();
     return () => { cancelled = true; };
@@ -94,6 +100,10 @@ export function SummaryPage() {
     })();
     return () => { cancelled = true; };
   }, [categoryCode]);
+
+  // B6 加载态：三源（报告名称/仪表盘 stats/汇总表）任一未到即整页加载；
+  // 出过数据后 categoryCode 切换 refetch 不再整页回退（error 也解除门控）
+  if ((!namesReady || !stats || !data) && !error) return <PageLoading />;
 
   return (
     // @entry M05.F01.I02 — 仪表盘容器（包裹 I03/I04 + 汇总表）

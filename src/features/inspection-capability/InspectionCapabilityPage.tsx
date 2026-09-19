@@ -14,6 +14,7 @@ import type {
 } from "@/types/inspection";
 import { InspectionCapabilityFormModal } from "./InspectionCapabilityFormModal";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { PageLoading } from "@/components/app/page-loading";
 
 const PAGE_SIZE = 50;
 
@@ -196,7 +197,9 @@ export function InspectionCapabilityPage(props: InspectionCapabilityPageProps = 
 
   const load = () => {
     const controller = new AbortController();
-    setState({ items: [], total: 0, loading: true, error: null });
+    // B6 加载态：refetch 不清空旧列表（首载 items 为空时才由整页 PageLoading 门控；
+    // 筛选/翻页 refetch 期间旧数据保持可见，避免整页回退到加载态）
+    setState((prev) => ({ ...prev, loading: true, error: null }));
     const params: {
       page: number;
       pageSize: string;
@@ -318,6 +321,9 @@ export function InspectionCapabilityPage(props: InspectionCapabilityPageProps = 
       .catch(() => {});
     return () => controller.abort();
   }, [key, objectFilter]);
+
+  // B6 加载态：首载未到齐整页 PageLoading，不渲染空壳（列表为空且仍在加载才门控）
+  if (state.loading && state.items.length === 0) return <PageLoading />;
 
   return (
     <div className="space-y-4" data-fn={FN_ID[key]}>

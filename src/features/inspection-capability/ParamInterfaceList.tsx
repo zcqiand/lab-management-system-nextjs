@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react'
+import { PageLoading } from '@/components/app/page-loading'
 // REF src/features/inspection-capability/ParamInterfaceList.tsx 移植。
 // TSOT Phase C2：legacy apiClient/API_ROUTES 全部替换为 orval 生成函数；
 // 参数界面按 code 寻址（契约 /api/param-interfaces/{code}）。
@@ -192,6 +193,9 @@ export function ParamInterfaceList() {
     // 关联可能在弹窗页签里被改过，刷新聚合列
     loadAssociations()
   }
+
+  // B6 加载态：首载未到齐整页 PageLoading，不渲染空壳（列表为空且仍在加载才门控）
+  if (loading && rows.length === 0) return <PageLoading />
 
   return (
     <div className="space-y-4" data-fn="M06.F08.I01">

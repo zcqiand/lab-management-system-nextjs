@@ -23,6 +23,7 @@ import {
   inspectionDictionaryListStandards,
 } from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
 import type { InspectionDictionaryListStandardsParams } from "@/api/endpoints/model";
+import { PageLoading } from "@/components/app/page-loading";
 
 /** 检测项目节点（1 级） */
 export interface ObjectNode {
@@ -138,6 +139,8 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
   const [list, setList] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // B6 加载态：检测项目树未就绪也视为整页加载中（树是这两页的首屏主数据）
+  const [objectsReady, setObjectsReady] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -151,7 +154,8 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
         items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setObjects(items);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setObjectsReady(true));
   }, []);
 
   // 展开某个检测项目时，按需加载它下面的检测标准。
@@ -274,6 +278,9 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
       setError(msg ?? "排序保存失败");
     }
   };
+
+  // B6 加载态：检测项目树未就绪整页 PageLoading，不渲染空壳
+  if (!objectsReady) return <PageLoading />;
 
   return (
     <div className="flex flex-col flex-1 min-h-0" data-fn={dataFn}>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { PageLoading } from '@/components/app/page-loading'
 import { useParams } from 'next/navigation'
 import type {
   InspectionParameter as TestParameter,
@@ -24,7 +25,8 @@ export function ReceiptDetailPage() {
   const [parameters, setParameters] = useState<TestParameter[]>([])
   const [reportNames, setReportNames] = useState<InspectionReportName[]>([])
   const [standards, setStandards] = useState<InspectionStandard[]>([])
-  const [loading, setLoading] = useState(false)
+  // B6 加载态：首屏即视为加载中（首帧不渲染详情壳；refetch 时详情保持旧数据）
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
 
@@ -52,7 +54,8 @@ export function ReceiptDetailPage() {
 
   useEffect(() => { fetchReceipt() }, [fetchReceipt])
 
-  if (loading) return <div className="p-8 text-center text-gray-500">加载中...</div>
+  // B6 加载态：详情未到齐整页 PageLoading（替换原纯文本加载行）
+  if (loading) return <PageLoading />
   if (error) return <div className="p-8 text-red-600">{error}</div>
   if (!receipt) return null
 
