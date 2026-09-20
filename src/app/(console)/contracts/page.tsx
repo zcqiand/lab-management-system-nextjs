@@ -167,7 +167,11 @@ export default function ContractsPage() {
                 </tr>
               )}
               {items.map((c) => (
-                <tr key={c.id} data-fn="M02.F01.I01" className="border-t hover:bg-slate-50">
+                <tr
+                  key={c.id}
+                  data-fn="M02.F01.I01"
+                  className="border-t hover:bg-slate-50"
+                >
                   <td className="px-4 py-2 font-mono text-xs">{c.contractCode}</td>
                   <td className="px-4 py-2">{c.projectName}</td>
                   <td className="px-4 py-2">{c.clientUnit}</td>
@@ -403,11 +407,7 @@ function ContractFormBody({
         </div>
       </div>
       <DialogFooter>
-        <Button
-          type="button"
-          disabled={submitting}
-          onClick={() => onSubmit(body)}
-        >
+        <Button type="button" disabled={submitting} onClick={() => onSubmit(body)}>
           {submitting ? "提交中…" : initial ? "保存" : "创建"}
         </Button>
       </DialogFooter>

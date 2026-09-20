@@ -19,9 +19,24 @@ import { LabJwtSigner } from "@/lib/auth/jwt";
 import { readLabConfig } from "@/lib/auth/factory";
 
 const DEMO_TENANTS = [
-  { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
-  { tenantId: "TENANT-002", code: "district-lab", name: "区检测站", roleIds: ["technician"] },
-  { tenantId: "TENANT-003", code: "third-party", name: "第三方检测实验室", roleIds: ["viewer"] },
+  {
+    tenantId: "TENANT-001",
+    code: "city-lab",
+    name: "市住建工程质量检测中心",
+    roleIds: ["admin"],
+  },
+  {
+    tenantId: "TENANT-002",
+    code: "district-lab",
+    name: "区检测站",
+    roleIds: ["technician"],
+  },
+  {
+    tenantId: "TENANT-003",
+    code: "third-party",
+    name: "第三方检测实验室",
+    roleIds: ["viewer"],
+  },
 ];
 
 // v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(deploy 脚本 L115 迁移删掉,
@@ -74,7 +89,10 @@ export async function serviceLogin(): Promise<string | null> {
 }
 
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => ({}))) as { username?: string; password?: string };
+  const body = (await req.json().catch(() => ({}))) as {
+    username?: string;
+    password?: string;
+  };
   const username = String(body.username ?? "").trim();
   const password = String(body.password ?? "");
   if (!username || !password) {
@@ -86,9 +104,7 @@ export async function POST(req: Request) {
   // 2026-09-02 契约对齐：走 directory 校验（alice/dev123456，与 msw/springboot/aspnetcore
   // 四方一致；错凭证 401 不再 demo 放行——contract-test 错误分支比对依赖）。
   // ADR-0019：dev_password 缺失 throw,不允许 fallback 到字面 "dev123456"。
-  const directory = new ConfigUserDirectory(
-    requireEnv("LAB_AUTH_DEV_PASSWORD"),
-  );
+  const directory = new ConfigUserDirectory(requireEnv("LAB_AUTH_DEV_PASSWORD"));
   // ADR-0019 + P2 debt: LabJwtSigner 走真 HS256（与 msw/aspnetcore/springboot 形态对齐）,
   // 缺失即 throw;不允许 mock-jwt opaque token 兜底。
   const labCfg = readLabConfig();

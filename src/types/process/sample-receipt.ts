@@ -1,4 +1,4 @@
-import type { FlowStage, FlowHistoryEntry } from './flow';
+import type { FlowStage, FlowHistoryEntry } from "./flow";
 
 /**
  * 接样单（M03.F01）——接样表与报告表合并为一张表。
@@ -89,7 +89,7 @@ export interface SampleReceipt {
   /** 检测结论（报告编制环节维护）。 */
   conclusion?: string;
   /** 判定结果：pass=合格 / fail=不合格 / ''=未评定。 */
-  result?: 'pass' | 'fail' | '';
+  result?: "pass" | "fail" | "";
   /** 报告签发时间。 */
   issuedAt?: string | null;
   /** 创建时间。 */

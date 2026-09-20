@@ -29,9 +29,7 @@ function loginAsAdmin() {
   });
 }
 
-function renderPage(
-  resource: "specialties" | "objects" | "parameters" | "standards",
-) {
+function renderPage(resource: "specialties" | "objects" | "parameters" | "standards") {
   return render(<InspectionCapabilityPage resource={resource} />);
 }
 
@@ -261,7 +259,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     },
   );
 
-  fnTest(["M06.F02.I14"],"AssociationManager 列出/添加/移除关联", async () => {
+  fnTest(["M06.F02.I14"], "AssociationManager 列出/添加/移除关联", async () => {
     // 给 OBJ-SP01-P1 建一条自定义参数关联用于移除
     await apiClient.post(API_ROUTES["/inspection-parameters"], {
       code: "IP-AM-1",
@@ -297,7 +295,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     );
   });
 
-  fnTest(["M06.F02.I14"],"AssociationManager 行内前缀：必备参数以 * 呈现", async () => {
+  fnTest(["M06.F02.I14"], "AssociationManager 行内前缀：必备参数以 * 呈现", async () => {
     render(
       <AssociationManager
         ariaLabel="OBJ-SP01-P1 关联检测参数"
@@ -326,37 +324,41 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(await within(list).findByText("*凝结时间")).toBeTruthy();
   });
 
-  fnTest(["M06.F01.I05"], "AssociationManager 行内前缀：检测标准性质以【】呈现", async () => {
-    render(
-      <AssociationManager
-        ariaLabel="OBJ-SP01-P1 关联检测标准"
-        endpoint="/inspection-object-standards"
-        parentParam="inspectionObjectCode"
-        parentCode="OBJ-SP01-P1"
-        targetLabel="检测标准"
-        targetEndpoint="/inspection-standards"
-        targetParam="inspectionStandardCode"
-        targetValueKey="code"
-        targetTextKey="name"
-        extraFields={[
-          {
-            name: "role",
-            label: "标准性质",
-            type: "select",
-            options: ["TESTING", "JUDGMENT"],
-            valueLabels: { TESTING: "检测依据", JUDGMENT: "判定依据" },
-            rowPrefix: { TESTING: "【检测依据】", JUDGMENT: "【判定依据】" },
-          },
-        ]}
-      />,
-    );
-    // 种子 OBJ-SP01-P1 关联 GB 175-2023(TESTING) → 行内以【检测依据】为前缀
-    const list = await screen.findByRole("list");
-    const rows = await within(list).findAllByText((t) => t.startsWith("【检测依据】"));
-    expect(rows.length).toBeGreaterThan(0);
-  });
+  fnTest(
+    ["M06.F01.I05"],
+    "AssociationManager 行内前缀：检测标准性质以【】呈现",
+    async () => {
+      render(
+        <AssociationManager
+          ariaLabel="OBJ-SP01-P1 关联检测标准"
+          endpoint="/inspection-object-standards"
+          parentParam="inspectionObjectCode"
+          parentCode="OBJ-SP01-P1"
+          targetLabel="检测标准"
+          targetEndpoint="/inspection-standards"
+          targetParam="inspectionStandardCode"
+          targetValueKey="code"
+          targetTextKey="name"
+          extraFields={[
+            {
+              name: "role",
+              label: "标准性质",
+              type: "select",
+              options: ["TESTING", "JUDGMENT"],
+              valueLabels: { TESTING: "检测依据", JUDGMENT: "判定依据" },
+              rowPrefix: { TESTING: "【检测依据】", JUDGMENT: "【判定依据】" },
+            },
+          ]}
+        />,
+      );
+      // 种子 OBJ-SP01-P1 关联 GB 175-2023(TESTING) → 行内以【检测依据】为前缀
+      const list = await screen.findByRole("list");
+      const rows = await within(list).findAllByText((t) => t.startsWith("【检测依据】"));
+      expect(rows.length).toBeGreaterThan(0);
+    },
+  );
 
-  fnTest(["M06.F02.I14"],"检测项目编辑弹窗出现 关联检测参数 页签", async () => {
+  fnTest(["M06.F02.I14"], "检测项目编辑弹窗出现 关联检测参数 页签", async () => {
     renderPage("objects");
     await flush();
     const user = userEvent.setup();
@@ -386,7 +388,7 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     expect(within(select).getByRole("option", { name: "判定依据" })).toBeTruthy();
   });
 
-  fnTest(["M06.F02.I14"],"检测参数关联 资质级别 下拉以中文呈现", async () => {
+  fnTest(["M06.F02.I14"], "检测参数关联 资质级别 下拉以中文呈现", async () => {
     renderPage("objects");
     await flush();
     const user = userEvent.setup();
@@ -411,7 +413,9 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
     await user.type(screen.getByLabelText("搜索"), "OBJ-SP01-P1");
     await flush();
     // 水泥(OBJ-SP01-P1) 聚合列含 凝结时间
-    expect((await screen.findAllByText((t) => t.includes("凝结时间"))).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText((t) => t.includes("凝结时间"))).length,
+    ).toBeGreaterThan(0);
   });
 
   fnTest(["M06.F03.I01"], "检测参数清单分页：可翻到下一页", async () => {
@@ -436,7 +440,9 @@ describe("InspectionCapabilityPage M06 CRUD 入口", () => {
       vi.spyOn(apiClient, "get").mockResolvedValue(malformed);
 
       // 渲染本身不得抛错
-      expect(() => render(<InspectionCapabilityPage resource="specialties" />)).not.toThrow();
+      expect(() =>
+        render(<InspectionCapabilityPage resource="specialties" />),
+      ).not.toThrow();
 
       // 等待 loading 结束后，应出现 error 提示或"暂无数据"，二者满足其一即可
       await waitFor(() => {

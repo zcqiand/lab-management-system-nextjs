@@ -4,7 +4,5 @@
 import ParamInterfaceList from "@/features/inspection-capability/ParamInterfaceList";
 
 export default function Page() {
-  return (
-      <ParamInterfaceList />
-  );
+  return <ParamInterfaceList />;
 }

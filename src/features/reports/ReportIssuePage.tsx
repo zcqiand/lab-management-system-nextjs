@@ -1,4 +1,4 @@
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
 
 /** 报告发放——流程线第六环节（flowStatus='issuance'）。仅走流程：提交=发放进入归档，退回批准。 */
 export function ReportIssuePage() {
@@ -14,7 +14,7 @@ export function ReportIssuePage() {
       viewDataFn="M03.F07.I02"
       actionDataFn="M03.F07.I05"
     />
-  )
+  );
 }
 
-export default ReportIssuePage
+export default ReportIssuePage;

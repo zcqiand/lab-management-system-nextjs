@@ -17,11 +17,7 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app/app-shell";
 import { useAuth } from "@/state/auth-context";
 
-export default function ConsoleLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { token } = useAuth();
   const [hydrated, setHydrated] = useState(false);

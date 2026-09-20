@@ -20,5 +20,7 @@ export const customFetch = <TData = unknown>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
-  return axios({ ...config, ...options }).then((r) => r.data) as unknown as Promise<TData>;
+  return axios({ ...config, ...options }).then(
+    (r) => r.data,
+  ) as unknown as Promise<TData>;
 };

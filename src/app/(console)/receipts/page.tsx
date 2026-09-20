@@ -4,7 +4,5 @@
 import ReceiptList from "@/features/receipts/ReceiptList";
 
 export default function Page() {
-  return (
-      <ReceiptList />
-  );
+  return <ReceiptList />;
 }

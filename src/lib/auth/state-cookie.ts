@@ -83,7 +83,9 @@ export class StateCookieManager {
     }
     let sp: StatePayload;
     try {
-      sp = JSON.parse(Buffer.from(payloadB64!, "base64url").toString("utf8")) as StatePayload;
+      sp = JSON.parse(
+        Buffer.from(payloadB64!, "base64url").toString("utf8"),
+      ) as StatePayload;
     } catch (e) {
       throw new Error(`lab_sso_state payload unparseable: ${(e as Error).message}`);
     }
@@ -114,5 +116,9 @@ export class StateCookieManager {
 }
 
 function b64url(buf: Buffer): string {
-  return buf.toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+  return buf
+    .toString("base64")
+    .replace(/=+$/, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 }

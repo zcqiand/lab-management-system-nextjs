@@ -293,9 +293,7 @@ export function InspectionCapabilityFormModal({
                     <select
                       aria-label={f.label}
                       value={values[f.name] ?? ""}
-                      onChange={(e) =>
-                        setValues({ ...values, [f.name]: e.target.value })
-                      }
+                      onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
                       className="mt-1 w-full border rounded px-2 py-1.5"
                     >
                       {(f.options ?? []).map((o) => (

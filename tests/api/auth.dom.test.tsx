@@ -18,16 +18,20 @@ import { GET as ssoAuthorizeGET } from "@/app/api/auth/sso/authorize/route";
 
 describe("M01.F04/F05 认证管理集成层", () => {
   // ─────── F04.I02 路由守卫 ───────
-  fnTest(["M01.F04.I02"], "(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')", async () => {
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const src = fs.readFileSync(
-      path.resolve(process.cwd(), "src/app/(console)/layout.tsx"),
-      "utf8",
-    );
-    expect(src).toMatch(/data-fn="M01\.F04\.I02"/);
-    expect(src).toMatch(/router\.replace\(['"]\/login['"]\)/);
-  });
+  fnTest(
+    ["M01.F04.I02"],
+    "(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')",
+    async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const src = fs.readFileSync(
+        path.resolve(process.cwd(), "src/app/(console)/layout.tsx"),
+        "utf8",
+      );
+      expect(src).toMatch(/data-fn="M01\.F04\.I02"/);
+      expect(src).toMatch(/router\.replace\(['"]\/login['"]\)/);
+    },
+  );
 
   // ─────── F04.I03 已废弃（合并到 I02；M01.F04.I02 = 守卫 + 占位 UI） ───────
   // 旧 @entry=I03 注释已从 layout.tsx 移除；保留此注释说明避免回归。
@@ -44,77 +48,95 @@ describe("M01.F04/F05 认证管理集成层", () => {
   });
 
   // ─────── F05.I02 Token 校验 ───────
-  fnTest(["M01.F05.I02"], "apiClient/identityClient 请求拦截器注入 Authorization Bearer", async () => {
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const src = fs.readFileSync(
-      path.resolve(process.cwd(), "src/api/legacy-client.ts"),
-      "utf8",
-    );
-    // 拦截器存在 + 注 Bearer
-    expect(src).toMatch(/@entry M01\.F05\.I02/);
-    expect(src).toMatch(/Authorization.*Bearer.*currentToken/);
-    // 401 处理
-    expect(src).toMatch(/401.*unauthorizedHandler/);
-  });
+  fnTest(
+    ["M01.F05.I02"],
+    "apiClient/identityClient 请求拦截器注入 Authorization Bearer",
+    async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const src = fs.readFileSync(
+        path.resolve(process.cwd(), "src/api/legacy-client.ts"),
+        "utf8",
+      );
+      // 拦截器存在 + 注 Bearer
+      expect(src).toMatch(/@entry M01\.F05\.I02/);
+      expect(src).toMatch(/Authorization.*Bearer.*currentToken/);
+      // 401 处理
+      expect(src).toMatch(/401.*unauthorizedHandler/);
+    },
+  );
 
   // ─────── F05.I03 SSO 统一登录 ───────
-  fnTest(["M01.F05.I03"], "GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）", async () => {
-    // 2026-09-15 对齐家族收敛（lab-springboot 2026-08-29 / lab-aspnetcore v0.2.11 同款）：
-    // authorize 返回 saas 登录页跳板 URL（redirect_uri+state+client_id），服务端
-    // **不做 code 预拿**——saas /oauth/authorize 已要求认证身份、禁匿名签 code，
-    // 旧「服务端先领 code」恒 401（生产表现为登录页 502）。code 由用户在 saas
-    // 登录后由 saas 前端带 session 领取 → 302 回跳。故本用例断言不发任何 fetch。
-    const realFetch = globalThis.fetch;
-    const fetchCalls: string[] = [];
-    globalThis.fetch = (async (input: RequestInfo | URL) => {
-      fetchCalls.push(String(input));
-      return new Response("{}", { status: 200 });
-    }) as typeof fetch;
-    try {
-      const req = new Request(
-        "http://localhost/api/auth/sso/authorize?response_type=code&client_id=lab-management&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=state-test",
-      );
-      const res = await ssoAuthorizeGET(req as unknown as Parameters<typeof ssoAuthorizeGET>[0]);
-      expect(res.status).toBeLessThan(400);
-      const data = (await res.json()) as { authorizeUrl?: string; state?: string };
-      expect(data.state).toBe("state-test");
-      expect(data.authorizeUrl).toContain("/login?");
-      expect(data.authorizeUrl).toContain("client_id=lab-management");
-      expect(data.authorizeUrl).toContain("redirect_uri=");
-      expect(data.authorizeUrl).toContain("state=state-test");
-      // 跳板语义：不在服务端预拿 code，不发任何 saas 请求
-      expect(data.authorizeUrl).not.toContain("code=");
-      expect(fetchCalls).toHaveLength(0);
-    } finally {
-      globalThis.fetch = realFetch;
-    }
-  });
+  fnTest(
+    ["M01.F05.I03"],
+    "GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）",
+    async () => {
+      // 2026-09-15 对齐家族收敛（lab-springboot 2026-08-29 / lab-aspnetcore v0.2.11 同款）：
+      // authorize 返回 saas 登录页跳板 URL（redirect_uri+state+client_id），服务端
+      // **不做 code 预拿**——saas /oauth/authorize 已要求认证身份、禁匿名签 code，
+      // 旧「服务端先领 code」恒 401（生产表现为登录页 502）。code 由用户在 saas
+      // 登录后由 saas 前端带 session 领取 → 302 回跳。故本用例断言不发任何 fetch。
+      const realFetch = globalThis.fetch;
+      const fetchCalls: string[] = [];
+      globalThis.fetch = (async (input: RequestInfo | URL) => {
+        fetchCalls.push(String(input));
+        return new Response("{}", { status: 200 });
+      }) as typeof fetch;
+      try {
+        const req = new Request(
+          "http://localhost/api/auth/sso/authorize?response_type=code&client_id=lab-management&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=state-test",
+        );
+        const res = await ssoAuthorizeGET(
+          req as unknown as Parameters<typeof ssoAuthorizeGET>[0],
+        );
+        expect(res.status).toBeLessThan(400);
+        const data = (await res.json()) as { authorizeUrl?: string; state?: string };
+        expect(data.state).toBe("state-test");
+        expect(data.authorizeUrl).toContain("/login?");
+        expect(data.authorizeUrl).toContain("client_id=lab-management");
+        expect(data.authorizeUrl).toContain("redirect_uri=");
+        expect(data.authorizeUrl).toContain("state=state-test");
+        // 跳板语义：不在服务端预拿 code，不发任何 saas 请求
+        expect(data.authorizeUrl).not.toContain("code=");
+        expect(fetchCalls).toHaveLength(0);
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+    },
+  );
 
   // ─────── F05.I04 身份会话同步 ───────
-  fnTest(["M01.F05.I04"], "authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪", async () => {
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const src = fs.readFileSync(
-      path.resolve(process.cwd(), "src/state/authStore.ts"),
-      "utf8",
-    );
-    expect(src).toMatch(/@entry M01\.F05\.I04/);
-    // 拉权限端点（demo handler 不读 query）
-    const res = await permissionsGET();
-    expect(res.status).toBe(200);
-  });
+  fnTest(
+    ["M01.F05.I04"],
+    "authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪",
+    async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const src = fs.readFileSync(
+        path.resolve(process.cwd(), "src/state/authStore.ts"),
+        "utf8",
+      );
+      expect(src).toMatch(/@entry M01\.F05\.I04/);
+      // 拉权限端点（demo handler 不读 query）
+      const res = await permissionsGET();
+      expect(res.status).toBe(200);
+    },
+  );
 
   // ─────── F05.I05 登出 ───────
-  fnTest(["M01.F05.I05"], "POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05", async () => {
-    const res = await logoutPOST();
-    expect(res.status).toBe(204);
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const src = fs.readFileSync(
-      path.resolve(process.cwd(), "src/components/app/app-shell.tsx"),
-      "utf8",
-    );
-    expect(src).toMatch(/data-fn="M01\.F05\.I05"/);
-  });
+  fnTest(
+    ["M01.F05.I05"],
+    "POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05",
+    async () => {
+      const res = await logoutPOST();
+      expect(res.status).toBe(204);
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const src = fs.readFileSync(
+        path.resolve(process.cwd(), "src/components/app/app-shell.tsx"),
+        "utf8",
+      );
+      expect(src).toMatch(/data-fn="M01\.F05\.I05"/);
+    },
+  );
 });

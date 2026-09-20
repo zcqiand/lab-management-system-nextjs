@@ -7,9 +7,13 @@ import { inspectionSpecialtyObjects } from "@lab/management-system-msw/fixtures"
 import { wrapLinks, linkDelete, noContent } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  return wrapLinks(inspectionSpecialtyObjects as unknown as Record<string, unknown>[], req, {
-    inspectionSpecialtyCode: "inspectionSpecialtyCode",
-  });
+  return wrapLinks(
+    inspectionSpecialtyObjects as unknown as Record<string, unknown>[],
+    req,
+    {
+      inspectionSpecialtyCode: "inspectionSpecialtyCode",
+    },
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -19,5 +23,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  return linkDelete(req, inspectionSpecialtyObjects as unknown as Record<string, unknown>[]);
+  return linkDelete(
+    req,
+    inspectionSpecialtyObjects as unknown as Record<string, unknown>[],
+  );
 }

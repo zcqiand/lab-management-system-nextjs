@@ -4,7 +4,5 @@
 import TaskAssignmentPage from "@/features/task-assignment/TaskAssignmentPage";
 
 export default function Page() {
-  return (
-      <TaskAssignmentPage />
-  );
+  return <TaskAssignmentPage />;
 }

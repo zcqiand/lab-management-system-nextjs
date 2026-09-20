@@ -48,13 +48,18 @@ const _g = globalThis as unknown as { __menuSnapshotStore?: Map<string, MenuSnap
 const store = (_g.__menuSnapshotStore ??= new Map<string, MenuSnapshot>());
 
 /** 写入/覆盖某用户的菜单快照（userId 为 JWT sub）。空参静默忽略。 */
-export function putMenuSnapshot(userId: string | null | undefined, menus: ContractMenuNode[] | null): void {
+export function putMenuSnapshot(
+  userId: string | null | undefined,
+  menus: ContractMenuNode[] | null,
+): void {
   if (!userId || !menus) return;
   store.set(userId, { menus, expiresAt: Date.now() + TTL_MS });
 }
 
 /** 读某用户的未过期快照；miss/过期返回 null（调用方回退 demo 菜单）。 */
-export function getMenuSnapshot(userId: string | null | undefined): ContractMenuNode[] | null {
+export function getMenuSnapshot(
+  userId: string | null | undefined,
+): ContractMenuNode[] | null {
   if (!userId) return null;
   const snap = store.get(userId);
   if (!snap || snap.expiresAt < Date.now()) return null;
@@ -101,7 +106,9 @@ export async function cacheMenuSnapshot(
     const tree = body[appCode] ?? []; // appCode 不在响应里 → 空快照（saas 未返回本 app 菜单的合法形态）
     putMenuSnapshot(userId, tree.map(mapSaasMenu));
   } catch (err) {
-    console.warn(`[menu-snapshot] fetch failed for user ${userId}: ${(err as Error).message}`);
+    console.warn(
+      `[menu-snapshot] fetch failed for user ${userId}: ${(err as Error).message}`,
+    );
   }
 }
 

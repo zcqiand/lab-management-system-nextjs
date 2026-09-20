@@ -4,7 +4,13 @@
 // 链路（HttpSaasAuthClient / HttpSaasMeClient，4 个 saas env 由构造器逐项 fail-fast）。
 // LAB_SSO_PROFILE key 随模式退役删除（家族 env 契约同批收敛）。
 import { LabJwtSigner } from "./jwt";
-import { SaasAuthClient, SaasMeClient, createSaasAuthClient, createSaasMeClient, SaasConfig } from "./saas";
+import {
+  SaasAuthClient,
+  SaasMeClient,
+  createSaasAuthClient,
+  createSaasMeClient,
+  SaasConfig,
+} from "./saas";
 import { StateCookieManager } from "./state-cookie";
 import { ConfigUserDirectory, IUserDirectory } from "./directory";
 import { AuthService } from "./config";

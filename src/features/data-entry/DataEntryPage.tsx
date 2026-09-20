@@ -27,13 +27,8 @@ import {
 } from "@/api/endpoints/param-interfaces/param-interfaces";
 import { reportNamesListReportNames } from "@/api/endpoints/report-names/report-names";
 import { receiptsUpdateReceipt } from "@/api/endpoints/receipts/receipts";
-import {
-  samplesDeleteSample,
-  samplesListSamples,
-} from "@/api/endpoints/samples/samples";
-import {
-  technicalRequirementsListTechnicalRequirements,
-} from "@/api/endpoints/technical-requirements/technical-requirements";
+import { samplesDeleteSample, samplesListSamples } from "@/api/endpoints/samples/samples";
+import { technicalRequirementsListTechnicalRequirements } from "@/api/endpoints/technical-requirements/technical-requirements";
 import {
   testRecordsCreateTestRecord,
   testRecordsListTestRecords,
@@ -142,11 +137,12 @@ export function EntryModal({
     try {
       // test-records 契约参数集无 receiptId（spec gap，后端 /api/test-records 支持），
       // 用交叉类型变量透传，避免 TS 多余属性检查。
-      const testRecordParams: TestRecordsListTestRecordsParams & { receiptId?: string } = {
-        receiptId: receipt.id,
-        page: 1,
-        pageSize: 200,
-      };
+      const testRecordParams: TestRecordsListTestRecordsParams & { receiptId?: string } =
+        {
+          receiptId: receipt.id,
+          page: 1,
+          pageSize: 200,
+        };
       const [
         sampRes,
         recRes,

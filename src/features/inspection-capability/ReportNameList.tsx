@@ -105,7 +105,7 @@ export function ReportNameList() {
         const arr = stdMap[link.reportNameCode] ?? [];
         if (link.inspectionStandardCode && !arr.includes(link.inspectionStandardCode))
           arr.push(link.inspectionStandardCode);
-        stdMap[link.reportNameCode ?? ''] = arr;
+        stdMap[link.reportNameCode ?? ""] = arr;
       }
       for (const k of Object.keys(stdMap)) stdMap[k]!.sort();
       setStdByRn(stdMap);
@@ -120,7 +120,8 @@ export function ReportNameList() {
       setParamByRn(paramMap);
 
       const nameMap: Record<string, string> = {};
-      for (const p of (paramMasterRes?.items ?? []) as InspectionParameter[]) nameMap[p.code] = p.name;
+      for (const p of (paramMasterRes?.items ?? []) as InspectionParameter[])
+        nameMap[p.code] = p.name;
       setParamNameByCode(nameMap);
     });
   };

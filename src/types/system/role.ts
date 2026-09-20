@@ -1,5 +1,5 @@
-import type { Permission } from './permission';
-import type { PageQuery } from '../common';
+import type { Permission } from "./permission";
+import type { PageQuery } from "../common";
 
 /** 角色管理（M01.F02） */
 export interface RoleRecord {

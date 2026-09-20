@@ -7,7 +7,8 @@
 
 export type RequirementValueType = "numeric" | "string" | "range" | "formula" | "manual";
 export type RequirementComparison = "≥" | "≤" | "=" | "range" | "eq";
-export type RequirementVerificationStatus = "draft" | "reviewed" | "verified" | "rejected";
+export type RequirementVerificationStatus =
+  "draft" | "reviewed" | "verified" | "rejected";
 export type RequirementJudgmentMode = "automatic" | "manual";
 
 export interface InspectionTechnicalRequirement {

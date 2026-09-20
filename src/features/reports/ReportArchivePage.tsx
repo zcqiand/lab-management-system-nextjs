@@ -1,4 +1,4 @@
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
 
 /** 报告归档——流程线最后环节（flowStatus='archived'）。提交后流程结束（已归档），可退回发放。 */
 export function ReportArchivePage() {
@@ -16,7 +16,7 @@ export function ReportArchivePage() {
       viewDataFn="M03.F08.I02"
       actionDataFn="M03.F08.I05"
     />
-  )
+  );
 }
 
-export default ReportArchivePage
+export default ReportArchivePage;

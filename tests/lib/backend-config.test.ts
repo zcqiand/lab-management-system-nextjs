@@ -51,8 +51,12 @@ describe("backend-config 运行时切换", () => {
       "springboot",
     ]);
     expect(BACKENDS.find((b) => b.key === "nextjs-self")?.baseUrl).toBe("");
-    expect(BACKENDS.find((b) => b.key === "aspnetcore")?.baseUrl).toBe("http://localhost:5204");
-    expect(BACKENDS.find((b) => b.key === "springboot")?.baseUrl).toBe("http://localhost:5205");
+    expect(BACKENDS.find((b) => b.key === "aspnetcore")?.baseUrl).toBe(
+      "http://localhost:5204",
+    );
+    expect(BACKENDS.find((b) => b.key === "springboot")?.baseUrl).toBe(
+      "http://localhost:5205",
+    );
   });
 
   it("未选择时走 env 默认（NEXT_PUBLIC_API_BASE_URL，setup.ts seed 空串=同源）", () => {
@@ -92,7 +96,7 @@ describe("backend-config 运行时切换", () => {
     expect(getApiMode()).toBe(process.env.NEXT_PUBLIC_API_MODE || "nextjs-self");
   });
 
-  it("setSelectedBackend(\"\") 清除选择 → 回 env 默认", () => {
+  it('setSelectedBackend("") 清除选择 → 回 env 默认', () => {
     installFakeLocalStorage();
     setSelectedBackend("springboot");
     setSelectedBackend("");
@@ -107,14 +111,16 @@ describe("backend-config 运行时切换", () => {
     globalThis.localStorage.setItem("lab.token", "stale-jwt-from-old-backend");
     // 同值 set：不重置会话（防 dropdown 重复点选误伤）
     setSelectedBackend("aspnetcore");
-    expect(globalThis.localStorage.getItem("lab.token")).toBe("stale-jwt-from-old-backend");
+    expect(globalThis.localStorage.getItem("lab.token")).toBe(
+      "stale-jwt-from-old-backend",
+    );
     // 真切换：token 必须清（2026-09-15 401 事故——5205 自定义 key 铸的 token 带到 5204 验不过）
     setSelectedBackend("springboot");
     expect(globalThis.localStorage.getItem("lab.token")).toBeNull();
     expect(globalThis.localStorage.getItem("lab.api.backend")).toBe("springboot");
   });
 
-  it("从已选切回 env 默认（\"\")同样清 lab.token", () => {
+  it('从已选切回 env 默认（"")同样清 lab.token', () => {
     installFakeLocalStorage();
     setSelectedBackend("aspnetcore");
     globalThis.localStorage.setItem("lab.token", "t");

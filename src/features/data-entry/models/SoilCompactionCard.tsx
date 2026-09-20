@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { ParamModelProps } from './types'
+import { useEffect, useMemo, useState } from "react";
+import type { ParamModelProps } from "./types";
 
 /**
  * 土工击实录入卡（componentPath = soil-compaction）
@@ -19,22 +19,22 @@ import type { ParamModelProps } from './types'
 
 export interface CompactionPoint {
   /** 含水率 (%)；0 = 未填 */
-  moisture: number
+  moisture: number;
   /** 干密度 (g/cm³)；0 = 未填 */
-  dryDensity: number
+  dryDensity: number;
 }
 
 export interface CompactionResult {
-  points: CompactionPoint[]
-  maxDryDensity: number | undefined
-  optimalMoisture: number | undefined
+  points: CompactionPoint[];
+  maxDryDensity: number | undefined;
+  optimalMoisture: number | undefined;
 }
 
-const DEFAULT_POINT_COUNT = 5
+const DEFAULT_POINT_COUNT = 5;
 
 function round(v: number, digits: number): number {
-  const f = 10 ** digits
-  return Math.round(v * f) / f
+  const f = 10 ** digits;
+  return Math.round(v * f) / f;
 }
 
 /**
@@ -45,62 +45,62 @@ function round(v: number, digits: number): number {
  * 回退到实测最大干密度点。
  */
 export function computeCompactionPeak(points: CompactionPoint[]): {
-  maxDryDensity: number | undefined
-  optimalMoisture: number | undefined
+  maxDryDensity: number | undefined;
+  optimalMoisture: number | undefined;
 } {
-  const valid = points.filter((p) => p.dryDensity > 0 && p.moisture > 0)
-  if (valid.length === 0) return { maxDryDensity: undefined, optimalMoisture: undefined }
+  const valid = points.filter((p) => p.dryDensity > 0 && p.moisture > 0);
+  if (valid.length === 0) return { maxDryDensity: undefined, optimalMoisture: undefined };
 
-  const sorted = [...valid].sort((a, b) => a.moisture - b.moisture)
-  let peakIdx = 0
+  const sorted = [...valid].sort((a, b) => a.moisture - b.moisture);
+  let peakIdx = 0;
   for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i]!.dryDensity > sorted[peakIdx]!.dryDensity) peakIdx = i
+    if (sorted[i]!.dryDensity > sorted[peakIdx]!.dryDensity) peakIdx = i;
   }
-  const peak = sorted[peakIdx]!
+  const peak = sorted[peakIdx]!;
   const fallback = {
     maxDryDensity: round(peak.dryDensity, 3),
     optimalMoisture: round(peak.moisture, 1),
-  }
+  };
 
   // 峰值在端点或点数不足 → 无法三点拟合
-  if (sorted.length < 3 || peakIdx === 0 || peakIdx === sorted.length - 1) return fallback
+  if (sorted.length < 3 || peakIdx === 0 || peakIdx === sorted.length - 1)
+    return fallback;
 
-  const [p1, p2, p3] = [sorted[peakIdx - 1]!, peak, sorted[peakIdx + 1]!]
-  const [x1, y1] = [p1.moisture, p1.dryDensity]
-  const [x2, y2] = [p2.moisture, p2.dryDensity]
-  const [x3, y3] = [p3.moisture, p3.dryDensity]
-  const denom = (x1 - x2) * (x1 - x3) * (x2 - x3)
-  if (denom === 0) return fallback
+  const [p1, p2, p3] = [sorted[peakIdx - 1]!, peak, sorted[peakIdx + 1]!];
+  const [x1, y1] = [p1.moisture, p1.dryDensity];
+  const [x2, y2] = [p2.moisture, p2.dryDensity];
+  const [x3, y3] = [p3.moisture, p3.dryDensity];
+  const denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
+  if (denom === 0) return fallback;
 
-  const a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom
+  const a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
   // a >= 0 → 开口向上/退化为直线，没有极大值
-  if (a >= 0) return fallback
-  const b =
-    (x3 * x3 * (y1 - y2) + x2 * x2 * (y3 - y1) + x1 * x1 * (y2 - y3)) / denom
+  if (a >= 0) return fallback;
+  const b = (x3 * x3 * (y1 - y2) + x2 * x2 * (y3 - y1) + x1 * x1 * (y2 - y3)) / denom;
   const c =
     (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2 * (x1 - x2) * y3) /
-    denom
-  const vertexX = -b / (2 * a)
-  const vertexY = a * vertexX * vertexX + b * vertexX + c
+    denom;
+  const vertexX = -b / (2 * a);
+  const vertexY = a * vertexX * vertexX + b * vertexX + c;
 
   // 拟合顶点必须落在三点区间内且不低于实测峰值，否则不可信 → 回退
-  if (vertexX < x1 || vertexX > x3 || vertexY < peak.dryDensity) return fallback
-  return { maxDryDensity: round(vertexY, 3), optimalMoisture: round(vertexX, 1) }
+  if (vertexX < x1 || vertexX > x3 || vertexY < peak.dryDensity) return fallback;
+  return { maxDryDensity: round(vertexY, 3), optimalMoisture: round(vertexX, 1) };
 }
 
 function parseResult(raw: string | undefined, count: number): CompactionPoint[] {
   const empty = () =>
-    Array.from({ length: count }, () => ({ moisture: 0, dryDensity: 0 }))
-  if (!raw || !raw.trimStart().startsWith('{')) return empty()
+    Array.from({ length: count }, () => ({ moisture: 0, dryDensity: 0 }));
+  if (!raw || !raw.trimStart().startsWith("{")) return empty();
   try {
-    const obj = JSON.parse(raw) as { points?: Array<Partial<CompactionPoint>> }
-    if (!Array.isArray(obj.points)) return empty()
+    const obj = JSON.parse(raw) as { points?: Array<Partial<CompactionPoint>> };
+    if (!Array.isArray(obj.points)) return empty();
     return Array.from({ length: count }, (_, i) => ({
       moisture: Number(obj.points?.[i]?.moisture) || 0,
       dryDensity: Number(obj.points?.[i]?.dryDensity) || 0,
-    }))
+    }));
   } catch {
-    return empty()
+    return empty();
   }
 }
 
@@ -112,40 +112,41 @@ export function SoilCompactionCard({
   onChange,
   readOnly = false,
 }: ParamModelProps) {
-  const count = Number((config as { pointCount?: number } | undefined)?.pointCount) ||
-    DEFAULT_POINT_COUNT
+  const count =
+    Number((config as { pointCount?: number } | undefined)?.pointCount) ||
+    DEFAULT_POINT_COUNT;
 
   const initial = useMemo(
     () => parseResult(record?.result, count),
     [record?.result, count],
-  )
-  const [points, setPoints] = useState<CompactionPoint[]>(initial)
+  );
+  const [points, setPoints] = useState<CompactionPoint[]>(initial);
 
   useEffect(() => {
-    setPoints(initial)
+    setPoints(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅切换样品/落库后重置，避免覆盖正在输入的值
-  }, [sampleId, record?.result, count])
+  }, [sampleId, record?.result, count]);
 
-  const peak = useMemo(() => computeCompactionPeak(points), [points])
+  const peak = useMemo(() => computeCompactionPeak(points), [points]);
 
   const emit = (next: CompactionPoint[]) => {
-    const { maxDryDensity, optimalMoisture } = computeCompactionPeak(next)
-    const result: CompactionResult = { points: next, maxDryDensity, optimalMoisture }
-    onChange({ result: JSON.stringify(result) })
-  }
+    const { maxDryDensity, optimalMoisture } = computeCompactionPeak(next);
+    const result: CompactionResult = { points: next, maxDryDensity, optimalMoisture };
+    onChange({ result: JSON.stringify(result) });
+  };
 
   const update = (i: number, field: keyof CompactionPoint, v: number) => {
-    if (readOnly) return
+    if (readOnly) return;
     const next = points.map((p, idx) =>
       idx === i ? { ...p, [field]: Number.isFinite(v) ? v : 0 } : p,
-    )
-    setPoints(next)
-    emit(next)
-  }
+    );
+    setPoints(next);
+    emit(next);
+  };
 
-  const cellCls = 'border px-2 py-1 text-center'
+  const cellCls = "border px-2 py-1 text-center";
   const inputCls =
-    'w-20 border rounded px-1 py-0.5 text-right disabled:bg-gray-100 disabled:text-gray-500'
+    "w-20 border rounded px-1 py-0.5 text-right disabled:bg-gray-100 disabled:text-gray-500";
 
   return (
     <div className="border rounded p-3 space-y-3" data-fn="M03.F03.I03">
@@ -176,8 +177,8 @@ export function SoilCompactionCard({
                   aria-label={`第 ${i + 1} 组含水率`}
                   className={inputCls}
                   disabled={readOnly}
-                  value={p.moisture || ''}
-                  onChange={(e) => update(i, 'moisture', Number(e.target.value))}
+                  value={p.moisture || ""}
+                  onChange={(e) => update(i, "moisture", Number(e.target.value))}
                 />
               </td>
             ))}
@@ -192,8 +193,8 @@ export function SoilCompactionCard({
                   aria-label={`第 ${i + 1} 组干密度`}
                   className={inputCls}
                   disabled={readOnly}
-                  value={p.dryDensity || ''}
-                  onChange={(e) => update(i, 'dryDensity', Number(e.target.value))}
+                  value={p.dryDensity || ""}
+                  onChange={(e) => update(i, "dryDensity", Number(e.target.value))}
                 />
               </td>
             ))}
@@ -204,13 +205,13 @@ export function SoilCompactionCard({
       <div className="flex gap-6 text-sm">
         <span>
           最大干密度（g/cm³）：
-          <b data-testid="max-dry-density">{peak.maxDryDensity ?? '—'}</b>
+          <b data-testid="max-dry-density">{peak.maxDryDensity ?? "—"}</b>
         </span>
         <span>
           最优含水率（%）：
-          <b data-testid="optimal-moisture">{peak.optimalMoisture ?? '—'}</b>
+          <b data-testid="optimal-moisture">{peak.optimalMoisture ?? "—"}</b>
         </span>
       </div>
     </div>
-  )
+  );
 }

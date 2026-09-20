@@ -34,9 +34,7 @@ describe("流程集成测试：FlowPanel 状态流转端到端", () => {
       // 终态文案在 span 中（状态标签 + 终态提示 span）
       expect(screen.getAllByText(/已通过/).length).toBeGreaterThan(0);
       // 终态无操作按钮（除重置）
-      expect(
-        screen.queryByRole("button", { name: "通过复审" }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "通过复审" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "拒绝" })).not.toBeInTheDocument();
 
       // 历史记录 4 条
@@ -77,9 +75,7 @@ describe("流程集成测试：FlowPanel 状态流转端到端", () => {
     () => {
       render(<FlowPanel operatorId="u-001" operatorRole="admin" />);
       // draft 状态下不应有通过复审按钮
-      expect(
-        screen.queryByRole("button", { name: "通过复审" }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "通过复审" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "拒绝" })).not.toBeInTheDocument();
     },
   );
@@ -95,9 +91,7 @@ describe("流程集成测试：FlowPanel 状态流转端到端", () => {
       await user.click(screen.getByRole("button", { name: "提交复审" }));
       expect(screen.getByText("复审中", { exact: true })).toBeInTheDocument();
       // technician 无权通过/拒绝
-      expect(
-        screen.queryByRole("button", { name: "通过复审" }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "通过复审" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "拒绝" })).not.toBeInTheDocument();
     },
   );

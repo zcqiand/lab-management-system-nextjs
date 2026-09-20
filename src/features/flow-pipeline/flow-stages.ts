@@ -2,7 +2,11 @@
 // 全量删除，实体类型改 import orval 生成物（src/api/endpoints/model/）。
 // FLOW_STAGE_ORDER / FLOW_STAGE_LABELS 是纯 UI 常量（顺序 + 中文名），契约里没有，
 // 落在消费最集中的 flow-pipeline 特性目录；阶段值类型用 orval 的 FlowStatus。
-import type { FlowActionRequest, FlowActionResult, FlowStatus } from "@/api/endpoints/model";
+import type {
+  FlowActionRequest,
+  FlowActionResult,
+  FlowStatus,
+} from "@/api/endpoints/model";
 import { receiptsActFlowApprove } from "@/api/endpoints/receipts/receipts";
 import { receiptsActFlowArchived } from "@/api/endpoints/receipts/receipts";
 import { receiptsActFlowAssigning } from "@/api/endpoints/receipts/receipts";

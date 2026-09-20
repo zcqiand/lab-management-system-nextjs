@@ -99,7 +99,6 @@ export class AuthService {
     return this.ssoAuth;
   }
 
-
   login(username: string, password: string): LoginResponse {
     if (!username || !password) {
       throw new Error("username and password are required");
@@ -194,7 +193,8 @@ export class AuthService {
 
   me(claims: Record<string, unknown>): CurrentUserSession {
     const user = this.resolveUser(claims);
-    const currentTenantId = (claims.tenant_id as string) ?? this.directory.defaultTenant().tenantId;
+    const currentTenantId =
+      (claims.tenant_id as string) ?? this.directory.defaultTenant().tenantId;
     return {
       user: this.toUserView(user),
       tenants: this.directory.tenantsOf(user.username),
@@ -239,10 +239,7 @@ export class AuthService {
     saasRefresh?: string,
   ): LoginResponse {
     const accessToken = this.jwt.issue(user.id, tenantId);
-    const refreshToken = this.jwt.issueRefresh(
-      user.id,
-      saasRefresh ?? "dev-placeholder",
-    );
+    const refreshToken = this.jwt.issueRefresh(user.id, saasRefresh ?? "dev-placeholder");
     const tenants: TenantView[] =
       explicitTenants.length > 0 && "tenantId" in explicitTenants[0]!
         ? (explicitTenants as LabTenant[]).map((t) => ({

@@ -27,7 +27,10 @@ export async function handleActRequest(
       { status: 400 },
     );
   }
-  if (typeof body.action !== "string" || !(ACTIONS as readonly string[]).includes(body.action)) {
+  if (
+    typeof body.action !== "string" ||
+    !(ACTIONS as readonly string[]).includes(body.action)
+  ) {
     return NextResponse.json(
       { code: "BAD_REQUEST", message: `action must be one of ${ACTIONS.join("|")}` },
       { status: 400 },

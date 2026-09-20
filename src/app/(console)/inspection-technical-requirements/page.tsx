@@ -5,7 +5,5 @@
 import TechnicalRequirementList from "@/features/inspection-capability/TechnicalRequirementList";
 
 export default function Page() {
-  return (
-      <TechnicalRequirementList />
-  );
+  return <TechnicalRequirementList />;
 }

@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
   const obj = url.get("inspectionObjectCode");
   const param = url.get("inspectionParameterCode");
   const std = url.get("testingStandardCode");
-  let items = calcMethodArr().map((r): Record<string, unknown> => ({ ...r, id: calcMethodId(r) }));
+  let items = calcMethodArr().map((r): Record<string, unknown> => ({
+    ...r,
+    id: calcMethodId(r),
+  }));
   if (obj) items = items.filter((r) => r["inspectionObjectCode"] === obj);
   if (param) items = items.filter((r) => r["inspectionParameterCode"] === param);
   if (std) items = items.filter((r) => r["testingStandardCode"] === std);

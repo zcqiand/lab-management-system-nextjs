@@ -55,7 +55,9 @@ export function BackendBadge({ variant = "sidebar" }: { variant?: "sidebar" | "p
           >
             <span className="flex min-w-0 items-center gap-2">
               <Server className="h-4 w-4 text-slate-500" />
-              <span className="truncate font-medium">{current ? current.key : "(env 默认)"}</span>
+              <span className="truncate font-medium">
+                {current ? current.key : "(env 默认)"}
+              </span>
             </span>
             <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-slate-400" />
           </Button>

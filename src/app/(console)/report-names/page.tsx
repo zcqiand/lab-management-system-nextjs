@@ -4,7 +4,5 @@
 import ReportNameList from "@/features/inspection-capability/ReportNameList";
 
 export default function Page() {
-  return (
-      <ReportNameList />
-  );
+  return <ReportNameList />;
 }

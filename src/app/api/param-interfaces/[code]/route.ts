@@ -22,11 +22,16 @@ export async function GET(_req: NextRequest, { params }: { params: { code: strin
 export async function PUT(req: NextRequest, { params }: { params: { code: string } }) {
   const row = findRow(params.code);
   if (!row) return notFound("InspectionParamInterface not found");
-  Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
+  Object.assign(row, (await req.json().catch(() => ({}))) as object, {
+    updatedAt: NOW(),
+  });
   return Response.json(row);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { code: string } }) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { code: string } },
+) {
   const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
   const i = arr.findIndex((r) => r["code"] === params.code);
   if (i < 0) return notFound("参数界面不存在");

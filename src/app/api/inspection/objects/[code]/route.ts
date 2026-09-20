@@ -8,12 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { notFound, noContent } from "@/lib/api-helpers";
-import {
-  DICT_CFGS,
-  deleteDictDb,
-  isDbUnavailable,
-  putDictDb,
-} from "@/lib/db-queries";
+import { DICT_CFGS, deleteDictDb, isDbUnavailable, putDictDb } from "@/lib/db-queries";
 
 function dbUnavailable() {
   return NextResponse.json(

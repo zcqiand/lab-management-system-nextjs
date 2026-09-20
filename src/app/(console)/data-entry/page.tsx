@@ -5,9 +5,7 @@
 import DataEntryPage from "@/features/data-entry/DataEntryPage";
 
 export default function Page() {
-  return (
-      <DataEntryPage />
-  );
+  return <DataEntryPage />;
 }
 
 export { DataEntryPage };

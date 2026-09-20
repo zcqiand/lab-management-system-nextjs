@@ -4,7 +4,5 @@
 import ReportArchivePage from "@/features/reports/ReportArchivePage";
 
 export default function Page() {
-  return (
-      <ReportArchivePage />
-  );
+  return <ReportArchivePage />;
 }

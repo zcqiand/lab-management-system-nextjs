@@ -1,12 +1,11 @@
 import { describe, expect, beforeEach } from "vitest";
-import { tablesOf, installShapeAdapters, resetFixtures } from '../../helpers/seed'
+import { tablesOf, installShapeAdapters, resetFixtures } from "../../helpers/seed";
 import { http, HttpResponse } from "msw";
-import { server } from '../../setup.dom';
+import { server } from "../../setup.dom";
 import { useSampleStore } from "@/state/sampleStore";
 import type { SampleQuery } from "@/state/sampleStore";
 import { resetApiClient } from "@/api/legacy-client";
-const { receiptTable, inspectionReportNameTable, sampleTable } = tablesOf()
-;
+const { receiptTable, inspectionReportNameTable, sampleTable } = tablesOf();
 import { fnTest } from "../../fn";
 
 function seedCategory(code = "steel") {
@@ -25,7 +24,7 @@ function seedCategory(code = "steel") {
 function insertReceipt(id = `rc-${Math.random().toString(36).slice(2, 8)}`) {
   return receiptTable.insert({
     id,
-    tenantId: 'TENANT-001',
+    tenantId: "TENANT-001",
     contractId: "contract-001",
     commissionCode: "RC-TEST-001",
     categoryCode: "steel",
@@ -42,7 +41,7 @@ function insertReceipt(id = `rc-${Math.random().toString(36).slice(2, 8)}`) {
 
 function insertSample(receiptId: string, sampleCode: string) {
   return sampleTable.insert({
-    tenantId: 'TENANT-001',
+    tenantId: "TENANT-001",
     receiptId,
     sampleCode,
     sampleName: sampleCode,
@@ -118,7 +117,9 @@ describe("sampleStore", () => {
       receiptId: "rc-default",
       sampleCode: "S-NEW",
     });
-    expect(useSampleStore.getState().list.some((s) => s.sampleCode === "S-NEW")).toBe(true);
+    expect(useSampleStore.getState().list.some((s) => s.sampleCode === "S-NEW")).toBe(
+      true,
+    );
     expect(useSampleStore.getState().total).toBe(1);
   });
 
@@ -157,9 +158,7 @@ describe("sampleStore", () => {
     await useSampleStore.getState().fetchSamples({ page: 1, pageSize: 10 });
     const target = useSampleStore.getState().list[0]!;
     await useSampleStore.getState().deleteSample(target.id);
-    expect(
-      useSampleStore.getState().list.some((s) => s.id === target.id),
-    ).toBe(false);
+    expect(useSampleStore.getState().list.some((s) => s.id === target.id)).toBe(false);
   });
 
   fnTest(["M03.F03.I10"], "deleteSample 不存在时 error 填充", async () => {

@@ -18,15 +18,14 @@ export function LoginForm() {
 
   async function onLogin() {
     try {
-      const res = await authLogin(
-        { username, password },
-        { baseURL: baseUrl },
-      );
+      const res = await authLogin({ username, password }, { baseURL: baseUrl });
       setResult(
         `mode=${apiMode} baseUrl=${JSON.stringify(baseUrl)}\nlogin OK → token=${(res as { token?: string }).token ?? "(no token)"}`,
       );
     } catch (e) {
-      setResult(`mode=${apiMode} baseUrl=${JSON.stringify(baseUrl)}\nlogin FAIL: ${(e as Error).message}`);
+      setResult(
+        `mode=${apiMode} baseUrl=${JSON.stringify(baseUrl)}\nlogin FAIL: ${(e as Error).message}`,
+      );
     }
   }
 

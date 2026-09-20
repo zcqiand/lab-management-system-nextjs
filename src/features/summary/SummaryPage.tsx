@@ -20,7 +20,10 @@ import {
 } from "@/api/endpoints/summary/summary";
 import { PageLoading } from "@/components/app/page-loading";
 
-const FUNNEL_LABELS: Array<{ key: keyof DashboardStats["funnelByStage"]; label: string }> = [
+const FUNNEL_LABELS: Array<{
+  key: keyof DashboardStats["funnelByStage"];
+  label: string;
+}> = [
   { key: "pending_collect", label: "待取样" },
   { key: "received", label: "已收样" },
   { key: "testing", label: "试验中" },
@@ -70,7 +73,9 @@ export function SummaryPage() {
         if (!cancelled) setNamesReady(true);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // 拉仪表盘 stats（一次性）
@@ -87,7 +92,9 @@ export function SummaryPage() {
         if (!cancelled) setStatsReady(true);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // 拉汇总表（categoryCode 变化时）
@@ -105,7 +112,9 @@ export function SummaryPage() {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [categoryCode]);
 
   // B6 加载态：三源（报告名称/仪表盘 stats/汇总表）任一未到即整页加载；
@@ -118,7 +127,11 @@ export function SummaryPage() {
     // @entry M05.F01.I06 — 仪表盘统计基础端点（ADR-0033 阶段二自 M05.F02.I01 改挂）
     <div className="space-y-6" data-fn="M05.F01.I02">
       {/* —— M05.F01.I03 核心指标卡 —— */}
-      <section data-fn="M05.F01.I03" data-testid="dashboard-metrics" className="space-y-3">
+      <section
+        data-fn="M05.F01.I03"
+        data-testid="dashboard-metrics"
+        className="space-y-3"
+      >
         <h2 className="text-base font-semibold">核心指标</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <MetricCard
@@ -133,9 +146,15 @@ export function SummaryPage() {
             customValue={
               stats ? (
                 <div className="text-sm" data-testid="metric-output-detail">
-                  <div>已生成：<b>{stats.reportOutputByStatus.generated}</b></div>
-                  <div>待审核：<b>{stats.reportOutputByStatus.pending}</b></div>
-                  <div>已签发：<b>{stats.reportOutputByStatus.issued}</b></div>
+                  <div>
+                    已生成：<b>{stats.reportOutputByStatus.generated}</b>
+                  </div>
+                  <div>
+                    待审核：<b>{stats.reportOutputByStatus.pending}</b>
+                  </div>
+                  <div>
+                    已签发：<b>{stats.reportOutputByStatus.issued}</b>
+                  </div>
                 </div>
               ) : (
                 "—"
@@ -179,7 +198,11 @@ export function SummaryPage() {
       </section>
 
       {/* —— M05.F01.I01 汇总表 —— */}
-      <section data-fn="M05.F01.I01" data-testid="summary-table-section" className="space-y-3">
+      <section
+        data-fn="M05.F01.I01"
+        data-testid="summary-table-section"
+        className="space-y-3"
+      >
         <h2 className="text-base font-semibold">试验报告汇总表</h2>
         <div className="flex items-center gap-3">
           <label htmlFor="summary-category" className="text-sm font-medium">
@@ -221,10 +244,7 @@ export function SummaryPage() {
               <thead>
                 <tr>
                   {data.columns.map((c: SummaryColumn) => (
-                    <th
-                      key={c.key}
-                      className="text-left px-2 py-1 border-b font-medium"
-                    >
+                    <th key={c.key} className="text-left px-2 py-1 border-b font-medium">
                       {c.label}
                     </th>
                   ))}
@@ -275,10 +295,7 @@ function MetricCard({
   testid: string;
 }) {
   return (
-    <div
-      data-testid={testid}
-      className="border rounded bg-white p-4 shadow-sm"
-    >
+    <div data-testid={testid} className="border rounded bg-white p-4 shadow-sm">
       <div className="text-xs text-slate-500 uppercase tracking-wider">{label}</div>
       <div className="mt-2">
         {customValue ?? (
@@ -308,10 +325,7 @@ function FunnelChart({ counts }: { counts: DashboardStats["funnelByStage"] }) {
   // 漏斗视觉：按段比例画水平条，宽度逐段递减
   const stageCount = FUNNEL_LABELS.length;
   return (
-    <div
-      data-testid="funnel-bars"
-      className="border rounded bg-white p-4 space-y-2"
-    >
+    <div data-testid="funnel-bars" className="border rounded bg-white p-4 space-y-2">
       {FUNNEL_LABELS.map((s, i) => {
         const count = counts[s.key];
         // 漏斗宽度：从 100% 线性递减到 50%（视觉漏斗感）
@@ -336,9 +350,7 @@ function FunnelChart({ counts }: { counts: DashboardStats["funnelByStage"] }) {
           </div>
         );
       })}
-      <div className="text-xs text-slate-500 pt-1">
-        合计 {total} 项
-      </div>
+      <div className="text-xs text-slate-500 pt-1">合计 {total} 项</div>
     </div>
   );
 }

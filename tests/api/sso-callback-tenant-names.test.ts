@@ -74,9 +74,8 @@ describe("POST /api/auth/sso/callback 租户显示名", () => {
     process.env.SAAS_OAUTH_CLIENT_ID = "lab-management";
     process.env.SAAS_OAUTH_CLIENT_SECRET = "lab-management-secret";
     process.env.SAAS_TENANT_ID = TENANT_A;
-    const { __resetMembershipSnapshotCache } = await import(
-      "@/lib/auth/membership-snapshot"
-    );
+    const { __resetMembershipSnapshotCache } =
+      await import("@/lib/auth/membership-snapshot");
     __resetMembershipSnapshotCache();
   });
 

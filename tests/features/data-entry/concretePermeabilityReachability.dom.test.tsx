@@ -1,10 +1,15 @@
 import { describe, expect, beforeEach } from "vitest";
-import { server } from '../../setup.dom'
+import { server } from "../../setup.dom";
 import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import { fnTest } from "../../fn";
-import {installShapeAdapters, resetFixtures, seedMasterDataIntoMockDb, seedParamInterfaces, tablesOf} from '../../helpers/seed'
-const { sampleTable, testRecordTable, receiptTable } = tablesOf(server)
-;
+import {
+  installShapeAdapters,
+  resetFixtures,
+  seedMasterDataIntoMockDb,
+  seedParamInterfaces,
+  tablesOf,
+} from "../../helpers/seed";
+const { sampleTable, testRecordTable, receiptTable } = tablesOf(server);
 import { EntryModal } from "@/features/data-entry/DataEntryPage";
 import { ReceiptDetail } from "@/features/receipts/ReceiptDetail";
 import type { SampleReceipt } from "@/api/endpoints/model";
@@ -33,7 +38,7 @@ function loginAsAdmin() {
 function buildRc2024071202(): SampleReceipt {
   return {
     id: "rc-2024-0712-02",
-    tenantId: 'TENANT-001',
+    tenantId: "TENANT-001",
     contractId: "c-2024-0712",
     commissionCode: "RC-2024-0712-02",
     commissionDate: "2024-07-12",
@@ -112,9 +117,7 @@ describe("concrete-permeability reachability RC-2024-0712-02（数据录入 + �
     ["M03.F03.I03", "M06.F08.I04"],
     "EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
     async () => {
-      render(
-          <EntryModal receipt={buildRc2024071202()} onClose={() => {}} />
-      );
+      render(<EntryModal receipt={buildRc2024071202()} onClose={() => {}} />);
       // 等接口派发完成 + 卡片渲染
       await waitFor(
         () => {
@@ -134,9 +137,7 @@ describe("concrete-permeability reachability RC-2024-0712-02（数据录入 + �
     "ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
     async () => {
       // ReceiptDetail 是纯组件，receiptId + categoryCode 由 props 传入（路由层 ReceiptDetailPage 才用 useParams）
-      render(
-          <ReceiptDetail receiptId="rc-2024-0712-02" categoryCode="RN-105-1" />
-      );
+      render(<ReceiptDetail receiptId="rc-2024-0712-02" categoryCode="RN-105-1" />);
       // 等详情页加载（从 MSW 拉接样单 + 样品 + testRecords + 接口派发）
       await waitFor(
         () => {

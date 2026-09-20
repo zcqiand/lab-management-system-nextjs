@@ -84,7 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((session) => {
         setUser(session.user);
         setTenants(session.tenants ?? []);
-        setCurrentTenantId(session.currentTenantId ?? session.tenants?.[0]?.tenantId ?? null);
+        setCurrentTenantId(
+          session.currentTenantId ?? session.tenants?.[0]?.tenantId ?? null,
+        );
       })
       .catch(() => {
         // /me 失败（快照 miss / 后端不可达）：不阻断 UI，顶栏显示占位。

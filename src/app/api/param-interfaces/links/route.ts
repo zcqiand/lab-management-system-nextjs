@@ -65,7 +65,9 @@ export async function DELETE(req: NextRequest) {
     interfaceCode = url.get("paramInterfaceCode") ?? "";
   }
   const i = arr.findIndex(
-    (l) => l["inspectionParameterCode"] === parameterCode && l["paramInterfaceCode"] === interfaceCode,
+    (l) =>
+      l["inspectionParameterCode"] === parameterCode &&
+      l["paramInterfaceCode"] === interfaceCode,
   );
   // 契约 unlink 对不存在的关联幂等返回 204（tsp: void | ErrorResponse，
   // REF linkDelete 语义 = 未命中也 204），保持与 msw/真后端一致

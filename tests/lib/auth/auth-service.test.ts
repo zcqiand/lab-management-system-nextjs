@@ -22,7 +22,11 @@ import { ConfigUserDirectory } from "@/lib/auth/directory";
 import { AuthService } from "@/lib/auth/config";
 
 class StubSaasAuthClient implements SaasAuthClient {
-  async authorize(_redirectUri: string, _scope: string, state: string): Promise<AuthorizeCodeResponse> {
+  async authorize(
+    _redirectUri: string,
+    _scope: string,
+    state: string,
+  ): Promise<AuthorizeCodeResponse> {
     // authorize 返固定 dev-code，参数被接口签名强制要求但不在响应里出现。
     void _redirectUri;
     void _scope;
@@ -60,18 +64,54 @@ class StubSaasMeClient implements SaasMeClient {
       email: "alice",
       displayName: "管理员",
       memberships: [
-        { id: "m1", userId: "USER-A", tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },
-        { id: "m2", userId: "USER-A", tenantId: "TENANT-002", roleIds: ["technician"], status: "active" },
-        { id: "m3", userId: "USER-A", tenantId: "TENANT-003", roleIds: ["viewer"], status: "active" },
+        {
+          id: "m1",
+          userId: "USER-A",
+          tenantId: "TENANT-001",
+          roleIds: ["admin"],
+          status: "active",
+        },
+        {
+          id: "m2",
+          userId: "USER-A",
+          tenantId: "TENANT-002",
+          roleIds: ["technician"],
+          status: "active",
+        },
+        {
+          id: "m3",
+          userId: "USER-A",
+          tenantId: "TENANT-003",
+          roleIds: ["viewer"],
+          status: "active",
+        },
       ],
     };
   }
   async listMyTenants(_saasAccessToken: string): Promise<SaasTenantMembership[]> {
     void _saasAccessToken;
     return [
-      { id: "m1", userId: "USER-A", tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },
-      { id: "m2", userId: "USER-A", tenantId: "TENANT-002", roleIds: ["technician"], status: "active" },
-      { id: "m3", userId: "USER-A", tenantId: "TENANT-003", roleIds: ["viewer"], status: "active" },
+      {
+        id: "m1",
+        userId: "USER-A",
+        tenantId: "TENANT-001",
+        roleIds: ["admin"],
+        status: "active",
+      },
+      {
+        id: "m2",
+        userId: "USER-A",
+        tenantId: "TENANT-002",
+        roleIds: ["technician"],
+        status: "active",
+      },
+      {
+        id: "m3",
+        userId: "USER-A",
+        tenantId: "TENANT-003",
+        roleIds: ["viewer"],
+        status: "active",
+      },
     ];
   }
 }
@@ -160,7 +200,9 @@ describe("M01.F05 AuthService", () => {
       redirect_uri: "http://lab.local/api/auth/sso/callback",
       state: "forged-state",
     };
-    await expect(SVC.ssoCallback(body, auth.cookieValue)).rejects.toThrow(/nonce mismatch/);
+    await expect(SVC.ssoCallback(body, auth.cookieValue)).rejects.toThrow(
+      /nonce mismatch/,
+    );
   });
 
   it("me with no JWT claims defaults to first tenant", () => {
@@ -182,7 +224,9 @@ describe("M01.F05 AuthService", () => {
   });
 
   it("switchTenant unknown tenant throws", () => {
-    expect(() => SVC.switchTenant({ sub: "USER-A" }, "TENANT-999")).toThrow(/Tenant not found/);
+    expect(() => SVC.switchTenant({ sub: "USER-A" }, "TENANT-999")).toThrow(
+      /Tenant not found/,
+    );
   });
 
   it("permissions returns admin full set", () => {

@@ -1,14 +1,9 @@
 import { describe, expect } from "vitest";
-import type {
-  AuthState,
-  ContractState,
-  ReceiptState,
-  SampleState,
-} from "@/types/store";
+import type { AuthState, ContractState, ReceiptState, SampleState } from "@/types/store";
 import { fnTest } from "../fn";
 
 describe("types/store store 状态类型（v3）", () => {
-  fnTest(["M01.F05.I03"], "AuthState 未登录态可构造（SSO 流程）", () =>{
+  fnTest(["M01.F05.I03"], "AuthState 未登录态可构造（SSO 流程）", () => {
     const auth: AuthState = {
       user: null,
       token: null,

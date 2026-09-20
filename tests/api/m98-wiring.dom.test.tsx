@@ -38,10 +38,15 @@ describe("M98 frontend 接线层", () => {
     });
     const res = await loginPOST(req);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { token: string; tenants: Array<{ tenantId: string }> };
+    const body = (await res.json()) as {
+      token: string;
+      tenants: Array<{ tenantId: string }>;
+    };
     // 真 JWT = 3 段 base64url + payload 含 sub
     expect(body.token.split(".").length).toBe(3);
-    const payload = JSON.parse(Buffer.from(body.token.split(".")[1]!, "base64url").toString("utf-8"));
+    const payload = JSON.parse(
+      Buffer.from(body.token.split(".")[1]!, "base64url").toString("utf-8"),
+    );
     expect(payload.sub).toBe("USER-A");
     expect(body.tenants).toHaveLength(3);
     expect(body.tenants[0]?.tenantId).toBe("TENANT-001");

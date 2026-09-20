@@ -138,7 +138,8 @@ export function CalculationMethodList() {
           inspectionObjectCode: objectCode,
           inspectionParameterCode: paramCode,
           testingStandardCode: form.testingStandardCode || undefined,
-          algorithmType: form.algorithmType as CreateCalculationMethodRequest["algorithmType"],
+          algorithmType:
+            form.algorithmType as CreateCalculationMethodRequest["algorithmType"],
           specimenCount: Number(form.specimenCount) || 1,
           remark: form.remark || undefined,
         };

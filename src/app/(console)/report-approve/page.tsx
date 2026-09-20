@@ -4,7 +4,5 @@
 import ReportApprovePage from "@/features/reports/ReportApprovePage";
 
 export default function Page() {
-  return (
-      <ReportApprovePage />
-  );
+  return <ReportApprovePage />;
 }

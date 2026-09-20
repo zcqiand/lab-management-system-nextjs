@@ -118,13 +118,19 @@ export function SidebarNav({
     try {
       const v = window.localStorage.getItem(SIDEBAR_KEY);
       if (v === "1") setCollapsed(true);
-    } catch { /* SSR / 无 storage 时忽略 */ }
+    } catch {
+      /* SSR / 无 storage 时忽略 */
+    }
     setHydrated(true);
   }, [SIDEBAR_KEY]);
   const toggleCollapsed = () => {
     const next = !collapsed;
     setCollapsed(next);
-    try { window.localStorage.setItem(SIDEBAR_KEY, next ? "1" : "0"); } catch { /* ignore */ }
+    try {
+      window.localStorage.setItem(SIDEBAR_KEY, next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
   };
   // 防止 SSR/CSR 阶段不一致闪烁：未水合前按展开渲染
   const effectiveCollapsed = hydrated ? collapsed : false;
@@ -138,16 +144,25 @@ export function SidebarNav({
       const raw = window.localStorage.getItem(GROUPS_KEY);
       if (raw) {
         const arr = JSON.parse(raw) as unknown;
-        if (Array.isArray(arr)) setGroupCollapsed(new Set(arr.filter((x): x is string => typeof x === "string")));
+        if (Array.isArray(arr))
+          setGroupCollapsed(
+            new Set(arr.filter((x): x is string => typeof x === "string")),
+          );
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [GROUPS_KEY]);
   const toggleGroup = (code: string) => {
     setGroupCollapsed((prev) => {
       const next = new Set(prev);
       if (next.has(code)) next.delete(code);
       else next.add(code);
-      try { window.localStorage.setItem(GROUPS_KEY, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      try {
+        window.localStorage.setItem(GROUPS_KEY, JSON.stringify(Array.from(next)));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   };
@@ -163,17 +178,33 @@ export function SidebarNav({
       data-testid="sidebar-nav"
       aria-label="主导航"
     >
-      <div className={cn("flex items-center py-4 border-b border-white/10", effectiveCollapsed ? "px-2 justify-center" : "px-5")}>
-        <div className={cn("flex items-center gap-2", effectiveCollapsed && "justify-center")}>
+      <div
+        className={cn(
+          "flex items-center py-4 border-b border-white/10",
+          effectiveCollapsed ? "px-2 justify-center" : "px-5",
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center gap-2",
+            effectiveCollapsed && "justify-center",
+          )}
+        >
           <div className="h-8 w-8 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold shrink-0">
             L
           </div>
           {!effectiveCollapsed && (
             <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold leading-tight truncate" data-testid="sidebar-app-name">
+              <h1
+                className="text-sm font-bold leading-tight truncate"
+                data-testid="sidebar-app-name"
+              >
                 {appName ?? "Lab-Management"}
               </h1>
-              <p className="text-xs text-white/50 truncate" data-testid="sidebar-app-version">
+              <p
+                className="text-xs text-white/50 truncate"
+                data-testid="sidebar-app-version"
+              >
                 v{pkg.version}
               </p>
             </div>
@@ -191,12 +222,21 @@ export function SidebarNav({
           )}
           data-testid="sidebar-toggle"
         >
-          {effectiveCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {effectiveCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </button>
       </div>
       <nav className="flex-1 px-2 py-3 overflow-y-auto" aria-label="菜单树">
         {tree.length === 0 ? (
-          <p className={cn("text-xs text-white/40", effectiveCollapsed ? "text-center" : "px-3")}>
+          <p
+            className={cn(
+              "text-xs text-white/40",
+              effectiveCollapsed ? "text-center" : "px-3",
+            )}
+          >
             {effectiveCollapsed ? "—" : "（无菜单）"}
           </p>
         ) : (
@@ -226,11 +266,21 @@ export function SidebarNav({
         )}
       </nav>
       <Separator className="bg-white/10" />
-      <div className={cn("space-y-2", effectiveCollapsed ? "p-2 flex flex-col items-center" : "p-3")}>
+      <div
+        className={cn(
+          "space-y-2",
+          effectiveCollapsed ? "p-2 flex flex-col items-center" : "p-3",
+        )}
+      >
         {footerAction}
         {footerExtras}
         {version && (
-          <div className={cn("text-xs text-white/40 truncate", effectiveCollapsed ? "text-[10px] text-center" : "px-2")}>
+          <div
+            className={cn(
+              "text-xs text-white/40 truncate",
+              effectiveCollapsed ? "text-[10px] text-center" : "px-2",
+            )}
+          >
             {effectiveCollapsed ? "v" : version}
           </div>
         )}
@@ -267,7 +317,11 @@ function NavLeaf({
     const childCount = node.children.length;
     const showHeaderButton = !collapsed; // 仅展开态有可点击的 header
     return (
-      <div className="mb-3" data-testid={`sidebar-group-${node.code}`} data-group-collapsed={isGroupCollapsed}>
+      <div
+        className="mb-3"
+        data-testid={`sidebar-group-${node.code}`}
+        data-group-collapsed={isGroupCollapsed}
+      >
         <div
           className={cn(
             "flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/40 border-t border-white/5 first:border-t-0",
@@ -284,7 +338,9 @@ function NavLeaf({
               type="button"
               onClick={() => onToggleGroup(node.code)}
               title={isGroupCollapsed ? `展开「${node.name}」` : `收起「${node.name}」`}
-              aria-label={isGroupCollapsed ? `展开「${node.name}」` : `收起「${node.name}」`}
+              aria-label={
+                isGroupCollapsed ? `展开「${node.name}」` : `收起「${node.name}」`
+              }
               aria-expanded={!isGroupCollapsed}
               className="flex items-center gap-1.5 hover:text-white/80 transition-colors text-left flex-1 min-w-0"
               data-testid={`sidebar-group-toggle-${node.code}`}
@@ -360,9 +416,19 @@ function ChevronToggle({ expanded }: { expanded: boolean }) {
       width="10"
       height="10"
       viewBox="0 0 10 10"
-      className={cn("transition-transform duration-150", expanded ? "rotate-0" : "-rotate-90")}
+      className={cn(
+        "transition-transform duration-150",
+        expanded ? "rotate-0" : "-rotate-90",
+      )}
     >
-      <path d="M2 3.5 L5 7 L8 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M2 3.5 L5 7 L8 3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -510,5 +576,11 @@ function requireClientEnv(v: string | undefined, name: string): string {
   }
   return v;
 }
-const APP_CODE = requireClientEnv(process.env.NEXT_PUBLIC_LAB_APP_CODE, "NEXT_PUBLIC_LAB_APP_CODE");
-const SAAS_BASE = requireClientEnv(process.env.NEXT_PUBLIC_SAAS_BASE_URL, "NEXT_PUBLIC_SAAS_BASE_URL");
+const APP_CODE = requireClientEnv(
+  process.env.NEXT_PUBLIC_LAB_APP_CODE,
+  "NEXT_PUBLIC_LAB_APP_CODE",
+);
+const SAAS_BASE = requireClientEnv(
+  process.env.NEXT_PUBLIC_SAAS_BASE_URL,
+  "NEXT_PUBLIC_SAAS_BASE_URL",
+);

@@ -6,14 +6,15 @@ import type {
   TestRecord,
   TestRecordsListTestRecordsParams,
 } from "@/api/endpoints/model";
-import {
-  samplesListSamples,
-  samplesUpdateSample,
-} from "@/api/endpoints/samples/samples";
+import { samplesListSamples, samplesUpdateSample } from "@/api/endpoints/samples/samples";
 import { testRecordsListTestRecords } from "@/api/endpoints/test-records/test-records";
 import { ORG_INFO, type OrgInfo } from "./org-info";
 import generatedReportNames from "@/data/generated/inspection-report-name.json";
-import { assembleReport, flattenForDocx, ensureAllDocxTagsFromBuffer } from "./reportTemplateData";
+import {
+  assembleReport,
+  flattenForDocx,
+  ensureAllDocxTagsFromBuffer,
+} from "./reportTemplateData";
 import { SampleExtFieldsModal } from "./SampleExtFieldsModal";
 
 /** 报告编号(RN) → 模板文件名（来自 generated/inspection-report-name.json 的 templatePath）。
@@ -169,7 +170,13 @@ export function ReportPreviewModal({ open, receipt, onClose }: Props) {
     const data = assembleReport({ receipt: rcpt, samples: displaySamples, records, org });
     const fname = REPORT_NAME_TEMPLATE[rcpt.categoryCode];
     const basename = fname ? fname.replace(/\.docx$/, "") : null;
-    const flat = flattenForDocx(rcpt.categoryCode, basename, data, displaySamples, records);
+    const flat = flattenForDocx(
+      rcpt.categoryCode,
+      basename,
+      data,
+      displaySamples,
+      records,
+    );
     // 兜底：manifest 漏登记的 {tag} 也补成「—」，避免 docxtemplater 渲染 "undefined"。
     await ensureAllDocxTagsFromBuffer(flat, arrayBuffer);
     const PizZip = (await import("pizzip")).default;

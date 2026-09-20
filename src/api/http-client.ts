@@ -23,7 +23,11 @@ export class ApiError extends Error {
 export function toApiError(err: unknown): ApiError {
   if (axios.isAxiosError(err)) {
     const axErr = err as AxiosError<unknown>;
-    return new ApiError(axErr.response?.status ?? 0, axErr.response?.data ?? null, axErr.message);
+    return new ApiError(
+      axErr.response?.status ?? 0,
+      axErr.response?.data ?? null,
+      axErr.message,
+    );
   }
   if (err instanceof ApiError) return err;
   if (err instanceof Error) return new ApiError(0, null, err.message);

@@ -17,7 +17,12 @@ import { getMembershipSnapshot } from "@/lib/auth/membership-snapshot";
 import { subFromBearer } from "@/lib/auth/bearer";
 
 // 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
-const DEMO_USER = { id: "USER-A", username: "alice", displayName: "管理员", roleCode: "admin" };
+const DEMO_USER = {
+  id: "USER-A",
+  username: "alice",
+  displayName: "管理员",
+  roleCode: "admin",
+};
 
 export async function GET(request: Request) {
   const sub = subFromBearer(request.headers.get("authorization"));
@@ -50,7 +55,8 @@ export async function GET(request: Request) {
     "TENANT-003": { code: "third-party", name: "第三方检测实验室" },
   };
   const fullTenants = tenants.map((t) => {
-    const fallback: { code?: string; name?: string } = DEMO_TENANTS_FULL[t.tenantId] ?? {};
+    const fallback: { code?: string; name?: string } =
+      DEMO_TENANTS_FULL[t.tenantId] ?? {};
     return {
       tenantId: t.tenantId,
       roleIds: t.roleIds,

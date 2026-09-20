@@ -1,4 +1,4 @@
-import type { FlowStatus } from '@/state/flow-types'
+import type { FlowStatus } from "@/state/flow-types";
 
 /**
  * 状态转换表：定义每个状态可达的下一状态。
@@ -11,26 +11,26 @@ import type { FlowStatus } from '@/state/flow-types'
  * rejected   → []                             已拒收（终态）
  */
 export const TRANSITIONS: Record<FlowStatus, FlowStatus[]> = {
-  draft: ['submitted'],
-  submitted: ['testing', 'draft'],
-  testing: ['review', 'submitted'],
-  review: ['approved', 'rejected', 'testing'],
+  draft: ["submitted"],
+  submitted: ["testing", "draft"],
+  testing: ["review", "submitted"],
+  review: ["approved", "rejected", "testing"],
   approved: [],
   rejected: [],
-}
+};
 
 /** 动作到目标状态的映射 */
 export const ACTION_TARGET: Record<string, FlowStatus> = {
-  SUBMIT: 'submitted',
-  RECALL: 'draft',
-  START_TESTING: 'testing',
-  SUBMIT_REVIEW: 'review',
-  APPROVE: 'approved',
-  REJECT: 'rejected',
-}
+  SUBMIT: "submitted",
+  RECALL: "draft",
+  START_TESTING: "testing",
+  SUBMIT_REVIEW: "review",
+  APPROVE: "approved",
+  REJECT: "rejected",
+};
 
 /** 各动作所需的角色（未列出则不校验角色） */
 export const ACTION_REQUIRED_ROLE: Record<string, string> = {
-  APPROVE: 'admin',
-  REJECT: 'admin',
-}
+  APPROVE: "admin",
+  REJECT: "admin",
+};

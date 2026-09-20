@@ -12,11 +12,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { qp, num, NOW, TENANT } from "@/lib/api-helpers";
-import {
-  listReceiptsDb,
-  createReceiptDb,
-  isDbUnavailable,
-} from "@/lib/db-queries";
+import { listReceiptsDb, createReceiptDb, isDbUnavailable } from "@/lib/db-queries";
 
 function dbUnavailable() {
   return NextResponse.json(

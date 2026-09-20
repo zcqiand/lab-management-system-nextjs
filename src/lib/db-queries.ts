@@ -274,8 +274,7 @@ async function actOneForStage(
             : action === "withdraw"
               ? null
               : (r.lastSubmittedBy as never),
-        issuedAt:
-          action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
+        issuedAt: action === "submit" && to === "issuance" ? now : (r.issuedAt as never),
         flowHistory: hist as never,
         updatedAt: now,
       })
@@ -820,7 +819,6 @@ export const CATALOG_CFGS = {
 // 「POST 201 后 [code] 路由 404」。对齐 receipts 批次做法，数据源切 lab_dev；
 // 契约面（路径/信封/状态码）不变。语义真相源 = 各 route.ts 头注引 lab-msw handler。）———
 
-
 const RN_MAIN = schema.inspectionReportNames;
 const RN_LINKS = {
   object: schema.inspectionObjectReportNames,
@@ -872,7 +870,11 @@ export async function updateReportNameDb(code: string, patch: Row): Promise<Row 
     if (k in patch) sets[k] = patch[k] as never;
   }
   sets.updatedAt = String(patch.updatedAt ?? "");
-  const rows = await db.update(RN_MAIN).set(sets).where(eq(RN_MAIN.code, code)).returning();
+  const rows = await db
+    .update(RN_MAIN)
+    .set(sets)
+    .where(eq(RN_MAIN.code, code))
+    .returning();
   return (rows[0] as Row) ?? null;
 }
 
@@ -887,8 +889,14 @@ export async function listReportNameLinksDb(kind: ReportNameLinkKind): Promise<R
 }
 
 /** junction POST：msw 版是裸 push（204 恒定）；PG 主键冲突按幂等 upsert 处理仍 204。 */
-export async function createReportNameLinkDb(kind: ReportNameLinkKind, dto: Row): Promise<void> {
-  await db.insert(RN_LINKS[kind]).values(dto as never).onConflictDoNothing();
+export async function createReportNameLinkDb(
+  kind: ReportNameLinkKind,
+  dto: Row,
+): Promise<void> {
+  await db
+    .insert(RN_LINKS[kind])
+    .values(dto as never)
+    .onConflictDoNothing();
 }
 
 /** junction DELETE：msw linkDelete 按 query 全键匹配删一行（未命中也 204）。
@@ -952,13 +960,19 @@ export async function listContractsDb(q: ListContractsQuery): Promise<Row[]> {
     conds.push(or(ilike(t.contractCode, like), ilike(t.projectName, like)));
   }
   const rows = conds.length
-    ? await db.select().from(t).where(and(...conds))
+    ? await db
+        .select()
+        .from(t)
+        .where(and(...conds))
     : await db.select().from(t);
   return rows as Row[];
 }
 
 export async function getContractDb(id: string): Promise<Row | null> {
-  const rows = await db.select().from(schema.contracts).where(eq(schema.contracts.id, id));
+  const rows = await db
+    .select()
+    .from(schema.contracts)
+    .where(eq(schema.contracts.id, id));
   return (rows[0] as Row) ?? null;
 }
 
@@ -972,7 +986,10 @@ export async function createContractDb(dto: Row): Promise<Row> {
   }
   values.createdAt = String(dto.createdAt ?? "");
   values.updatedAt = String(dto.updatedAt ?? "");
-  const rows = await db.insert(t).values(values as never).returning();
+  const rows = await db
+    .insert(t)
+    .values(values as never)
+    .returning();
   return rows[0] as Row;
 }
 

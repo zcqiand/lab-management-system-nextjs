@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { ParamModelProps } from './types'
-import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from './types'
-import { requirementLabel } from './DefaultParamCard'
-import { autoVerdict } from './cement-strength'
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ParamModelProps } from "./types";
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from "./types";
+import { requirementLabel } from "./DefaultParamCard";
+import { autoVerdict } from "./cement-strength";
 import {
   parseRebarMechResult,
   computeStrengths,
@@ -12,19 +12,19 @@ import {
   rounderFor,
   type RebarMechResult,
   type RebarMechFormula,
-} from './rebar-mechanics'
+} from "./rebar-mechanics";
 
-const MANUAL_VERDICTS = ['合格', '不合格'] as const
+const MANUAL_VERDICTS = ["合格", "不合格"] as const;
 
 interface NumericConfig {
-  formulaKey?: RebarMechFormula
-  specimenCount?: number
-  needsDiameter?: boolean
-  inputLabel?: string
-  valueLabel?: string
+  formulaKey?: RebarMechFormula;
+  specimenCount?: number;
+  needsDiameter?: boolean;
+  inputLabel?: string;
+  valueLabel?: string;
   /** 机械连接模式：每试件录入「断裂位置」下拉，存到 result.fractureLocations[N] */
-  connectionMode?: boolean
-  fractureLocationOptions?: string[]
+  connectionMode?: boolean;
+  fractureLocationOptions?: string[];
 }
 
 /**
@@ -47,126 +47,152 @@ export function RebarMechNumericCard({
   onChange,
   readOnly = false,
 }: ParamModelProps) {
-  const cfg = (config ?? {}) as NumericConfig
-  const formula: RebarMechFormula = cfg.formulaKey ?? 'passthrough'
-  const count = cfg.specimenCount ?? calcRule?.specimenCount ?? 2
-  const needsDiameter = !!cfg.needsDiameter
-  const inputLabel = cfg.inputLabel ?? '数值'
-  const connectionMode = !!cfg.connectionMode
-  const fractureLocationOptions = cfg.fractureLocationOptions ?? ['母材断裂', '断于接头', '热影响区断裂', '其他']
-  const round = rounderFor(formula)
-  const isStrength = formula === 'tensile_strength' || formula === 'yield_strength'
+  const cfg = (config ?? {}) as NumericConfig;
+  const formula: RebarMechFormula = cfg.formulaKey ?? "passthrough";
+  const count = cfg.specimenCount ?? calcRule?.specimenCount ?? 2;
+  const needsDiameter = !!cfg.needsDiameter;
+  const inputLabel = cfg.inputLabel ?? "数值";
+  const connectionMode = !!cfg.connectionMode;
+  const fractureLocationOptions = cfg.fractureLocationOptions ?? [
+    "母材断裂",
+    "断于接头",
+    "热影响区断裂",
+    "其他",
+  ];
+  const round = rounderFor(formula);
+  const isStrength = formula === "tensile_strength" || formula === "yield_strength";
   const isRatio =
-    formula === 'ratio_tensile_over_yield' || formula === 'ratio_measured_over_spec_yield'
+    formula === "ratio_tensile_over_yield" ||
+    formula === "ratio_measured_over_spec_yield";
 
-  const initial = useMemo(() => parseRebarMechResult(record?.result, count), [record?.result, count])
-  const [state, setState] = useState<RebarMechResult>(initial)
+  const initial = useMemo(
+    () => parseRebarMechResult(record?.result, count),
+    [record?.result, count],
+  );
+  const [state, setState] = useState<RebarMechResult>(initial);
   useEffect(() => {
-    setState(initial)
+    setState(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅在样品切换/落库后重置，避免每次输入被覆盖
-  }, [sampleId, record?.result, count])
+  }, [sampleId, record?.result, count]);
 
   const reqOptions = useMemo(
-    () => techReqs.filter((r) => r.verificationStatus === 'verified'),
+    () => techReqs.filter((r) => r.verificationStatus === "verified"),
     [techReqs],
-  )
+  );
   const req: InspectionTechnicalRequirement | undefined =
-    reqOptions.find((r) => r.id === state.techReqId) ?? reqOptions[0]
+    reqOptions.find((r) => r.id === state.techReqId) ?? reqOptions[0];
 
   // 比值卡的自动联立值（抗拉/屈服 或 实测屈服/标准屈服）；缺跨记录数据 → null（回退手动录入）
   const autoStrengths = useMemo<number[] | null>(() => {
-    if (formula === 'ratio_tensile_over_yield') {
-      const t = crossRecord?.tensileStrengths
-      const y = crossRecord?.yieldStrengths
+    if (formula === "ratio_tensile_over_yield") {
+      const t = crossRecord?.tensileStrengths;
+      const y = crossRecord?.yieldStrengths;
       if (t && y && t.some((v) => v > 0) && y.some((v) => v > 0))
-        return ratioTensileOverYield(t, y, count)
+        return ratioTensileOverYield(t, y, count);
     }
-    if (formula === 'ratio_measured_over_spec_yield') {
-      const y = crossRecord?.yieldStrengths
-      const spec = crossRecord?.specStandardYield
-      if (y && spec && spec > 0 && y.some((v) => v > 0)) return ratioMeasuredOverSpec(y, spec, count)
+    if (formula === "ratio_measured_over_spec_yield") {
+      const y = crossRecord?.yieldStrengths;
+      const spec = crossRecord?.specStandardYield;
+      if (y && spec && spec > 0 && y.some((v) => v > 0))
+        return ratioMeasuredOverSpec(y, spec, count);
     }
-    return null
-  }, [formula, crossRecord, count])
-  const autoMode = autoStrengths !== null
+    return null;
+  }, [formula, crossRecord, count]);
+  const autoMode = autoStrengths !== null;
 
   // 有效结果数组：强度=载荷+直径算；比值自动=联立；其余=录入值本身
   const strengths = useMemo<number[]>(() => {
-    if (isStrength) return computeStrengths(state.loads, state.diameter ?? 0)
-    if (autoMode) return autoStrengths as number[]
-    return state.loads.slice(0, count).map((v) => (Number.isFinite(v) && v > 0 ? round(v) : 0))
-  }, [isStrength, autoMode, autoStrengths, state.loads, state.diameter, count, round])
-  const mean = useMemo(() => meanOf(strengths, round), [strengths, round])
-  const verdict = autoVerdict(mean, req)
+    if (isStrength) return computeStrengths(state.loads, state.diameter ?? 0);
+    if (autoMode) return autoStrengths as number[];
+    return state.loads
+      .slice(0, count)
+      .map((v) => (Number.isFinite(v) && v > 0 ? round(v) : 0));
+  }, [isStrength, autoMode, autoStrengths, state.loads, state.diameter, count, round]);
+  const mean = useMemo(() => meanOf(strengths, round), [strengths, round]);
+  const verdict = autoVerdict(mean, req);
 
-  const buildResult = (next: RebarMechResult, nextStrengths: number[]): RebarMechResult => ({
+  const buildResult = (
+    next: RebarMechResult,
+    nextStrengths: number[],
+  ): RebarMechResult => ({
     ...next,
     strengths: nextStrengths,
     mean: meanOf(nextStrengths, round),
-  })
+  });
 
   const emit = (next: RebarMechResult, nextStrengths: number[]) => {
-    const result = buildResult(next, nextStrengths)
-    const v = autoVerdict(result.mean, req)
-    onChange({ result: JSON.stringify(result), ...(v ? { verdict: v } : {}) })
-  }
+    const result = buildResult(next, nextStrengths);
+    const v = autoVerdict(result.mean, req);
+    onChange({ result: JSON.stringify(result), ...(v ? { verdict: v } : {}) });
+  };
 
   const updateFractureLocation = (i: number, value: string) => {
-    const nextLocs = Array.from({ length: count }, (_, j) => state.fractureLocations?.[j] ?? '')
-    nextLocs[i] = value
-    const next = { ...state, fractureLocations: nextLocs }
-    setState(next)
-    emit(next, strengths)
-  }
+    const nextLocs = Array.from(
+      { length: count },
+      (_, j) => state.fractureLocations?.[j] ?? "",
+    );
+    nextLocs[i] = value;
+    const next = { ...state, fractureLocations: nextLocs };
+    setState(next);
+    emit(next, strengths);
+  };
 
   // 自动比值：跨记录数据就绪或变化时把联立结果落进 dirty 缓冲（用序列化 dep 防重复触发）。
-  const autoKey = autoMode ? JSON.stringify(autoStrengths) : ''
-  const lastAuto = useRef<string>('')
+  const autoKey = autoMode ? JSON.stringify(autoStrengths) : "";
+  const lastAuto = useRef<string>("");
   useEffect(() => {
-    if (readOnly || !autoMode) return
-    if (lastAuto.current === autoKey) return
-    lastAuto.current = autoKey
-    emit(state, autoStrengths as number[])
+    if (readOnly || !autoMode) return;
+    if (lastAuto.current === autoKey) return;
+    lastAuto.current = autoKey;
+    emit(state, autoStrengths as number[]);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅在联立结果变化时同步一次
-  }, [autoKey, autoMode, readOnly])
+  }, [autoKey, autoMode, readOnly]);
 
   const updateDiameter = (v: number) => {
-    if (readOnly) return
-    const next = { ...state, diameter: Number.isFinite(v) ? v : 0 }
-    setState(next)
-    emit(next, computeStrengths(next.loads, next.diameter ?? 0))
-  }
+    if (readOnly) return;
+    const next = { ...state, diameter: Number.isFinite(v) ? v : 0 };
+    setState(next);
+    emit(next, computeStrengths(next.loads, next.diameter ?? 0));
+  };
   const updateLoad = (i: number, v: number) => {
-    if (readOnly || autoMode) return
-    const loads = [...state.loads]
-    loads[i] = Number.isFinite(v) ? v : 0
-    const next = { ...state, loads }
+    if (readOnly || autoMode) return;
+    const loads = [...state.loads];
+    loads[i] = Number.isFinite(v) ? v : 0;
+    const next = { ...state, loads };
     const ns = isStrength
       ? computeStrengths(loads, next.diameter ?? 0)
-      : loads.slice(0, count).map((x) => (Number.isFinite(x) && x > 0 ? round(x) : 0))
-    setState(next)
-    emit(next, ns)
-  }
+      : loads.slice(0, count).map((x) => (Number.isFinite(x) && x > 0 ? round(x) : 0));
+    setState(next);
+    emit(next, ns);
+  };
   const updateReq = (reqId: string) => {
-    if (readOnly) return
-    const r = reqOptions.find((x) => x.id === reqId)
-    const next = { ...state, techReqId: reqId, techReqLabel: r ? requirementLabel(r) : '' }
-    setState(next)
-    emit(next, strengths)
-  }
-  const handleManualVerdict = (v: string) => onChange({ verdict: v })
+    if (readOnly) return;
+    const r = reqOptions.find((x) => x.id === reqId);
+    const next = {
+      ...state,
+      techReqId: reqId,
+      techReqLabel: r ? requirementLabel(r) : "",
+    };
+    setState(next);
+    emit(next, strengths);
+  };
+  const handleManualVerdict = (v: string) => onChange({ verdict: v });
 
   const verdictClass =
-    verdict === '合格' ? 'text-green-600' : verdict === '不合格' ? 'text-red-600' : 'text-gray-400'
+    verdict === "合格"
+      ? "text-green-600"
+      : verdict === "不合格"
+        ? "text-red-600"
+        : "text-gray-400";
 
   return (
     <div className="border rounded p-3 space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">
           {p.canonicalName || p.name}
-          {p.unit ? `（${p.unit}）` : ''}
+          {p.unit ? `（${p.unit}）` : ""}
           <span className="ml-2 text-xs text-gray-500">
-            {count} 组{isRatio ? (autoMode ? ' / 自动计算' : ' / 手动录入') : ''}
+            {count} 组{isRatio ? (autoMode ? " / 自动计算" : " / 手动录入") : ""}
           </span>
         </span>
         <span className="text-xs">
@@ -174,7 +200,7 @@ export function RebarMechNumericCard({
             <span className={verdictClass}>{verdict}</span>
           ) : (
             <select
-              value={record?.verdict ?? ''}
+              value={record?.verdict ?? ""}
               onChange={(e) => handleManualVerdict(e.target.value)}
               disabled={readOnly}
               aria-label="整体单项评定"
@@ -199,8 +225,12 @@ export function RebarMechNumericCard({
               type="number"
               step="0.1"
               placeholder="直径"
-              value={state.diameter === 0 || state.diameter === undefined ? '' : state.diameter}
-              onChange={(e) => updateDiameter(e.target.value === '' ? 0 : Number(e.target.value))}
+              value={
+                state.diameter === 0 || state.diameter === undefined ? "" : state.diameter
+              }
+              onChange={(e) =>
+                updateDiameter(e.target.value === "" ? 0 : Number(e.target.value))
+              }
               readOnly={readOnly}
               aria-label="公称直径"
               className="ml-1 w-24 border rounded px-2 py-1 text-sm read-only:bg-gray-50 read-only:text-gray-500"
@@ -239,9 +269,9 @@ export function RebarMechNumericCard({
         </thead>
         <tbody>
           {Array.from({ length: count }, (_, i) => {
-            const load = state.loads[i] ?? 0
-            const val = strengths[i] ?? 0
-            const manualRatio = isRatio && !autoMode
+            const load = state.loads[i] ?? 0;
+            const val = strengths[i] ?? 0;
+            const manualRatio = isRatio && !autoMode;
             return (
               <tr key={i}>
                 <td className="py-1">{i + 1}</td>
@@ -249,24 +279,28 @@ export function RebarMechNumericCard({
                   <td className="py-1">
                     <input
                       type="number"
-                      step={isRatio ? '0.01' : '0.01'}
+                      step={isRatio ? "0.01" : "0.01"}
                       placeholder={inputLabel}
-                      value={load === 0 ? '' : load}
-                      onChange={(e) => updateLoad(i, e.target.value === '' ? 0 : Number(e.target.value))}
+                      value={load === 0 ? "" : load}
+                      onChange={(e) =>
+                        updateLoad(i, e.target.value === "" ? 0 : Number(e.target.value))
+                      }
                       readOnly={readOnly}
                       aria-label={`第 ${i + 1} 组 ${inputLabel}`}
                       className="w-28 border rounded px-2 py-1 text-sm read-only:bg-gray-50 read-only:text-gray-500"
                     />
                   </td>
                 )}
-                {isStrength && <td className="py-1 text-gray-700">{val > 0 ? val.toFixed(1) : '-'}</td>}
+                {isStrength && (
+                  <td className="py-1 text-gray-700">{val > 0 ? val.toFixed(1) : "-"}</td>
+                )}
                 {isRatio && autoMode && (
-                  <td className="py-1 text-gray-700">{val > 0 ? val.toFixed(2) : '-'}</td>
+                  <td className="py-1 text-gray-700">{val > 0 ? val.toFixed(2) : "-"}</td>
                 )}
                 {connectionMode && (
                   <td className="py-1">
                     <select
-                      value={state.fractureLocations?.[i] ?? ''}
+                      value={state.fractureLocations?.[i] ?? ""}
                       onChange={(e) => updateFractureLocation(i, e.target.value)}
                       disabled={readOnly}
                       aria-label={`第 ${i + 1} 试件断裂位置`}
@@ -282,22 +316,24 @@ export function RebarMechNumericCard({
                   </td>
                 )}
               </tr>
-            )
+            );
           })}
         </tbody>
       </table>
 
       <div className="text-xs text-gray-600">
-        均值：<span className="font-medium text-gray-900">{mean ?? '—'}</span>
+        均值：<span className="font-medium text-gray-900">{mean ?? "—"}</span>
         {isStrength && (state.diameter ?? 0) <= 0 && (
           <span className="ml-2 text-orange-500">（需填公称直径以计算强度）</span>
         )}
         {isRatio && !autoMode && (
-          <span className="ml-2 text-orange-500">（同样品抗拉/屈服未录入，暂手动填写比值）</span>
+          <span className="ml-2 text-orange-500">
+            （同样品抗拉/屈服未录入，暂手动填写比值）
+          </span>
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default RebarMechNumericCard
+export default RebarMechNumericCard;

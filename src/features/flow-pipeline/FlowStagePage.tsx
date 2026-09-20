@@ -158,7 +158,11 @@ export function FlowStagePage({
   };
   const reportNameLabel = (code?: string) => {
     if (!code) return "—";
-    return reportNames.find((r) => r.code === code)?.name ?? LEGACY_CATEGORY_LABEL[code] ?? code;
+    return (
+      reportNames.find((r) => r.code === code)?.name ??
+      LEGACY_CATEGORY_LABEL[code] ??
+      code
+    );
   };
   const contractCode = (id?: string) =>
     (id && contracts.find((c) => c.id === id)?.contractCode) || id || "—";
@@ -241,9 +245,7 @@ export function FlowStagePage({
       // completed 是终态只读视图（无 act 端点，7 阶段全 act 模式不含它），
       // 收窄到 Exclude<FlowStatus, "completed"> 与 ACT_BY_STAGE 键集对齐。
       const act =
-        ACT_BY_STAGE[
-          (stage ?? "receiving") as Exclude<FlowStatus, "completed">
-        ];
+        ACT_BY_STAGE[(stage ?? "receiving") as Exclude<FlowStatus, "completed">];
       const results = await act({ action, ids, operator });
       const failed = results.filter((r) => !r.ok);
       const okCount = results.length - failed.length;
@@ -414,8 +416,12 @@ export function FlowStagePage({
                   />
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap">{r.commissionDate}</td>
-                <td className="px-4 py-2 whitespace-nowrap">{reportNameLabel(r.categoryCode)}</td>
-                <td className="px-4 py-2 whitespace-nowrap">{contractCode(r.contractId)}</td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {reportNameLabel(r.categoryCode)}
+                </td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {contractCode(r.contractId)}
+                </td>
                 <td className="px-4 py-2 whitespace-nowrap">{r.commissionCode}</td>
                 <td className="px-4 py-2 whitespace-nowrap">{r.reportCode ?? "—"}</td>
                 <td className="px-4 py-2 whitespace-nowrap">{r.testCategory ?? "—"}</td>

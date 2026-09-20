@@ -25,9 +25,9 @@ const MATERIAL_KEYWORDS: Record<string, string[]> = {
 };
 
 function materialOf(categoryCode: string): keyof typeof MATERIAL_KEYWORDS | null {
-  const rn = (inspectionReportNames as unknown as Array<{ code: string; summaryName?: string }>).find(
-    (r) => r.code === categoryCode,
-  );
+  const rn = (
+    inspectionReportNames as unknown as Array<{ code: string; summaryName?: string }>
+  ).find((r) => r.code === categoryCode);
   const name = rn?.summaryName ?? "";
   for (const [k, kws] of Object.entries(MATERIAL_KEYWORDS)) {
     if (kws.some((kw) => name.includes(kw))) {
@@ -82,10 +82,8 @@ export async function GET() {
 
   // 报告产出量：按 reportCode + flowStatus 切分
   const generatedCount = rows.filter((r) => Boolean(r["reportCode"])).length;
-  const pendingCount =
-    byStatus("review") + byStatus("approval");
-  const issuedCount =
-    byStatus("issuance") + byStatus("archived") + byStatus("completed");
+  const pendingCount = byStatus("review") + byStatus("approval");
+  const issuedCount = byStatus("issuance") + byStatus("archived") + byStatus("completed");
   const reportOutputByStatus = {
     generated: generatedCount,
     pending: pendingCount,

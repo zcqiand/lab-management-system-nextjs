@@ -24,5 +24,5 @@ export interface DateRangeFilter {
   dateTo?: string;
 }
 
-export type { ExtFieldDef } from './ext-field-def';
-export type { ParamInterfaceRow, ParamInterfaceLink } from './inspection-param-interface';
+export type { ExtFieldDef } from "./ext-field-def";
+export type { ParamInterfaceRow, ParamInterfaceLink } from "./inspection-param-interface";

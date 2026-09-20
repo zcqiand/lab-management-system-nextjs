@@ -1,4 +1,4 @@
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
 
 /** 报告批准——流程线第五环节（flowStatus='approval'）。仅走流程：提交=批准进入发放，退回审核。 */
 export function ReportApprovePage() {
@@ -15,7 +15,7 @@ export function ReportApprovePage() {
       viewDataFn="M03.F06.I02"
       actionDataFn="M03.F06.I05"
     />
-  )
+  );
 }
 
-export default ReportApprovePage
+export default ReportApprovePage;

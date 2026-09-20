@@ -6,7 +6,12 @@
 // db-queries.ts contracts 域）。404 / Object.assign 局部更新语义零改动。
 
 import { NextRequest, NextResponse } from "next/server";
-import { deleteContractDb, getContractDb, isDbUnavailable, updateContractDb } from "@/lib/db-queries";
+import {
+  deleteContractDb,
+  getContractDb,
+  isDbUnavailable,
+  updateContractDb,
+} from "@/lib/db-queries";
 
 const NOW = () => new Date().toISOString();
 

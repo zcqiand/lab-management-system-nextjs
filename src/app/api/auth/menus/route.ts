@@ -46,7 +46,9 @@ export async function GET(request: Request) {
       const recovered = getMenuSnapshot(sub);
       if (recovered) return NextResponse.json(recovered);
     } else {
-      console.warn(`[menus] self-heal: service-account login unreachable for user ${sub}`);
+      console.warn(
+        `[menus] self-heal: service-account login unreachable for user ${sub}`,
+      );
     }
     // demo 兜底删除（2026-08-27）：miss 如实报错，可恢复态（重登/refresh 重建快照）
     return NextResponse.json(

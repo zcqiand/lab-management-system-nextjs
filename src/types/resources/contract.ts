@@ -1,5 +1,5 @@
 /** 合同/委托（M02.F01） */
-export type ContractStatus = 'active' | 'archived';
+export type ContractStatus = "active" | "archived";
 
 export interface Contract {
   id: string;

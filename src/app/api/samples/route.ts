@@ -16,7 +16,10 @@ export async function GET(req: NextRequest) {
   if (keyword)
     items = items.filter((s) => {
       const rec = s as { sampleCode?: string; sampleName?: string };
-      return (rec.sampleCode ?? "").includes(keyword) || (rec.sampleName ?? "").includes(keyword);
+      return (
+        (rec.sampleCode ?? "").includes(keyword) ||
+        (rec.sampleName ?? "").includes(keyword)
+      );
     });
   return NextResponse.json(
     pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), 20)),

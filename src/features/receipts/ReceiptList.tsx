@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useContractStore } from '@/state/contractStore'
-import { ReceiptFormModal, type ReceiptFormValues } from './ReceiptFormModal'
-import { ConfirmModal } from '@/components/ConfirmModal'
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
-import type { SampleReceipt } from '@/api/endpoints/model'
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useContractStore } from "@/state/contractStore";
+import { ReceiptFormModal, type ReceiptFormValues } from "./ReceiptFormModal";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
+import type { SampleReceipt } from "@/api/endpoints/model";
 import {
   receiptsCreateReceipt,
   receiptsDeleteReceipt,
   receiptsUpdateReceipt,
-} from '@/api/endpoints/receipts/receipts'
+} from "@/api/endpoints/receipts/receipts";
 
 /** 接样管理——流程线第一环节（flowStatus='receiving'）。
  * 显示接样中的接样单，可新建/编辑/删除；提交后进入任务安排。已提交的单不可编辑/删除。 */
@@ -17,36 +17,48 @@ function ReceiptRowActions({
   onEdit,
   onDelete,
 }: {
-  receipt: SampleReceipt
-  onEdit: (r: SampleReceipt) => void
-  onDelete: (r: SampleReceipt) => void
+  receipt: SampleReceipt;
+  onEdit: (r: SampleReceipt) => void;
+  onDelete: (r: SampleReceipt) => void;
 }) {
   return (
     <>
-      <button onClick={() => onEdit(receipt)} data-fn="M03.F01.I03" className="px-2 py-1 text-blue-600 hover:underline">编辑</button>
-      <button onClick={() => onDelete(receipt)} data-fn="M03.F01.I04" className="px-2 py-1 text-red-600 hover:underline">删除</button>
+      <button
+        onClick={() => onEdit(receipt)}
+        data-fn="M03.F01.I03"
+        className="px-2 py-1 text-blue-600 hover:underline"
+      >
+        编辑
+      </button>
+      <button
+        onClick={() => onDelete(receipt)}
+        data-fn="M03.F01.I04"
+        className="px-2 py-1 text-red-600 hover:underline"
+      >
+        删除
+      </button>
     </>
-  )
+  );
 }
 
 export function ReceiptList() {
-  const { list: contracts, fetchContracts } = useContractStore()
-  const [formOpen, setFormOpen] = useState(false)
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-  const [editing, setEditing] = useState<SampleReceipt | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState<SampleReceipt | null>(null)
-  const [deleting, setDeleting] = useState(false)
-  const refreshRef = useRef<(() => Promise<void>) | null>(null)
+  const { list: contracts, fetchContracts } = useContractStore();
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [editing, setEditing] = useState<SampleReceipt | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SampleReceipt | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const refreshRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     if (contracts.length === 0) {
-      fetchContracts({ page: 1, pageSize: 100 })
+      fetchContracts({ page: 1, pageSize: 100 });
     }
-  }, [contracts.length, fetchContracts])
+  }, [contracts.length, fetchContracts]);
 
   const handleSubmit = async (values: ReceiptFormValues) => {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
       const payload = {
         contractId: values.contractId,
@@ -71,66 +83,66 @@ export function ReceiptList() {
         testingBasis: values.testingBasis,
         testParameters: values.testParameters,
         remark: values.remark,
-      }
-      if (formMode === 'create') {
-        const created = await receiptsCreateReceipt(payload)
-        setFormMode('edit')
-        setEditing(created)
+      };
+      if (formMode === "create") {
+        const created = await receiptsCreateReceipt(payload);
+        setFormMode("edit");
+        setEditing(created);
       } else if (editing) {
-        await receiptsUpdateReceipt(editing.id, payload)
-        setFormOpen(false)
+        await receiptsUpdateReceipt(editing.id, payload);
+        setFormOpen(false);
       }
-      await refreshRef.current?.()
+      await refreshRef.current?.();
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleting(true)
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await receiptsDeleteReceipt(deleteTarget.id)
-      setDeleteTarget(null)
-      await refreshRef.current?.()
+      await receiptsDeleteReceipt(deleteTarget.id);
+      setDeleteTarget(null);
+      await refreshRef.current?.();
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
-  }
+  };
 
   const toolbarAction = useCallback((refresh: () => Promise<void>) => {
-    refreshRef.current = refresh
+    refreshRef.current = refresh;
     return (
       <button
         onClick={() => {
-          setFormMode('create')
-        setEditing(null)
-        setFormOpen(true)
+          setFormMode("create");
+          setEditing(null);
+          setFormOpen(true);
         }}
         data-fn="M03.F01.I02"
         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
       >
         新建接样
       </button>
-    )
-  }, [])
+    );
+  }, []);
 
   const rowActions = useCallback((r: SampleReceipt) => {
-    if (r.flowStatus === 'receiving') {
+    if (r.flowStatus === "receiving") {
       return (
         <ReceiptRowActions
           receipt={r}
           onEdit={(r) => {
-            setFormMode('edit')
-            setEditing(r)
-            setFormOpen(true)
+            setFormMode("edit");
+            setEditing(r);
+            setFormOpen(true);
           }}
           onDelete={setDeleteTarget}
         />
-      )
+      );
     }
-    return <span className="text-gray-400 text-xs">已提交</span>
-  }, [])
+    return <span className="text-gray-400 text-xs">已提交</span>;
+  }, []);
 
   return (
     // @entry M03.F01.I01
@@ -159,14 +171,14 @@ export function ReceiptList() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="删除确认"
-        message={`确定删除接样「${deleteTarget?.commissionCode ?? ''}」？其下样品与检测记录将一并删除。`}
+        message={`确定删除接样「${deleteTarget?.commissionCode ?? ""}」？其下样品与检测记录将一并删除。`}
         confirmText="确认"
         loading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
     </>
-  )
+  );
 }
 
-export default ReceiptList
+export default ReceiptList;

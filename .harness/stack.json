@@ -9,6 +9,7 @@
       "cmd": [
         "npx",
         "--no",
+        "--",
         "prettier",
         "--check",
         "src",

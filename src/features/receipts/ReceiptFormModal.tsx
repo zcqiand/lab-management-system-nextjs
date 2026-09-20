@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { useAuthStore } from '@/state/authStore'
-import { SampleManagerModal } from '@/features/samples/SampleManagerModal'
+import { useEffect, useState, type FormEvent } from "react";
+import { useAuthStore } from "@/state/authStore";
+import { SampleManagerModal } from "@/features/samples/SampleManagerModal";
 import type {
   Contract,
   InspectionParameter,
@@ -9,57 +9,57 @@ import type {
   InspectionStandardRole,
   SampleReceipt,
   StandardParameterLink,
-} from '@/api/endpoints/model'
+} from "@/api/endpoints/model";
 import {
   inspectionDictionaryListParameters,
   inspectionDictionaryListStandardParameterLinks,
   inspectionDictionaryListStandards,
-} from '@/api/endpoints/inspection-dictionary/inspection-dictionary'
+} from "@/api/endpoints/inspection-dictionary/inspection-dictionary";
 import {
   reportNamesListReportNameParameterLinks,
   reportNamesListReportNameStandardLinks,
   reportNamesListReportNames,
-} from '@/api/endpoints/report-names/report-names'
+} from "@/api/endpoints/report-names/report-names";
 
 /** 接样表单提交值。categoryCode = 报告名称 code（FK→InspectionReportName.code）。 */
 export interface ReceiptFormValues {
-  id?: string
-  contractId: string
-  categoryCode: string
-  commissionCode: string
-  commissionDate: string
-  projectName: string
-  clientUnit: string
-  buildingUnit?: string
-  supervisorUnit?: string
-  constructionUnit?: string
-  witnessUnit?: string
-  samplingLocation?: string
-  witness?: string
-  witnessPhone?: string
-  inspector?: string
-  inspectorPhone?: string
-  receivedBy: string
-  sampleSource: string
-  testCategory: string
-  judgmentBasis?: string[]
-  testingBasis?: string[]
-  testParameters?: string[]
-  remark?: string
+  id?: string;
+  contractId: string;
+  categoryCode: string;
+  commissionCode: string;
+  commissionDate: string;
+  projectName: string;
+  clientUnit: string;
+  buildingUnit?: string;
+  supervisorUnit?: string;
+  constructionUnit?: string;
+  witnessUnit?: string;
+  samplingLocation?: string;
+  witness?: string;
+  witnessPhone?: string;
+  inspector?: string;
+  inspectorPhone?: string;
+  receivedBy: string;
+  sampleSource: string;
+  testCategory: string;
+  judgmentBasis?: string[];
+  testingBasis?: string[];
+  testParameters?: string[];
+  remark?: string;
 }
 
 interface ReceiptFormModalProps {
-  open: boolean
-  mode: 'create' | 'edit'
-  initialValues?: Partial<SampleReceipt>
-  contracts: Contract[]
-  onSubmit: (values: ReceiptFormValues) => void
-  onCancel: () => void
-  loading?: boolean
+  open: boolean;
+  mode: "create" | "edit";
+  initialValues?: Partial<SampleReceipt>;
+  contracts: Contract[];
+  onSubmit: (values: ReceiptFormValues) => void;
+  onCancel: () => void;
+  loading?: boolean;
 }
 
-const SAMPLE_SOURCES = ['施工送检', '现场抽样', '监督抽查']
-const TEST_CATEGORIES = ['委托检验', '见证取样', '监督抽查']
+const SAMPLE_SOURCES = ["施工送检", "现场抽样", "监督抽查"];
+const TEST_CATEGORIES = ["委托检验", "见证取样", "监督抽查"];
 
 /** 接样表单（全量字段）——参考 v2.0-006，类型映射到现行 inspection 模型。
  * 报告名称 = InspectionReportName；判定/检测依据按 role=JUDGMENT/TESTING 从报告名称关联取；
@@ -73,101 +73,105 @@ export function ReceiptFormModal({
   onCancel,
   loading = false,
 }: ReceiptFormModalProps) {
-  const currentUser = useAuthStore((s) => s.user)
-  const [contractId, setContractId] = useState('')
-  const [categoryCode, setCategoryCode] = useState('')
-  const [commissionCode, setCommissionCode] = useState('')
+  const currentUser = useAuthStore((s) => s.user);
+  const [contractId, setContractId] = useState("");
+  const [categoryCode, setCategoryCode] = useState("");
+  const [commissionCode, setCommissionCode] = useState("");
   const [commissionDate, setCommissionDate] = useState(
-    new Date().toISOString().split('T')[0] ?? '',
-  )
-  const [samplingLocation, setSamplingLocation] = useState('')
-  const [witness, setWitness] = useState('')
-  const [witnessPhone, setWitnessPhone] = useState('')
-  const [inspector, setInspector] = useState('')
-  const [inspectorPhone, setInspectorPhone] = useState('')
-  const [sampleSource, setSampleSource] = useState('施工送检')
-  const [testCategory, setTestCategory] = useState('委托检验')
-  const [judgmentBasis, setJudgmentBasis] = useState<string[]>([])
-  const [testingBasis, setTestingBasis] = useState<string[]>([])
-  const [testParameters, setTestParameters] = useState<string[]>([])
-  const [remark, setRemark] = useState('')
+    new Date().toISOString().split("T")[0] ?? "",
+  );
+  const [samplingLocation, setSamplingLocation] = useState("");
+  const [witness, setWitness] = useState("");
+  const [witnessPhone, setWitnessPhone] = useState("");
+  const [inspector, setInspector] = useState("");
+  const [inspectorPhone, setInspectorPhone] = useState("");
+  const [sampleSource, setSampleSource] = useState("施工送检");
+  const [testCategory, setTestCategory] = useState("委托检验");
+  const [judgmentBasis, setJudgmentBasis] = useState<string[]>([]);
+  const [testingBasis, setTestingBasis] = useState<string[]>([]);
+  const [testParameters, setTestParameters] = useState<string[]>([]);
+  const [remark, setRemark] = useState("");
 
-  const [reportNames, setReportNames] = useState<InspectionReportName[]>([])
-  const [allStandards, setAllStandards] = useState<InspectionStandard[]>([])
-  const [allParameters, setAllParameters] = useState<InspectionParameter[]>([])
+  const [reportNames, setReportNames] = useState<InspectionReportName[]>([]);
+  const [allStandards, setAllStandards] = useState<InspectionStandard[]>([]);
+  const [allParameters, setAllParameters] = useState<InspectionParameter[]>([]);
   /** 报告名称关联的标准 code（按 role 拆） */
   const [judgmentStandardCodes, setJudgmentStandardCodes] = useState<Set<string>>(
     new Set(),
-  )
-  const [testingStandardCodes, setTestingStandardCodes] = useState<Set<string>>(new Set())
+  );
+  const [testingStandardCodes, setTestingStandardCodes] = useState<Set<string>>(
+    new Set(),
+  );
   /** 选中标准并集对应的参数 code */
-  const [selectedParamCodes, setSelectedParamCodes] = useState<Set<string>>(new Set())
+  const [selectedParamCodes, setSelectedParamCodes] = useState<Set<string>>(new Set());
   /** 报告名称关联的参数 code（未选标准时用它兜底，而非展示全部参数） */
-  const [reportParamCodes, setReportParamCodes] = useState<Set<string>>(new Set())
+  const [reportParamCodes, setReportParamCodes] = useState<Set<string>>(new Set());
   const [errors, setErrors] = useState<{
-    contractId?: string
-    categoryCode?: string
-    commissionCode?: string
-  }>({})
+    contractId?: string;
+    categoryCode?: string;
+    commissionCode?: string;
+  }>({});
 
   // 报告名称 / 全部标准 / 全部参数（启动加载一次）
   useEffect(() => {
     reportNamesListReportNames({ page: 1, pageSize: 200 })
       .then((r) => setReportNames(Array.isArray(r?.items) ? r.items : []))
-      .catch(() => setReportNames([]))
+      .catch(() => setReportNames([]));
     inspectionDictionaryListStandards({ page: 1, pageSize: 200 })
       .then((r) => setAllStandards(Array.isArray(r?.items) ? r.items : []))
-      .catch(() => setAllStandards([]))
+      .catch(() => setAllStandards([]));
     inspectionDictionaryListParameters({
       // 全部参数（>500 条）一次拉齐，否则报告关联的高位编码参数(如 IP-0548..)被分页截断，勾不到。
       page: 1,
       pageSize: 1000,
     })
       .then((r) => setAllParameters(Array.isArray(r?.items) ? r.items : []))
-      .catch(() => setAllParameters([]))
-  }, [])
+      .catch(() => setAllParameters([]));
+  }, []);
 
   // 按报告名称加载关联标准（role=JUDGMENT / TESTING）
   useEffect(() => {
     if (!categoryCode) {
-      setJudgmentStandardCodes(new Set())
-      setTestingStandardCodes(new Set())
-      return
+      setJudgmentStandardCodes(new Set());
+      setTestingStandardCodes(new Set());
+      return;
     }
     const load = async (role: InspectionStandardRole) => {
       try {
         const res = await reportNamesListReportNameStandardLinks({
           reportNameCode: categoryCode,
           role,
-        })
-        return new Set(res.items.map((i) => i.inspectionStandardCode))
+        });
+        return new Set(res.items.map((i) => i.inspectionStandardCode));
       } catch {
-        return new Set<string>()
+        return new Set<string>();
       }
-    }
-    Promise.all([load('JUDGMENT'), load('TESTING')]).then(([j, t]) => {
-      setJudgmentStandardCodes(j)
-      setTestingStandardCodes(t)
-    })
-  }, [categoryCode])
+    };
+    Promise.all([load("JUDGMENT"), load("TESTING")]).then(([j, t]) => {
+      setJudgmentStandardCodes(j);
+      setTestingStandardCodes(t);
+    });
+  }, [categoryCode]);
 
   // 按报告名称加载关联参数（未选标准时的默认可选集，避免展示全部参数）
   useEffect(() => {
     if (!categoryCode) {
-      setReportParamCodes(new Set())
-      return
+      setReportParamCodes(new Set());
+      return;
     }
     reportNamesListReportNameParameterLinks({ reportNameCode: categoryCode })
-      .then((r) => setReportParamCodes(new Set(r.items.map((i) => i.inspectionParameterCode))))
-      .catch(() => setReportParamCodes(new Set()))
-  }, [categoryCode])
+      .then((r) =>
+        setReportParamCodes(new Set(r.items.map((i) => i.inspectionParameterCode))),
+      )
+      .catch(() => setReportParamCodes(new Set()));
+  }, [categoryCode]);
 
   // 按选中标准加载关联参数
   useEffect(() => {
-    const selected = [...judgmentBasis, ...testingBasis]
+    const selected = [...judgmentBasis, ...testingBasis];
     if (selected.length === 0) {
-      setSelectedParamCodes(new Set())
-      return
+      setSelectedParamCodes(new Set());
+      return;
     }
     Promise.all(
       selected.map((code) =>
@@ -176,68 +180,72 @@ export function ReceiptFormModal({
           .catch(() => [] as StandardParameterLink[]),
       ),
     ).then((results) => {
-      const set = new Set<string>()
-      results.forEach((items) => items.forEach((i) => set.add(i.inspectionParameterCode)))
-      setSelectedParamCodes(set)
-    })
-  }, [judgmentBasis, testingBasis])
+      const set = new Set<string>();
+      results.forEach((items) =>
+        items.forEach((i) => set.add(i.inspectionParameterCode)),
+      );
+      setSelectedParamCodes(set);
+    });
+  }, [judgmentBasis, testingBasis]);
 
   // 打开时初始化
   useEffect(() => {
-    if (!open) return
-    setContractId(initialValues?.contractId ?? '')
-    setCategoryCode(initialValues?.categoryCode ?? '')
-    setCommissionCode(initialValues?.commissionCode ?? '')
+    if (!open) return;
+    setContractId(initialValues?.contractId ?? "");
+    setCategoryCode(initialValues?.categoryCode ?? "");
+    setCommissionCode(initialValues?.commissionCode ?? "");
     setCommissionDate(
       initialValues?.commissionDate ?? new Date().toISOString().slice(0, 10),
-    )
-    setSamplingLocation(initialValues?.samplingLocation ?? '')
-    setWitness(initialValues?.witness ?? '')
-    setWitnessPhone(initialValues?.witnessPhone ?? '')
-    setInspector(initialValues?.inspector ?? '')
-    setInspectorPhone(initialValues?.inspectorPhone ?? '')
-    setSampleSource(initialValues?.sampleSource ?? '施工送检')
-    setTestCategory(initialValues?.testCategory ?? '委托检验')
-    setJudgmentBasis(initialValues?.judgmentBasis ?? [])
-    setTestingBasis(initialValues?.testingBasis ?? [])
-    setTestParameters(initialValues?.testParameters ?? [])
-    setRemark(initialValues?.remark ?? '')
-    setErrors({})
-  }, [open, initialValues])
+    );
+    setSamplingLocation(initialValues?.samplingLocation ?? "");
+    setWitness(initialValues?.witness ?? "");
+    setWitnessPhone(initialValues?.witnessPhone ?? "");
+    setInspector(initialValues?.inspector ?? "");
+    setInspectorPhone(initialValues?.inspectorPhone ?? "");
+    setSampleSource(initialValues?.sampleSource ?? "施工送检");
+    setTestCategory(initialValues?.testCategory ?? "委托检验");
+    setJudgmentBasis(initialValues?.judgmentBasis ?? []);
+    setTestingBasis(initialValues?.testingBasis ?? []);
+    setTestParameters(initialValues?.testParameters ?? []);
+    setRemark(initialValues?.remark ?? "");
+    setErrors({});
+  }, [open, initialValues]);
 
-  const judgmentCandidates = allStandards.filter((s) => judgmentStandardCodes.has(s.code))
-  const testingCandidates = allStandards.filter((s) => testingStandardCodes.has(s.code))
+  const judgmentCandidates = allStandards.filter((s) =>
+    judgmentStandardCodes.has(s.code),
+  );
+  const testingCandidates = allStandards.filter((s) => testingStandardCodes.has(s.code));
   // 参数可选集优先级：选中标准的并集 > 报告名称关联参数 > 全部参数（都为空时兜底）
   const filteredParameters =
     selectedParamCodes.size > 0
       ? allParameters.filter((p) => selectedParamCodes.has(p.code))
       : reportParamCodes.size > 0
         ? allParameters.filter((p) => reportParamCodes.has(p.code))
-        : allParameters
+        : allParameters;
 
   const toggleInList = (list: string[], value: string) =>
-    list.includes(value) ? list.filter((c) => c !== value) : [...list, value]
+    list.includes(value) ? list.filter((c) => c !== value) : [...list, value];
 
-  if (!open) return null
+  if (!open) return null;
 
-  const contract = contracts.find((c) => c.id === contractId)
+  const contract = contracts.find((c) => c.id === contractId);
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    const nextErrors: typeof errors = {}
-    if (!contractId) nextErrors.contractId = '请选择合同'
-    if (!categoryCode) nextErrors.categoryCode = '请选择报告名称'
-    if (!commissionCode.trim()) nextErrors.commissionCode = '委托书编号必填'
-    setErrors(nextErrors)
-    if (Object.keys(nextErrors).length > 0) return
+    e.preventDefault();
+    const nextErrors: typeof errors = {};
+    if (!contractId) nextErrors.contractId = "请选择合同";
+    if (!categoryCode) nextErrors.categoryCode = "请选择报告名称";
+    if (!commissionCode.trim()) nextErrors.commissionCode = "委托书编号必填";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
     onSubmit({
       id: initialValues?.id,
       contractId,
       categoryCode,
       commissionCode: commissionCode.trim(),
       commissionDate,
-      projectName: contract?.projectName ?? '',
-      clientUnit: contract?.clientUnit ?? '',
+      projectName: contract?.projectName ?? "",
+      clientUnit: contract?.clientUnit ?? "",
       buildingUnit: contract?.buildingUnit,
       supervisorUnit: contract?.supervisorUnit,
       constructionUnit: contract?.constructionUnit,
@@ -247,15 +255,15 @@ export function ReceiptFormModal({
       witnessPhone: witnessPhone.trim() || undefined,
       inspector: inspector.trim() || undefined,
       inspectorPhone: inspectorPhone.trim() || undefined,
-      receivedBy: currentUser?.displayName ?? currentUser?.username ?? '',
+      receivedBy: currentUser?.displayName ?? currentUser?.username ?? "",
       sampleSource,
       testCategory,
       judgmentBasis: judgmentBasis.length > 0 ? judgmentBasis : undefined,
       testingBasis: testingBasis.length > 0 ? testingBasis : undefined,
       testParameters: testParameters.length > 0 ? testParameters : undefined,
       remark: remark.trim() || undefined,
-    })
-  }
+    });
+  };
 
   const standardCheckboxGrid = (
     list: string[],
@@ -280,14 +288,14 @@ export function ReceiptFormModal({
         </label>
       ))}
     </div>
-  )
+  );
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-40 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[94vh] flex flex-col">
         <header className="flex items-center justify-between px-5 py-3 border-b">
           <h2 className="text-base font-semibold">
-            {mode === 'create' ? '新建接样单' : '编辑接样单'}
+            {mode === "create" ? "新建接样单" : "编辑接样单"}
           </h2>
           <button
             onClick={onCancel}
@@ -306,7 +314,7 @@ export function ReceiptFormModal({
                 <select
                   value={contractId}
                   onChange={(e) => setContractId(e.target.value)}
-                  disabled={mode === 'edit'}
+                  disabled={mode === "edit"}
                   className="w-full border rounded px-2 py-1.5 text-sm disabled:bg-gray-100"
                 >
                   <option value="">请选择合同</option>
@@ -327,12 +335,12 @@ export function ReceiptFormModal({
                 <select
                   value={categoryCode}
                   onChange={(e) => {
-                    setCategoryCode(e.target.value)
-                    setJudgmentBasis([])
-                    setTestingBasis([])
-                    setTestParameters([])
+                    setCategoryCode(e.target.value);
+                    setJudgmentBasis([]);
+                    setTestingBasis([]);
+                    setTestParameters([]);
                   }}
-                  disabled={mode === 'edit'}
+                  disabled={mode === "edit"}
                   className="w-full border rounded px-2 py-1.5 text-sm disabled:bg-gray-100"
                 >
                   <option value="">请选择报告名称</option>
@@ -351,11 +359,11 @@ export function ReceiptFormModal({
             {contract && (
               <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 bg-gray-50 border rounded p-3">
                 <div>工程名称：{contract.projectName}</div>
-                <div>委托单位：{contract.clientUnit ?? '—'}</div>
-                <div>建设单位：{contract.buildingUnit ?? '—'}</div>
-                <div>监理单位：{contract.supervisorUnit ?? '—'}</div>
-                <div>施工单位：{contract.constructionUnit ?? '—'}</div>
-                <div>见证单位：{contract.witnessUnit ?? '—'}</div>
+                <div>委托单位：{contract.clientUnit ?? "—"}</div>
+                <div>建设单位：{contract.buildingUnit ?? "—"}</div>
+                <div>监理单位：{contract.supervisorUnit ?? "—"}</div>
+                <div>施工单位：{contract.constructionUnit ?? "—"}</div>
+                <div>见证单位：{contract.witnessUnit ?? "—"}</div>
               </div>
             )}
 
@@ -493,9 +501,9 @@ export function ReceiptFormModal({
                 检测参数
                 {selectedParamCodes.size === 0
                   ? reportParamCodes.size > 0
-                    ? '（未选标准时显示报告关联参数）'
-                    : '（未选标准时显示全部）'
-                  : ''}
+                    ? "（未选标准时显示报告关联参数）"
+                    : "（未选标准时显示全部）"
+                  : ""}
               </label>
               <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto border rounded p-2 bg-gray-50">
                 {filteredParameters.length === 0 && (
@@ -513,7 +521,7 @@ export function ReceiptFormModal({
                     />
                     <span>
                       {p.canonicalName || p.name}
-                      {p.unit ? `（${p.unit}）` : ''}
+                      {p.unit ? `（${p.unit}）` : ""}
                     </span>
                   </label>
                 ))}
@@ -529,7 +537,7 @@ export function ReceiptFormModal({
               />
             </div>
 
-            {mode === 'edit' && initialValues?.id && (
+            {mode === "edit" && initialValues?.id && (
               <div className="border-t pt-3">
                 <SampleManagerModal
                   inline
@@ -552,13 +560,13 @@ export function ReceiptFormModal({
               disabled={loading}
               className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
             >
-              {loading ? '保存中...' : '保存'}
+              {loading ? "保存中..." : "保存"}
             </button>
           </footer>
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default ReceiptFormModal
+export default ReceiptFormModal;

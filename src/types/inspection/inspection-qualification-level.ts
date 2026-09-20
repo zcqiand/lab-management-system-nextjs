@@ -10,4 +10,7 @@
 
 export type InspectionQualificationLevel = "QUALIFIED" | "RESTRICTED";
 
-export const INSPECTION_QUALIFICATION_LEVELS: InspectionQualificationLevel[] = ["QUALIFIED", "RESTRICTED"];
+export const INSPECTION_QUALIFICATION_LEVELS: InspectionQualificationLevel[] = [
+  "QUALIFIED",
+  "RESTRICTED",
+];

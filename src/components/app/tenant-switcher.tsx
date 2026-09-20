@@ -28,7 +28,9 @@ export function TenantSwitcher() {
     } catch (err) {
       const apiErr = toApiError(err);
       toast.error(
-        apiErr.status === 404 ? "该租户不存在或你不是其成员" : `切换失败：${apiErr.message}`,
+        apiErr.status === 404
+          ? "该租户不存在或你不是其成员"
+          : `切换失败：${apiErr.message}`,
       );
     }
   }
@@ -44,9 +46,7 @@ export function TenantSwitcher() {
           data-fn="M00.F02.I01"
         >
           <Building2 className="h-4 w-4 text-slate-500" />
-          <span className="font-medium">
-            {current ? current.name : "选择租户"}
-          </span>
+          <span className="font-medium">{current ? current.name : "选择租户"}</span>
           <ChevronsUpDown className="h-3.5 w-3.5 text-slate-400" />
         </Button>
       </DropdownMenuTrigger>

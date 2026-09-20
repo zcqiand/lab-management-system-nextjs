@@ -1,19 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { ParamModelProps } from './types'
-import type { TestRecord } from '@/api/endpoints/model'
-import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from './types'
-import { requirementLabel } from './DefaultParamCard'
-import { autoVerdict, parseStrengthRecord, type StrengthResult } from './cement-strength'
+import { useEffect, useMemo, useState } from "react";
+import type { ParamModelProps } from "./types";
+import type { TestRecord } from "@/api/endpoints/model";
+import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from "./types";
+import { requirementLabel } from "./DefaultParamCard";
+import { autoVerdict, parseStrengthRecord, type StrengthResult } from "./cement-strength";
 
-const MANUAL_VERDICTS = ['合格', '不合格'] as const
+const MANUAL_VERDICTS = ["合格", "不合格"] as const;
 
 export interface StrengthCardProps extends ParamModelProps {
   /** 试件数（抗折 3 / 抗压 6）。 */
-  specimenCount: number
+  specimenCount: number;
   /** 荷载(kN) → StrengthResult 的计算函数（含 ±10% 剔除）。 */
-  compute: (loads: number[]) => StrengthResult
+  compute: (loads: number[]) => StrengthResult;
   /** 强度列表头，如「抗折强度 (MPa)」。 */
-  strengthLabel: string
+  strengthLabel: string;
 }
 
 /**
@@ -32,31 +32,41 @@ export function StrengthCardBase({
   onChange,
   readOnly = false,
 }: StrengthCardProps) {
-  const initial = useMemo(() => parseStrengthRecord(record?.result), [record?.result])
+  const initial = useMemo(() => parseStrengthRecord(record?.result), [record?.result]);
   const [loads, setLoads] = useState<number[]>(
     Array.from({ length: specimenCount }, (_, i) => initial.loads[i] ?? 0),
-  )
+  );
 
   // 切换样品(sampleId 变)或落库(result 变)时重置本地荷载，避免跨样品污染。
   useEffect(() => {
-    setLoads(Array.from({ length: specimenCount }, (_, i) => initial.loads[i] ?? 0))
+    setLoads(Array.from({ length: specimenCount }, (_, i) => initial.loads[i] ?? 0));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅在 sampleId/result 引用变化时重置，避免每次 keystroke 清空输入
-  }, [sampleId, record?.result, specimenCount])
+  }, [sampleId, record?.result, specimenCount]);
 
   // 仅取已核验的技术要求参与自动判；无则回退手选。
   const reqOptions = useMemo(
-    () => techReqs.filter((r) => r.verificationStatus === 'verified'),
+    () => techReqs.filter((r) => r.verificationStatus === "verified"),
     [techReqs],
-  )
-  const [reqId, setReqId] = useState<string>(record?.requirementCode ?? reqOptions[0]?.id ?? '')
-  const selectedReq: InspectionTechnicalRequirement | undefined = reqOptions.find((r) => r.id === reqId)
+  );
+  const [reqId, setReqId] = useState<string>(
+    record?.requirementCode ?? reqOptions[0]?.id ?? "",
+  );
+  const selectedReq: InspectionTechnicalRequirement | undefined = reqOptions.find(
+    (r) => r.id === reqId,
+  );
 
-  const { strengths, kept, mean, invalid } = useMemo(() => compute(loads), [compute, loads])
-  const verdict = reqOptions.length > 0 ? autoVerdict(mean, selectedReq ?? reqOptions[0]) : record?.verdict ?? ''
+  const { strengths, kept, mean, invalid } = useMemo(
+    () => compute(loads),
+    [compute, loads],
+  );
+  const verdict =
+    reqOptions.length > 0
+      ? autoVerdict(mean, selectedReq ?? reqOptions[0])
+      : (record?.verdict ?? "");
 
   const emit = (nextLoads: number[], nextReqId: string, manualVerdict?: string) => {
-    const res = compute(nextLoads)
-    const req = reqOptions.find((r) => r.id === nextReqId) ?? reqOptions[0]
+    const res = compute(nextLoads);
+    const req = reqOptions.find((r) => r.id === nextReqId) ?? reqOptions[0];
     const patch: Partial<TestRecord> = {
       result: JSON.stringify({
         loads: nextLoads,
@@ -65,28 +75,32 @@ export function StrengthCardBase({
         mean: res.mean,
         invalid: res.invalid,
       }),
-    }
+    };
     if (reqOptions.length > 0) {
-      patch.verdict = autoVerdict(res.mean, req)
-      patch.requirementCode = nextReqId
-      patch.requirement = req ? requirementLabel(req) : ''
+      patch.verdict = autoVerdict(res.mean, req);
+      patch.requirementCode = nextReqId;
+      patch.requirement = req ? requirementLabel(req) : "";
     } else if (manualVerdict !== undefined) {
-      patch.verdict = manualVerdict
+      patch.verdict = manualVerdict;
     }
-    onChange(patch)
-  }
+    onChange(patch);
+  };
 
   const verdictClass =
-    verdict === '合格' ? 'text-green-600' : verdict === '不合格' ? 'text-red-600' : 'text-gray-400'
+    verdict === "合格"
+      ? "text-green-600"
+      : verdict === "不合格"
+        ? "text-red-600"
+        : "text-gray-400";
 
   return (
     <div className="border rounded p-3 space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">
           {p.canonicalName || p.name}
-          {p.unit ? `（${p.unit}）` : ''}
+          {p.unit ? `（${p.unit}）` : ""}
         </span>
-        <span className={`text-xs ${verdictClass}`}>{verdict || '未评定'}</span>
+        <span className={`text-xs ${verdictClass}`}>{verdict || "未评定"}</span>
       </div>
       <table className="w-full text-xs">
         <thead className="text-gray-500">
@@ -98,8 +112,8 @@ export function StrengthCardBase({
         </thead>
         <tbody>
           {loads.map((lv, i) => {
-            const s = strengths[i]
-            const discarded = lv > 0 && !kept[i]
+            const s = strengths[i];
+            const discarded = lv > 0 && !kept[i];
             return (
               <tr key={i}>
                 <td className="py-1">{i + 1}</td>
@@ -108,31 +122,37 @@ export function StrengthCardBase({
                     type="number"
                     step="0.01"
                     placeholder="破坏荷载 (kN)"
-                    value={lv === 0 ? '' : lv}
+                    value={lv === 0 ? "" : lv}
                     onChange={(e) => {
-                      if (readOnly) return
-                      const v = e.target.value === '' ? 0 : Number(e.target.value)
-                      const next = [...loads]
-                      next[i] = Number.isFinite(v) ? v : 0
-                      setLoads(next)
-                      emit(next, reqId)
+                      if (readOnly) return;
+                      const v = e.target.value === "" ? 0 : Number(e.target.value);
+                      const next = [...loads];
+                      next[i] = Number.isFinite(v) ? v : 0;
+                      setLoads(next);
+                      emit(next, reqId);
                     }}
                     readOnly={readOnly}
                     aria-label={`试件 ${i + 1} 破坏荷载`}
                     className="w-32 border rounded px-2 py-1 text-sm read-only:bg-gray-50 read-only:text-gray-500"
                   />
                 </td>
-                <td className={`py-1 ${discarded ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
-                  {lv > 0 ? s : '-'}
+                <td
+                  className={`py-1 ${discarded ? "text-gray-400 line-through" : "text-gray-700"}`}
+                >
+                  {lv > 0 ? s : "-"}
                 </td>
               </tr>
-            )
+            );
           })}
         </tbody>
       </table>
       <div className="text-xs text-gray-600">
-        强度平均值：<span className="font-medium text-gray-900">{mean ?? '—'}</span>
-        {invalid && <span className="ml-2 text-red-500">（离群值超 ±10%，按 GB/T 17671 结果作废）</span>}
+        强度平均值：<span className="font-medium text-gray-900">{mean ?? "—"}</span>
+        {invalid && (
+          <span className="ml-2 text-red-500">
+            （离群值超 ±10%，按 GB/T 17671 结果作废）
+          </span>
+        )}
       </div>
       {reqOptions.length > 0 ? (
         <div className="text-xs">
@@ -140,9 +160,9 @@ export function StrengthCardBase({
           <select
             value={reqId}
             onChange={(e) => {
-              if (readOnly) return
-              setReqId(e.target.value)
-              emit(loads, e.target.value)
+              if (readOnly) return;
+              setReqId(e.target.value);
+              emit(loads, e.target.value);
             }}
             disabled={readOnly}
             className="border rounded px-1 py-1 text-sm disabled:bg-gray-50 disabled:text-gray-500"
@@ -158,10 +178,10 @@ export function StrengthCardBase({
         <div className="text-xs">
           <label className="text-gray-500 mr-1">单项评定</label>
           <select
-            value={record?.verdict ?? ''}
+            value={record?.verdict ?? ""}
             onChange={(e) => {
-              if (readOnly) return
-              emit(loads, reqId, e.target.value)
+              if (readOnly) return;
+              emit(loads, reqId, e.target.value);
             }}
             disabled={readOnly}
             className="border rounded px-1 py-1 text-sm disabled:bg-gray-50 disabled:text-gray-500"
@@ -176,5 +196,5 @@ export function StrengthCardBase({
         </div>
       )}
     </div>
-  )
+  );
 }

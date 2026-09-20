@@ -1,24 +1,44 @@
-import { useCallback, useState } from 'react'
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
-import { ConfirmModal } from '@/components/ConfirmModal'
-import type { SampleReceipt } from '@/api/endpoints/model'
-import { receiptsAssignTask } from '@/api/endpoints/receipts/receipts'
+import { useCallback, useState } from "react";
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import type { SampleReceipt } from "@/api/endpoints/model";
+import { receiptsAssignTask } from "@/api/endpoints/receipts/receipts";
 
 /** 任务安排——流程线第二环节（flowStatus='task_assignment'）。
  * 为接样单指定检测人员与计划检测日期；提交（支持批量）后进入「数据录入」；
  * 可退回「接样」；已提交的可由提交人撤回。
  * 任务信息直接记录在接样单（assigneeId/assigneeName/plannedTestDate），无独立任务表。
  */
-function AssignButton({ receipt, onAssign, refresh }: { receipt: SampleReceipt; onAssign: (r: SampleReceipt, refresh: () => Promise<void>) => void; refresh: () => Promise<void> }) {
+function AssignButton({
+  receipt,
+  onAssign,
+  refresh,
+}: {
+  receipt: SampleReceipt;
+  onAssign: (r: SampleReceipt, refresh: () => Promise<void>) => void;
+  refresh: () => Promise<void>;
+}) {
   return (
-    <button onClick={() => onAssign(receipt, refresh)} data-fn="M03.F02.I01" className="px-2 py-1 text-purple-600 hover:underline">
+    <button
+      onClick={() => onAssign(receipt, refresh)}
+      data-fn="M03.F02.I01"
+      className="px-2 py-1 text-purple-600 hover:underline"
+    >
       安排
     </button>
-  )
+  );
 }
 
 /** 任务取消——M03.F02.I03：清空 assigneeName/assigneeId/plannedTestDate，回到未分配态 */
-function CancelButton({ receipt, onCancel, refresh }: { receipt: SampleReceipt; onCancel: (r: SampleReceipt, refresh: () => Promise<void>) => Promise<void>; refresh: () => Promise<void> }) {
+function CancelButton({
+  receipt,
+  onCancel,
+  refresh,
+}: {
+  receipt: SampleReceipt;
+  onCancel: (r: SampleReceipt, refresh: () => Promise<void>) => Promise<void>;
+  refresh: () => Promise<void>;
+}) {
   return (
     <button
       // @entry M03.F02.I03 任务取消（已安排的接样单「取消任务」按钮，清空 assignee + plannedTestDate）
@@ -28,54 +48,61 @@ function CancelButton({ receipt, onCancel, refresh }: { receipt: SampleReceipt; 
     >
       取消任务
     </button>
-  )
+  );
 }
 
 export function TaskAssignmentPage() {
-  const [target, setTarget] = useState<SampleReceipt | null>(null)
-  const [assigneeName, setAssigneeName] = useState('')
-  const [plannedTestDate, setPlannedTestDate] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [refreshAfterSave, setRefreshAfterSave] = useState<(() => Promise<void>) | null>(null)
+  const [target, setTarget] = useState<SampleReceipt | null>(null);
+  const [assigneeName, setAssigneeName] = useState("");
+  const [plannedTestDate, setPlannedTestDate] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [refreshAfterSave, setRefreshAfterSave] = useState<(() => Promise<void>) | null>(
+    null,
+  );
 
   const openAssign = (r: SampleReceipt, refresh: () => Promise<void>) => {
-    setTarget(r)
-    setAssigneeName(r.assigneeName ?? '')
-    setPlannedTestDate(r.plannedTestDate ?? new Date().toISOString().split('T')[0] ?? '')
-    setRefreshAfterSave(() => refresh)
-  }
+    setTarget(r);
+    setAssigneeName(r.assigneeName ?? "");
+    setPlannedTestDate(r.plannedTestDate ?? new Date().toISOString().split("T")[0] ?? "");
+    setRefreshAfterSave(() => refresh);
+  };
 
   const cancelAssignment = async (r: SampleReceipt, refresh: () => Promise<void>) => {
     // 任务字段走契约专用端点 PUT /api/receipts/{id}/task
     // （UpdateSampleReceiptRequest 不含 assignee* 字段）
     await receiptsAssignTask(r.id, {
-      assigneeName: '',
-    })
-    await refresh()
-  }
+      assigneeName: "",
+    });
+    await refresh();
+  };
 
-  const rowAction = useCallback((r: SampleReceipt, refresh: () => Promise<void>) => (
-    <>
-      <AssignButton receipt={r} onAssign={openAssign} refresh={refresh} />
-      {r.assigneeName && <CancelButton receipt={r} onCancel={cancelAssignment} refresh={refresh} />}
-    </>
-  ), [])
+  const rowAction = useCallback(
+    (r: SampleReceipt, refresh: () => Promise<void>) => (
+      <>
+        <AssignButton receipt={r} onAssign={openAssign} refresh={refresh} />
+        {r.assigneeName && (
+          <CancelButton receipt={r} onCancel={cancelAssignment} refresh={refresh} />
+        )}
+      </>
+    ),
+    [],
+  );
 
   const handleSave = async () => {
-    if (!target) return
-    setSaving(true)
+    if (!target) return;
+    setSaving(true);
     try {
       await receiptsAssignTask(target.id, {
         assigneeName: assigneeName.trim(),
         assigneeId: assigneeName.trim() ? `u-${assigneeName.trim()}` : undefined,
         plannedTestDate,
-      })
-      setTarget(null)
-      await refreshAfterSave?.()
+      });
+      setTarget(null);
+      await refreshAfterSave?.();
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   return (
     // @entry M03.F02.I01
@@ -89,11 +116,12 @@ export function TaskAssignmentPage() {
         filterDataFn="M03.F02.I04"
         extraColumns={[
           {
-            header: '检测人员',
-            render: (r) => r.assigneeName ?? <span className="text-gray-400">待安排</span>,
+            header: "检测人员",
+            render: (r) =>
+              r.assigneeName ?? <span className="text-gray-400">待安排</span>,
           },
           {
-            header: '计划检测日期',
+            header: "计划检测日期",
             render: (r) => r.plannedTestDate ?? <span className="text-gray-400">—</span>,
           },
         ]}
@@ -102,12 +130,14 @@ export function TaskAssignmentPage() {
 
       <ConfirmModal
         open={target !== null}
-        title={`任务安排 — ${target?.commissionCode ?? ''}`}
+        title={`任务安排 — ${target?.commissionCode ?? ""}`}
         danger={false}
         message={
           <div className="space-y-3 text-left text-sm">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">检测人员</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                检测人员
+              </label>
               <input
                 value={assigneeName}
                 onChange={(e) => setAssigneeName(e.target.value)}
@@ -116,7 +146,9 @@ export function TaskAssignmentPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">计划检测日期</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                计划检测日期
+              </label>
               <input
                 type="date"
                 value={plannedTestDate}
@@ -132,7 +164,7 @@ export function TaskAssignmentPage() {
         onCancel={() => setTarget(null)}
       />
     </>
-  )
+  );
 }
 
-export default TaskAssignmentPage
+export default TaskAssignmentPage;

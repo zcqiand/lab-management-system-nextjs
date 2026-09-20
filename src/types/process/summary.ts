@@ -1,4 +1,4 @@
-import type { FlowStage } from './flow';
+import type { FlowStage } from "./flow";
 
 /**
  * 统计（M05 数据统计）——仪表盘 + 试验报告汇总表
@@ -15,7 +15,12 @@ export interface DashboardStats {
   /** 各流程阶段的接样单数量 */
   receiptCountByStage: Record<FlowStage, number>;
   /** 各报告类别的接样单数量与已出报告数 */
-  receiptCountByCategory: { categoryCode: string; categoryName: string; count: number; reported: number }[];
+  receiptCountByCategory: {
+    categoryCode: string;
+    categoryName: string;
+    count: number;
+    reported: number;
+  }[];
 }
 
 export interface SummaryColumn {
@@ -40,5 +45,5 @@ export interface SteelSummaryRow {
   representQuantity: string;
   reportCode: string;
   testDate: string;
-  result: 'pass' | 'fail';
+  result: "pass" | "fail";
 }

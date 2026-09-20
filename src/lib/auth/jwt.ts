@@ -145,5 +145,9 @@ export class LabJwtSigner {
 }
 
 function b64url(data: Buffer): string {
-  return data.toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+  return data
+    .toString("base64")
+    .replace(/=+$/, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 }

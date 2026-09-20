@@ -31,16 +31,27 @@ describe("ReportNameList 聚合列", () => {
     });
   }
 
-  fnTest(["M06.F07.I01"], "列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作", async () => {
-    render(<ReportNameList />);
-    await flush();
+  fnTest(
+    ["M06.F07.I01"],
+    "列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作",
+    async () => {
+      render(<ReportNameList />);
+      await flush();
 
-    const headers = screen.getAllByRole("columnheader").map((h) => h.textContent);
-    expect(headers).toEqual(["编码", "简称", "检测标准", "检测参数", "扩展属性", "操作"]);
-    // 旧列已下线
-    expect(screen.queryByText("全称")).toBeNull();
-    expect(screen.queryByText("模板路径")).toBeNull();
-  });
+      const headers = screen.getAllByRole("columnheader").map((h) => h.textContent);
+      expect(headers).toEqual([
+        "编码",
+        "简称",
+        "检测标准",
+        "检测参数",
+        "扩展属性",
+        "操作",
+      ]);
+      // 旧列已下线
+      expect(screen.queryByText("全称")).toBeNull();
+      expect(screen.queryByText("模板路径")).toBeNull();
+    },
+  );
 
   fnTest(["M06.F07.I01"], "RN-101 行聚合显示其检测标准编码与检测参数名", async () => {
     render(<ReportNameList />);

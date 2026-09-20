@@ -13,9 +13,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const fetchMock = vi.fn();
 
 function makeRequest(query: string): Request {
-  return new Request(
-    `http://localhost:5201/api/auth/sso/authorize?${query}`,
-  );
+  return new Request(`http://localhost:5201/api/auth/sso/authorize?${query}`);
 }
 
 describe("GET /api/auth/sso/authorize 跳板语义", () => {

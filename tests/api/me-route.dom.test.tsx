@@ -15,8 +15,7 @@ import {
 
 /** 造一个 payload 段为 {sub} 的伪 JWT（route 只解不验签，签名段任意）。 */
 function fakeJwt(sub: string): string {
-  const b64url = (obj: unknown) =>
-    Buffer.from(JSON.stringify(obj)).toString("base64url");
+  const b64url = (obj: unknown) => Buffer.from(JSON.stringify(obj)).toString("base64url");
   return `${b64url({ alg: "none" })}.${b64url({ sub })}.${b64url({ sig: 0 })}`;
 }
 
@@ -27,7 +26,12 @@ function reqWithBearer(token: string | null): Request {
 }
 
 const SAAS_TENANTS: SaasMyTenant[] = [
-  { tenantId: "00000000-0000-0000-0000-000000000001", code: "00000000-0000-0000-0000-000000000001", name: "00000000-0000-0000-0000-000000000001", roleIds: ["admin"] },
+  {
+    tenantId: "00000000-0000-0000-0000-000000000001",
+    code: "00000000-0000-0000-0000-000000000001",
+    name: "00000000-0000-0000-0000-000000000001",
+    roleIds: ["admin"],
+  },
 ];
 
 beforeEach(() => {
@@ -40,7 +44,10 @@ describe("2026-09-03 /api/auth/me 租户体系对齐", () => {
 
     const res = await meGET(reqWithBearer(fakeJwt("saas-user-1")));
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { tenants: SaasMyTenant[]; currentTenantId: string };
+    const body = (await res.json()) as {
+      tenants: SaasMyTenant[];
+      currentTenantId: string;
+    };
     expect(body.tenants).toEqual(SAAS_TENANTS);
     expect(body.currentTenantId).toBe(SAAS_TENANTS[0]!.tenantId);
   });

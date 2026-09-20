@@ -76,10 +76,7 @@ function rowId(item: ResourceState["items"][number]): string {
   return (item as { id: string }).id;
 }
 
-function isOfficialRow(
-  key: ResourceKey,
-  item: ResourceState["items"][number],
-): boolean {
+function isOfficialRow(key: ResourceKey, item: ResourceState["items"][number]): boolean {
   if (key === "specialties" || key === "objects")
     return (item as { isOfficial?: boolean }).isOfficial === true;
   if (key === "parameters")
@@ -248,8 +245,11 @@ export function InspectionCapabilityPage(props: InspectionCapabilityPageProps = 
     return () => controller.abort();
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => load(), [key, specialtyFilter, objectFilter, standardFilter, keyword, page]);
+  useEffect(
+    () => load(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load 每次渲染重建，刻意不入依赖；其内部自管 AbortController 清理
+    [key, specialtyFilter, objectFilter, standardFilter, keyword, page],
+  );
 
   // 专项下拉选项（objects/standards/parameters，专项页本身不需要筛专项）
   useEffect(() => {

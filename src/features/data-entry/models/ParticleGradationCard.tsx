@@ -157,7 +157,6 @@ export function ParticleGradationCard({
         })),
       );
     }
-     
   }, [sampleId, record?.result, sieveCount, sampleRows]);
 
   const updatePct = (ri: number, ci: number, v: number) => {

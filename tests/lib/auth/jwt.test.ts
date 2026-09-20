@@ -62,7 +62,9 @@ describe("M01.F05.I06 LabJwtSigner", () => {
   });
 
   it("missing LAB_JWT_SECRET throws at construction", () => {
-    expect(() => new LabJwtSigner("", "lab-test", 3600, 604800)).toThrow(/LAB_JWT_SECRET/);
+    expect(() => new LabJwtSigner("", "lab-test", 3600, 604800)).toThrow(
+      /LAB_JWT_SECRET/,
+    );
   });
 
   it("too short LAB_JWT_SECRET throws at construction", () => {

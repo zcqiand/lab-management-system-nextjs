@@ -14,7 +14,10 @@ export async function GET() {
     const { Pool } = await import("pg");
     const url = process.env.DATABASE_URL;
     if (!url) {
-      return NextResponse.json({ ok: false, error: "DATABASE_URL 未设置" }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: "DATABASE_URL 未设置" },
+        { status: 500 },
+      );
     }
     const pool = new Pool({ connectionString: url, connectionTimeoutMillis: 5000 });
     const client = await pool.connect();

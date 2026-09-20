@@ -8,7 +8,7 @@
  * 同时承载原「报告类别」的 summaryName + extFields 字段。
  */
 
-import type { ExtFieldDef } from '@/types/api'
+import type { ExtFieldDef } from "@/types/api";
 
 export interface InspectionReportName {
   id: string;

@@ -15,22 +15,14 @@
  * 本文件仅做 re-export，保持旧 import 路径（'../../types/api'）继续可用。
  */
 
-export type { ExtFieldDef } from './common';
+export type { ExtFieldDef } from "./common";
 
-export type { InspectionReportName } from './inspection/inspection-report-name';
-export type { InspectionParameter } from './inspection/inspection-parameter';
+export type { InspectionReportName } from "./inspection/inspection-report-name";
+export type { InspectionParameter } from "./inspection/inspection-parameter";
 
-export type {
-  ApiResult,
-  Page,
-  PageQuery,
-  DateRangeFilter,
-} from './common';
+export type { ApiResult, Page, PageQuery, DateRangeFilter } from "./common";
 
-export type {
-  Contract,
-  ContractStatus,
-} from './resources';
+export type { Contract, ContractStatus } from "./resources";
 
 export type {
   FlowStage,
@@ -48,8 +40,8 @@ export type {
   SummaryColumn,
   SummaryData,
   SteelSummaryRow,
-} from './process';
-export { FLOW_STAGE_ORDER, FLOW_STAGE_LABELS } from './process';
+} from "./process";
+export { FLOW_STAGE_ORDER, FLOW_STAGE_LABELS } from "./process";
 
 export type {
   Permission,
@@ -65,4 +57,4 @@ export type {
   RoleCreateInput,
   RoleUpdateInput,
   OrgInfo,
-} from './system';
+} from "./system";

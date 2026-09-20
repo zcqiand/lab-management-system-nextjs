@@ -159,8 +159,7 @@ describe("ext:<key> source 解析（M03.F01.I07 补录 → 预览）", () => {
     () => {
       const flat: Record<string, unknown> = { r9_jcz: "5.33" };
       // 模拟 docx XML 含 3 个未登记 tag：p1_jcyj / c_yply / c_sccj
-      const xml =
-        "<w:p>{p1_jcyj} {c_yply} {c_sccj} {r9_jcz}</w:p>";
+      const xml = "<w:p>{p1_jcyj} {c_yply} {c_sccj} {r9_jcz}</w:p>";
       const out = ensureAllDocxTags(flat, xml);
       expect(out.p1_jcyj).toBe("—");
       expect(out.c_yply).toBe("—");

@@ -177,7 +177,11 @@ export default function LoginPage() {
         restartAuthorize("state 校验失败（登录流程已过期）");
         return;
       }
-      if (flowBackend !== null && flowBackend !== baseUrl && !callbackStartedRef.current) {
+      if (
+        flowBackend !== null &&
+        flowBackend !== baseUrl &&
+        !callbackStartedRef.current
+      ) {
         // 后端已切换：旧 code 只与旧后端的 authorize 配对（cookie 也是旧后端的
         // —— cookie 按 host 共享不分端口），POST 新后端必 INVALID_GRANT。
         sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);

@@ -8,7 +8,8 @@
  *   - disabled：被机构停用
  */
 
-export type InspectionReadinessStatus = "catalogued" | "under_review" | "operational" | "disabled";
+export type InspectionReadinessStatus =
+  "catalogued" | "under_review" | "operational" | "disabled";
 
 export const INSPECTION_READINESS_STATUSES: InspectionReadinessStatus[] = [
   "catalogued",

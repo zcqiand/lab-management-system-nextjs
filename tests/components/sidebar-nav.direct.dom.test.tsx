@@ -32,7 +32,12 @@ const meQueue: MockResponse[] = [];
 const ME_SESSION = {
   user: { id: "USER-A", username: "alice", displayName: "管理员", roleCode: "admin" },
   tenants: [
-    { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
+    {
+      tenantId: "TENANT-001",
+      code: "city-lab",
+      name: "市住建工程质量检测中心",
+      roleIds: ["admin"],
+    },
   ],
   currentTenantId: "TENANT-001",
 };
@@ -43,7 +48,8 @@ vi.mock("axios", () => ({
     const url = config?.url ?? "";
     // 精确匹配（"/api/auth/menus" 含 "/api/auth/me" 子串，startsWith 会误伤）
     const isMe = url === "/api/auth/me";
-    const r = (isMe ? meQueue : queue).shift() ??
+    const r =
+      (isMe ? meQueue : queue).shift() ??
       (isMe ? { status: 200, data: ME_SESSION } : undefined);
     if (!r || r.status >= 400) {
       throw Object.assign(new Error(`HTTP ${r?.status ?? "no-mock"}`), {
@@ -79,18 +85,17 @@ describe("ADR-0009 sidebar-nav 菜单走 lab 后端 /api/auth/menus", () => {
     // 响应形状 = SSOT OAuthClientPublicInfo {clientId, clientName, status}。
     // 每次调用出新 Response：token 异步 hydrate 会让 hook effect 跑两次，
     // 复用同一 Response 实例第二次 r.json() 撞「body already read」走 catch。
-    fetchMock = vi.fn().mockImplementation(
-      () =>
-        Promise.resolve(
-          new Response(
-            JSON.stringify({
-              clientId: "lab-management",
-              clientName: "建筑工程实验室管理系统",
-              status: 1,
-            }),
-            { status: 200 },
-          ),
+    fetchMock = vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            clientId: "lab-management",
+            clientName: "建筑工程实验室管理系统",
+            status: 1,
+          }),
+          { status: 200 },
         ),
+      ),
     );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     localStorage.clear();
@@ -206,9 +211,12 @@ describe("M01.F04.I04 useBackendMenus — demo 兜底删除后失败语义", () 
     meQueue.length = 0;
     calls.length = 0;
     fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ code: "lab-management", name: "建筑工程实验室管理系统" }), {
-        status: 200,
-      }),
+      new Response(
+        JSON.stringify({ code: "lab-management", name: "建筑工程实验室管理系统" }),
+        {
+          status: 200,
+        },
+      ),
     );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     localStorage.clear();

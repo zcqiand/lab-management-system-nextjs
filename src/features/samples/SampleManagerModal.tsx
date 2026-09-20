@@ -139,10 +139,18 @@ export function SampleManagerModal({ receipt, onClose, readOnly, inline }: Props
     const toNames = (items: { name?: string }[]): string[] =>
       items.map((i) => i.name ?? "");
     Promise.all([
-      catalogListModels({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
-      catalogListSpecs({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
-      catalogListGrades({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
-      catalogListBrands({ page: 1, pageSize: 200 }).catch(() => ({ items: [] as never[] })),
+      catalogListModels({ page: 1, pageSize: 200 }).catch(() => ({
+        items: [] as never[],
+      })),
+      catalogListSpecs({ page: 1, pageSize: 200 }).catch(() => ({
+        items: [] as never[],
+      })),
+      catalogListGrades({ page: 1, pageSize: 200 }).catch(() => ({
+        items: [] as never[],
+      })),
+      catalogListBrands({ page: 1, pageSize: 200 }).catch(() => ({
+        items: [] as never[],
+      })),
     ]).then(([models, specifications, grades, brands]) =>
       setDicts({
         models: toNames(models.items ?? []),

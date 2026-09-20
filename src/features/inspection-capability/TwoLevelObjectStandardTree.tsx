@@ -168,7 +168,9 @@ export function TwoLevelObjectStandardTree<T extends TreeListItem>(props: Props<
     } = { page: 1, pageSize: 500, inspectionObjectCode: objectCode };
     inspectionDictionaryListStandards(params)
       .then((r) => {
-        const items = Array.isArray(r?.items) ? (r.items as unknown as StandardNode[]) : [];
+        const items = Array.isArray(r?.items)
+          ? (r.items as unknown as StandardNode[])
+          : [];
         items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setStandardsByObject((prev) => ({ ...prev, [objectCode]: items }));
       })

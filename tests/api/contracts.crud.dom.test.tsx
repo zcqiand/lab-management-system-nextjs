@@ -20,26 +20,34 @@ const NEW_BODY = {
 };
 
 describe("contracts CRUD (M02.F01.I02 / I05)", () => {
-  fnTest(["M02.F01.I02"], "新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到", async () => {
-    const post = await apiClient.post(BASE, NEW_BODY);
-    expect(post.status).toBe(201);
-    const created = post.data as { id: string; contractCode: string };
-    expect(created.id).toMatch(/^CONTRACT-/);
-    expect(created.contractCode).toBe(NEW_BODY.contractCode);
+  fnTest(
+    ["M02.F01.I02"],
+    "新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
+    async () => {
+      const post = await apiClient.post(BASE, NEW_BODY);
+      expect(post.status).toBe(201);
+      const created = post.data as { id: string; contractCode: string };
+      expect(created.id).toMatch(/^CONTRACT-/);
+      expect(created.contractCode).toBe(NEW_BODY.contractCode);
 
-    const list = await apiClient.get(`${BASE}?keyword=TEST-CRUD-001`);
-    expect(list.status).toBe(200);
-    const items = (list.data as { items: Array<{ id: string }> }).items;
-    expect(items.some((c) => c.id === created.id)).toBe(true);
-  });
+      const list = await apiClient.get(`${BASE}?keyword=TEST-CRUD-001`);
+      expect(list.status).toBe(200);
+      const items = (list.data as { items: Array<{ id: string }> }).items;
+      expect(items.some((c) => c.id === created.id)).toBe(true);
+    },
+  );
 
-  fnTest(["M02.F01.I02"], "编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新", async () => {
-    const post = await apiClient.post(BASE, NEW_BODY);
-    const id = (post.data as { id: string }).id;
-    const put = await apiClient.put(`${BASE}/${id}`, { witness: "见证人乙" });
-    expect(put.status).toBe(200);
-    expect((put.data as { witness: string }).witness).toBe("见证人乙");
-  });
+  fnTest(
+    ["M02.F01.I02"],
+    "编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新",
+    async () => {
+      const post = await apiClient.post(BASE, NEW_BODY);
+      const id = (post.data as { id: string }).id;
+      const put = await apiClient.put(`${BASE}/${id}`, { witness: "见证人乙" });
+      expect(put.status).toBe(200);
+      expect((put.data as { witness: string }).witness).toBe("见证人乙");
+    },
+  );
 
   fnTest(["M02.F01.I05"], "删除合同：DELETE 后 GET 列表不再包含该 id", async () => {
     const post = await apiClient.post(BASE, NEW_BODY);

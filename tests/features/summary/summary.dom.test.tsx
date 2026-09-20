@@ -58,64 +58,56 @@ describe("M05.F01 试验报告汇总表 + 仪表盘", () => {
     },
   );
 
-  fnTest(
-    ["M05.F01.I04"],
-    "data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗",
-    async () => {
-      mount();
-      const section = await waitFor(() => {
-        const el = document.querySelector('[data-fn="M05.F01.I04"]');
-        expect(el).not.toBeNull();
-        return el as HTMLElement;
-      });
-      expect(section.textContent).toContain("试验任务状态");
-      // 等 stats 拉回
-      await waitFor(() => {
-        expect(screen.getByTestId("funnel-bars")).toBeInTheDocument();
-      });
-      // 6 段全部渲染
-      const stages = [
-        "pending_collect",
-        "received",
-        "testing",
-        "reporting",
-        "reviewing",
-        "issued",
-      ];
-      for (const s of stages) {
-        expect(screen.getByTestId(`funnel-stage-${s}`)).toBeInTheDocument();
-      }
-      // 漏斗容器显示中文标签
-      const funnelEl = screen.getByTestId("funnel-bars");
-      expect(funnelEl.textContent).toContain("待取样");
-      expect(funnelEl.textContent).toContain("已收样");
-      expect(funnelEl.textContent).toContain("试验中");
-      expect(funnelEl.textContent).toContain("报告编制");
-      expect(funnelEl.textContent).toContain("待审核");
-      expect(funnelEl.textContent).toContain("已签发");
-    },
-  );
+  fnTest(["M05.F01.I04"], "data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗", async () => {
+    mount();
+    const section = await waitFor(() => {
+      const el = document.querySelector('[data-fn="M05.F01.I04"]');
+      expect(el).not.toBeNull();
+      return el as HTMLElement;
+    });
+    expect(section.textContent).toContain("试验任务状态");
+    // 等 stats 拉回
+    await waitFor(() => {
+      expect(screen.getByTestId("funnel-bars")).toBeInTheDocument();
+    });
+    // 6 段全部渲染
+    const stages = [
+      "pending_collect",
+      "received",
+      "testing",
+      "reporting",
+      "reviewing",
+      "issued",
+    ];
+    for (const s of stages) {
+      expect(screen.getByTestId(`funnel-stage-${s}`)).toBeInTheDocument();
+    }
+    // 漏斗容器显示中文标签
+    const funnelEl = screen.getByTestId("funnel-bars");
+    expect(funnelEl.textContent).toContain("待取样");
+    expect(funnelEl.textContent).toContain("已收样");
+    expect(funnelEl.textContent).toContain("试验中");
+    expect(funnelEl.textContent).toContain("报告编制");
+    expect(funnelEl.textContent).toContain("待审核");
+    expect(funnelEl.textContent).toContain("已签发");
+  });
 
-  fnTest(
-    ["M05.F01.I01"],
-    "data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
-    async () => {
-      const { container } = mount();
-      // B6 加载态：整页 PageLoading 门控后，锚点随数据一起出现 → waitFor 断言
-      await waitFor(() => {
-        const root = container.querySelector('[data-fn="M05.F01.I01"]');
-        expect(root).not.toBeNull();
-      });
-      // 等 /api/summary 拉回
-      await waitFor(() => {
-        expect(screen.getByTestId("summary-table")).toBeInTheDocument();
-      });
-      const table = screen.getByTestId("summary-table");
-      // 表格应至少有一行（种子数据有 sampleReceipts）
-      const rows = table.querySelectorAll("tbody tr");
-      expect(rows.length).toBeGreaterThan(0);
-    },
-  );
+  fnTest(["M05.F01.I01"], "data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行", async () => {
+    const { container } = mount();
+    // B6 加载态：整页 PageLoading 门控后，锚点随数据一起出现 → waitFor 断言
+    await waitFor(() => {
+      const root = container.querySelector('[data-fn="M05.F01.I01"]');
+      expect(root).not.toBeNull();
+    });
+    // 等 /api/summary 拉回
+    await waitFor(() => {
+      expect(screen.getByTestId("summary-table")).toBeInTheDocument();
+    });
+    const table = screen.getByTestId("summary-table");
+    // 表格应至少有一行（种子数据有 sampleReceipts）
+    const rows = table.querySelectorAll("tbody tr");
+    expect(rows.length).toBeGreaterThan(0);
+  });
 
   fnTest(
     ["M05.F01.I01"],

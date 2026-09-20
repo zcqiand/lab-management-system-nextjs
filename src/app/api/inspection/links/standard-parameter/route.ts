@@ -8,11 +8,15 @@ import { inspectionStandardParameters } from "@lab/management-system-msw/fixture
 import { wrapLinks, linkDelete, noContent } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  return wrapLinks(inspectionStandardParameters as unknown as Record<string, unknown>[], req, {
-    standardCode: "inspectionStandardCode",
-    inspectionStandardCode: "inspectionStandardCode",
-    inspectionParameterCode: "inspectionParameterCode",
-  });
+  return wrapLinks(
+    inspectionStandardParameters as unknown as Record<string, unknown>[],
+    req,
+    {
+      standardCode: "inspectionStandardCode",
+      inspectionStandardCode: "inspectionStandardCode",
+      inspectionParameterCode: "inspectionParameterCode",
+    },
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -22,5 +26,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  return linkDelete(req, inspectionStandardParameters as unknown as Record<string, unknown>[]);
+  return linkDelete(
+    req,
+    inspectionStandardParameters as unknown as Record<string, unknown>[],
+  );
 }

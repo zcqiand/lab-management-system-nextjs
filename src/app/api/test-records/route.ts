@@ -15,7 +15,9 @@ export async function GET(req: Request) {
   let items = testRecords.filter((t) => t.tenantId === TENANT);
   if (sampleId) items = items.filter((t) => t.sampleId === sampleId);
   if (receiptId) {
-    const sids = new Set(samples.filter((s) => s.receiptId === receiptId).map((s) => s.id));
+    const sids = new Set(
+      samples.filter((s) => s.receiptId === receiptId).map((s) => s.id),
+    );
     items = items.filter((t) => sids.has(t.sampleId));
   }
   return NextResponse.json(

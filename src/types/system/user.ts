@@ -1,5 +1,5 @@
-import type { Role, Permission } from './permission';
-import type { PageQuery } from '../common';
+import type { Role, Permission } from "./permission";
+import type { PageQuery } from "../common";
 
 /** 用户（M01.F03） */
 export interface User {
@@ -18,14 +18,14 @@ export interface UserRecord {
   displayName: string;
   email: string;
   roleId: string;
-  status: 'active' | 'disabled';
+  status: "active" | "disabled";
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UserQuery extends PageQuery {
   role?: string;
-  status?: 'active' | 'disabled';
+  status?: "active" | "disabled";
 }
 
 export interface UserCreateInput {
@@ -33,14 +33,14 @@ export interface UserCreateInput {
   displayName: string;
   email: string;
   roleId: string;
-  status?: 'active' | 'disabled';
+  status?: "active" | "disabled";
 }
 
 export interface UserUpdateInput {
   displayName?: string;
   email?: string;
   roleId?: string;
-  status?: 'active' | 'disabled';
+  status?: "active" | "disabled";
 }
 
 /** 密码修改（M01.F05） */

@@ -32,10 +32,16 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body["code"] ?? "").trim();
   if (!code || !body["componentPath"])
-    return NextResponse.json({ code: "BAD_REQUEST", message: "code/componentPath 必填" }, { status: 400 });
+    return NextResponse.json(
+      { code: "BAD_REQUEST", message: "code/componentPath 必填" },
+      { status: 400 },
+    );
   const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
   if (arr.some((r) => r["code"] === code))
-    return NextResponse.json({ code: "CONFLICT", message: "参数界面编码已存在" }, { status: 400 });
+    return NextResponse.json(
+      { code: "CONFLICT", message: "参数界面编码已存在" },
+      { status: 400 },
+    );
   const now = NOW();
   const row = {
     code,

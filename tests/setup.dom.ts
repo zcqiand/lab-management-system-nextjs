@@ -51,13 +51,13 @@ if (isDom) {
  */
 const server: NodeMockServer = new Proxy({} as NodeMockServer, {
   get(_t, prop, receiver) {
-    const target = serverRef as unknown as Record<string | symbol, unknown> | null
+    const target = serverRef as unknown as Record<string | symbol, unknown> | null;
     if (!target) {
       throw new Error(
         `tests/setup.dom.ts: server.${String(prop)} 在 beforeAll 之前被访问（server 尚未 listen）。`,
-      )
+      );
     }
-    return Reflect.get(target, prop, receiver)
+    return Reflect.get(target, prop, receiver);
   },
 });
 export { server };

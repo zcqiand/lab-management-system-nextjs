@@ -20,7 +20,8 @@ export async function POST(req: Request) {
   return NextResponse.json(
     {
       code: "REFRESH_NOT_IMPLEMENTED",
-      message: "refresh path 走 saas /oauth/token grant_type=refresh_token,本仓 demo 暂未接通",
+      message:
+        "refresh path 走 saas /oauth/token grant_type=refresh_token,本仓 demo 暂未接通",
     },
     { status: 400 },
   );

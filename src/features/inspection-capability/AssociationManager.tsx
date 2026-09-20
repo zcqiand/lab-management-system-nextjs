@@ -102,8 +102,7 @@ const JUNCTION_API: Record<
         // 需经 unknown 中转（同款 add/remove 的 as unknown as 惯例）
         (r) => (r.items ?? []) as unknown as Row[],
       ),
-    add: (p) =>
-      reportNamesLinkObjectReportName(p as unknown as ObjectReportNameLink),
+    add: (p) => reportNamesLinkObjectReportName(p as unknown as ObjectReportNameLink),
     remove: (p) =>
       reportNamesUnlinkObjectReportName(
         p as unknown as ReportNamesUnlinkObjectReportNameBody,
@@ -116,8 +115,7 @@ const JUNCTION_API: Record<
       } satisfies ReportNamesListReportNameStandardLinksParams).then(
         (r) => (r.items ?? []) as unknown as Row[],
       ),
-    add: (p) =>
-      reportNamesLinkReportNameStandard(p as unknown as ReportNameStandardLink),
+    add: (p) => reportNamesLinkReportNameStandard(p as unknown as ReportNameStandardLink),
     remove: (p) =>
       reportNamesUnlinkReportNameStandard(
         p as unknown as ReportNamesUnlinkReportNameStandardBody,
@@ -131,9 +129,7 @@ const JUNCTION_API: Record<
         (r) => (r.items ?? []) as unknown as Row[],
       ),
     add: (p) =>
-      reportNamesLinkReportNameParameter(
-        p as unknown as ReportNameParameterLink,
-      ),
+      reportNamesLinkReportNameParameter(p as unknown as ReportNameParameterLink),
     remove: (p) =>
       reportNamesUnlinkReportNameParameter(
         p as unknown as ReportNamesUnlinkReportNameParameterBody,
@@ -144,8 +140,7 @@ const JUNCTION_API: Record<
       paramInterfacesListParamInterfaceLinks({
         paramInterfaceCode: parentCode,
       }).then((r) => (r.items ?? []) as unknown as Row[]),
-    add: (p) =>
-      paramInterfacesLinkParamInterface(p as unknown as ParamInterfaceLink),
+    add: (p) => paramInterfacesLinkParamInterface(p as unknown as ParamInterfaceLink),
     remove: (p) =>
       paramInterfacesUnlinkParamInterface(
         p as unknown as ParamInterfacesUnlinkParamInterfaceBody,
@@ -253,7 +248,9 @@ export function AssociationManager(props: Props) {
   const [prefilterOptions, setPrefilterOptions] = useState<Row[]>([]);
   const [prefilterSelected, setPrefilterSelected] = useState("");
   const [allowedTargetCodes, setAllowedTargetCodes] = useState<Set<string> | null>(null);
-  const [parameterObjectNames, setParameterObjectNames] = useState<Map<string, string[]>>(new Map());
+  const [parameterObjectNames, setParameterObjectNames] = useState<Map<string, string[]>>(
+    new Map(),
+  );
   const [selected, setSelected] = useState("");
   const [extra, setExtra] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -317,7 +314,14 @@ export function AssociationManager(props: Props) {
   // prefilter 是配置块，调用方按字面量传入；整对象进 deps 会在父级每次 render 都重拉。改按 sub-field 触发。
   // showParameterObjects 是布尔配置，加进 deps 触发一次性拉取（行渲染只读 parameterObjectNames）。
   /* eslint-disable react-hooks/exhaustive-deps -- prefilter 是配置块 */
-  useEffect(loadAll, [endpoint, parentParam, parentCode, targetEndpoint, prefilter?.endpoint, showParameterObjects]);
+  useEffect(loadAll, [
+    endpoint,
+    parentParam,
+    parentCode,
+    targetEndpoint,
+    prefilter?.endpoint,
+    showParameterObjects,
+  ]);
 
   // prefilter 选中后，反查允许的 target 集合（当前唯一形态：检测项目 → object-parameter links）
   useEffect(() => {
@@ -343,7 +347,12 @@ export function AssociationManager(props: Props) {
         setSelected(""); // 过滤集变了，target 选中清空
       })
       .catch(() => setError("加载过滤集合失败"));
-  }, [prefilterSelected, prefilter?.filterEndpoint, prefilter?.filterParamKey, prefilter?.filterResultKey]);
+  }, [
+    prefilterSelected,
+    prefilter?.filterEndpoint,
+    prefilter?.filterParamKey,
+    prefilter?.filterResultKey,
+  ]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   const add = async () => {
@@ -458,7 +467,9 @@ export function AssociationManager(props: Props) {
                 const code = r[targetParam] ?? "";
                 const target = targets.find((t) => t[targetValueKey] === code);
                 const display = target?.[targetTextKey] ?? code;
-                const extraText = targetExtraTextKey ? target?.[targetExtraTextKey] : undefined;
+                const extraText = targetExtraTextKey
+                  ? target?.[targetExtraTextKey]
+                  : undefined;
                 out.push(
                   <li
                     key={code + extraFields.map((f) => r[f.name] ?? "").join("#")}
@@ -467,10 +478,16 @@ export function AssociationManager(props: Props) {
                     <span>
                       {display}
                       {extraText && extraText !== display ? ` · ${extraText}` : ""}
-                      {showParameterObjects && (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
+                      {showParameterObjects &&
+                        (parameterObjectNames.get(code) ?? [])
+                          .map((n) => ` · ${n}`)
+                          .join("")}
                       {extraFields
                         .filter((f) => !f.rowPrefix && !f.groupBy)
-                        .map((f) => ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`)
+                        .map(
+                          (f) =>
+                            ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`,
+                        )
                         .join("")}
                     </span>
                     <button
@@ -493,7 +510,9 @@ export function AssociationManager(props: Props) {
             const code = r[targetParam] ?? "";
             const target = targets.find((t) => t[targetValueKey] === code);
             const display = target?.[targetTextKey] ?? code;
-            const extraText = targetExtraTextKey ? target?.[targetExtraTextKey] : undefined;
+            const extraText = targetExtraTextKey
+              ? target?.[targetExtraTextKey]
+              : undefined;
             return (
               <li
                 key={code + extraFields.map((f) => r[f.name] ?? "").join("#")}
@@ -506,10 +525,14 @@ export function AssociationManager(props: Props) {
                     .join("")}
                   {display}
                   {extraText && extraText !== display ? ` · ${extraText}` : ""}
-                  {showParameterObjects && (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
+                  {showParameterObjects &&
+                    (parameterObjectNames.get(code) ?? []).map((n) => ` · ${n}`).join("")}
                   {extraFields
                     .filter((f) => !f.rowPrefix)
-                    .map((f) => ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`)
+                    .map(
+                      (f) =>
+                        ` · ${f.label}: ${f.valueLabels?.[r[f.name] ?? ""] ?? r[f.name] ?? ""}`,
+                    )
                     .join("")}
                 </span>
                 <button
@@ -538,7 +561,10 @@ export function AssociationManager(props: Props) {
             >
               <option value="">选择{prefilter.label}</option>
               {prefilterOptions.map((o) => (
-                <option key={o[prefilter.valueKey] ?? ""} value={o[prefilter.valueKey] ?? ""}>
+                <option
+                  key={o[prefilter.valueKey] ?? ""}
+                  value={o[prefilter.valueKey] ?? ""}
+                >
                   {o[prefilter.textKey] ?? ""}
                 </option>
               ))}
@@ -561,7 +587,11 @@ export function AssociationManager(props: Props) {
                   : `请先选择${prefilter.label}`}
             </option>
             {targets
-              .filter((t) => !allowedTargetCodes || allowedTargetCodes.has(String(t[targetValueKey] ?? "")))
+              .filter(
+                (t) =>
+                  !allowedTargetCodes ||
+                  allowedTargetCodes.has(String(t[targetValueKey] ?? "")),
+              )
               .map((t) => {
                 const extra = targetExtraTextKey ? t[targetExtraTextKey] : undefined;
                 return (

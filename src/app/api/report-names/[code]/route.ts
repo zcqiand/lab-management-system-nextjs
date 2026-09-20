@@ -44,7 +44,10 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { code: string } }) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { code: string } },
+) {
   try {
     const ok = await deleteReportNameDb(params.code);
     if (!ok) return notFound("ReportName not found");

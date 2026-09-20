@@ -8,12 +8,21 @@ import { env } from "./env";
 let currentToken: string | null = null;
 let unauthorizedHandler: (() => void) | null = null;
 
-export function setToken(token: string | null) { currentToken = token; }
-export function onUnauthorized(handler: () => void) { unauthorizedHandler = handler; }
-export function resetApiClient() { currentToken = null; unauthorizedHandler = null; }
+export function setToken(token: string | null) {
+  currentToken = token;
+}
+export function onUnauthorized(handler: () => void) {
+  unauthorizedHandler = handler;
+}
+export function resetApiClient() {
+  currentToken = null;
+  unauthorizedHandler = null;
+}
 
 export const apiClient: AxiosInstance = axios.create({ baseURL: "" });
-export const identityClient: AxiosInstance = axios.create({ baseURL: env.IDENTITY_BASE_URL });
+export const identityClient: AxiosInstance = axios.create({
+  baseURL: env.IDENTITY_BASE_URL,
+});
 
 // @entry M01.F05.I02
 //   apiClient / identityClient 请求拦截器：注入 Authorization: Bearer <token>
@@ -31,7 +40,8 @@ for (const client of [apiClient, identityClient]) {
   client.interceptors.response.use(
     (r) => r,
     (err: unknown) => {
-      if (err instanceof AxiosError && err.response?.status === 401) unauthorizedHandler?.();
+      if (err instanceof AxiosError && err.response?.status === 401)
+        unauthorizedHandler?.();
       return Promise.reject(err);
     },
   );

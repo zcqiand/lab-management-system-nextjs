@@ -21,8 +21,7 @@ import {
 
 /** 造一个 payload 段为 {sub} 的伪 JWT（route 只解不验签，签名段任意）。 */
 function fakeJwt(sub: string): string {
-  const b64url = (obj: unknown) =>
-    Buffer.from(JSON.stringify(obj)).toString("base64url");
+  const b64url = (obj: unknown) => Buffer.from(JSON.stringify(obj)).toString("base64url");
   return `${b64url({ alg: "none" })}.${b64url({ sub })}.${b64url({ sig: 0 })}`;
 }
 
@@ -39,7 +38,11 @@ beforeEach(() => {
 describe("ADR-0009 /api/auth/menus 快照链", () => {
   fnTest(["M01.F04.I04"], "快照命中：Bearer sub 有快照 → 返回快照树", async () => {
     const snap: ContractMenuNode[] = [
-      { id: "g1", label: "saas 分组", children: [{ id: "leaf", label: "saas 页面", path: "/p" }] },
+      {
+        id: "g1",
+        label: "saas 分组",
+        children: [{ id: "leaf", label: "saas 页面", path: "/p" }],
+      },
     ];
     putMenuSnapshot("user-1", snap);
 
@@ -49,34 +52,42 @@ describe("ADR-0009 /api/auth/menus 快照链", () => {
     expect(body).toEqual(snap);
   });
 
-  fnTest(["M01.F04.I04"], "快照 miss：无 token / sub 无快照 → 401（ADR-0019 删 demo 兜底）", async () => {
-    // ADR-0019：删「无 Bearer = USER-A 走自愈」反模式。无 Bearer 必须 401,不再走自愈。
-    // 真路径要 login 后拿 token 才能调 /menus,miss 时 503 走原逻辑。
-    const res1 = await menusGET(reqWithBearer(null));
-    expect(res1.status).toBe(401);
-    expect(((await res1.json()) as { code: string }).code).toBe("UNAUTHORIZED");
+  fnTest(
+    ["M01.F04.I04"],
+    "快照 miss：无 token / sub 无快照 → 401（ADR-0019 删 demo 兜底）",
+    async () => {
+      // ADR-0019：删「无 Bearer = USER-A 走自愈」反模式。无 Bearer 必须 401,不再走自愈。
+      // 真路径要 login 后拿 token 才能调 /menus,miss 时 503 走原逻辑。
+      const res1 = await menusGET(reqWithBearer(null));
+      expect(res1.status).toBe(401);
+      expect(((await res1.json()) as { code: string }).code).toBe("UNAUTHORIZED");
 
-    // 有 token 但该 sub 从未缓存 → 503
-    const res2 = await menusGET(reqWithBearer(fakeJwt("stranger")));
-    expect(res2.status).toBe(503);
+      // 有 token 但该 sub 从未缓存 → 503
+      const res2 = await menusGET(reqWithBearer(fakeJwt("stranger")));
+      expect(res2.status).toBe(503);
 
-    // 非三段 token（不是 JWT）→ sub 解不出 → 401 (Bearer 缺失语义)
-    const res3 = await menusGET(reqWithBearer("not-a-jwt"));
-    expect(res3.status).toBe(401);
-  });
+      // 非三段 token（不是 JWT）→ sub 解不出 → 401 (Bearer 缺失语义)
+      const res3 = await menusGET(reqWithBearer("not-a-jwt"));
+      expect(res3.status).toBe(401);
+    },
+  );
 
-  fnTest(["M01.F04.I01"], "动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在", async () => {
-    // I01 是「菜单下发」API 端点本身；功能树要求源码挂锚点，避免锚点丢失
-    // 后 L5 误报已上线却无入口。
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const src = fs.readFileSync(
-      path.resolve(process.cwd(), "src/app/api/auth/menus/route.ts"),
-      "utf8",
-    );
-    expect(src).toMatch(/@entry M01\.F04\.I01/);
-    expect(src).toMatch(/export async function GET/);
-  });
+  fnTest(
+    ["M01.F04.I01"],
+    "动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在",
+    async () => {
+      // I01 是「菜单下发」API 端点本身；功能树要求源码挂锚点，避免锚点丢失
+      // 后 L5 误报已上线却无入口。
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const src = fs.readFileSync(
+        path.resolve(process.cwd(), "src/app/api/auth/menus/route.ts"),
+        "utf8",
+      );
+      expect(src).toMatch(/@entry M01\.F04\.I01/);
+      expect(src).toMatch(/export async function GET/);
+    },
+  );
 });
 
 describe("menu-snapshot 缓存单测", () => {
@@ -124,51 +135,78 @@ describe("cacheMenuSnapshot：saas /me/menus Record<appCode, EffectiveMenuNode[]
     return fetchMock;
   }
 
-  fnTest(["M01.F04.I04"], "Record 形状：appCode 命中 → 写入子树 + 完成 title→label 映射 + 跨 app 数据不污染", async () => {
-    // saas 真实 payload 形状（2026-09-08 clientId 重命名后）：展示名 title，type menu|directory
-    mockSaas({
-      "lab-management": [
+  fnTest(
+    ["M01.F04.I04"],
+    "Record 形状：appCode 命中 → 写入子树 + 完成 title→label 映射 + 跨 app 数据不污染",
+    async () => {
+      // saas 真实 payload 形状（2026-09-08 clientId 重命名后）：展示名 title，type menu|directory
+      mockSaas({
+        "lab-management": [
+          {
+            id: "g1",
+            clientId: "lab-management",
+            title: "分组1",
+            type: "directory",
+            path: null,
+            icon: null,
+            sortOrder: 15,
+            children: [
+              {
+                id: "p1",
+                clientId: "lab-management",
+                title: "页面1",
+                type: "menu",
+                path: "p1",
+                icon: "Icon1",
+                sortOrder: 1,
+              },
+            ],
+          },
+          {
+            id: "p2",
+            clientId: "lab-management",
+            title: "页面2",
+            type: "menu",
+            path: "p2",
+            sortOrder: 2,
+          },
+        ],
+        erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }], // 跨 app 数据，绝不能进 lab 快照
+      });
+
+      await cacheMenuSnapshot("user-x", "tok", "http://saas", "lab-management");
+
+      expect(getMenuSnapshot("user-x")).toEqual([
         {
           id: "g1",
-          clientId: "lab-management",
-          title: "分组1",
-          type: "directory",
-          path: null,
-          icon: null,
-          sortOrder: 15,
-          children: [{ id: "p1", clientId: "lab-management", title: "页面1", type: "menu", path: "p1", icon: "Icon1", sortOrder: 1 }],
+          label: "分组1",
+          children: [{ id: "p1", label: "页面1", path: "p1", icon: "Icon1" }],
         },
-        { id: "p2", clientId: "lab-management", title: "页面2", type: "menu", path: "p2", sortOrder: 2 },
-      ],
-      erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }], // 跨 app 数据，绝不能进 lab 快照
-    });
+        { id: "p2", label: "页面2", path: "p2" },
+      ]);
 
-    await cacheMenuSnapshot("user-x", "tok", "http://saas", "lab-management");
+      // URL 带 appCode query 参数 + Bearer header
+      const [calledUrl, calledInit] = fetchMock.mock.calls[0]!;
+      expect(String(calledUrl)).toContain("/api/v1/me/menus?appCode=lab-management");
+      expect((calledInit as RequestInit).headers).toMatchObject({
+        authorization: "Bearer tok",
+      });
+    },
+  );
 
-    expect(getMenuSnapshot("user-x")).toEqual([
-      {
-        id: "g1",
-        label: "分组1",
-        children: [{ id: "p1", label: "页面1", path: "p1", icon: "Icon1" }],
-      },
-      { id: "p2", label: "页面2", path: "p2" },
-    ]);
+  fnTest(
+    ["M01.F04.I04"],
+    "Record 形状：appCode 不在响应里 → 写空快照（saas 无本 app 菜单的合法形态）",
+    async () => {
+      mockSaas({
+        erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }],
+      });
 
-    // URL 带 appCode query 参数 + Bearer header
-    const [calledUrl, calledInit] = fetchMock.mock.calls[0]!;
-    expect(String(calledUrl)).toContain("/api/v1/me/menus?appCode=lab-management");
-    expect((calledInit as RequestInit).headers).toMatchObject({
-      authorization: "Bearer tok",
-    });
-  });
+      await cacheMenuSnapshot("user-y", "tok", "http://saas", "lab-management");
 
-  fnTest(["M01.F04.I04"], "Record 形状：appCode 不在响应里 → 写空快照（saas 无本 app 菜单的合法形态）", async () => {
-    mockSaas({ erp: [{ id: "erp-1", clientId: "erp", title: "ERP 页", type: "menu" }] });
-
-    await cacheMenuSnapshot("user-y", "tok", "http://saas", "lab-management");
-
-    expect(getMenuSnapshot("user-y")).toEqual([]); // 空数组 ≠ null，仍是合法快照
-  });
+      expect(getMenuSnapshot("user-y")).toEqual([]); // 空数组 ≠ null，仍是合法快照
+    },
+  );
 
   fnTest(["M01.F04.I04"], "Record 形状：响应是空对象 → 写空快照", async () => {
     mockSaas({});

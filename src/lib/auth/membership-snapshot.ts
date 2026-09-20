@@ -32,7 +32,9 @@ const TTL_MS = 30 * 60 * 1000;
  * → 快照恒 miss → 401 MEMBERSHIP_UNAVAILABLE（T11 live 套件实证）。挂 globalThis
  * 才是真·进程级单例。HMR 重置场景不变（globalThis 随进程存活）。
  */
-const _g = globalThis as unknown as { __membershipSnapshotStore?: Map<string, MembershipSnapshot> };
+const _g = globalThis as unknown as {
+  __membershipSnapshotStore?: Map<string, MembershipSnapshot>;
+};
 const store = (_g.__membershipSnapshotStore ??= new Map<string, MembershipSnapshot>());
 
 /** 写入/覆盖某用户的租户快照（userId 为 saas user id）。空参静默忽略。 */

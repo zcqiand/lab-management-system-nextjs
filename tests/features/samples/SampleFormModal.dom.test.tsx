@@ -68,7 +68,7 @@ describe("SampleFormModal 表单（create/edit 复用）", () => {
   });
 
   // SKIPPED: Test is broken - it doesn't provide projectId which is required for form validation
-it.skip("[fn: M03.F03.I02] edit 提交触发 onSubmit with id - 缺少 projectId 导致表单验证失败", async () => {
+  it.skip("[fn: M03.F03.I02] edit 提交触发 onSubmit with id - 缺少 projectId 导致表单验证失败", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(

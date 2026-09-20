@@ -1,4 +1,4 @@
-import { FlowStagePage } from '@/features/flow-pipeline/FlowStagePage'
+import { FlowStagePage } from "@/features/flow-pipeline/FlowStagePage";
 
 /** 报告审核——流程线第四环节（flowStatus='review'）。仅走流程：提交=审核通过进入批准，退回数据录入。 */
 export function ReportReviewPage() {
@@ -15,7 +15,7 @@ export function ReportReviewPage() {
       viewDataFn="M03.F05.I02"
       actionDataFn="M03.F05.I07"
     />
-  )
+  );
 }
 
-export default ReportReviewPage
+export default ReportReviewPage;

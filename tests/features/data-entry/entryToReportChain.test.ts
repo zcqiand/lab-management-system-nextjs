@@ -2,10 +2,7 @@ import { describe, expect, beforeEach } from "vitest";
 import { fnTest } from "../../fn";
 import { seedData, tablesOf } from "../../helpers/seed";
 const { receiptTable, sampleTable, testRecordTable, orgInfoTable } = tablesOf();
-import {
-  assembleReport,
-  flattenForDocx,
-} from "@/features/data-entry/reportTemplateData";
+import { assembleReport, flattenForDocx } from "@/features/data-entry/reportTemplateData";
 import { resolveInterfaceByParam } from "@/features/data-entry/models/resolveInterfaceByParam";
 import { MODEL_REGISTRY } from "@/features/data-entry/models/registry";
 import reportNames from "@/data/generated/inspection-report-name.json";
@@ -14,7 +11,10 @@ import inspectionParamInterfaces from "@/data/generated/inspection-param-interfa
 import inspectionParamInterfaceLinks from "@/data/generated/inspection-parameter-param-interface.json";
 import type { SampleReceipt, Sample, TestRecord } from "@/api/endpoints/model";
 import type { OrgInfo } from "@/features/data-entry/org-info";
-import type { ParamInterface as ParamInterfaceRow, ParamInterfaceLink } from "@/api/endpoints/model";
+import type {
+  ParamInterface as ParamInterfaceRow,
+  ParamInterfaceLink,
+} from "@/api/endpoints/model";
 
 /**
  * 录入 → 报告 链路回归。
@@ -25,18 +25,21 @@ import type { ParamInterface as ParamInterfaceRow, ParamInterfaceLink } from "@/
  */
 
 const RN = reportNames as Array<{ code: string; templatePath: string }>;
-const TEMPLATE_BY_RN = new Map(RN.map((r) => [r.code, r.templatePath.replace(/\.docx$/, "")]));
+const TEMPLATE_BY_RN = new Map(
+  RN.map((r) => [r.code, r.templatePath.replace(/\.docx$/, "")]),
+);
 
 function contextFor(categoryCode: string): {
   receipt: SampleReceipt;
   samples: Sample[];
   records: TestRecord[];
 } {
-  const receipt = receiptTable
-    .all()
-    .find((r) => r.categoryCode === categoryCode) as SampleReceipt | undefined;
+  const receipt = receiptTable.all().find((r) => r.categoryCode === categoryCode) as
+    SampleReceipt | undefined;
   if (!receipt) throw new Error(`未找到 ${categoryCode} 的接样单种子`);
-  const samples = sampleTable.all().filter((s) => s.receiptId === receipt.id) as unknown as Sample[];
+  const samples = sampleTable
+    .all()
+    .filter((s) => s.receiptId === receipt.id) as unknown as Sample[];
   const sampleIds = new Set(samples.map((s) => s.id));
   const records = testRecordTable
     .all()
@@ -46,7 +49,7 @@ function contextFor(categoryCode: string): {
 
 function flatFor(categoryCode: string): Record<string, unknown> {
   const ctx = contextFor(categoryCode);
-  const org = orgInfoTable.all()[0] as unknown as OrgInfo | null ?? null;
+  const org = (orgInfoTable.all()[0] as unknown as OrgInfo | null) ?? null;
   const structured = assembleReport({ ...ctx, org });
   return flattenForDocx(
     categoryCode,
@@ -72,7 +75,9 @@ describe("录入卡 → 报告模板 取数链路", () => {
     ["M06.F08.I04"],
     "参数界面关联的 paramInterfaceCode 全部存在于 inspection-param-interface.json",
     () => {
-      const codes = new Set((inspectionParamInterfaces as ParamInterfaceRow[]).map((p) => p.code));
+      const codes = new Set(
+        (inspectionParamInterfaces as ParamInterfaceRow[]).map((p) => p.code),
+      );
       const dangling = (inspectionParamInterfaceLinks as ParamInterfaceLink[]).filter(
         (l) => !codes.has(l.paramInterfaceCode),
       );
@@ -82,12 +87,16 @@ describe("录入卡 → 报告模板 取数链路", () => {
     },
   );
 
-  fnTest(["M06.F08.I04"], "每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件", () => {
-    const missing = (inspectionParamInterfaces as ParamInterfaceRow[])
-      .map((p) => p.componentPath)
-      .filter((cp) => !(cp in MODEL_REGISTRY));
-    expect(missing).toEqual([]);
-  });
+  fnTest(
+    ["M06.F08.I04"],
+    "每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
+    () => {
+      const missing = (inspectionParamInterfaces as ParamInterfaceRow[])
+        .map((p) => p.componentPath)
+        .filter((cp) => !(cp in MODEL_REGISTRY));
+      expect(missing).toEqual([]);
+    },
+  );
 
   fnTest(["M03.F03.I03"], "每个报告名称都关联了至少一个检测参数", () => {
     const linked = new Set(
@@ -112,17 +121,21 @@ describe("录入卡 → 报告模板 取数链路", () => {
     }
   });
 
-  fnTest(["M03.F03.I03", "M06.F08.I04"], "抗渗报告三个样品块分别取到各自样品的数据", () => {
-    const flat = flatFor("RN-105-2");
-    for (const p of ["s1", "s2", "s3"]) {
-      expect(filled(flat, `${p}_bh`)).toBe(true);
-      expect(filled(flat, `${p}_syl0`)).toBe(true);
-      expect(filled(flat, `${p}_sqk0`)).toBe(true);
-      expect(filled(flat, `${p}_jd`)).toBe(true);
-    }
-    // 三块必须是不同样品，不能都渲染首样品
-    expect(new Set([flat.s1_bh, flat.s2_bh, flat.s3_bh]).size).toBe(3);
-  });
+  fnTest(
+    ["M03.F03.I03", "M06.F08.I04"],
+    "抗渗报告三个样品块分别取到各自样品的数据",
+    () => {
+      const flat = flatFor("RN-105-2");
+      for (const p of ["s1", "s2", "s3"]) {
+        expect(filled(flat, `${p}_bh`)).toBe(true);
+        expect(filled(flat, `${p}_syl0`)).toBe(true);
+        expect(filled(flat, `${p}_sqk0`)).toBe(true);
+        expect(filled(flat, `${p}_jd`)).toBe(true);
+      }
+      // 三块必须是不同样品，不能都渲染首样品
+      expect(new Set([flat.s1_bh, flat.s2_bh, flat.s3_bh]).size).toBe(3);
+    },
+  );
 
   fnTest(["M03.F03.I03", "M06.F08.I04"], "土工击实报告取到 5 组数据与峰值", () => {
     const flat = flatFor("RN-109-1");
@@ -147,7 +160,7 @@ describe("录入卡 → 报告模板 取数链路", () => {
 
   fnTest(["M03.F03.I03"], "砂浆抗压强度走试件轴且强度列 kyqd 有值", () => {
     const ctx = contextFor("RN-108-2");
-    const org = orgInfoTable.all()[0] as unknown as OrgInfo | null ?? null;
+    const org = (orgInfoTable.all()[0] as unknown as OrgInfo | null) ?? null;
     const structured = assembleReport({ ...ctx, org });
     expect("rows" in structured).toBe(true);
     const rows = (structured as { rows: Array<{ kyqd: string; dbz: string }> }).rows;

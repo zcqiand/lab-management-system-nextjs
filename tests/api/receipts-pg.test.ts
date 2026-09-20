@@ -17,7 +17,8 @@ import { listReceiptsDb, getReceiptDb, actForStageDb, TENANT } from "@/lib/db-qu
 // postgres-js 是仓 dependencies（不是 devDep），缺包即 module-load 失败，
 // 无需运行时 hasPg 探测 —— 与 db.smoke.test.ts 的 devDep pg 探测不是同一回事。
 const DATABASE_URL =
-  process.env.DATABASE_URL ?? "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_test";
+  process.env.DATABASE_URL ??
+  "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_test";
 
 // 自播种子 marker：commission_code 前缀。afterAll 按前缀 DELETE 整批清理。
 const TEST_MARKER = "__receipts_pg_test_";
@@ -94,9 +95,27 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
   // （seed-db.ts L200-211 同款教训：tagged 模板里 ${string}::jsonb 会被 postgres-js
   // 当 unknown literal 包装 → "cannot extract elements from a scalar"）。
   const reviewHistory = [
-    { action: "submit", from: "receiving", to: "task_assignment", operator: "tester", at: "2026-09-04T01:00:00Z" },
-    { action: "submit", from: "task_assignment", to: "data_entry", operator: "tester", at: "2026-09-04T02:00:00Z" },
-    { action: "submit", from: "data_entry", to: "review", operator: "tester", at: "2026-09-04T03:00:00Z" },
+    {
+      action: "submit",
+      from: "receiving",
+      to: "task_assignment",
+      operator: "tester",
+      at: "2026-09-04T01:00:00Z",
+    },
+    {
+      action: "submit",
+      from: "task_assignment",
+      to: "data_entry",
+      operator: "tester",
+      at: "2026-09-04T02:00:00Z",
+    },
+    {
+      action: "submit",
+      from: "data_entry",
+      to: "review",
+      operator: "tester",
+      at: "2026-09-04T03:00:00Z",
+    },
   ];
   await s`insert into sample_receipts (
     id, tenant_id, contract_id, commission_code, commission_date, category_code,
@@ -110,7 +129,13 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
   )`;
   // submitted 种子（已从 receiving submit 走，但当前不在 receiving；history 有 submit from receiving）
   const submittedHistory = [
-    { action: "submit", from: "receiving", to: "task_assignment", operator: "tester", at: "2026-09-04T01:00:00Z" },
+    {
+      action: "submit",
+      from: "receiving",
+      to: "task_assignment",
+      operator: "tester",
+      at: "2026-09-04T01:00:00Z",
+    },
   ];
   await s`insert into sample_receipts (
     id, tenant_id, contract_id, commission_code, commission_date, category_code,
@@ -134,101 +159,133 @@ interface FlowHistoryEntry {
 
 // family-wide：requireReachable 即接即测，连不上 throw（fail-loud, no fallback）。
 // 家族约定「CI 编译+mock / gate 真库」—— CI workflow 用 --exclude 决定是否跑本文件。
-describe("receipts 三态流转（pg, lab_test, requireReachable）", { timeout: 30_000 }, () => {
-  beforeAll(async () => {
-    const s = await connect();
-    await seedFixture(s);
-  });
+describe(
+  "receipts 三态流转（pg, lab_test, requireReachable）",
+  { timeout: 30_000 },
+  () => {
+    beforeAll(async () => {
+      const s = await connect();
+      await seedFixture(s);
+    });
 
-  afterAll(async () => {
-    if (sql) await cleanupTestRows(sql);
-    await disconnect();
-  });
+    afterAll(async () => {
+      if (sql) await cleanupTestRows(sql);
+      await disconnect();
+    });
 
-  it("not_yet: 停在 receiving 的单据", async () => {
-    const r = await listReceiptsDb({ filter: "not_yet", flowStatus: "receiving", page: 1, pageSize: 20 });
-    // 至少包含我们种子的 receiving 行；可能有 msw fixture 历史残留（CI 不跑 seed）
-    expect(r.total).toBeGreaterThanOrEqual(1);
-    const seeded = r.items.find((it) => it.id === SEEDED_RECEIVING_ID);
-    expect(seeded).toBeDefined();
-    expect(seeded!.flowStatus).toBe("receiving");
-  });
+    it("not_yet: 停在 receiving 的单据", async () => {
+      const r = await listReceiptsDb({
+        filter: "not_yet",
+        flowStatus: "receiving",
+        page: 1,
+        pageSize: 20,
+      });
+      // 至少包含我们种子的 receiving 行；可能有 msw fixture 历史残留（CI 不跑 seed）
+      expect(r.total).toBeGreaterThanOrEqual(1);
+      const seeded = r.items.find((it) => it.id === SEEDED_RECEIVING_ID);
+      expect(seeded).toBeDefined();
+      expect(seeded!.flowStatus).toBe("receiving");
+    });
 
-  it("submitted: 已从 receiving 提交走的单据", async () => {
-    const r = await listReceiptsDb({ filter: "submitted", flowStatus: "receiving", page: 1, pageSize: 20 });
-    expect(r.total).toBeGreaterThanOrEqual(1);
-    const seeded = r.items.find((it) => it.id === SEEDED_SUBMITTED_ID);
-    expect(seeded).toBeDefined();
-    expect(seeded!.flowStatus).not.toBe("receiving");
-    expect(
-      (seeded!.flowHistory as FlowHistoryEntry[]).some(
-        (h) => h.action === "submit" && h.from === "receiving",
-      ),
-    ).toBe(true);
-  });
+    it("submitted: 已从 receiving 提交走的单据", async () => {
+      const r = await listReceiptsDb({
+        filter: "submitted",
+        flowStatus: "receiving",
+        page: 1,
+        pageSize: 20,
+      });
+      expect(r.total).toBeGreaterThanOrEqual(1);
+      const seeded = r.items.find((it) => it.id === SEEDED_SUBMITTED_ID);
+      expect(seeded).toBeDefined();
+      expect(seeded!.flowStatus).not.toBe("receiving");
+      expect(
+        (seeded!.flowHistory as FlowHistoryEntry[]).some(
+          (h) => h.action === "submit" && h.from === "receiving",
+        ),
+      ).toBe(true);
+    });
 
-  it("flowStatus 直滤 + tenant 隔离", async () => {
-    const r = await listReceiptsDb({ flowStatus: "review", page: 1, pageSize: 1000 });
-    expect(r.total).toBeGreaterThanOrEqual(1);
-    for (const it of r.items) {
-      expect(it.flowStatus).toBe("review");
-      expect(it.tenantId).toBe(TENANT);
-    }
-  });
+    it("flowStatus 直滤 + tenant 隔离", async () => {
+      const r = await listReceiptsDb({ flowStatus: "review", page: 1, pageSize: 1000 });
+      expect(r.total).toBeGreaterThanOrEqual(1);
+      for (const it of r.items) {
+        expect(it.flowStatus).toBe("review");
+        expect(it.tenantId).toBe(TENANT);
+      }
+    });
 
-  // ———— actForStageDb（M03 7 阶段 stage-guard；2026-09-17 SSOT 清理后唯一流转写路径）————
+    // ———— actForStageDb（M03 7 阶段 stage-guard；2026-09-17 SSOT 清理后唯一流转写路径）————
 
-  it("actForStageDb: submit 前进一阶并 append history（返回裸数组）", async () => {
-    const res = await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
-    expect(res).toHaveLength(1);
-    const one = res[0]!;
-    expect(one.ok).toBe(true);
-    const after = await getReceiptDb(SEEDED_RECEIVING_ID);
-    expect(after!.flowStatus).toBe("task_assignment");
-    expect(after!.lastSubmittedBy).toBe("tester");
-    const hist = after!.flowHistory as FlowHistoryEntry[];
-    expect(hist[hist.length - 1]!.action).toBe("submit");
-    // 还原（return = 后退一阶，走所在阶段的 act 路径）
-    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
-  });
+    it("actForStageDb: submit 前进一阶并 append history（返回裸数组）", async () => {
+      const res = await actForStageDb(
+        "receiving",
+        [SEEDED_RECEIVING_ID],
+        "submit",
+        "tester",
+      );
+      expect(res).toHaveLength(1);
+      const one = res[0]!;
+      expect(one.ok).toBe(true);
+      const after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      expect(after!.flowStatus).toBe("task_assignment");
+      expect(after!.lastSubmittedBy).toBe("tester");
+      const hist = after!.flowHistory as FlowHistoryEntry[];
+      expect(hist[hist.length - 1]!.action).toBe("submit");
+      // 还原（return = 后退一阶，走所在阶段的 act 路径）
+      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+    });
 
-  it("stage 不匹配 / 不存在 → ok:false 单条失败不拖垮整批", async () => {
-    const res = await actForStageDb(
-      "review",
-      [SEEDED_RECEIVING_ID, "no-such-receipt-id"],
-      "submit",
-      "tester",
-    );
-    expect(res).toHaveLength(2);
-    const mismatch = res[0]!;
-    expect(mismatch.ok).toBe(false);
-    if (!mismatch.ok)
-      expect(mismatch.message).toContain("Stage mismatch: requires review but is receiving");
-    expect(res[1]).toMatchObject({ id: "no-such-receipt-id", ok: false });
-  });
+    it("stage 不匹配 / 不存在 → ok:false 单条失败不拖垮整批", async () => {
+      const res = await actForStageDb(
+        "review",
+        [SEEDED_RECEIVING_ID, "no-such-receipt-id"],
+        "submit",
+        "tester",
+      );
+      expect(res).toHaveLength(2);
+      const mismatch = res[0]!;
+      expect(mismatch.ok).toBe(false);
+      if (!mismatch.ok)
+        expect(mismatch.message).toContain(
+          "Stage mismatch: requires review but is receiving",
+        );
+      expect(res[1]).toMatchObject({ id: "no-such-receipt-id", ok: false });
+    });
 
-  it("return 不清空 lastSubmittedBy；withdraw 在 receiving = 自转移并清提交人", async () => {
-    // submit ×2 → receiving → data_entry（逐阶段走自己的 act 路径）
-    await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
-    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
-    let after = await getReceiptDb(SEEDED_RECEIVING_ID);
-    expect(after!.flowStatus).toBe("data_entry");
-    expect(after!.lastSubmittedBy).toBe("tester");
-    // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
-    const ret = await actForStageDb("data-entry", [SEEDED_RECEIVING_ID], "return", "reviewer", "材料不齐");
-    const r0 = ret[0]!;
-    expect(r0.ok).toBe(true);
-    if (r0.ok) expect(r0.flowStatus).toBe("task_assignment");
-    after = await getReceiptDb(SEEDED_RECEIVING_ID);
-    expect(after!.lastSubmittedBy).toBe("tester");
-    const hist = after!.flowHistory as FlowHistoryEntry[];
-    expect(hist[hist.length - 1]!.action).toBe("return");
-    // 回到 receiving 后 withdraw：自转移（原地不动）+ 清 lastSubmittedBy，还原数据
-    await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
-    const w = await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "withdraw", "tester");
-    expect(w[0]!.ok).toBe(true);
-    after = await getReceiptDb(SEEDED_RECEIVING_ID);
-    expect(after!.flowStatus).toBe("receiving");
-    expect(after!.lastSubmittedBy).toBeNull();
-  });
-});
+    it("return 不清空 lastSubmittedBy；withdraw 在 receiving = 自转移并清提交人", async () => {
+      // submit ×2 → receiving → data_entry（逐阶段走自己的 act 路径）
+      await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
+      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
+      let after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      expect(after!.flowStatus).toBe("data_entry");
+      expect(after!.lastSubmittedBy).toBe("tester");
+      // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
+      const ret = await actForStageDb(
+        "data-entry",
+        [SEEDED_RECEIVING_ID],
+        "return",
+        "reviewer",
+        "材料不齐",
+      );
+      const r0 = ret[0]!;
+      expect(r0.ok).toBe(true);
+      if (r0.ok) expect(r0.flowStatus).toBe("task_assignment");
+      after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      expect(after!.lastSubmittedBy).toBe("tester");
+      const hist = after!.flowHistory as FlowHistoryEntry[];
+      expect(hist[hist.length - 1]!.action).toBe("return");
+      // 回到 receiving 后 withdraw：自转移（原地不动）+ 清 lastSubmittedBy，还原数据
+      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+      const w = await actForStageDb(
+        "receiving",
+        [SEEDED_RECEIVING_ID],
+        "withdraw",
+        "tester",
+      );
+      expect(w[0]!.ok).toBe(true);
+      after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      expect(after!.flowStatus).toBe("receiving");
+      expect(after!.lastSubmittedBy).toBeNull();
+    });
+  },
+);

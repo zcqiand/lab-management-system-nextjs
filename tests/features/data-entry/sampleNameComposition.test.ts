@@ -32,45 +32,37 @@ describe("applyComposedSampleName（预览合成样品名称）", () => {
     },
   );
 
-  fnTest(
-    ["M03.F09.I03"],
-    "ext.sampleModel 优先于 sample.model（补录覆盖内建）",
-    () => {
-      const samples: Sample[] = [
-        {
-          id: "s1",
-          receiptId: "r1",
-          sampleCode: "S1",
-          sampleName: "建设用砂",
-          model: "中砂",
-          grade: "Ⅱ类",
-          ext: { sampleModel: "粗砂" },
-        } as unknown as Sample,
-      ];
-      const out = applyComposedSampleName(samples);
-      expect(out[0]!.sampleName).toBe("粗砂 Ⅱ类");
-    },
-  );
+  fnTest(["M03.F09.I03"], "ext.sampleModel 优先于 sample.model（补录覆盖内建）", () => {
+    const samples: Sample[] = [
+      {
+        id: "s1",
+        receiptId: "r1",
+        sampleCode: "S1",
+        sampleName: "建设用砂",
+        model: "中砂",
+        grade: "Ⅱ类",
+        ext: { sampleModel: "粗砂" },
+      } as unknown as Sample,
+    ];
+    const out = applyComposedSampleName(samples);
+    expect(out[0]!.sampleName).toBe("粗砂 Ⅱ类");
+  });
 
-  fnTest(
-    ["M03.F09.I03"],
-    "model/grade/brand 都有 → 合成三者空格连接",
-    () => {
-      const samples: Sample[] = [
-        {
-          id: "s1",
-          receiptId: "r1",
-          sampleCode: "S1",
-          model: "热轧带肋",
-          grade: "HRB400",
-          brand: "首钢",
-          ext: {},
-        } as unknown as Sample,
-      ];
-      const out = applyComposedSampleName(samples);
-      expect(out[0]!.sampleName).toBe("热轧带肋 HRB400 首钢");
-    },
-  );
+  fnTest(["M03.F09.I03"], "model/grade/brand 都有 → 合成三者空格连接", () => {
+    const samples: Sample[] = [
+      {
+        id: "s1",
+        receiptId: "r1",
+        sampleCode: "S1",
+        model: "热轧带肋",
+        grade: "HRB400",
+        brand: "首钢",
+        ext: {},
+      } as unknown as Sample,
+    ];
+    const out = applyComposedSampleName(samples);
+    expect(out[0]!.sampleName).toBe("热轧带肋 HRB400 首钢");
+  });
 
   fnTest(
     ["M03.F09.I03"],
@@ -90,24 +82,20 @@ describe("applyComposedSampleName（预览合成样品名称）", () => {
     },
   );
 
-  fnTest(
-    ["M03.F09.I03"],
-    "只填 grade → 合成只含 grade（model 空被 filter 掉）",
-    () => {
-      const samples: Sample[] = [
-        {
-          id: "s1",
-          receiptId: "r1",
-          sampleCode: "S1",
-          sampleName: "建设用砂",
-          grade: "Ⅱ类",
-          ext: {},
-        } as Sample,
-      ];
-      const out = applyComposedSampleName(samples);
-      expect(out[0]!.sampleName).toBe("Ⅱ类");
-    },
-  );
+  fnTest(["M03.F09.I03"], "只填 grade → 合成只含 grade（model 空被 filter 掉）", () => {
+    const samples: Sample[] = [
+      {
+        id: "s1",
+        receiptId: "r1",
+        sampleCode: "S1",
+        sampleName: "建设用砂",
+        grade: "Ⅱ类",
+        ext: {},
+      } as Sample,
+    ];
+    const out = applyComposedSampleName(samples);
+    expect(out[0]!.sampleName).toBe("Ⅱ类");
+  });
 
   fnTest(
     ["M03.F09.I03"],

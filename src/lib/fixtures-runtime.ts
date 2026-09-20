@@ -27,7 +27,9 @@ export function techReqArr(): FixtureRow[] {
 }
 
 export function calcMethodId(r: FixtureRow): string {
-  return String(r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`);
+  return String(
+    r["id"] ?? `cr-${r["inspectionObjectCode"]}-${r["inspectionParameterCode"]}`,
+  );
 }
 
 export function techReqId(r: FixtureRow): string {

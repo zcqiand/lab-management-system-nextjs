@@ -55,4 +55,3 @@ const ADR0019_TEST_ENV: Record<string, string> = {
 for (const [k, v] of Object.entries(ADR0019_TEST_ENV)) {
   if (process.env[k] === undefined) process.env[k] = v;
 }
-

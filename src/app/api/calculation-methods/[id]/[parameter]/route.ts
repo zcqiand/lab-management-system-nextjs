@@ -35,7 +35,9 @@ export async function PUT(
 ) {
   const row = findRow(params.id, params.parameter);
   if (!row) return notFound("CalculationMethod not found");
-  Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
+  Object.assign(row, (await req.json().catch(() => ({}))) as object, {
+    updatedAt: NOW(),
+  });
   return NextResponse.json({ ...row, id: calcMethodId(row) });
 }
 

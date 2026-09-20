@@ -4,7 +4,5 @@
 import ReportReviewPage from "@/features/reports/ReportReviewPage";
 
 export default function Page() {
-  return (
-      <ReportReviewPage />
-  );
+  return <ReportReviewPage />;
 }

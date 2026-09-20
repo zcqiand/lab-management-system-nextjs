@@ -1,92 +1,100 @@
-import { useEffect, useState } from 'react'
-import { useSampleStore, type SampleQuery } from '@/state/sampleStore'
-import { SampleFormModal, type SampleFormValues } from './SampleFormModal'
-import { ConfirmModal } from '@/components/ConfirmModal'
-import type { Sample } from '@/api/endpoints/model'
+import { useEffect, useState } from "react";
+import { useSampleStore, type SampleQuery } from "@/state/sampleStore";
+import { SampleFormModal, type SampleFormValues } from "./SampleFormModal";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import type { Sample } from "@/api/endpoints/model";
 
 /** 样品状态（原 @/types SampleStatus = string；UI 筛选值，后端无该过滤参数） */
-type SampleStatus = string
+type SampleStatus = string;
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 10;
 
 export function SampleList() {
-  const { list, total, loading, error, fetchSamples, createSample, updateSample, deleteSample } =
-    useSampleStore()
+  const {
+    list,
+    total,
+    loading,
+    error,
+    fetchSamples,
+    createSample,
+    updateSample,
+    deleteSample,
+  } = useSampleStore();
 
-  const [page, setPage] = useState(1)
-  const [keyword, setSearchKeyword] = useState('')
-  const [status, setStatus] = useState<SampleStatus | ''>('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-  const [editing, setEditing] = useState<Sample | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState<Sample | null>(null)
-  const [deleting, setDeleting] = useState(false)
+  const [page, setPage] = useState(1);
+  const [keyword, setSearchKeyword] = useState("");
+  const [status, setStatus] = useState<SampleStatus | "">("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [editing, setEditing] = useState<Sample | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Sample | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const buildQuery = (p: number): SampleQuery => ({
     page: p,
     pageSize: PAGE_SIZE,
     keyword: keyword || undefined,
-  })
+  });
 
   useEffect(() => {
-    fetchSamples(buildQuery(page))
+    fetchSamples(buildQuery(page));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [page]);
 
   const handleSearch = () => {
-    setPage(1)
-    fetchSamples(buildQuery(1))
-  }
+    setPage(1);
+    fetchSamples(buildQuery(1));
+  };
 
-  const handleStatusChange = (value: SampleStatus | '') => {
-    setStatus(value)
-    setPage(1)
+  const handleStatusChange = (value: SampleStatus | "") => {
+    setStatus(value);
+    setPage(1);
     // status 筛选是 UI 态：契约 SamplesListSamplesParams 无 status，
     // 后端 /api/samples 亦不过滤（旧实现传了也被忽略，行为不变）
-    fetchSamples(buildQuery(1))
-  }
+    fetchSamples(buildQuery(1));
+  };
 
   const openCreate = () => {
-    setFormMode('create')
-    setEditing(null)
-    setFormOpen(true)
-  }
+    setFormMode("create");
+    setEditing(null);
+    setFormOpen(true);
+  };
 
   const openEdit = (sample: Sample) => {
-    setFormMode('edit')
-    setEditing(sample)
-    setFormOpen(true)
-  }
+    setFormMode("edit");
+    setEditing(sample);
+    setFormOpen(true);
+  };
 
   const handleSubmit = async (values: SampleFormValues) => {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      if (formMode === 'create') {
-        await createSample(values as Parameters<typeof createSample>[0])
+      if (formMode === "create") {
+        await createSample(values as Parameters<typeof createSample>[0]);
       } else if (values.id) {
-        await updateSample(values.id, values as Parameters<typeof updateSample>[1])
+        await updateSample(values.id, values as Parameters<typeof updateSample>[1]);
       }
-      setFormOpen(false)
-      await fetchSamples(buildQuery(page))
+      setFormOpen(false);
+      await fetchSamples(buildQuery(page));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleting(true)
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await deleteSample(deleteTarget.id)
-      setDeleteTarget(null)
-      await fetchSamples(buildQuery(page))
+      await deleteSample(deleteTarget.id);
+      setDeleteTarget(null);
+      await fetchSamples(buildQuery(page));
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
-  }
+  };
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-4">
@@ -105,14 +113,14 @@ export function SampleList() {
           placeholder="搜索样品名称/编号"
           value={keyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           className="border rounded px-3 py-1.5 text-sm flex-1"
         />
         <label className="text-sm text-gray-600 flex items-center gap-1">
           状态筛选
           <select
             value={status}
-            onChange={(e) => handleStatusChange(e.target.value as SampleStatus | '')}
+            onChange={(e) => handleStatusChange(e.target.value as SampleStatus | "")}
             className="border rounded px-2 py-1.5 text-sm"
           >
             <option value="">全部</option>
@@ -165,12 +173,16 @@ export function SampleList() {
             {list.map((s) => (
               <tr key={s.id} className="border-t hover:bg-gray-50">
                 <td className="px-4 py-2">
-                  <div>{[s.model, s.specification, s.grade, s.brand].filter(Boolean).join(' / ') || '—'}</div>
+                  <div>
+                    {[s.model, s.specification, s.grade, s.brand]
+                      .filter(Boolean)
+                      .join(" / ") || "—"}
+                  </div>
                   <div className="text-xs text-gray-400">{s.sampleCode}</div>
                 </td>
-                <td className="px-4 py-2">{s.manufacturer ?? '—'}</td>
-                <td className="px-4 py-2">{s.structuralPart ?? '—'}</td>
-                <td className="px-4 py-2">{s.representQuantity ?? '—'}</td>
+                <td className="px-4 py-2">{s.manufacturer ?? "—"}</td>
+                <td className="px-4 py-2">{s.structuralPart ?? "—"}</td>
+                <td className="px-4 py-2">{s.representQuantity ?? "—"}</td>
                 <td className="px-4 py-2 text-right space-x-2">
                   <button
                     onClick={() => openEdit(s)}
@@ -226,14 +238,14 @@ export function SampleList() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="删除确认"
-        message={`确定删除样品「${deleteTarget?.sampleName ?? ''}」？此操作不可撤销。`}
+        message={`确定删除样品「${deleteTarget?.sampleName ?? ""}」？此操作不可撤销。`}
         confirmText="确认"
         loading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
-  )
+  );
 }
 
-export default SampleList
+export default SampleList;

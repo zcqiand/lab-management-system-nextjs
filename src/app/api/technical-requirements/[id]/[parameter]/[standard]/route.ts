@@ -13,7 +13,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { techReqArr, techReqId, type FixtureRow } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
 
-function findRow(objectCode: string, parameterCode: string, standardCode: string): FixtureRow | undefined {
+function findRow(
+  objectCode: string,
+  parameterCode: string,
+  standardCode: string,
+): FixtureRow | undefined {
   return techReqArr().find(
     (r) =>
       String(r["inspectionObjectCode"] ?? "") === objectCode &&
@@ -37,7 +41,9 @@ export async function PUT(
 ) {
   const row = findRow(params.id, params.parameter, params.standard);
   if (!row) return notFound("TechnicalRequirement not found");
-  Object.assign(row, (await req.json().catch(() => ({}))) as object, { updatedAt: NOW() });
+  Object.assign(row, (await req.json().catch(() => ({}))) as object, {
+    updatedAt: NOW(),
+  });
   return NextResponse.json({ ...row, id: techReqId(row) });
 }
 

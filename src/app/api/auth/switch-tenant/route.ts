@@ -12,9 +12,24 @@ import { LabJwtSigner } from "@/lib/auth/jwt";
 import { readLabConfig } from "@/lib/auth/factory";
 
 const DEMO_TENANTS = [
-  { tenantId: "TENANT-001", code: "city-lab", name: "市住建工程质量检测中心", roleIds: ["admin"] },
-  { tenantId: "TENANT-002", code: "district-lab", name: "区检测站", roleIds: ["technician"] },
-  { tenantId: "TENANT-003", code: "third-party", name: "第三方检测实验室", roleIds: ["viewer"] },
+  {
+    tenantId: "TENANT-001",
+    code: "city-lab",
+    name: "市住建工程质量检测中心",
+    roleIds: ["admin"],
+  },
+  {
+    tenantId: "TENANT-002",
+    code: "district-lab",
+    name: "区检测站",
+    roleIds: ["technician"],
+  },
+  {
+    tenantId: "TENANT-003",
+    code: "third-party",
+    name: "第三方检测实验室",
+    roleIds: ["viewer"],
+  },
 ];
 
 export async function POST(req: Request) {
@@ -35,7 +50,10 @@ export async function POST(req: Request) {
     );
   }
   if (!DEMO_TENANTS.some((t) => t.tenantId === tid)) {
-    return NextResponse.json({ code: "NOT_FOUND", message: "Tenant not found" }, { status: 404 });
+    return NextResponse.json(
+      { code: "NOT_FOUND", message: "Tenant not found" },
+      { status: 404 },
+    );
   }
   // 真 HS256（ADR-0019 禁 opaque mock token 兜底）：缺失密钥即 throw → 500 fail-fast。
   const labCfg = readLabConfig();

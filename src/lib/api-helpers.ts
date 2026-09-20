@@ -24,7 +24,12 @@ export const TENANT = "TENANT-001";
 
 export function pageOf<T>(items: T[], page = 1, pageSize = 20) {
   const start = (page - 1) * pageSize;
-  return { items: items.slice(start, start + pageSize), page, pageSize, total: items.length };
+  return {
+    items: items.slice(start, start + pageSize),
+    page,
+    pageSize,
+    total: items.length,
+  };
 }
 
 export function num(v: string | null, dflt: number): number {
@@ -99,7 +104,9 @@ export function wrapDict(rows: Row[], req: Request, junctions?: DictJunctions) {
         );
         allowed = next;
       }
-      items = allowed ? items.filter((r) => allowed!.has(String(r[selfCodeKey] ?? ""))) : items;
+      items = allowed
+        ? items.filter((r) => allowed!.has(String(r[selfCodeKey] ?? "")))
+        : items;
     }
   }
   const paged = pageOf(
@@ -201,10 +208,13 @@ export function applyFlowAction(
   action: FlowActionFull,
   operator: string,
   reason?: string,
-): { id: string; ok: true; flowStatus: string } | { id: string; ok: false; message: string } {
+):
+  | { id: string; ok: true; flowStatus: string }
+  | { id: string; ok: false; message: string } {
   const now = NOW();
   const idx = FLOW_ORDER_FULL.indexOf(r.flowStatus as FlowStatusFull);
-  if (idx < 0) return { id: r.id, ok: false, message: `Unknown flowStatus: ${r.flowStatus}` };
+  if (idx < 0)
+    return { id: r.id, ok: false, message: `Unknown flowStatus: ${r.flowStatus}` };
   const to = action === "submit" ? FLOW_ORDER_FULL[idx + 1] : FLOW_ORDER_FULL[idx - 1];
   if (!to) {
     return {

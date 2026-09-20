@@ -18,7 +18,10 @@ export function tenantIdFromBearer(authz: string | null): string | null {
   return bearerClaim(authz, (p) => p.tenant_id ?? null);
 }
 
-function bearerClaim(authz: string | null, pick: (payload: { sub?: string; tenant_id?: string }) => string | null): string | null {
+function bearerClaim(
+  authz: string | null,
+  pick: (payload: { sub?: string; tenant_id?: string }) => string | null,
+): string | null {
   if (!authz?.startsWith("Bearer ")) return null;
   const token = authz.slice(7);
   const parts = token.split(".");

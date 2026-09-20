@@ -1,7 +1,7 @@
 "use client";
 // REF 同名组件移植（无 API 调用，仅 registry 引用改 @/ 别名）。
-import { resolveParamInterfaceModel } from "@/features/data-entry/models/registry"
-import { buildPreviewProps, type PreviewInterfaceRow } from './previewSampleMock'
+import { resolveParamInterfaceModel } from "@/features/data-entry/models/registry";
+import { buildPreviewProps, type PreviewInterfaceRow } from "./previewSampleMock";
 
 /**
  * 参数界面预览弹窗（M06.F08.I06）：按行的 componentPath 渲染注册的录入卡组件，
@@ -11,11 +11,11 @@ export function ParamInterfacePreviewModal({
   row,
   onClose,
 }: {
-  row: PreviewInterfaceRow & { componentPath?: string }
-  onClose: () => void
+  row: PreviewInterfaceRow & { componentPath?: string };
+  onClose: () => void;
 }) {
-  const Model = resolveParamInterfaceModel(row.componentPath)
-  const props = buildPreviewProps(row)
+  const Model = resolveParamInterfaceModel(row.componentPath);
+  const props = buildPreviewProps(row);
   return (
     <div
       role="dialog"
@@ -27,8 +27,10 @@ export function ParamInterfacePreviewModal({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-5 space-y-3 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">
-            预览 — {row.name ?? '参数界面'}
-            <span className="ml-2 font-mono text-xs text-gray-500">{row.componentPath ?? 'default'}</span>
+            预览 — {row.name ?? "参数界面"}
+            <span className="ml-2 font-mono text-xs text-gray-500">
+              {row.componentPath ?? "default"}
+            </span>
           </h3>
           <button
             type="button"
@@ -56,7 +58,7 @@ export function ParamInterfacePreviewModal({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ParamInterfacePreviewModal
+export default ParamInterfacePreviewModal;

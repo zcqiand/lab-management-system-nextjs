@@ -4,7 +4,5 @@
 import InspectionCapabilityPage from "@/features/inspection-capability/InspectionCapabilityPage";
 
 export default function Page() {
-  return (
-      <InspectionCapabilityPage resource="specialties" />
-  );
+  return <InspectionCapabilityPage resource="specialties" />;
 }

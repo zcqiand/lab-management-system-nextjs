@@ -7,7 +7,9 @@ describe("pickTemplateUrl（模板 URL 直构 public/templates）", () => {
   fnTest(["M03.F09.I03"], "有种子的 RN 码 → 返回 /templates/<文件名> 非空 URL", () => {
     const url = pickTemplateUrl("RN-101");
     expect(url).toBeTruthy();
-    expect(url).toBe("/templates/101_%E6%B0%B4%E6%B3%A5%E6%A3%80%E6%B5%8B%E6%8A%A5%E5%91%8A.docx");
+    expect(url).toBe(
+      "/templates/101_%E6%B0%B4%E6%B3%A5%E6%A3%80%E6%B5%8B%E6%8A%A5%E5%91%8A.docx",
+    );
   });
 
   fnTest(

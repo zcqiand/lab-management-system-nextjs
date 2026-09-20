@@ -61,7 +61,11 @@ export interface SaasAuthClientConfig {
 }
 
 export interface SaasAuthClient {
-  authorize(redirectUri: string, scope: string, state: string): Promise<AuthorizeCodeResponse>;
+  authorize(
+    redirectUri: string,
+    scope: string,
+    state: string,
+  ): Promise<AuthorizeCodeResponse>;
   token(
     grantType: "authorization_code" | "refresh_token",
     code: string | null,
@@ -82,11 +86,17 @@ export class HttpSaasAuthClient implements SaasAuthClient {
     if (!cfg.baseUrl) throw new Error("HttpSaasAuthClient: baseUrl required");
     if (!cfg.clientId) throw new Error("HttpSaasAuthClient: clientId required");
     if (!cfg.clientSecret) throw new Error("HttpSaasAuthClient: clientSecret required");
-    if (!cfg.defaultTenantId) throw new Error("HttpSaasAuthClient: defaultTenantId required");
-    if (!cfg.callbacks.redirectUri) throw new Error("HttpSaasAuthClient: redirectUri required");
+    if (!cfg.defaultTenantId)
+      throw new Error("HttpSaasAuthClient: defaultTenantId required");
+    if (!cfg.callbacks.redirectUri)
+      throw new Error("HttpSaasAuthClient: redirectUri required");
   }
 
-  async authorize(redirectUri: string, scope: string, state: string): Promise<AuthorizeCodeResponse> {
+  async authorize(
+    redirectUri: string,
+    scope: string,
+    state: string,
+  ): Promise<AuthorizeCodeResponse> {
     const body = {
       clientId: this.cfg.clientId,
       redirectUri,
@@ -128,26 +138,26 @@ export class HttpSaasAuthClient implements SaasAuthClient {
         body: JSON.stringify(body),
       });
     } catch (e) {
-      throw new SaasAuthError(`saas connect failed: ${(e as Error).message}`, 502, "upstream");
+      throw new SaasAuthError(
+        `saas connect failed: ${(e as Error).message}`,
+        502,
+        "upstream",
+      );
     }
     if (!resp.ok) {
       const text = await resp.text().catch(() => "");
       const truncated = text.length > 200 ? text.slice(0, 200) + "..." : text;
       if (resp.status === 401) {
-        throw new SaasAuthError("saas 401 unauthorized_client", 401, "unauthorized_client");
-      }
-      if (resp.status >= 400 && resp.status < 500) {
         throw new SaasAuthError(
-          `saas ${resp.status} ${truncated}`,
-          400,
-          "invalid_grant",
+          "saas 401 unauthorized_client",
+          401,
+          "unauthorized_client",
         );
       }
-      throw new SaasAuthError(
-        `saas ${resp.status} ${truncated}`,
-        502,
-        "upstream",
-      );
+      if (resp.status >= 400 && resp.status < 500) {
+        throw new SaasAuthError(`saas ${resp.status} ${truncated}`, 400, "invalid_grant");
+      }
+      throw new SaasAuthError(`saas ${resp.status} ${truncated}`, 502, "upstream");
     }
     return resp.json();
   }
@@ -169,7 +179,11 @@ export class HttpSaasMeClient implements SaasMeClient {
       if (resp.status >= 500) {
         throw new SaasAuthError(`saas /me ${resp.status} ${truncated}`, 502, "upstream");
       }
-      throw new SaasAuthError(`saas /me ${resp.status} ${truncated}`, 400, "invalid_grant");
+      throw new SaasAuthError(
+        `saas /me ${resp.status} ${truncated}`,
+        400,
+        "invalid_grant",
+      );
     }
     return (await resp.json()) as SaasCurrentUser;
   }
@@ -183,9 +197,17 @@ export class HttpSaasMeClient implements SaasMeClient {
       const text = await resp.text().catch(() => "");
       const truncated = text.length > 200 ? text.slice(0, 200) + "..." : text;
       if (resp.status >= 500) {
-        throw new SaasAuthError(`saas /me/tenants ${resp.status} ${truncated}`, 502, "upstream");
+        throw new SaasAuthError(
+          `saas /me/tenants ${resp.status} ${truncated}`,
+          502,
+          "upstream",
+        );
       }
-      throw new SaasAuthError(`saas /me/tenants ${resp.status} ${truncated}`, 400, "invalid_grant");
+      throw new SaasAuthError(
+        `saas /me/tenants ${resp.status} ${truncated}`,
+        400,
+        "invalid_grant",
+      );
     }
     return (await resp.json()) as SaasTenantMembership[];
   }

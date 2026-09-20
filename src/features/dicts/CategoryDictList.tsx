@@ -151,7 +151,9 @@ export function CategoryDictList({
   const [deleteTarget, setDeleteTarget] = useState<DictItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
 
   useEffect(() => {
     inspectionDictionaryListObjects({ page: 1, pageSize: 200 })
@@ -245,7 +247,8 @@ export function CategoryDictList({
       setFormOpen(false);
       await fetchList();
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data
+        ?.message;
       setError(msg ?? "保存失败");
     } finally {
       setSaving(false);
@@ -260,7 +263,8 @@ export function CategoryDictList({
       setDeleteTarget(null);
       await fetchList();
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data
+        ?.message;
       setError(msg ?? "删除失败");
     } finally {
       setDeleting(false);
@@ -278,12 +282,11 @@ export function CategoryDictList({
     setList(next); // 立即反馈
     try {
       await Promise.all(
-        next.map((item, idx) =>
-          api.update(item.code, { sortOrder: (idx + 1) * 10 }),
-        ),
+        next.map((item, idx) => api.update(item.code, { sortOrder: (idx + 1) * 10 })),
       );
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data
+        ?.message;
       setError(msg ?? "排序保存失败");
       // 失败时回滚到服务端顺序
       await fetchList();
@@ -325,7 +328,9 @@ export function CategoryDictList({
           </div>
           <ul className="flex-1 overflow-y-auto min-h-0">
             {objects.length === 0 && (
-              <li className="px-3 py-4 text-sm text-gray-400 text-center">暂无检测项目</li>
+              <li className="px-3 py-4 text-sm text-gray-400 text-center">
+                暂无检测项目
+              </li>
             )}
             {objects.map((o) => {
               const active = o.code === selectedCode;
@@ -385,7 +390,10 @@ export function CategoryDictList({
                 items={list.map((i) => i.code)}
                 strategy={verticalListSortingStrategy}
               >
-                <ul data-testid={`${String(endpoint)}-list`} className="flex-1 overflow-y-auto">
+                <ul
+                  data-testid={`${String(endpoint)}-list`}
+                  className="flex-1 overflow-y-auto"
+                >
                   {list.map((item) => (
                     <SortableRow
                       key={item.code}
@@ -409,7 +417,9 @@ export function CategoryDictList({
         message={
           <div className="space-y-3 text-left text-sm">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">检测项目</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                检测项目
+              </label>
               <select
                 value={formObject}
                 onChange={(e) => setFormObject(e.target.value)}
@@ -474,9 +484,10 @@ function SortableRow({
   onEdit: (item: DictItem) => void;
   onDelete: (item: DictItem) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: item.code,
-  });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({
+      id: item.code,
+    });
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,

@@ -11,7 +11,9 @@ export async function GET(req: NextRequest) {
   const items =
     categoryCode === "ALL"
       ? sampleReceipts.filter((r) => r.tenantId === TENANT)
-      : sampleReceipts.filter((r) => r.tenantId === TENANT && r.categoryCode === categoryCode);
+      : sampleReceipts.filter(
+          (r) => r.tenantId === TENANT && r.categoryCode === categoryCode,
+        );
   return NextResponse.json({
     summaryName: `报告汇总（${categoryCode}）`,
     columns: [
