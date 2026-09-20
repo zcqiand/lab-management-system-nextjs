@@ -8,7 +8,7 @@ export const TENANT = "TENANT-001";
 // 「下划线+数字」（a_1b）与「连续下划线」（a__b）不对称——
 //   toCamel("a_1b") === "a1b"，而 toSnake("a1b") === "a1b"（回不去 a_1b）；
 //   toCamel("a__b") === "aB"，而 toSnake("a_b")  === "a_b"（再转一次才变 a__b 的逆不可达）。
-// 当前 25 张表列名实测零触发（全部常规 snake_case，无数字段/连续下划线），
+// 当前 24 张表列名实测零触发（全部常规 snake_case，无数字段/连续下划线），
 // 若未来 DDL 新增此类列名需同步升级这对转换器。
 
 export function toCamel(s: string): string {
@@ -34,7 +34,7 @@ export function dtoToRow(obj: Record<string, unknown>): Record<string, unknown> 
 // drizzle select 返回的行已是 camelCase 属性（generated/schema.ts 映射），但为
 // 统一形状（含 jsonb 直通），路由层统一走 rowToDto 兜底命名转换。
 
-// 常用别名表：seed 脚本与查询层共用。25 张表与 generated/schema.ts pgTable 导出一一对应。
+// 常用别名表：seed 脚本与查询层共用。24 张表与 src/db/schema.ts pgTable 导出一一对应。
 export const PG_TABLES = {
   contracts: "contracts",
   receipts: "sample_receipts",
@@ -60,5 +60,4 @@ export const PG_TABLES = {
   reportNameParameters: "inspection_report_name_parameters",
   paramInterfaces: "inspection_param_interfaces",
   paramInterfaceLinks: "inspection_param_interface_links",
-  auditEvents: "audit_events",
 } as const;

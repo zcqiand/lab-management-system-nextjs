@@ -4,7 +4,7 @@
 // ADR-0033 阶段一起 shared 的 DDL 真源是 src/db/schema.ts（Drizzle schema-first），
 // 物化产物为 ../lab-management-system-shared/drizzle/0000_target_ddl.sql——
 // 本测试把它灌进独立 schema `lab_smoke`（不碰 public，seed 数据不受影响），
-// 校验三点：SELECT 1 / 25 张表齐全 / tenant_id 列存在。
+// 校验三点：SELECT 1 / 24 张表齐全 / tenant_id 列存在。
 //
 // 跳过条件：DATABASE_URL 未设 / `npm install` 没装 pg 时。CI 实跑。
 //
@@ -40,8 +40,9 @@ try {
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const SMOKE_SCHEMA = "lab_smoke";
-// 与 shared tests/drizzle.replay.test.ts 的 EXPECTED_TABLES 一致（25 张业务表）
-const EXPECTED_TABLES = 25;
+// 与 shared tests/drizzle.replay.test.ts 的 EXPECTED_TABLES 一致（24 张业务表；
+// audit_events 表已全链清理，2026-09-20，5.65）
+const EXPECTED_TABLES = 24;
 
 describe("DB smoke (PG)", () => {
   if (!pgModule || !DATABASE_URL) {
@@ -104,7 +105,7 @@ describe("DB smoke (PG)", () => {
     expect(typeof pgModule!.Client).toBe("function");
   });
 
-  it("has the 25 target tables after applying shared target DDL", async () => {
+  it("has the 24 target tables after applying shared target DDL", async () => {
     if (!client) return;
     const { rows } = await client.query(
       `SELECT table_name FROM information_schema.tables WHERE table_schema = $1 ORDER BY table_name`,

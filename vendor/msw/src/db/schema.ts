@@ -1,27 +1,4 @@
-import { pgTable, index, text, serial, bigint, uniqueIndex, foreignKey, integer, boolean, jsonb, timestamp, primaryKey, pgEnum } from "drizzle-orm/pg-core"
-export const auditAction = pgEnum("audit_action", ['login', 'logout', 'create', 'update', 'delete', 'flow', 'export', 'other'])
-
-
-export const auditEvents = pgTable("audit_events", {
-	id: text().primaryKey().notNull(),
-	action: auditAction().notNull(),
-	operator: text().notNull(),
-	target: text().notNull(),
-	targetId: text("target_id"),
-	detail: text(),
-	ip: text(),
-	at: text().notNull(),
-	createdAt: text("created_at").default('').notNull(),
-	updatedAt: text("updated_at").default('').notNull(),
-	tenantId: text("tenant_id").default('').notNull(),
-}, (table) => {
-	return {
-		idxAuditEventsAt: index("idx_audit_events_at").using("btree", table.at.asc().nullsLast().op("text_ops")),
-		idxAuditEventsOperator: index("idx_audit_events_operator").using("btree", table.operator.asc().nullsLast().op("text_ops")),
-		idxAuditEventsTarget: index("idx_audit_events_target").using("btree", table.target.asc().nullsLast().op("text_ops"), table.targetId.asc().nullsLast().op("text_ops")),
-		idxAuditEventsTenant: index("idx_audit_events_tenant").using("btree", table.tenantId.asc().nullsLast().op("text_ops")),
-	}
-});
+import { pgTable, index, text, serial, bigint, uniqueIndex, foreignKey, integer, boolean, jsonb, timestamp, primaryKey } from "drizzle-orm/pg-core"
 
 export const drizzleMigrations = pgTable("__drizzle_migrations", {
 	id: serial().primaryKey().notNull(),

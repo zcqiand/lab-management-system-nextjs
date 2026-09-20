@@ -238,31 +238,6 @@ export interface TechnicalRequirement {
   updatedAt: string;
 }
 
-// === M01.F04/F05 — Audit ===
-export type AuditAction =
-  | "login"
-  | "logout"
-  | "create"
-  | "update"
-  | "delete"
-  | "flow"
-  | "export"
-  | "other";
-
-export interface AuditEvent {
-  id: string;
-  tenantId: string;
-  action: AuditAction;
-  operator: string;
-  target: string;
-  targetId?: string;
-  detail?: string;
-  ip?: string;
-  at: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // === M05.F01 — Summary ===
 export interface SummaryColumn {
   key: string;
