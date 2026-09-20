@@ -37,6 +37,9 @@ const ADR0019_TEST_ENV: Record<string, string> = {
   SAAS_TENANT_ID: "00000000-0000-0000-0000-000000000001",
   LAB_SAAS_SERVICE_USER: "alice",
   LAB_SAAS_SERVICE_PASSWORD: "dev123456",
+  // 5.37（5.33/5.37 家族对齐）：serviceLogin body 补 clientId（requireEnv），
+  // 缺 seed 则 menus 自愈/login 快照路径 serviceLogin 必 throw → 503 假红。
+  LAB_SAAS_SERVICE_CLIENT_ID: "lab-management",
   LAB_AUTH_DEV_PASSWORD: "dev123456",
   // readLabConfig fail-fast 组（factory.ts requireKey，等同 .env.test 值）：
   // vitest 不读 .env*，缺这些 seed 则 login/switch-tenant 路由测试全 500。

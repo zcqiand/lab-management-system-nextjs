@@ -40,6 +40,11 @@ const DEMO_TENANTS = [
 const SAAS_BASE_URL = () => requireEnv("SAAS_IDP_URL");
 const SERVICE_USER = () => requireEnv("LAB_SAAS_SERVICE_USER");
 const SERVICE_PASSWORD = () => requireEnv("LAB_SAAS_SERVICE_PASSWORD");
+// 5.37（对齐 5.33 springboot 379b6ee / aspnetcore 222db63）：saas LoginRequest
+// 契约 clientId 必填——缺了 saas 直接 400，serviceLogin warn 落空菜单快照。
+// 独立键（不复用 SAAS_OAUTH_CLIENT_ID），值形 = oauth_client code。
+// ADR-0019：缺失即 throw，禁兜底字面量。
+const SERVICE_CLIENT_ID = () => requireEnv("LAB_SAAS_SERVICE_CLIENT_ID");
 
 /** saas /api/v1/auth/login 密码登录（服务账号用），返回 accessToken。失败返回 null（调用方 warn 兜底）。
  *  2026-09-04 export：menus route miss 自愈复用本函数（同步阻塞重拉菜单快照）。 */
@@ -48,7 +53,11 @@ export async function serviceLogin(): Promise<string | null> {
     const resp = await fetch(`${SAAS_BASE_URL().replace(/\/$/, "")}/api/v1/auth/login`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username: SERVICE_USER(), password: SERVICE_PASSWORD() }),
+      body: JSON.stringify({
+        username: SERVICE_USER(),
+        password: SERVICE_PASSWORD(),
+        clientId: SERVICE_CLIENT_ID(),
+      }),
       cache: "no-store",
       signal: AbortSignal.timeout(10_000),
     });

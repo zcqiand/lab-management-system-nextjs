@@ -74,6 +74,8 @@ if [ ! -f "$BASE/lab.env" ]; then
     # v0.3.56 key 对齐(2026-08-28 线上漂移修复):显式字面量 = .env.production 契约值
     printf 'LAB_SAAS_SERVICE_USER=%s\n' "$LAB_SAAS_SERVICE_USER"
     printf 'LAB_SAAS_SERVICE_PASSWORD=%s\n' "$LAB_SAAS_SERVICE_PASSWORD"
+    # 5.37（5.33/5.37 家族对齐）：saas LoginRequest.clientId 契约必填，非 secret 字面量
+    printf 'LAB_SAAS_SERVICE_CLIENT_ID=lab-management\n'
     printf 'LAB_JWT_ISSUER=lab-management-system\n'
     printf 'LAB_JWT_TTL_SECONDS=3600\n'
     printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
@@ -136,6 +138,8 @@ if [ -f "$BASE/lab.env" ]; then
     append_if_missing LAB_SAAS_SERVICE_USER "$LAB_SAAS_SERVICE_USER"
     append_if_missing LAB_SAAS_SERVICE_PASSWORD "$LAB_SAAS_SERVICE_PASSWORD"
   fi
+  # 5.37（5.33/5.37 家族对齐）：saas LoginRequest.clientId 契约必填，非 secret 字面量
+  append_if_missing LAB_SAAS_SERVICE_CLIENT_ID 'lab-management'
   append_if_missing LAB_JWT_ISSUER 'lab-management-system'
   append_if_missing LAB_JWT_TTL_SECONDS '3600'
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
