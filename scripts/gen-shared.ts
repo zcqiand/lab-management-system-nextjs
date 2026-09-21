@@ -35,21 +35,29 @@ try {
     /* 首次写 */
   }
 
-  const now = new Date().toISOString();
-  marker["api_synced_sha"] = sharedSha;
-  marker["api_synced_at"] = now;
-  marker["api_synced_cmd"] = "gen-shared.ts";
-  // shared_sha 取最近一次同步：ISO-8601 UTC 时间戳字典序==时间序（5.21 修复，勿 sort sha）。
-  const entries: Array<[string, string]> = (["api_synced", "db_synced"] as const)
-    .map((k) => [String(marker[`${k}_at`] ?? ""), String(marker[`${k}_sha`] ?? "")] as [string, string])
-    .filter(([, sha]) => sha !== "");
-  marker["shared_sha"] = entries.length
-    ? entries.sort((a, b) => a[0].localeCompare(b[0])).pop()![1]
-    : sharedSha;
-  marker["consumer_repo"] = "lab-management-system-nextjs";
+  // 5.77（2026-09-21 人裁立项）：同 sha 零写入——api_synced_sha 与现存 marker 相同 →
+  // 整个 marker 文件零写入（时间戳/mtime 不动，字节级幂等）；sha 真变才全量写。
+  if (marker["api_synced_sha"] === sharedSha) {
+    console.log(
+      `[gen-shared]    ADR-0026 marker sha 未变，零写入（5.77 同 sha 不刷时间戳）: ${markerPath}`,
+    );
+  } else {
+    const now = new Date().toISOString();
+    marker["api_synced_sha"] = sharedSha;
+    marker["api_synced_at"] = now;
+    marker["api_synced_cmd"] = "gen-shared.ts";
+    // shared_sha 取最近一次同步：ISO-8601 UTC 时间戳字典序==时间序（5.21 修复，勿 sort sha）。
+    const entries: Array<[string, string]> = (["api_synced", "db_synced"] as const)
+      .map((k) => [String(marker[`${k}_at`] ?? ""), String(marker[`${k}_sha`] ?? "")] as [string, string])
+      .filter(([, sha]) => sha !== "");
+    marker["shared_sha"] = entries.length
+      ? entries.sort((a, b) => a[0].localeCompare(b[0])).pop()![1]
+      : sharedSha;
+    marker["consumer_repo"] = "lab-management-system-nextjs";
 
-  writeFileSync(markerPath, JSON.stringify(marker, null, 2) + "\n");
-  console.log(`[gen-shared]    ADR-0026 marker 已落盘: ${markerPath} (shared HEAD ${sharedSha.slice(0, 7)})`);
+    writeFileSync(markerPath, JSON.stringify(marker, null, 2) + "\n");
+    console.log(`[gen-shared]    ADR-0026 marker 已落盘: ${markerPath} (shared HEAD ${sharedSha.slice(0, 7)})`);
+  }
 } catch (err) {
   console.log(
     `[gen-shared]    WARN: 非 git 仓或 marker 写失败——跳过（staleness 将报 UNKNOWN）: ${err instanceof Error ? err.message : err}`,
