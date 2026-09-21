@@ -50,6 +50,10 @@ fi
 echo "[pull-schema] step 2/5 — move ${PULL_OUT_DIR}/schema.ts → ${SCHEMA_FILE}"
 mkdir -p "$(dirname "$SCHEMA_FILE")"
 mv "${PULL_OUT_DIR}/schema.ts" "${SCHEMA_FILE}"
+# 5.86: drizzle-kit 原始输出非 prettier 形态（5.73 起 schema.ts 受 L1 门）——内建格式化消 drift 门假红，regen 严格 byte-idempotent
+echo "[pull-schema] prettier --write ${SCHEMA_FILE}"
+npx --no -- prettier --write "${SCHEMA_FILE}"
+
 
 echo "[pull-schema] step 3/5 — fix pulled schema（.default(') / 未用 sql import）"
 node scripts/fix-pulled-schema.mjs
