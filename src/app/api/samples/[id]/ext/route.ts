@@ -8,12 +8,20 @@
 import { NextRequest } from "next/server";
 
 import { getSample } from "@lab/management-system-msw/fixtures";
-import { notFound, NOW } from "@/lib/api-helpers";
+import { badRequest, notFound, NOW } from "@/lib/api-helpers";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  // 5.89：schema 校验先于存在性（镜像 aspnetcore ModelState 最先、springboot IAE 在
+  // findById 前）——缺 ext 不该因 id 查不到被 404 掩盖。附带消除 dev 热载下 fixtures
+  // 模块实例分叉的时序脆弱（POST 路由与本地实例不共享时 404 不会吞掉 400 契约面）。
+  const body = (await req.json().catch(() => ({}))) as { ext?: Record<string, string> };
+  // 5.89（5.85 评审 MINOR-1）：契约 ext 必填（sample.tsp UpdateSampleExtRequest.ext 无 ?）。
+  // 原 `?? {}` 把缺 ext/坏 JSON 静默兜底成清空 ext 返 200——数据破坏面（lab-ct 缺 ext 断言锁定）。
+  if (body.ext === null || typeof body.ext !== "object" || Array.isArray(body.ext)) {
+    return badRequest("ext is required");
+  }
   const s = getSample(params.id);
   if (!s) return notFound("Sample not found");
-  const body = (await req.json().catch(() => ({}))) as { ext?: Record<string, string> };
-  Object.assign(s, { ext: body.ext ?? {}, updatedAt: NOW() });
+  Object.assign(s, { ext: body.ext, updatedAt: NOW() });
   return Response.json(s);
 }
