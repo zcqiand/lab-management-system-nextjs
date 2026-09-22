@@ -250,7 +250,8 @@ export default function LoginPage() {
             后端换 token
           </p>
           <p className="text-xs text-slate-400">
-            demo 后端：<span className="font-medium">{apiMode}</span> · saas 端口：3000
+            demo 后端：<span className="font-medium">{apiMode}</span> · saas 身份平台：
+            {process.env.NEXT_PUBLIC_SAAS_BASE_URL}
           </p>
           <div className="pt-2 border-t">
             <a href="/" className="text-blue-600 hover:underline text-xs">
