@@ -100,7 +100,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   data-testid="user-display-name"
                   data-fn="M00.F01.I01"
                 >
-                  {user?.displayName ?? user?.username ?? "…"}
+                  {/* || 而非 ??：saas 无显示名 → aspnetcore 落地 displayName=""，
+                      ?? 对空串不回退 → 顶栏空白（2026-09-23 回归锁 header-session.dom） */}
+                  {user?.displayName || user?.username || "…"}
                 </span>
                 {/* 租户切换（M00.F02.I01） */}
                 <TenantSwitcher />

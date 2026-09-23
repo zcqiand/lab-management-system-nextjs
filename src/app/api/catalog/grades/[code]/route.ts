@@ -11,9 +11,6 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
   return catalogPut(CATALOG_CFGS.grades, req, params.code);
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { code: string } },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { code: string } }) {
   return catalogDelete(CATALOG_CFGS.grades, req, params.code);
 }

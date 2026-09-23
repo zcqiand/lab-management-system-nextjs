@@ -116,7 +116,9 @@ describe("contracts 域 token 租户隔离（pg, lab_test）", { timeout: 90_000
     ).toBeNull();
     expect(await deleteContractDb(TENANT_DEMO, ID_SSO)).toBe(false);
     expect((await getContractDb(TENANT_SSO, ID_SSO))!.projectName).toBe("项目");
-    expect(await updateContractDb(TENANT_SSO, ID_SSO, { projectName: "改了" })).not.toBeNull();
+    expect(
+      await updateContractDb(TENANT_SSO, ID_SSO, { projectName: "改了" }),
+    ).not.toBeNull();
     expect(await deleteContractDb(TENANT_SSO, ID_SSO)).toBe(true);
   });
 });

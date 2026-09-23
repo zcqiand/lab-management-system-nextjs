@@ -225,7 +225,11 @@ describe(
     });
 
     it("flowStatus 直滤 + tenant 隔离", async () => {
-      const r = await listReceiptsDb(TENANT, { flowStatus: "review", page: 1, pageSize: 1000 });
+      const r = await listReceiptsDb(TENANT, {
+        flowStatus: "review",
+        page: 1,
+        pageSize: 1000,
+      });
       expect(r.total).toBeGreaterThanOrEqual(1);
       for (const it of r.items) {
         expect(it.flowStatus).toBe("review");
@@ -254,7 +258,8 @@ describe(
     // ———— actForStageDb（M03 7 阶段 stage-guard；2026-09-17 SSOT 清理后唯一流转写路径）————
 
     it("actForStageDb: submit 前进一阶并 append history（返回裸数组）", async () => {
-      const res = await actForStageDb(TENANT,
+      const res = await actForStageDb(
+        TENANT,
         "receiving",
         [SEEDED_RECEIVING_ID],
         "submit",
@@ -263,17 +268,18 @@ describe(
       expect(res).toHaveLength(1);
       const one = res[0]!;
       expect(one.ok).toBe(true);
-      const after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
+      const after = await getReceiptDb(TENANT, SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("task_assignment");
       expect(after!.lastSubmittedBy).toBe("tester");
       const hist = after!.flowHistory as FlowHistoryEntry[];
       expect(hist[hist.length - 1]!.action).toBe("submit");
       // 还原（return = 后退一阶，走所在阶段的 act 路径）
-      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+      await actForStageDb(TENANT, "assigning", [SEEDED_RECEIVING_ID], "return", "tester");
     });
 
     it("stage 不匹配 / 不存在 → ok:false 单条失败不拖垮整批", async () => {
-      const res = await actForStageDb(TENANT,
+      const res = await actForStageDb(
+        TENANT,
         "review",
         [SEEDED_RECEIVING_ID, "no-such-receipt-id"],
         "submit",
@@ -291,13 +297,14 @@ describe(
 
     it("return 不清空 lastSubmittedBy；withdraw 在 receiving = 自转移并清提交人", async () => {
       // submit ×2 → receiving → data_entry（逐阶段走自己的 act 路径）
-      await actForStageDb(TENANT,"receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
-      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
-      let after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
+      await actForStageDb(TENANT, "receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
+      await actForStageDb(TENANT, "assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
+      let after = await getReceiptDb(TENANT, SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("data_entry");
       expect(after!.lastSubmittedBy).toBe("tester");
       // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
-      const ret = await actForStageDb(TENANT,
+      const ret = await actForStageDb(
+        TENANT,
         "data-entry",
         [SEEDED_RECEIVING_ID],
         "return",
@@ -307,20 +314,21 @@ describe(
       const r0 = ret[0]!;
       expect(r0.ok).toBe(true);
       if (r0.ok) expect(r0.flowStatus).toBe("task_assignment");
-      after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
+      after = await getReceiptDb(TENANT, SEEDED_RECEIVING_ID);
       expect(after!.lastSubmittedBy).toBe("tester");
       const hist = after!.flowHistory as FlowHistoryEntry[];
       expect(hist[hist.length - 1]!.action).toBe("return");
       // 回到 receiving 后 withdraw：自转移（原地不动）+ 清 lastSubmittedBy，还原数据
-      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "return", "tester");
-      const w = await actForStageDb(TENANT,
+      await actForStageDb(TENANT, "assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+      const w = await actForStageDb(
+        TENANT,
         "receiving",
         [SEEDED_RECEIVING_ID],
         "withdraw",
         "tester",
       );
       expect(w[0]!.ok).toBe(true);
-      after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
+      after = await getReceiptDb(TENANT, SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("receiving");
       expect(after!.lastSubmittedBy).toBeNull();
     });

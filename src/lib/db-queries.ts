@@ -122,7 +122,10 @@ export async function listReceiptsDb(
 }
 
 /** 单条查询（tenant 隔离）。 */
-export async function getReceiptDb(tenantId: string, id: string): Promise<Row | undefined> {
+export async function getReceiptDb(
+  tenantId: string,
+  id: string,
+): Promise<Row | undefined> {
   const t = schema.sampleReceipts;
   const rows = await db
     .select()
@@ -981,13 +984,16 @@ export interface ListContractsQuery {
  *  case-insensitive contains，与 msw toLowerCase().includes() 同语义 → SQL ilike）。
  *  分页信封由路由层 pageOf 处理。2026-09-23 token 化：T11 落地时缺租户条件是
  *  「nextjs 显示 6 条重复」报障根因（SSO 数据面桥双世界全量返回）。 */
-export async function listContractsDb(tenantId: string, q: ListContractsQuery): Promise<Row[]> {
+export async function listContractsDb(
+  tenantId: string,
+  q: ListContractsQuery,
+): Promise<Row[]> {
   const t = schema.contracts;
   const conds = [eq(t.tenantId, tenantId)];
   if (q.status) conds.push(eq(t.status, q.status));
   if (q.keyword) {
     const like = `%${q.keyword}%`;
-    conds.push(or(ilike(t.contractCode, like), ilike(t.projectName, like)));
+    conds.push(or(ilike(t.contractCode, like), ilike(t.projectName, like))!);
   }
   const rows = conds.length
     ? await db

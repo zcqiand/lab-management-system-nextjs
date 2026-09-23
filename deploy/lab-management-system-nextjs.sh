@@ -71,6 +71,10 @@ if [ ! -f "$BASE/lab.env" ]; then
     # MSW 已删 (ADR-0012); 空串 = 同源走 lab-nextjs 自己的 /api/* Route Handler (连真 PG)
     printf 'NEXT_PUBLIC_API_BASE_URL=\n'
     printf 'NEXT_PUBLIC_API_MODE=nextjs\n'
+    # 2026-09-22 CORS 治本:src/middleware.ts 读白名单 CSV(镜像 springboot SecurityConfig;
+    # allowCredentials=true → 回显 origin 禁 *)。缺失 requireEnv throw(ADR-0019)。
+    # 值 = 家族 canonical prod 值(与 lab-aspnetcore/lab-springboot .env.production 同值)。
+    printf 'LAB_CORS_ALLOWED_ORIGINS=https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk\n'
     # v0.3.56 key 对齐(2026-08-28 线上漂移修复):显式字面量 = .env.production 契约值
     printf 'LAB_SAAS_SERVICE_USER=%s\n' "$LAB_SAAS_SERVICE_USER"
     printf 'LAB_SAAS_SERVICE_PASSWORD=%s\n' "$LAB_SAAS_SERVICE_PASSWORD"
@@ -129,6 +133,8 @@ if [ -f "$BASE/lab.env" ]; then
   }
   append_if_missing NEXT_PUBLIC_LAB_APP_CODE 'lab-management'
   append_if_missing NEXT_PUBLIC_API_MODE 'nextjs'
+  # 2026-09-22 CORS 治本:老 lab.env 补白名单(值 = bootstrap 块同值)
+  append_if_missing LAB_CORS_ALLOWED_ORIGINS 'https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk'
   # 服务账号是 secret 类:老文件已有则保留;没有则从 env 传入,fail-fast 不兜底
   if ! grep -q '^LAB_SAAS_SERVICE_USER=' "$BASE/lab.env"; then
     if [ -z "${LAB_SAAS_SERVICE_USER:-}" ] || [ -z "${LAB_SAAS_SERVICE_PASSWORD:-}" ]; then

@@ -255,7 +255,9 @@ export function ReceiptFormModal({
       witnessPhone: witnessPhone.trim() || undefined,
       inspector: inspector.trim() || undefined,
       inspectorPhone: inspectorPhone.trim() || undefined,
-      receivedBy: currentUser?.displayName ?? currentUser?.username ?? "",
+      // || 而非 ??：displayName 空串（saas 无显示名，aspnetcore SSO 落地如此）时
+      // 必须回退 username——?? 兜不住空串，会把 "" 写进收样单（2026-09-23）
+      receivedBy: currentUser?.displayName || currentUser?.username || "",
       sampleSource,
       testCategory,
       judgmentBasis: judgmentBasis.length > 0 ? judgmentBasis : undefined,

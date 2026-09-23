@@ -32,10 +32,7 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { code: string } },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { code: string } }) {
   const auth = requireTenant(req);
   if (auth instanceof NextResponse) return auth;
   try {

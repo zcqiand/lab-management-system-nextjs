@@ -1,6 +1,6 @@
 "use client";
 
-// `/` 操作页面：左 AppShell 拉 saas 菜单 + 右「Lab Operational Console」首页。
+// `/` 操作页面：左 AppShell 拉 saas 菜单 + 右「建筑工程实验室管理系统」首页。
 //
 // 守卫：未登录 → 跳 /login（SSO）。已登录 → AppShell。
 // 选中的菜单码通过 ?menu=<code> 反映到 URL，菜单点击只换 query 不换路径。
@@ -35,7 +35,7 @@ function Dashboard() {
   return (
     <div className="space-y-4 max-w-3xl">
       <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-1">Lab Operational Console</h2>
+        <h2 className="text-lg font-semibold mb-1">建筑工程实验室管理系统</h2>
         <p className="text-sm text-slate-500">
           lab-management-system-nextjs 是 lab 家族的 <strong>接线层</strong>： 提供
           SSO（委托 saas 身份平台）、菜单（来自 saas /me/menus 按{" "}

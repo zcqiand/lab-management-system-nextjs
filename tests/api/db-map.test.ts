@@ -28,13 +28,7 @@ describe("row↔DTO 映射", () => {
     });
   });
   it("db-queries re-export 通路：5 键齐备（TENANT 已随 token 化删除）", () => {
-    for (const k of [
-      "toCamel",
-      "toSnake",
-      "rowToDto",
-      "dtoToRow",
-      "PG_TABLES",
-    ]) {
+    for (const k of ["toCamel", "toSnake", "rowToDto", "dtoToRow", "PG_TABLES"]) {
       expect(dq).toHaveProperty(k);
     }
   });

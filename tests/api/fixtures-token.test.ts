@@ -42,14 +42,15 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
   it("samples GET：匿名 401；TENANT-001 token 见种子行；SSO token 空列表", async () => {
     const { GET } = await import("@/app/api/samples/route");
     expect((await GET(req(`${BASE}/samples`))).status).toBe(401);
-    const demo = (await (
-      await GET(req(`${BASE}/samples`, TOKEN_DEMO))
-    ).json()) as { items: Array<{ tenantId: string }>; total: number };
+    const demo = (await (await GET(req(`${BASE}/samples`, TOKEN_DEMO))).json()) as {
+      items: Array<{ tenantId: string }>;
+      total: number;
+    };
     expect(demo.total).toBeGreaterThan(0);
     expect(demo.items.every((s) => s.tenantId === "TENANT-001")).toBe(true);
-    const sso = (await (
-      await GET(req(`${BASE}/samples`, TOKEN_SSO))
-    ).json()) as { total: number };
+    const sso = (await (await GET(req(`${BASE}/samples`, TOKEN_SSO))).json()) as {
+      total: number;
+    };
     expect(sso.total).toBe(0);
   });
 
@@ -60,12 +61,10 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
       sampleCode: "TOKENIZED-SAMPLE",
       tenantId: "TENANT-EVIL",
     });
-    expect((await POST(req(`${BASE}/samples`, undefined, { method: "POST", body }))).status).toBe(
-      401,
-    );
-    const res = await POST(
-      req(`${BASE}/samples`, TOKEN_DEMO, { method: "POST", body }),
-    );
+    expect(
+      (await POST(req(`${BASE}/samples`, undefined, { method: "POST", body }))).status,
+    ).toBe(401);
+    const res = await POST(req(`${BASE}/samples`, TOKEN_DEMO, { method: "POST", body }));
     expect(res.status).toBe(201);
     const created = (await res.json()) as { id: string; tenantId: string };
     expect(created.tenantId).toBe("TENANT-001");
@@ -79,34 +78,47 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
     const { GET, PUT, DELETE } = await import("@/app/api/samples/[id]/route");
     const { samples } = await import("@lab/management-system-msw/fixtures");
     const anyId = String(samples[0]!.id);
-    expect((await GET(req(`${BASE}/samples/${anyId}`, TOKEN_SSO), {
-      params: { id: anyId },
-    } as never)).status).toBe(404);
     expect(
       (
-        await PUT(req(`${BASE}/samples/${anyId}`, TOKEN_SSO, {
-          method: "PUT",
-          body: JSON.stringify({ sampleCode: "hacked" }),
-        }), { params: { id: anyId } } as never)
+        await GET(req(`${BASE}/samples/${anyId}`, TOKEN_SSO), {
+          params: { id: anyId },
+        } as never)
       ).status,
     ).toBe(404);
     expect(
-      (await DELETE(req(`${BASE}/samples/${anyId}`, TOKEN_SSO), {
-        params: { id: anyId },
-      } as never)).status,
+      (
+        await PUT(
+          req(`${BASE}/samples/${anyId}`, TOKEN_SSO, {
+            method: "PUT",
+            body: JSON.stringify({ sampleCode: "hacked" }),
+          }),
+          { params: { id: anyId } } as never,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await DELETE(req(`${BASE}/samples/${anyId}`, TOKEN_SSO), {
+          params: { id: anyId },
+        } as never)
+      ).status,
     ).toBe(404);
     // 本租户 token 可见（fixtures 种子行未被破坏）
-    expect((await GET(req(`${BASE}/samples/${anyId}`, TOKEN_DEMO), {
-      params: { id: anyId },
-    } as never)).status).toBe(200);
+    expect(
+      (
+        await GET(req(`${BASE}/samples/${anyId}`, TOKEN_DEMO), {
+          params: { id: anyId },
+        } as never)
+      ).status,
+    ).toBe(200);
   });
 
   it("test-records GET：匿名 401；SSO token 空列表", async () => {
     const { GET } = await import("@/app/api/test-records/route");
     expect((await GET(req(`${BASE}/test-records`))).status).toBe(401);
-    const sso = (await (
-      await GET(req(`${BASE}/test-records`, TOKEN_SSO))
-    ).json()) as { total: number };
+    const sso = (await (await GET(req(`${BASE}/test-records`, TOKEN_SSO))).json()) as {
+      total: number;
+    };
     expect(sso.total).toBe(0);
   });
 
@@ -150,19 +162,22 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
       tenantId: "TENANT-EVIL",
     });
     expect(
-      (await POST(req(`${BASE}/technical-requirements`, undefined, { method: "POST", body })))
-        .status,
+      (
+        await POST(
+          req(`${BASE}/technical-requirements`, undefined, { method: "POST", body }),
+        )
+      ).status,
     ).toBe(401);
     const created = (await (
-      await POST(req(`${BASE}/technical-requirements`, TOKEN_SSO, { method: "POST", body }))
+      await POST(
+        req(`${BASE}/technical-requirements`, TOKEN_SSO, { method: "POST", body }),
+      )
     ).json()) as { tenantId: string };
     expect(created.tenantId).toBe("00000000-0000-0000-0000-000000000001");
     // 清理
     const { techReqArr } = await import("@/lib/fixtures-runtime");
     const arr = techReqArr();
-    const i = arr.findIndex(
-      (r) => String(r["inspectionObjectCode"]) === "OBJ-TOKEN",
-    );
+    const i = arr.findIndex((r) => String(r["inspectionObjectCode"]) === "OBJ-TOKEN");
     if (i >= 0) arr.splice(i, 1);
   });
 
@@ -173,16 +188,19 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
         await listGet(req(`${BASE}/technical-requirements`, TOKEN_DEMO))
       ).json()) as Array<Record<string, string>>
     )[0];
-    const { GET } = await import(
-      "@/app/api/technical-requirements/[id]/[parameter]/[standard]/route"
-    );
+    const { GET } =
+      await import("@/app/api/technical-requirements/[id]/[parameter]/[standard]/route");
     const params = {
       id: first!["inspectionObjectCode"],
       parameter: first!["inspectionParameterCode"],
       standard: first!["judgmentStandardCode"],
     };
-    expect((await GET(req(`${BASE}/tr-x`, TOKEN_SSO), { params } as never)).status).toBe(404);
-    expect((await GET(req(`${BASE}/tr-x`, TOKEN_DEMO), { params } as never)).status).toBe(200);
+    expect((await GET(req(`${BASE}/tr-x`, TOKEN_SSO), { params } as never)).status).toBe(
+      404,
+    );
+    expect((await GET(req(`${BASE}/tr-x`, TOKEN_DEMO), { params } as never)).status).toBe(
+      200,
+    );
   });
 
   // ———— 认证但全局域：只加 401 门 ————
@@ -192,7 +210,10 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
     expect((await cmGet(req(`${BASE}/calculation-methods`))).status).toBe(401);
     const { GET: piGet } = await import("@/app/api/param-interfaces/route");
     expect((await piGet(req(`${BASE}/param-interfaces`))).status).toBe(401);
-    const { GET: linkGet } = await import("@/app/api/inspection/links/object-parameter/route");
-    expect((await linkGet(req(`${BASE}/inspection/links/object-parameter`))).status).toBe(401);
+    const { GET: linkGet } =
+      await import("@/app/api/inspection/links/object-parameter/route");
+    expect((await linkGet(req(`${BASE}/inspection/links/object-parameter`))).status).toBe(
+      401,
+    );
   });
 });

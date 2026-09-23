@@ -72,7 +72,10 @@ export async function POST(req: NextRequest) {
     // tenantId 由 createReceiptDb 用 token claim 参数 stamp（ADR-0019，禁 body 传入）
   };
   try {
-    const created = (await createReceiptDb(auth.tenantId, newReceipt)) as Record<string, unknown>;
+    const created = (await createReceiptDb(auth.tenantId, newReceipt)) as Record<
+      string,
+      unknown
+    >;
     return NextResponse.json(created, { status: 201 });
   } catch (e) {
     if (isDbUnavailable(e)) return dbUnavailable();

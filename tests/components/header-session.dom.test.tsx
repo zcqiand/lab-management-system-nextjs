@@ -32,6 +32,22 @@ describe("M00 顶栏会话信息与租户切换", () => {
   );
 
   fnTest(
+    ["M00.F01.I01"],
+    "SSO 真后端 displayName 为空串时回退 username 渲染（空串回退回归锁）",
+    async () => {
+      // 2026-09-23 现场：saas sys_user 无显示名列 → /me 不带 displayName →
+      // aspnetcore SsoCallback Upsert 存 ""（且 FindByEmail 命中后不再更新）→
+      // 前端 ?? 对 "" 不触发回退 → 顶栏「租户旁用户名」渲染成空白。
+      // 链路必须用 ||（displayName 空串 → username → 占位），?? 只兜 null/undefined。
+      const shell = await readSrc("src/components/app/app-shell.tsx");
+      expect(shell).toMatch(/user\?\.displayName \|\| user\?\.username/);
+      // 同款写库陷阱：receivedBy 是收样单落库字段，空串会污染数据面
+      const modal = await readSrc("src/features/receipts/ReceiptFormModal.tsx");
+      expect(modal).toMatch(/currentUser\?\.displayName \|\| currentUser\?\.username/);
+    },
+  );
+
+  fnTest(
     ["M00.F02.I01"],
     "TenantSwitcher 挂 data-fn + 登出左侧渲染 + switchTenant 换 token",
     async () => {

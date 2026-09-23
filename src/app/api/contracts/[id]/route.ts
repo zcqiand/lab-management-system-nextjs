@@ -46,7 +46,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   try {
-    const c = await updateContractDb(auth.tenantId, params.id, { ...body, updatedAt: NOW() });
+    const c = await updateContractDb(auth.tenantId, params.id, {
+      ...body,
+      updatedAt: NOW(),
+    });
     if (!c) {
       return NextResponse.json(
         { code: "NOT_FOUND", message: "Contract not found" },
