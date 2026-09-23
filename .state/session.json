@@ -1,30 +1,36 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "2026-09-19 family-leftovers wave 收口（Task 6）：--all R1 db.smoke PG 超时判环境假红（R2/R3 两轮绿）；B 段 live 栈 5201 在用",
+  "current_task": "BFF 全域 token 化（Phase 1-5 落地，Phase 6/7 因 /handoff 截断挂起）；Plan C:/Users/Administrator/.claude/plans/binary-fluttering-perlis.md",
   "done": [
-    "docs/functions/function-tree.md 批次 1+2 落盘（编号错位收敛 + act-merge + M03.F05-F08.I03 双胞收敛 34 处）；中途大 CJK Write 散点损坏经 scratch 目标重合成修复，落盘 diff 逐字节为零",
-    "全仓悬空锚点迁移 30 文件 ~110 处（data-fn/@entry/测试 fn 数组/design+flow map）；contracts/page.tsx M02.F01.I05 锚点移到真删除按钮；含 `['M06.F02.I04','M06.F02.I05']`→`['M06.F01.I05']` 合并",
-    ".state/trace.json 再生成：488 tests / 98 fn ids / 废弃 ID 0 命中 / 新 ID 全在场",
-    "gate.py exit 0 全绿（L0-L5，205 条目引用完整，软告警 40 条为已知存量）",
-    "Task 6：db.smoke 假红定性（R2/R3 绿证据 gate-snapshots-r2/r3）"
+    "Phase 1（22fe4b0）：src/lib/auth/require-tenant.ts 401 短路 helper；6/6 vitest",
+    "Phase 2（185def7）：PG 域 25 路由 token 化 + db-queries 显式 tenantId 首参数化 + db-map.ts TENANT 常量删除；25/25 vitest 绿，全量 514/1",
+    "Phase 3（65f3516）：fixtures 域 21 路由 token 化 + api-helpers.ts TENANT 常量删除 + CreateContractBody Omits tenantId；9/9 fixtures-token 绿，全量 523/1",
+    "Phase 4（bd6f113）：fetchJson Bearer 头 + getToken helper；2/2 contracts-auth.dom 绿 + 4/4 contracts.crud.dom 绿，全量 526/1",
+    "Phase 5（4ae5922）：scripts/seed-db.ts catalog 4 表 -sso 镜像 + inspectionCalculationMethods 更名勘误 + audit_events PLAN 行删除 + SSO 数据面桥；npm run seed:db exit 0，22/22 表 OK，contracts 6 = 双租户各 3",
+    "style（500b77f）：prettier --write 治 L1 格式门；27 文件格式化 + 5 个未跟踪 leftover 误入（.state/inspect-fixtures.ts/2.ts、docs/adr/.gitkeep、src/middleware.ts、tests/api/cors-middleware.test.ts）",
+    "Ledger D:/qiand-life/1-projects/xr-code-suite/.superpowers/sdd/binary-fluttering-perlis/progress.md Tasks 1-5 complete + 4 Ruling + 2 备忘"
   ],
   "next": [
-    "无代码欠账；剩余项见 docs/superpowers/plans/2026-09-18-family-leftovers-remediation.md"
+    "撤销 500b77f 中 5 个未跟踪 leftover 入仓（重做 commit 只含格式化 Phase 1-4 文件），或保留并补独立 chore commit 标注 '未跟踪 leftover 应急收容'",
+    "Phase 6：output/lab-management-system-contract-test 加 probeAnonymous + tests/anonymous-401.test.ts（三目标 nextjs:5201/aspnetcore:5204/springboot:5205 跨 7 过滤 + 5 全局域代表路径 401）",
+    "Phase 7：gate --all（lab-nextjs 自身已绿）+ live trace（CONTRACT_TARGETS=nextjs,aspnetcore,springboot TRACE_MAP=1）+ 手动 SSO 冒烟（contracts 3 行 id='*-sso'）",
+    "Phase 7 完毕后剩余项登记 docs/superpowers/plans/2026-09-18-family-leftovers-remediation.md：/api/auth/permissions 静态无鉴权端点、bearer.ts 不验签、aspnetcore CatalogController dev-fallback 张力"
   ],
   "open_questions": [
-    "gate.py --all exit 2：saas family-env.json members 仍列 msw 但本地无 saas-identity-platform-msw 仓（lab-msw 同样本地不在）——删 member 还是建仓，需人裁",
-    "三仓批次 1+2 改动何时提交、按什么粒度分组"
+    "gate --all exit 2：lab-react L4 测试（344s 长跑红）、lab-springboot L4 测试（14s 快红）、lab-vue L5 引用完整性、saas-nextjs L1 格式（src/seeds/sys_role_menu.json）——均非本计划引入，按 CLAUDE.md '2 = 停下问人'。是否要先单独跑 lab-nextjs 自身 gate（已绿）再 commit/tag/push，把其它仓的失败另起 plan 处理？",
+    "user 指令 '/handoff完成后进行，对saas+lab 所有仓commit tag push' 与 gate 不绿相冲突：lab-react/springboot/vue/saas-nextjs 不应推。建议：仅推已 gate-绿的 _suite (无仓) + lab-management-system-{nextjs,aspnetcore,shared,contract-test}，其它先 commit 不 push 或暂停",
+    "500b77f style commit 误入的 5 个未跟踪文件是否要回滚（更干净）还是保留（节省一次 commit）"
   ],
   "dont": [
-    "大 CJK 密集表格禁单次 Write 直写 function-tree.md——先合成 scratch 目标，落盘后机器 diff 必须为空",
-    "隔离复跑部分测试文件时带 TRACE_MAP=1 会把 trace.json 覆盖成部分版——要隔离复跑先去掉 TRACE_MAP，或跑完全量再隔",
-    "到 PG VPS 链路丢包 10-40% 时真链路 dom 测试轮换假红——先 ping 100.79.128.25 看丢包，0% 窗口再跑 gate，别怀疑 selector",
-    "it() 标题禁写 Mxx.Fxx.Ixx 字面（fnReporter 误吸）",
-    "file: 依赖是拷贝——msw 侧改完必须 rm node_modules/@lab/management-system-msw + npm install",
-    "db.smoke 单轮 PG 超时先查 VPS RTT/丢包再动代码——R1 假红 R2/R3 即绿（Task 6 实证）"
+    "git add -A 慎用——会把 .state/inspect-fixtures.ts 等未跟踪 leftover 一起入仓（500b77f 教训）；commit 前先 git status --short 核对",
+    "seeder 第一次跑如果输出文件 0 字节 + 进程活着 + DB 无活跃查询 = '半死连接'（服务端已答、响应包丢失、客户端永等）。处理：Stop-Process -Force 清僵死 + 0% 丢包窗口内重跑（idempotent by design）",
+    "Phase 1-4 commit 没走 prettier --write → gate L1 格式门必挂；commit 前必跑 npx prettier --write --end-of-line auto src tests（endOfLine auto 必带，否则 LF/CRLF 漂移）",
+    "Phase 6 之前不要先跑 contract-test live（缺 401 探针会触发 401 自愈重登，全红误报）",
+    "Tailscale PG VPS 100.79.128.25 224ms RTT 下单次 listReceiptsDb 26s 冷启；pg test describe timeout 必须 30_000 → 90_000 否则 timeout 假红",
+    "previewSampleMock.ts:44 的 tenantId='TENANT-001' 是前端预览 mock 数据面（demo 数据标注自身租户），非身份判定/兜底——合法命中，不删"
   ],
   "active_branch": "master",
-  "last_session_at": "2026-09-19",
-  "last_session_summary": "无本批代码改动：R1 L4 db.smoke PG timeout 单轮红，R2/R3 同环境绿——轮换成立定环境假红（VPS RTT 抖动类）"
+  "last_session_at": "2026-09-23",
+  "last_session_summary": "BFF 全域 token 化 Phase 1-5 落地 + Phase 5 style 修 L1；ledger 5/7 task complete + 4 Ruling。Phase 6/7 待执行"
 }
