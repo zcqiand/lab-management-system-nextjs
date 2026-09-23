@@ -9,6 +9,7 @@ import {
   useQueryClient,
   type UseQueryOptions,
 } from "@tanstack/react-query";
+import { getToken } from "./backend-config";
 
 export type Contract = {
   id: string;
@@ -59,7 +60,18 @@ function toQuery(filters: ContractFilters): string {
 }
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, { cache: "no-store", ...init });
+  const token = getToken();
+  const res = await fetch(url, {
+    cache: "no-store",
+    ...init,
+    // BFF 全域 token 化（2026-09-23 P4）：无 token 时不带 Authorization 头，
+    // BFF 401 信封走 !res.ok 抛错路径（ADR-0019：身份缺失不兜底）。
+    // 合并在 init 之后：不覆盖调用方传入的 Content-Type 等
+    headers: {
+      ...(init?.headers as Record<string, string> | undefined),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
   if (!res.ok) {
     let body: unknown;
     try {

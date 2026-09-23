@@ -39,6 +39,17 @@ const BACKEND_LS_KEY = "lab.api.backend";
 // 切后端清 token 的逻辑在这层（见 setSelectedBackend），不能反向 import tsx。
 export const TOKEN_STORAGE_KEY = "lab.token";
 
+/** 当前存储的登录 token（无 / SSR / localStorage 不可用返回 null）。
+ * BFF 全域 token 化（2026-09-23 P4）：裸 fetch 的业务取数模块经此附带
+ * Authorization: Bearer（axios 链路走 legacy-client / http-client 拦截器）。 */
+export function getToken(): string | null {
+  try {
+    return globalThis.localStorage?.getItem(TOKEN_STORAGE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** 当前选中的后端 key（"" = 未选择，走 env 默认）。SSR/localStorage 不可用返回 ""。 */
 export function getSelectedBackend(): string {
   try {

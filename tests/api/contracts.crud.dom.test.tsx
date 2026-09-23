@@ -2,14 +2,15 @@
 //
 // 直接走 lab-msw 的 fixtures（同进程内 4-backend 切换共享同一份数组）；
 // POST 后立刻 GET 该 id 拿回，再 DELETE 验证 204 / 数组收缩。
+// BFF 全域 token 化（2026-09-23 P4）：body 不再带 tenantId（BFF 按 token
+// claim stamp）；附带锁 legacy-client 拦截器把 setToken 的值发成 Bearer 头。
 import { describe, expect } from "vitest";
-import { apiClient, API_ROUTES } from "@/api/legacy-client";
+import { apiClient, API_ROUTES, setToken } from "@/api/legacy-client";
 import { fnTest } from "../fn";
 
 const BASE = API_ROUTES["/contracts"]; // "/api/contracts"
 
 const NEW_BODY = {
-  tenantId: "TENANT-001",
   contractCode: "TEST-CRUD-001",
   clientUnit: "测试委托单位",
   projectName: "测试工程项目",
@@ -20,6 +21,30 @@ const NEW_BODY = {
 };
 
 describe("contracts CRUD (M02.F01.I02 / I05)", () => {
+  fnTest(
+    ["M02.F01.I02"],
+    "拦截器接线：setToken 后请求附带 Authorization: Bearer 头",
+    async () => {
+      // setup.dom afterEach resetHandlers——本用例内覆盖 + 捕获
+      const { server } = await import("../setup.dom");
+      const { http, HttpResponse } = await import("msw");
+      const seen: string[] = [];
+      server.use(
+        http.get("*/api/contracts", ({ request }) => {
+          seen.push(request.headers.get("authorization") ?? "");
+          return HttpResponse.json({ items: [], page: 1, pageSize: 20, total: 0 });
+        }),
+      );
+      setToken("crud-test-jwt");
+      try {
+        await apiClient.get(BASE);
+      } finally {
+        setToken(null);
+      }
+      expect(seen[0]).toBe("Bearer crud-test-jwt");
+    },
+  );
+
   fnTest(
     ["M02.F01.I02"],
     "新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
