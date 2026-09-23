@@ -352,6 +352,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::拦截器接线：setToken 后请求附带 Authorization: Bearer 头",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:111 (annot)"
