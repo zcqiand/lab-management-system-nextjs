@@ -9,10 +9,13 @@
 // 复合键路由读另一份 → PUT/DELETE 恒 404（live 四方实证）。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { calcMethodArr, calcMethodId } from "@/lib/fixtures-runtime";
 import { qp, NOW } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = qp(req);
   const obj = url.get("inspectionObjectCode");
   const param = url.get("inspectionParameterCode");
@@ -28,6 +31,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const entry = {
     createdAt: NOW(),
     updatedAt: NOW(),

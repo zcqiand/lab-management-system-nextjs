@@ -1,7 +1,8 @@
 // M06.F08 参数界面：GET/PUT/DELETE /api/param-interfaces/{code}（契约路径，REQ-2026-001；
 // PUT 为 PATCH 语义；DELETE 内置（isOfficial）不可删 400——REF 语义）
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { fixturesSingleton } from "@/lib/fixtures-runtime";
 
 const inspectionParamInterfaces = fixturesSingleton.inspectionParamInterfaces;
@@ -13,13 +14,17 @@ function findRow(code: string): Record<string, unknown> | undefined {
   );
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const row = findRow(params.code);
   if (!row) return notFound("InspectionParamInterface not found");
   return Response.json(row);
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { code: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const row = findRow(params.code);
   if (!row) return notFound("InspectionParamInterface not found");
   Object.assign(row, (await req.json().catch(() => ({}))) as object, {
@@ -29,9 +34,11 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { code: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
   const i = arr.findIndex((r) => r["code"] === params.code);
   if (i < 0) return notFound("参数界面不存在");

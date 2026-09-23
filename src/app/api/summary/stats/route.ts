@@ -13,9 +13,10 @@
 // 新增 M05.F01.I04 任务漏斗：
 //   funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued}
 
-import { NextResponse } from "next/server";
-import { sampleReceipts, samples, TENANT } from "@/lib/api-helpers";
+import { NextRequest, NextResponse } from "next/server";
+import { sampleReceipts, samples } from "@/lib/api-helpers";
 import { contracts, inspectionReportNames } from "@lab/management-system-msw/fixtures";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 // 材料类型映射：categoryCode → inspectionReportNames.summaryName → 关键词匹配
 const MATERIAL_KEYWORDS: Record<string, string[]> = {
@@ -41,10 +42,13 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // token 化（2026-09-23 P3）：按 token 租户过滤
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const todayStr = today();
   const rows = (sampleReceipts as unknown as Array<Record<string, unknown>>).filter(
-    (r) => r["tenantId"] === TENANT,
+    (r) => r["tenantId"] === auth.tenantId,
   );
   const byStatus = (s: string) => rows.filter((r) => r["flowStatus"] === s).length;
 

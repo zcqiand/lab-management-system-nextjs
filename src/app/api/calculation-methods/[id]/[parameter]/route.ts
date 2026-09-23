@@ -9,6 +9,7 @@
 // 数据源与 list / 单段 [id] 路由同源：fixtures-runtime 的 globalThis 单例。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { calcMethodArr, calcMethodId, type FixtureRow } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
 
@@ -21,9 +22,11 @@ function findRow(objectCode: string, parameterCode: string): FixtureRow | undefi
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string; parameter: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const row = findRow(params.id, params.parameter);
   if (!row) return notFound("CalculationMethod not found");
   return NextResponse.json({ ...row, id: calcMethodId(row) });
@@ -33,6 +36,8 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string; parameter: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const row = findRow(params.id, params.parameter);
   if (!row) return notFound("CalculationMethod not found");
   Object.assign(row, (await req.json().catch(() => ({}))) as object, {
@@ -42,9 +47,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string; parameter: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const arr = calcMethodArr();
   const i = arr.findIndex(
     (r) =>

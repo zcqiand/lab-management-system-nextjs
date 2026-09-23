@@ -20,7 +20,8 @@ import {
 
 export const NOW = () => new Date().toISOString();
 
-export const TENANT = "TENANT-001";
+// 原 TENANT = "TENANT-001" 常量已删（2026-09-23 BFF 全域 token 化）：租户一律由
+// requireTenant 从 Authorization Bearer JWT 的 tenant_id claim 解出（ADR-0019）。
 
 export function pageOf<T>(items: T[], page = 1, pageSize = 20) {
   const start = (page - 1) * pageSize;

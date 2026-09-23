@@ -228,9 +228,7 @@ function ContractsHeader({ onNew }: { onNew: () => void }) {
     <div className="mb-4 flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-semibold">合同管理</h1>
-        <p className="text-sm text-slate-500">
-          M02.F01 合同 CRUD 与工程信息维护（数据来自 lab-msw fixtures）
-        </p>
+        <p className="text-sm text-slate-500">M02.F01 合同 CRUD 与工程信息维护</p>
       </div>
       <Button onClick={onNew} data-fn="M02.F01.I02">
         新建合同
@@ -286,7 +284,7 @@ function StatusBadge({ status }: { status: "active" | "archived" }) {
   );
 }
 
-type ContractBody = Omit<Contract, "id" | "createdAt" | "updatedAt">;
+type ContractBody = Omit<Contract, "id" | "tenantId" | "createdAt" | "updatedAt">;
 
 function ContractFormBody({
   initial,
@@ -299,12 +297,8 @@ function ContractFormBody({
   error?: string;
   onSubmit: (body: ContractBody) => void;
 }) {
-  const [body, setBody] = useState<ContractBody>(
-    initial ?? {
-      ...EMPTY_BODY,
-      tenantId: "TENANT-001",
-    },
-  );
+  // tenantId 不进表单 body：BFF 按 token claim stamp（ADR-0019），body 传入值被忽略
+  const [body, setBody] = useState<ContractBody>(initial ?? EMPTY_BODY);
 
   function patch<K extends keyof ContractBody>(key: K, value: ContractBody[K]) {
     setBody((b) => ({ ...b, [key]: value }));

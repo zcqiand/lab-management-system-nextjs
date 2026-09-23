@@ -4,15 +4,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { sampleReceipts, contracts } from "@lab/management-system-msw/fixtures";
-import { samples, qp, TENANT } from "@/lib/api-helpers";
+import { samples, qp } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 export async function GET(req: NextRequest) {
+  // token 化（2026-09-23 P3）：按 token 租户过滤
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const categoryCode = qp(req).get("categoryCode") ?? "ALL";
   const items =
     categoryCode === "ALL"
-      ? sampleReceipts.filter((r) => r.tenantId === TENANT)
+      ? sampleReceipts.filter((r) => r.tenantId === auth.tenantId)
       : sampleReceipts.filter(
-          (r) => r.tenantId === TENANT && r.categoryCode === categoryCode,
+          (r) => r.tenantId === auth.tenantId && r.categoryCode === categoryCode,
         );
   return NextResponse.json({
     summaryName: `报告汇总（${categoryCode}）`,

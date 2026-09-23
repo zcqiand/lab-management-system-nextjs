@@ -6,12 +6,15 @@
 // DELETE → 204（@body 语义；query 兼容过渡期）
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { fixturesSingleton } from "@/lib/fixtures-runtime";
 
 const inspectionParamInterfaceLinks = fixturesSingleton.inspectionParamInterfaceLinks;
 import { pageOf, num, badRequest, NOW, qp, noContent } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = qp(req);
   const code = url.get("inspectionParameterCode");
   const pic = url.get("paramInterfaceCode");
@@ -26,6 +29,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   if (!body["inspectionParameterCode"] || !body["paramInterfaceCode"])
     return badRequest("inspectionParameterCode/paramInterfaceCode 必填");
@@ -51,6 +56,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   // 契约 unlink 是 @body；query 兼容过渡期（AssociationManager 双发）
   const arr = inspectionParamInterfaceLinks as unknown as Record<string, unknown>[];
   let parameterCode = "";

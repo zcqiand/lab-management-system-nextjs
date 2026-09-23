@@ -11,16 +11,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { techReqArr, techReqId } from "@/lib/fixtures-runtime";
 import { qp, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 export async function GET(req: NextRequest) {
+  // token 化（2026-09-23 P3）：fixtures 行自带 tenantId，按 token 租户过滤
+  // （SSO 世界不镜像 tech_req —— 三端 SSO 世界天然一致为空，计划已固化）
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = qp(req);
   const obj = url.get("inspectionObjectCode");
   const param = url.get("inspectionParameterCode");
   const std = url.get("judgmentStandardCode");
-  let items = techReqArr().map((r): Record<string, unknown> => ({
-    ...r,
-    id: techReqId(r),
-  }));
+  let items = techReqArr()
+    .filter((r) => r["tenantId"] === auth.tenantId)
+    .map((r): Record<string, unknown> => ({
+      ...r,
+      id: techReqId(r),
+    }));
   if (obj) items = items.filter((r) => r["inspectionObjectCode"] === obj);
   if (param) items = items.filter((r) => r["inspectionParameterCode"] === param);
   if (std) items = items.filter((r) => r["judgmentStandardCode"] === std);
@@ -28,10 +35,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // ADR-0019：租户 stamp 取 token claim，不信任 body.tenantId（放 ...body 后恒胜）
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const entry = {
     createdAt: NOW(),
     updatedAt: NOW(),
     ...((await req.json().catch(() => ({}))) as object),
+    tenantId: auth.tenantId,
   } as Record<string, unknown>;
   entry["id"] = techReqId(entry);
   techReqArr().push(entry);

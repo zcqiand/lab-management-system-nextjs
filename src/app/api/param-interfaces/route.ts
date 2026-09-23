@@ -7,12 +7,15 @@
 // 详情 GET/PUT/DELETE 走 /api/param-interfaces/[code]。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { fixturesSingleton } from "@/lib/fixtures-runtime";
 
 const inspectionParamInterfaces = fixturesSingleton.inspectionParamInterfaces;
 import { pageOf, num, NOW, qp } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = qp(req);
   const keyword = url.get("keyword")?.trim();
   let items = inspectionParamInterfaces as unknown as Record<string, unknown>[];
@@ -29,6 +32,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body["code"] ?? "").trim();
   if (!code || !body["componentPath"])

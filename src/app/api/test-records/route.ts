@@ -5,14 +5,18 @@
 
 import { NextResponse } from "next/server";
 import { testRecords, getTestRecord, samples } from "@lab/management-system-msw/fixtures";
-import { pageOf, qp, num, NOW, TENANT } from "@/lib/api-helpers";
+import { pageOf, qp, num, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 export async function GET(req: Request) {
   // @entry M03.F03.I08
+  // token 化（2026-09-23 P3）：fixtures 行自带 tenantId，按 token 租户过滤
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = qp(req);
   const sampleId = url.get("sampleId");
   const receiptId = url.get("receiptId");
-  let items = testRecords.filter((t) => t.tenantId === TENANT);
+  let items = testRecords.filter((t) => t.tenantId === auth.tenantId);
   if (sampleId) items = items.filter((t) => t.sampleId === sampleId);
   if (receiptId) {
     const sids = new Set(
@@ -27,6 +31,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   // @entry M03.F03.I09
+  // ADR-0019：租户 stamp 取 token claim，不信任 body.tenantId（放 ...body 后恒胜）
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const newRec = {
     id: `TR-${Date.now().toString(36)}`,
@@ -36,8 +43,8 @@ export async function POST(req: Request) {
     result: String(body.result ?? ""),
     createdAt: NOW(),
     updatedAt: NOW(),
-    tenantId: TENANT,
     ...body,
+    tenantId: auth.tenantId,
   };
   testRecords.push(newRec as never);
   return NextResponse.json(newRec, { status: 201 });

@@ -12,14 +12,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { techReqArr, techReqId, type FixtureRow } from "@/lib/fixtures-runtime";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 function findRow(
+  tenantId: string,
   objectCode: string,
   parameterCode: string,
   standardCode: string,
 ): FixtureRow | undefined {
   return techReqArr().find(
     (r) =>
+      r["tenantId"] === tenantId &&
       String(r["inspectionObjectCode"] ?? "") === objectCode &&
       String(r["inspectionParameterCode"] ?? "") === parameterCode &&
       String(r["judgmentStandardCode"] ?? "") === standardCode,
@@ -27,10 +30,13 @@ function findRow(
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string; parameter: string; standard: string } },
 ) {
-  const row = findRow(params.id, params.parameter, params.standard);
+  // token 化（2026-09-23 P3）：三元组匹配带租户，他租户 = 404 not-found 语义
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
+  const row = findRow(auth.tenantId, params.id, params.parameter, params.standard);
   if (!row) return notFound("TechnicalRequirement not found");
   return NextResponse.json({ ...row, id: techReqId(row) });
 }
@@ -39,21 +45,28 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string; parameter: string; standard: string } },
 ) {
-  const row = findRow(params.id, params.parameter, params.standard);
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
+  const row = findRow(auth.tenantId, params.id, params.parameter, params.standard);
   if (!row) return notFound("TechnicalRequirement not found");
   Object.assign(row, (await req.json().catch(() => ({}))) as object, {
     updatedAt: NOW(),
   });
+  // tenantId 归属不可被 body 改写
+  row["tenantId"] = auth.tenantId;
   return NextResponse.json({ ...row, id: techReqId(row) });
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string; parameter: string; standard: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const arr = techReqArr();
   const i = arr.findIndex(
     (r) =>
+      r["tenantId"] === auth.tenantId &&
       String(r["inspectionObjectCode"] ?? "") === params.id &&
       String(r["inspectionParameterCode"] ?? "") === params.parameter &&
       String(r["judgmentStandardCode"] ?? "") === params.standard,

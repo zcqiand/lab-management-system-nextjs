@@ -4,10 +4,24 @@
 // fixtures 是 lab-msw in-memory 数组：POST 后立刻 GET 断言可见，不留脏数据（测完 pop）。
 import { describe, expect } from "vitest";
 import { GET, POST } from "@/app/api/test-records/route";
+import { LabJwtSigner } from "@/lib/auth/jwt";
 import { fnTest } from "../fn";
 
+// BFF 全域 token 化（2026-09-23 P3）：路由按 Bearer tenant_id claim 过滤，
+// 直接调 handler 的测试自带 TENANT-001 token（fixtures 种子行所在世界）
+const signer = new LabJwtSigner(
+  "dev-key-32-bytes-minimum-length!",
+  "lab-management-system",
+  3600,
+  604800,
+);
+const AUTHZ = `Bearer ${signer.issue("USER-A", "TENANT-001")}`;
+
 function req(url: string, init?: RequestInit) {
-  return new Request(url, init);
+  return new Request(url, {
+    ...init,
+    headers: { authorization: AUTHZ, ...(init?.headers as Record<string, string>) },
+  });
 }
 
 describe("test-records API (M03.F03.I08 / I09)", () => {

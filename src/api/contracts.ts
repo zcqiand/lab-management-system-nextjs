@@ -94,7 +94,8 @@ export function useContract(id: string | null | undefined) {
   });
 }
 
-type CreateContractBody = Omit<Contract, "id" | "createdAt" | "updatedAt">;
+// tenantId 不收：BFF 按 token claim stamp（ADR-0019），body 传入值被忽略
+type CreateContractBody = Omit<Contract, "id" | "tenantId" | "createdAt" | "updatedAt">;
 type UpdateContractBody = Partial<
   Omit<Contract, "id" | "tenantId" | "createdAt" | "updatedAt">
 >;

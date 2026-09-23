@@ -5,12 +5,15 @@
 // aspnetcore/springboot 在 5.54 live 批补了实现，本仓漏网）。
 // 语义=整体替换 ext，镜像 aspnetcore SampleAndRecordService.UpdateExt 与 springboot
 // SampleService.updateExt（5.54 批对齐注记）。
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { getSample } from "@lab/management-system-msw/fixtures";
 import { badRequest, notFound, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   // 5.89：schema 校验先于存在性（镜像 aspnetcore ModelState 最先、springboot IAE 在
   // findById 前）——缺 ext 不该因 id 查不到被 404 掩盖。附带消除 dev 热载下 fixtures
   // 模块实例分叉的时序脆弱（POST 路由与本地实例不共享时 404 不会吞掉 400 契约面）。
@@ -21,7 +24,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     return badRequest("ext is required");
   }
   const s = getSample(params.id);
-  if (!s) return notFound("Sample not found");
+  // token 化：他租户样品 = 404 not-found 语义
+  if (!s || s.tenantId !== auth.tenantId) return notFound("Sample not found");
   Object.assign(s, { ext: body.ext, updatedAt: NOW() });
   return Response.json(s);
 }
