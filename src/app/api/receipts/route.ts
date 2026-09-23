@@ -11,7 +11,8 @@
 // operator = receivedBy 或 testOperator 等值。FK null 出库保持 null（不转回 ''）。
 
 import { NextRequest, NextResponse } from "next/server";
-import { qp, num, NOW, TENANT } from "@/lib/api-helpers";
+import { qp, num, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { listReceiptsDb, createReceiptDb, isDbUnavailable } from "@/lib/db-queries";
 
 function dbUnavailable() {
@@ -22,9 +23,11 @@ function dbUnavailable() {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const url = qp(req);
-    const data = await listReceiptsDb({
+    const data = await listReceiptsDb(auth.tenantId, {
       flowStatus: url.get("flowStatus") ?? undefined,
       contractId: url.get("contractId") ?? undefined,
       categoryCode: url.get("categoryCode") ?? undefined,
@@ -47,6 +50,8 @@ function newId() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const now = NOW();
   const newReceipt = {
@@ -64,10 +69,10 @@ export async function POST(req: NextRequest) {
     id: newId(),
     createdAt: now,
     updatedAt: now,
-    tenantId: TENANT,
+    // tenantId 由 createReceiptDb 用 token claim 参数 stamp（ADR-0019，禁 body 传入）
   };
   try {
-    const created = (await createReceiptDb(newReceipt)) as Record<string, unknown>;
+    const created = (await createReceiptDb(auth.tenantId, newReceipt)) as Record<string, unknown>;
     return NextResponse.json(created, { status: 201 });
   } catch (e) {
     if (isDbUnavailable(e)) return dbUnavailable();

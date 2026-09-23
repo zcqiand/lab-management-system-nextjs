@@ -1,8 +1,8 @@
 // src/lib/db-map.ts — row↔DTO 纯函数映射器（snake_case 列 ↔ camelCase 键）。
 // 纯函数、零 import：seed 脚本也要用，不能拖进 @/db 的 server-only 链。
 // db-queries.ts re-export 本文件；域查询函数后续任务追加在 db-queries.ts。
-
-export const TENANT = "TENANT-001";
+// （原 TENANT = "TENANT-001" 常量已删：BFF 全域 token 化后租户一律由
+//   requireTenant 从 Bearer claim 显式传参，ADR-0019 禁字面量兜底。）
 
 // 已知边界（carried ruling，Task 2 评审 Minor 1）：toCamel 与 toSnake 对
 // 「下划线+数字」（a_1b）与「连续下划线」（a__b）不对称——

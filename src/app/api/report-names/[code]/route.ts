@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { notFound, noContent, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   getReportNameDb,
   updateReportNameDb,
@@ -21,7 +22,9 @@ function dbUnavailable() {
   );
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const r = await getReportNameDb(params.code);
     if (!r) return notFound("ReportName not found");
@@ -33,6 +36,8 @@ export async function GET(_req: NextRequest, { params }: { params: { code: strin
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { code: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   try {
     const r = await updateReportNameDb(params.code, { ...body, updatedAt: NOW() });
@@ -45,9 +50,11 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { code: string } },
 ) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const ok = await deleteReportNameDb(params.code);
     if (!ok) return notFound("ReportName not found");

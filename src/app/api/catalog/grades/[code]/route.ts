@@ -1,7 +1,7 @@
 // M04.F08 等级维护：PUT/DELETE /api/catalog/grades/:code
 //
 // 数据源：lab_test.inspection_grades（src/lib/db-queries.ts CATALOG_CFGS；Batch1 接真库）。
-// fixture 版本无 tenant 过滤；DB 版本按 TENANT-001 隔离（种子行全部 TENANT-001，安全）。
+// token 化（2026-09-23）：DB 版本按 token 租户过滤（catalog-handlers requireTenant）。
 
 import { NextRequest } from "next/server";
 import { catalogPut, catalogDelete } from "@/lib/catalog-handlers";
@@ -12,8 +12,8 @@ export async function PUT(req: NextRequest, { params }: { params: { code: string
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { code: string } },
 ) {
-  return catalogDelete(CATALOG_CFGS.grades, params.code);
+  return catalogDelete(CATALOG_CFGS.grades, req, params.code);
 }

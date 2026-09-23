@@ -9,8 +9,8 @@
 // status / keyword 过滤 + 分页 + 必填 6 项 400；行读写下沉 db-queries.ts contracts 域。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { createContractDb, isDbUnavailable, listContractsDb } from "@/lib/db-queries";
-import { tenantIdFromBearer } from "@/lib/auth/bearer";
 
 const NOW = () => new Date().toISOString();
 
@@ -30,6 +30,10 @@ function newId() {
 }
 
 export async function GET(req: NextRequest) {
+  // token 化（2026-09-23）：此前 GET 无租户过滤，SSO 数据面桥双世界行全量返回
+  //（lab_dev 6 行 = 两租户各 3 条）——「nextjs 显示 6 条重复」报障根因
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const url = new URL(req.url);
   const status = url.searchParams.get("status");
   const keyword = url.searchParams.get("keyword") ?? "";
@@ -37,7 +41,7 @@ export async function GET(req: NextRequest) {
   const pageSize = Number(url.searchParams.get("pageSize") ?? 20);
 
   try {
-    const items = await listContractsDb({
+    const items = await listContractsDb(auth.tenantId, {
       status: status ?? undefined,
       keyword: keyword || undefined,
     });
@@ -54,20 +58,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-  // ADR-0019 + T11（2026-09-16）：租户身份取 token 的 tenant_id claim（与 aspnetcore
-  // HttpTenantContext / springboot currentTenant 同语义），不收 body.tenantId —— SSOT
-  // CreateContractRequest 无此字段，body 传入构成跨租户写风险。缺失 401，禁 demo 兜底。
-  const tenantId = tenantIdFromBearer(req.headers.get("authorization"));
-  if (!tenantId) {
-    return NextResponse.json(
-      { code: "UNAUTHORIZED", message: "tenant_id claim is required (ADR-0019)" },
-      { status: 401 },
-    );
-  }
+  // ADR-0019 + T11（2026-09-16）：租户身份取 token 的 tenant_id claim（requireTenant），
+  // 不收 body.tenantId —— createContractDb 以显式参数 stamp，body 传入值被忽略。
   const newContract = {
     id: newId(),
-    tenantId,
     contractCode: String(body.contractCode ?? ""),
     clientUnit: String(body.clientUnit ?? ""),
     projectName: String(body.projectName ?? ""),
@@ -107,7 +104,7 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
-    const row = await createContractDb(newContract);
+    const row = await createContractDb(auth.tenantId, newContract);
     // 响应行来自 PG returning：未填可空列是 null 不是 undefined —— 与
     // aspnetcore DTO 物化形状对齐（POST shape 四方比对，buildingUnit 等列）。
     return NextResponse.json(row, { status: 201 });

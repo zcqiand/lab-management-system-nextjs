@@ -6,6 +6,7 @@
 // db-queries.ts contracts 域）。404 / Object.assign 局部更新语义零改动。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   deleteContractDb,
   getContractDb,
@@ -22,9 +23,11 @@ function dbUnavailable() {
   );
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const c = await getContractDb(params.id);
+    const c = await getContractDb(auth.tenantId, params.id);
     if (!c) {
       return NextResponse.json(
         { code: "NOT_FOUND", message: "Contract not found" },
@@ -39,9 +42,11 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   try {
-    const c = await updateContractDb(params.id, { ...body, updatedAt: NOW() });
+    const c = await updateContractDb(auth.tenantId, params.id, { ...body, updatedAt: NOW() });
     if (!c) {
       return NextResponse.json(
         { code: "NOT_FOUND", message: "Contract not found" },
@@ -55,9 +60,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const ok = await deleteContractDb(params.id);
+    const ok = await deleteContractDb(auth.tenantId, params.id);
     if (!ok) {
       return NextResponse.json(
         { code: "NOT_FOUND", message: "Contract not found" },

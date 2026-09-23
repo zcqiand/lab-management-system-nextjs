@@ -6,9 +6,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { notFound } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { putReceiptDb, isDbUnavailable } from "@/lib/db-queries";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as {
     assigneeId?: string;
     assigneeName?: string;
@@ -19,7 +22,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if ("assigneeName" in body) patch.assigneeName = body.assigneeName;
   if ("plannedTestDate" in body) patch.plannedTestDate = body.plannedTestDate;
   try {
-    const r = await putReceiptDb(params.id, patch);
+    const r = await putReceiptDb(auth.tenantId, params.id, patch);
     if (!r) return notFound("Receipt not found");
     return Response.json(r);
   } catch (e) {

@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { notFound, noContent } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   getReceiptDb,
   putReceiptDb,
@@ -22,9 +23,11 @@ function dbUnavailable() {
   );
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const r = await getReceiptDb(params.id);
+    const r = await getReceiptDb(auth.tenantId, params.id);
     if (!r) return notFound("Receipt not found");
     return Response.json(r);
   } catch (e) {
@@ -34,9 +37,11 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   try {
-    const r = await putReceiptDb(params.id, body);
+    const r = await putReceiptDb(auth.tenantId, params.id, body);
     if (!r) return notFound("Receipt not found");
     return Response.json(r);
   } catch (e) {
@@ -45,9 +50,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const ok = await deleteReceiptDb(params.id);
+    const ok = await deleteReceiptDb(auth.tenantId, params.id);
     if (!ok) return notFound("Receipt not found");
     return noContent();
   } catch (e) {

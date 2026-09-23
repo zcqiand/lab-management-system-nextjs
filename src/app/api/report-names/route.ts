@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { wrapDict, badRequest, NOW } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   listReportNamesDb,
   getReportNameDb,
@@ -23,6 +24,9 @@ function dbUnavailable() {
 }
 
 export async function GET(req: NextRequest) {
+  // 表无租户列（与 aspnetcore 同为认证但全局域）——只加 401 门，不过滤
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     return wrapDict(await listReportNamesDb(), req);
   } catch (e) {
@@ -32,6 +36,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body.code ?? "");
   if (!code || !body.name) return badRequest("code/name 必填");

@@ -2,7 +2,7 @@
 // 语义真相源 = 各 route.ts 头部注释所引的 lab-msw handler 行为。
 // 映射器实现零 import 放在 db-map.ts（seed 脚本复用）；本文件 re-export，
 // 域查询函数（真正 import { db, schema } from "@/db"）追加在下方。
-export { TENANT, toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-map";
+export { toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-map";
 
 // ———— receipts 域（Task 4：三态流转 SQL + applyFlowActionDb 事务）————
 //
@@ -13,7 +13,11 @@ export { TENANT, toCamel, toSnake, rowToDto, dtoToRow, PG_TABLES } from "./db-ma
 import { and, asc, eq, ne, desc, inArray, or, ilike, sql as dsql } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db, schema } from "@/db";
-import { TENANT as TENANT_ID, rowToDto as toDto, toCamel } from "./db-map";
+import { rowToDto as toDto, toCamel } from "./db-map";
+
+// BFF 全域 token 化（2026-09-23）：租户身份不再由模块常量 TENANT-001 兜底，
+// 一律由路由层 requireTenant 从 Bearer tenant_id claim 解出后**显式传参**进来
+//（首参数，无缺省——可选缺省即兜底，ADR-0019 禁）。
 
 type Row = Record<string, unknown>;
 
@@ -42,14 +46,17 @@ export interface ListReceiptsQuery {
 }
 
 /** 列表查询（tenant 隔离 + 三态 filter + 精确过滤 + keyword + 分页）。 */
-export async function listReceiptsDb(q: ListReceiptsQuery): Promise<{
+export async function listReceiptsDb(
+  tenantId: string,
+  q: ListReceiptsQuery,
+): Promise<{
   items: Row[];
   page: number;
   pageSize: number;
   total: number;
 }> {
   const t = schema.sampleReceipts;
-  const conds = [eq(t.tenantId, TENANT_ID)];
+  const conds = [eq(t.tenantId, tenantId)];
   // 三态 filter（FlowStagePage）语义相对 flowStatus 环节（与 msw handler 同款）：
   //   not_yet   = 停在本环节待提交（无 flowStatus 时 = 无流转记录的新单）
   //   submitted = 已从本环节 submit 至下一环节（history 有 submit from 本环节且
@@ -115,12 +122,12 @@ export async function listReceiptsDb(q: ListReceiptsQuery): Promise<{
 }
 
 /** 单条查询（tenant 隔离）。 */
-export async function getReceiptDb(id: string): Promise<Row | undefined> {
+export async function getReceiptDb(tenantId: string, id: string): Promise<Row | undefined> {
   const t = schema.sampleReceipts;
   const rows = await db
     .select()
     .from(t)
-    .where(and(eq(t.id, id), eq(t.tenantId, TENANT_ID)))
+    .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
     .limit(1);
   return rows[0] ? receiptToDto(rows[0] as Row) : undefined;
 }
@@ -172,6 +179,7 @@ const ACT_STAGE_TO_STATUS: Record<string, FlowStatusFull> = {
 };
 
 export async function actForStageDb(
+  tenantId: string,
   stagePath: string,
   ids: string[],
   action: FlowActionFull,
@@ -182,12 +190,13 @@ export async function actForStageDb(
   if (!required) throw new Error(`Unknown act stage: ${stagePath}`);
   const results: FlowActionResult[] = [];
   for (const id of ids) {
-    results.push(await actOneForStage(id, required, action, operator, reason));
+    results.push(await actOneForStage(tenantId, id, required, action, operator, reason));
   }
   return results;
 }
 
 async function actOneForStage(
+  tenantId: string,
   id: string,
   required: FlowStatusFull,
   action: FlowActionFull,
@@ -200,7 +209,7 @@ async function actOneForStage(
     const rows = await tx
       .select()
       .from(t)
-      .where(and(eq(t.id, id), eq(t.tenantId, TENANT_ID)))
+      .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
       .for("update")
       .limit(1);
     const r = rows[0] as
@@ -278,7 +287,7 @@ async function actOneForStage(
         flowHistory: hist as never,
         updatedAt: now,
       })
-      .where(and(eq(t.id, id), eq(t.tenantId, TENANT_ID)))
+      .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
       .returning();
     const after = updated[0] as Row | undefined;
     return { id, ok: true as const, flowStatus: String(after?.flowStatus ?? to) };
@@ -291,9 +300,13 @@ async function actOneForStage(
  * jsonb（JS 数组直传，列 codec 自动 stringify）/ timestamp（string mode）由
  * drizzle 列映射处理。未知键静默丢弃（msw 版会带上，但 SQL 侧没有归宿）。
  */
-export async function putReceiptDb(id: string, body: Row): Promise<Row | undefined> {
+export async function putReceiptDb(
+  tenantId: string,
+  id: string,
+  body: Row,
+): Promise<Row | undefined> {
   const t = schema.sampleReceipts;
-  const existing = await getReceiptDb(id);
+  const existing = await getReceiptDb(tenantId, id);
   if (!existing) return undefined;
   const patch: Row = { updatedAt: new Date().toISOString() };
   for (const [k, v] of Object.entries(body)) {
@@ -304,17 +317,17 @@ export async function putReceiptDb(id: string, body: Row): Promise<Row | undefin
   const rows = await db
     .update(t)
     .set(patch as never)
-    .where(and(eq(t.id, id), eq(t.tenantId, TENANT_ID)))
+    .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
     .returning();
   return rows[0] ? receiptToDto(rows[0] as Row) : undefined;
 }
 
 /** DELETE（返回是否删了行；tenant 隔离）。 */
-export async function deleteReceiptDb(id: string): Promise<boolean> {
+export async function deleteReceiptDb(tenantId: string, id: string): Promise<boolean> {
   const t = schema.sampleReceipts;
   const deleted = await db
     .delete(t)
-    .where(and(eq(t.id, id), eq(t.tenantId, TENANT_ID)))
+    .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
     .returning({ id: t.id });
   return deleted.length > 0;
 }
@@ -324,10 +337,11 @@ export async function deleteReceiptDb(id: string): Promise<boolean> {
  * 列过滤到 schema 已知列（未知键静默丢弃，同 putReceiptDb）；必填列缺失或
  * FK 违反（contract_id / category_code restrict）由数据库抛错，路由层兜底。
  */
-export async function createReceiptDb(dto: Row): Promise<Row> {
+export async function createReceiptDb(tenantId: string, dto: Row): Promise<Row> {
   const t = schema.sampleReceipts;
-  const values: Row = {};
+  const values: Row = { tenantId };
   for (const [k, v] of Object.entries(dto)) {
+    if (k === "tenantId") continue;
     if (k in t) values[k] = v;
   }
   const rows = await db
@@ -390,8 +404,8 @@ export interface DictCfg {
   reverse: Record<string, DictReverseHop[]>;
   /** 聚合列（wrapDict junctions.aggregate；分页后逐行补列） */
   aggregate: DictAggregateCfg[];
-  /** tenant 列：catalog 4 表有 tenant_id；dict 4 表 schema 无此列（SSOT schema.ts），
-   * fixture 版本本就无 tenant 过滤，dict 侧保持全局可见（种子行全部 TENANT-001 域）。 */
+  /** tenant 列：catalog 4 表有 tenant_id（按 token 租户过滤）；dict 4 表 schema
+   * 无此列（SSOT schema.ts）——认证但全局域，传入 tenantId 被忽略。 */
   tenantCol?: PgColumn;
   /** 排序列：缺省按 code 单键。两键合一仍是全序（code 唯一）。 */
   sortCol?: PgColumn;
@@ -432,9 +446,9 @@ function reverseExists(hops: DictReverseHop[], selfCode: PgColumn) {
     where ${last.to} = ${selfCode})`;
 }
 
-function dictWhere(cfg: DictCfg, q: ListDictQuery) {
+function dictWhere(tenantId: string, cfg: DictCfg, q: ListDictQuery) {
   const conds = [];
-  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, tenantId));
   // keyword：wrapDict 是 JS includes（区分大小写的字面子串）——strpos 字面匹配
   // 精确同语义（不用 ilike：那是不区分大小写的增强，超出 wrapDict 契约）。
   if (q.keyword)
@@ -491,10 +505,11 @@ function dictRowToDto(row: Row, patchId: boolean): Row {
  * 不再确定（2026-09-18 react gate 牌号种子穿透用例实证）。
  */
 export async function listDictDb(
+  tenantId: string,
   cfg: DictCfg,
   q: ListDictQuery,
 ): Promise<{ items: Row[]; page: number; pageSize: number; total: number }> {
-  const where = dictWhere(cfg, q);
+  const where = dictWhere(tenantId, cfg, q);
   // count 先行：pageSize 缺省值 = total（wrapDict items.length || 1 同款）
   const counted = await db
     .select({ n: dsql<number>`count(*)::int` })
@@ -563,9 +578,13 @@ async function fillAggregates(cfg: DictCfg, items: Row[]) {
 }
 
 /** 单条查询（detail GET；wrapDict 不补 id —— 明细响应就是裸行）。 */
-export async function getDictDb(cfg: DictCfg, code: string): Promise<Row | undefined> {
+export async function getDictDb(
+  tenantId: string,
+  cfg: DictCfg,
+  code: string,
+): Promise<Row | undefined> {
   const conds = [eq(cfg.code, code)];
-  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, tenantId));
   const rows = (await db
     .select()
     .from(cfg.table)
@@ -582,16 +601,20 @@ export type CreateDictResult = { ok: true; row: Row } | { ok: false; message: st
  * 列过滤到 schema 已知列（未知键静默丢弃）；tenant 表强制 TENANT_ID
  * （否则 tenant 过滤的 GET 永远看不见新行）。
  */
-export async function createDictDb(cfg: DictCfg, body: Row): Promise<CreateDictResult> {
+export async function createDictDb(
+  tenantId: string,
+  cfg: DictCfg,
+  body: Row,
+): Promise<CreateDictResult> {
   const code = String(body.code ?? "");
-  if (await getDictDb(cfg, code)) return { ok: false, message: cfg.dupMessage };
+  if (await getDictDb(tenantId, cfg, code)) return { ok: false, message: cfg.dupMessage };
   const values: Row = {};
   for (const [k, v] of Object.entries(body)) {
     if (k in cfg.table) values[k] = v;
   }
   // code 以后处理兜底（body 可能缺 code 键——route 侧已保证非空）
   values.code = code;
-  if (cfg.tenantCol) values.tenantId = TENANT_ID;
+  if (cfg.tenantCol) values.tenantId = tenantId;
   const rows = (await db
     .insert(cfg.table)
     .values(values as never)
@@ -604,11 +627,12 @@ export async function createDictDb(cfg: DictCfg, body: Row): Promise<CreateDictR
  * body 键覆盖 + code/tenantId 不可改 + updatedAt 重写；未知键无列归宿静默丢弃）。
  */
 export async function putDictDb(
+  tenantId: string,
   cfg: DictCfg,
   code: string,
   body: Row,
 ): Promise<Row | undefined> {
-  const existing = await getDictDb(cfg, code);
+  const existing = await getDictDb(tenantId, cfg, code);
   if (!existing) return undefined;
   const patch: Row = { updatedAt: new Date().toISOString() };
   for (const [k, v] of Object.entries(body)) {
@@ -617,7 +641,7 @@ export async function putDictDb(
     patch[k] = v;
   }
   const conds = [eq(cfg.code, code)];
-  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, tenantId));
   const rows = (await db
     .update(cfg.table)
     .set(patch as never)
@@ -627,9 +651,13 @@ export async function putDictDb(
 }
 
 /** DELETE（返回是否删了行；tenant 隔离[若有列]）。 */
-export async function deleteDictDb(cfg: DictCfg, code: string): Promise<boolean> {
+export async function deleteDictDb(
+  tenantId: string,
+  cfg: DictCfg,
+  code: string,
+): Promise<boolean> {
   const conds = [eq(cfg.code, code)];
-  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, TENANT_ID));
+  if (cfg.tenantCol) conds.push(eq(cfg.tenantCol, tenantId));
   const deleted = await db
     .delete(cfg.table)
     .where(and(...conds))
@@ -949,11 +977,13 @@ export interface ListContractsQuery {
   keyword?: string;
 }
 
-/** 列表（status / keyword 过滤；keyword 对 contractCode/projectName 做 case-insensitive contains，
- *  与 msw toLowerCase().includes() 同语义 → SQL ilike）。分页信封由路由层 pageOf 处理。 */
-export async function listContractsDb(q: ListContractsQuery): Promise<Row[]> {
+/** 列表（token 租户过滤 + status / keyword 过滤；keyword 对 contractCode/projectName 做
+ *  case-insensitive contains，与 msw toLowerCase().includes() 同语义 → SQL ilike）。
+ *  分页信封由路由层 pageOf 处理。2026-09-23 token 化：T11 落地时缺租户条件是
+ *  「nextjs 显示 6 条重复」报障根因（SSO 数据面桥双世界全量返回）。 */
+export async function listContractsDb(tenantId: string, q: ListContractsQuery): Promise<Row[]> {
   const t = schema.contracts;
-  const conds = [];
+  const conds = [eq(t.tenantId, tenantId)];
   if (q.status) conds.push(eq(t.status, q.status));
   if (q.keyword) {
     const like = `%${q.keyword}%`;
@@ -968,19 +998,20 @@ export async function listContractsDb(q: ListContractsQuery): Promise<Row[]> {
   return rows as Row[];
 }
 
-export async function getContractDb(id: string): Promise<Row | null> {
+export async function getContractDb(tenantId: string, id: string): Promise<Row | null> {
   const rows = await db
     .select()
     .from(schema.contracts)
-    .where(eq(schema.contracts.id, id));
+    .where(and(eq(schema.contracts.id, id), eq(schema.contracts.tenantId, tenantId)));
   return (rows[0] as Row) ?? null;
 }
 
 /** POST：白名单列 + 路由层已校验的必填 6 项；同租户 contractCode 撞
  *  idx_contracts_tenant_code 唯一索引时 PG 23505 向上抛（路由层转 400）。 */
-export async function createContractDb(dto: Row): Promise<Row> {
+export async function createContractDb(tenantId: string, dto: Row): Promise<Row> {
   const t = schema.contracts;
-  const values: Row = { id: dto.id, tenantId: dto.tenantId };
+  // tenantId 以显式参数为准（不信 dto 携带值——写路径身份必须来自 token，ADR-0019）
+  const values: Row = { id: dto.id, tenantId };
   for (const k of CONTRACT_COLUMNS) {
     if (k in dto && dto[k] !== undefined) values[k] = dto[k];
   }
@@ -994,21 +1025,29 @@ export async function createContractDb(dto: Row): Promise<Row> {
 }
 
 /** PUT 语义 = msw Object.assign：只覆盖 body 给出的字段（白名单内），id/tenantId 不动。 */
-export async function updateContractDb(id: string, patch: Row): Promise<Row | null> {
+export async function updateContractDb(
+  tenantId: string,
+  id: string,
+  patch: Row,
+): Promise<Row | null> {
   const t = schema.contracts;
   const sets: Row = {};
   for (const k of CONTRACT_COLUMNS) {
     if (k in patch && patch[k] !== undefined) sets[k] = patch[k];
   }
   sets.updatedAt = String(patch.updatedAt ?? "");
-  const rows = await db.update(t).set(sets).where(eq(t.id, id)).returning();
+  const rows = await db
+    .update(t)
+    .set(sets)
+    .where(and(eq(t.id, id), eq(t.tenantId, tenantId)))
+    .returning();
   return (rows[0] as Row) ?? null;
 }
 
-export async function deleteContractDb(id: string): Promise<boolean> {
+export async function deleteContractDb(tenantId: string, id: string): Promise<boolean> {
   const rows = await db
     .delete(schema.contracts)
-    .where(eq(schema.contracts.id, id))
+    .where(and(eq(schema.contracts.id, id), eq(schema.contracts.tenantId, tenantId)))
     .returning();
   return rows.length > 0;
 }

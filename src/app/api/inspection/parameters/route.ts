@@ -6,9 +6,10 @@
 //
 // 数据源：lab_test.inspection_parameters（src/lib/db-queries.ts DICT_CFGS；Batch1 接真库）。
 // fixture 版本无 tenant 过滤；inspection_parameters schema 无 tenant_id 列（SSOT），
-// dict 侧保持全局可见（与 fixture 版等价；种子行全部 TENANT-001 域）。
+// dict 表无租户列——认证但全局域（只加 401 门，不过滤，ADR-0019 语义对齐）。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { badRequest, num, qp, NOW } from "@/lib/api-helpers";
 import { DICT_CFGS, createDictDb, isDbUnavailable, listDictDb } from "@/lib/db-queries";
 
@@ -20,10 +21,13 @@ function dbUnavailable() {
 }
 
 export async function GET(req: NextRequest) {
+  // dict 4 表 schema 无租户列 = 认证但全局（aspnetcore DictionaryController 同语义）；token 化只加 401 门
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const url = qp(req);
     return NextResponse.json(
-      await listDictDb(DICT_CFGS.parameters, {
+      await listDictDb(auth.tenantId, DICT_CFGS.parameters, {
         keyword: url.get("keyword") ?? "",
         direct: {
           inspectionSpecialtyCode: url.get("inspectionSpecialtyCode") ?? "",
@@ -41,12 +45,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body.code ?? "");
   if (!code || !body.name) return badRequest("code/name 必填");
   const row = { createdAt: NOW(), updatedAt: NOW(), ...body };
   try {
-    const res = await createDictDb(DICT_CFGS.parameters, row);
+    const res = await createDictDb(auth.tenantId, DICT_CFGS.parameters, row);
     if (!res.ok) return badRequest(res.message);
     return NextResponse.json(res.row, { status: 201 });
   } catch (e) {

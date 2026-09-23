@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { wrapLinks, noContent } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   listReportNameLinksDb,
   createReportNameLinkDb,
@@ -22,6 +23,8 @@ function dbUnavailable() {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     return wrapLinks(await listReportNameLinksDb("parameter"), req, {
       reportNameCode: "reportNameCode",
@@ -34,6 +37,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = await req.json().catch(() => null);
   try {
     if (body) await createReportNameLinkDb("parameter", body as Record<string, unknown>);
@@ -45,6 +50,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     await deleteReportNameLinkDb("parameter", req.nextUrl.searchParams);
     return noContent();

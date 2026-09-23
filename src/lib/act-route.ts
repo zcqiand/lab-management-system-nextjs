@@ -6,6 +6,7 @@
 // db-queries.ts actForStageDb（对齐 springboot/aspnetcore）。
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { actForStageDb, isDbUnavailable } from "@/lib/db-queries";
 
 const ACTIONS = ["submit", "return", "withdraw"] as const;
@@ -44,8 +45,13 @@ export async function handleActRequest(
       { status: 400 },
     );
   }
+  // token 化（2026-09-23）：流转写路径同样按 token 租户隔离（select for update
+  // 的 where 条件带 tenant_id，他租户单据 = not found 语义）
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const results = await actForStageDb(
+      auth.tenantId,
       stagePath,
       body.ids as string[],
       body.action as Action,

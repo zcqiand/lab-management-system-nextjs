@@ -4,11 +4,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { notFound } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import { getReceiptDb, isDbUnavailable } from "@/lib/db-queries";
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const r = await getReceiptDb(params.id);
+    const r = await getReceiptDb(auth.tenantId, params.id);
     if (!r) return notFound("Receipt not found");
     return Response.json(r.flowHistory ?? []);
   } catch (e) {

@@ -27,9 +27,8 @@ describe("row↔DTO 映射", () => {
       flow_history: [],
     });
   });
-  it("db-queries re-export 通路：6 键齐备（carried ruling，Task 2 Minor 2）", () => {
+  it("db-queries re-export 通路：5 键齐备（TENANT 已随 token 化删除）", () => {
     for (const k of [
-      "TENANT",
       "toCamel",
       "toSnake",
       "rowToDto",

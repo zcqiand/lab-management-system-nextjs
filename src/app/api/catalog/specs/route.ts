@@ -3,7 +3,7 @@
 // POST /api/catalog/specs → 201
 //
 // 数据源：lab_test.inspection_specs（src/lib/db-queries.ts CATALOG_CFGS；Batch1 接真库）。
-// fixture 版本无 tenant 过滤；DB 版本按 TENANT-001 隔离（种子行全部 TENANT-001，安全）。
+// token 化（2026-09-23）：DB 版本按 token 租户过滤（catalog-handlers requireTenant）。
 
 import { NextRequest } from "next/server";
 import { catalogGet, catalogPost } from "@/lib/catalog-handlers";

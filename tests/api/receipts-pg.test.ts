@@ -12,7 +12,12 @@
 // 本文件本身不再 skip，由 CI workflow 决定是否跑。
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import postgres from "postgres";
-import { listReceiptsDb, getReceiptDb, actForStageDb, TENANT } from "@/lib/db-queries";
+import { listReceiptsDb, getReceiptDb, actForStageDb } from "@/lib/db-queries";
+
+// BFF 全域 token 化（2026-09-23）：tenantId 改为显式参数（ADR-0019 禁字面量兜底，
+// db-map 的 TENANT 常量已删）。测试内用字面量 = 种子数据世界的描述，非运行时兜底。
+const TENANT = "TENANT-001";
+const TENANT_SSO = "00000000-0000-0000-0000-000000000001";
 
 // postgres-js 是仓 dependencies（不是 devDep），缺包即 module-load 失败，
 // 无需运行时 hasPg 探测 —— 与 db.smoke.test.ts 的 devDep pg 探测不是同一回事。
@@ -30,6 +35,8 @@ const SEEDED_CATEGORY_CODE = "CAT-SMK-001";
 const SEEDED_RECEIVING_ID = "test-receipt-receiving-001";
 const SEEDED_REVIEW_ID = "test-receipt-review-001";
 const SEEDED_SUBMITTED_ID = "test-receipt-submitted-001";
+// SSO 世界行（token 化跨租户断言用；id 加 -sso 后缀对齐 seeder 镜像约定）
+const SEEDED_SSO_ID = "test-receipt-sso-001";
 
 let sql: ReturnType<typeof postgres> | null = null;
 
@@ -147,6 +154,17 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
     ${"pg-tester"}, ${"现场抽样"}, ${"常规检测"}, ${"task_assignment"}, ${s.json(submittedHistory)},
     ${"tester"}, ${"2026-09-04T00:00:00Z"}, ${"2026-09-04T01:00:00Z"}
   )`;
+  // SSO 世界行（flow_status=receiving；mirror 约定 id 加 -sso 后缀）
+  await s`insert into sample_receipts (
+    id, tenant_id, contract_id, commission_code, commission_date, category_code,
+    received_by, sample_source, test_category, flow_status, flow_history,
+    last_submitted_by, created_at, updated_at
+  ) values (
+    ${SEEDED_SSO_ID}, ${TENANT_SSO}, ${TEST_CONTRACT_ID},
+    ${TEST_MARKER + "sso-001"}, ${"2026-09-04"}, ${"CAT-SMK-001"},
+    ${"pg-tester"}, ${"现场抽样"}, ${"常规检测"}, ${"receiving"}, ${s.json([])},
+    ${null}, ${"2026-09-04T00:00:00Z"}, ${"2026-09-04T00:00:00Z"}
+  )`;
 }
 
 // flowHistory jsonb 元素的最小形状（db-queries 侧类型是 unknown[]）
@@ -161,7 +179,8 @@ interface FlowHistoryEntry {
 // 家族约定「CI 编译+mock / gate 真库」—— CI workflow 用 --exclude 决定是否跑本文件。
 describe(
   "receipts 三态流转（pg, lab_test, requireReachable）",
-  { timeout: 30_000 },
+  // 与 dict-pg 同款 90s：Tailscale 远端库逐查询 RTT 偏高（实测单 list 26s 冷启）
+  { timeout: 90_000 },
   () => {
     beforeAll(async () => {
       const s = await connect();
@@ -174,7 +193,7 @@ describe(
     });
 
     it("not_yet: 停在 receiving 的单据", async () => {
-      const r = await listReceiptsDb({
+      const r = await listReceiptsDb(TENANT, {
         filter: "not_yet",
         flowStatus: "receiving",
         page: 1,
@@ -188,7 +207,7 @@ describe(
     });
 
     it("submitted: 已从 receiving 提交走的单据", async () => {
-      const r = await listReceiptsDb({
+      const r = await listReceiptsDb(TENANT, {
         filter: "submitted",
         flowStatus: "receiving",
         page: 1,
@@ -206,7 +225,7 @@ describe(
     });
 
     it("flowStatus 直滤 + tenant 隔离", async () => {
-      const r = await listReceiptsDb({ flowStatus: "review", page: 1, pageSize: 1000 });
+      const r = await listReceiptsDb(TENANT, { flowStatus: "review", page: 1, pageSize: 1000 });
       expect(r.total).toBeGreaterThanOrEqual(1);
       for (const it of r.items) {
         expect(it.flowStatus).toBe("review");
@@ -214,10 +233,28 @@ describe(
       }
     });
 
+    it("token 化：他租户行不可见、不可流转（BFF 全域 token 化回归）", async () => {
+      const demo = await listReceiptsDb(TENANT, { page: 1, pageSize: 1000 });
+      expect(demo.items.some((it) => it.id === SEEDED_SSO_ID)).toBe(false);
+      const sso = await listReceiptsDb(TENANT_SSO, { page: 1, pageSize: 1000 });
+      expect(sso.items.some((it) => it.id === SEEDED_RECEIVING_ID)).toBe(false);
+      expect(sso.items.some((it) => it.id === SEEDED_SSO_ID)).toBe(true);
+      // 跨租户详情 / 流转写路径同样不可见
+      expect(await getReceiptDb(TENANT_SSO, SEEDED_RECEIVING_ID)).toBeUndefined();
+      const cross = await actForStageDb(
+        TENANT_SSO,
+        "receiving",
+        [SEEDED_RECEIVING_ID],
+        "submit",
+        "tester",
+      );
+      expect(cross[0]!.ok).toBe(false);
+    });
+
     // ———— actForStageDb（M03 7 阶段 stage-guard；2026-09-17 SSOT 清理后唯一流转写路径）————
 
     it("actForStageDb: submit 前进一阶并 append history（返回裸数组）", async () => {
-      const res = await actForStageDb(
+      const res = await actForStageDb(TENANT,
         "receiving",
         [SEEDED_RECEIVING_ID],
         "submit",
@@ -226,17 +263,17 @@ describe(
       expect(res).toHaveLength(1);
       const one = res[0]!;
       expect(one.ok).toBe(true);
-      const after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      const after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("task_assignment");
       expect(after!.lastSubmittedBy).toBe("tester");
       const hist = after!.flowHistory as FlowHistoryEntry[];
       expect(hist[hist.length - 1]!.action).toBe("submit");
       // 还原（return = 后退一阶，走所在阶段的 act 路径）
-      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "return", "tester");
     });
 
     it("stage 不匹配 / 不存在 → ok:false 单条失败不拖垮整批", async () => {
-      const res = await actForStageDb(
+      const res = await actForStageDb(TENANT,
         "review",
         [SEEDED_RECEIVING_ID, "no-such-receipt-id"],
         "submit",
@@ -254,13 +291,13 @@ describe(
 
     it("return 不清空 lastSubmittedBy；withdraw 在 receiving = 自转移并清提交人", async () => {
       // submit ×2 → receiving → data_entry（逐阶段走自己的 act 路径）
-      await actForStageDb("receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
-      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
-      let after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      await actForStageDb(TENANT,"receiving", [SEEDED_RECEIVING_ID], "submit", "tester");
+      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "submit", "tester");
+      let after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("data_entry");
       expect(after!.lastSubmittedBy).toBe("tester");
       // return → 后退一阶（data_entry → task_assignment），lastSubmittedBy 保持不变（不清空）
-      const ret = await actForStageDb(
+      const ret = await actForStageDb(TENANT,
         "data-entry",
         [SEEDED_RECEIVING_ID],
         "return",
@@ -270,20 +307,20 @@ describe(
       const r0 = ret[0]!;
       expect(r0.ok).toBe(true);
       if (r0.ok) expect(r0.flowStatus).toBe("task_assignment");
-      after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
       expect(after!.lastSubmittedBy).toBe("tester");
       const hist = after!.flowHistory as FlowHistoryEntry[];
       expect(hist[hist.length - 1]!.action).toBe("return");
       // 回到 receiving 后 withdraw：自转移（原地不动）+ 清 lastSubmittedBy，还原数据
-      await actForStageDb("assigning", [SEEDED_RECEIVING_ID], "return", "tester");
-      const w = await actForStageDb(
+      await actForStageDb(TENANT,"assigning", [SEEDED_RECEIVING_ID], "return", "tester");
+      const w = await actForStageDb(TENANT,
         "receiving",
         [SEEDED_RECEIVING_ID],
         "withdraw",
         "tester",
       );
       expect(w[0]!.ok).toBe(true);
-      after = await getReceiptDb(SEEDED_RECEIVING_ID);
+      after = await getReceiptDb(TENANT,SEEDED_RECEIVING_ID);
       expect(after!.flowStatus).toBe("receiving");
       expect(after!.lastSubmittedBy).toBeNull();
     });

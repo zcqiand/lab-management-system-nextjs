@@ -16,6 +16,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { qp, num, NOW, notFound, noContent, badRequest } from "@/lib/api-helpers";
+import { requireTenant } from "@/lib/auth/require-tenant";
 import {
   CATALOG_CFGS,
   type DictCfg,
@@ -36,11 +37,15 @@ function dbUnavailable() {
 }
 
 export async function catalogGet(cfg: DictCfg, req: NextRequest) {
+  // token 化（2026-09-23）：catalog 4 表按 token 租户过滤（aspnetcore
+  // CatalogController 全 16 端点 _tenantContext.TenantId 同语义）
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
     const url = qp(req);
     // fixture 版 catalogGet 不支持 keyword（query 里给了也静默忽略）——不传即同语义
     return NextResponse.json(
-      await listDictDb(cfg, {
+      await listDictDb(auth.tenantId, cfg, {
         direct: { inspectionObjectCode: url.get("inspectionObjectCode") ?? "" },
         page: num(url.get("page"), 1),
         pageSizeParam: url.get("pageSize"),
@@ -53,6 +58,8 @@ export async function catalogGet(cfg: DictCfg, req: NextRequest) {
 }
 
 export async function catalogPost(cfg: DictCfg, req: NextRequest) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   // fixture 版 catalogPost 的强转兜底原样保留（code/name 空串也放行，无 code/name 必填校验）
   const entry = {
@@ -64,7 +71,7 @@ export async function catalogPost(cfg: DictCfg, req: NextRequest) {
     ...body,
   };
   try {
-    const res = await createDictDb(cfg, entry);
+    const res = await createDictDb(auth.tenantId, cfg, entry);
     if (!res.ok) return badRequest(res.message);
     return NextResponse.json(res.row, { status: 201 });
   } catch (e) {
@@ -74,9 +81,11 @@ export async function catalogPost(cfg: DictCfg, req: NextRequest) {
 }
 
 export async function catalogPut(cfg: DictCfg, req: NextRequest, code: string) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   try {
-    const row = await putDictDb(cfg, code, body);
+    const row = await putDictDb(auth.tenantId, cfg, code, body);
     if (!row) return notFound("Entry not found");
     return NextResponse.json(row);
   } catch (e) {
@@ -85,9 +94,11 @@ export async function catalogPut(cfg: DictCfg, req: NextRequest, code: string) {
   }
 }
 
-export async function catalogDelete(cfg: DictCfg, code: string) {
+export async function catalogDelete(cfg: DictCfg, req: NextRequest, code: string) {
+  const auth = requireTenant(req);
+  if (auth instanceof NextResponse) return auth;
   try {
-    const ok = await deleteDictDb(cfg, code);
+    const ok = await deleteDictDb(auth.tenantId, cfg, code);
     if (!ok) return notFound("Entry not found");
     return noContent();
   } catch (e) {
