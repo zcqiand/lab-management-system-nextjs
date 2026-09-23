@@ -1,17 +1,36 @@
 // scripts/seed-db.ts — 把 @lab/management-system-msw/fixtures 灌到 lab_dev。
-// 幂等：TRUNCATE 全部 25 张表 RESTART IDENTITY CASCADE 再灌。
+// 幂等：TRUNCATE PLAN 全部表 RESTART IDENTITY CASCADE 再灌。
 // 对账：灌完逐表 SELECT count(*) 与 fixtures 行数比对，不一致 exit 1。
 // DATABASE_URL 缺省时走 fallback（与 drizzle.config.pg.ts 同款，密码 +++ 已 URL 编码）。
 import postgres from "postgres";
 import {
-  contracts, sampleReceipts, samples, testRecords,
-  inspectionBrands, inspectionModels, inspectionSpecs, inspectionGrades,
-  technicalRequirements, inspectionSpecialties, inspectionObjects,
-  inspectionParameters, inspectionStandards, inspectionSpecialtyObjects,
-  inspectionObjectParameters, inspectionObjectStandards, inspectionStandardParameters,
-  inspectionCalculationRules, inspectionReportNames, inspectionObjectReportNames,
-  inspectionReportNameStandards, inspectionReportNameParameters,
-  inspectionParamInterfaces, inspectionParamInterfaceLinks,
+  contracts,
+  sampleReceipts,
+  samples,
+  testRecords,
+  inspectionBrands,
+  inspectionModels,
+  inspectionSpecs,
+  inspectionGrades,
+  technicalRequirements,
+  inspectionSpecialties,
+  inspectionObjects,
+  inspectionParameters,
+  inspectionStandards,
+  inspectionSpecialtyObjects,
+  inspectionObjectParameters,
+  inspectionObjectStandards,
+  inspectionStandardParameters,
+  // 2026-09-23 勘误：fixtures 导出 2026-09 前后由 inspectionCalculationRules
+  // 更名 inspectionCalculationMethods，本脚本没跟（手工脚本无 CI 覆盖）——
+  // npm run seed:db 在 HEAD 上 import 即崩。以 fixtures 现名为准。
+  inspectionCalculationMethods,
+  inspectionReportNames,
+  inspectionObjectReportNames,
+  inspectionReportNameStandards,
+  inspectionReportNameParameters,
+  inspectionParamInterfaces,
+  inspectionParamInterfaceLinks,
 } from "@lab/management-system-msw/fixtures";
 import { toSnake } from "../src/lib/db-map";
 
@@ -32,7 +51,10 @@ const PLAN: Array<[string, Array<Record<string, unknown>>]> = [
   ["inspection_models", inspectionModels],
   ["inspection_specs", inspectionSpecs],
   ["inspection_grades", inspectionGrades],
-  ["inspection_calculation_rules", inspectionCalculationRules],
+  // 2026-09-23 勘误（同上，手工脚本无 CI 覆盖）：表名随 V013 系 DDL 更名
+  // calculation_rules → calculation_methods，本脚本没跟；audit_events 表已从
+  // lab DDL 移除（fixtures 本来也不灌它），PLAN 行一并删。
+  ["inspection_calculation_methods", inspectionCalculationMethods],
   ["inspection_technical_requirements", technicalRequirements],
   ["contracts", contracts],
   ["sample_receipts", sampleReceipts],
@@ -46,8 +68,6 @@ const PLAN: Array<[string, Array<Record<string, unknown>>]> = [
   ["inspection_report_name_standards", inspectionReportNameStandards],
   ["inspection_report_name_parameters", inspectionReportNameParameters],
   ["inspection_param_interface_links", inspectionParamInterfaceLinks],
-  // audit_events 无种子（fixtures 派生路由也不读它），灌空
-  ["audit_events", []],
 ];
 // tenants：lab 库不建 tenants 表（V012 注释：租户真相源在 saas），跳过 tenants fixtures。
 
@@ -117,7 +137,7 @@ function synthesizeMissingDicts() {
       arr.push(dictRow(String(v), objByCode.get(String(v)) ?? null));
     }
   }
-  for (const r of inspectionCalculationRules) {
+  for (const r of inspectionCalculationMethods) {
     const t = r.testingStandardCode;
     if (t && !std.has(String(t))) {
       std.add(String(t));
@@ -131,7 +151,9 @@ function synthesizeMissingDicts() {
 // inspection_param_interface_links: fixture 用 inspectionParamInterfaceCode，
 // DDL 列是 param_interface_code（V013 更名时 junction 列名没跟着改）。
 const KEY_RENAME: Record<string, Record<string, string>> = {
-  inspection_param_interface_links: { inspectionParamInterfaceCode: "paramInterfaceCode" },
+  inspection_param_interface_links: {
+    inspectionParamInterfaceCode: "paramInterfaceCode",
+  },
 };
 
 // jsonb 列清单：postgres-js 对 JS 数组会走 pg array 序列化而不是 JSON，
@@ -140,7 +162,12 @@ const JSONB_COLUMNS: Record<string, Set<string>> = {
   inspection_parameters: new Set(["aliases"]),
   inspection_report_names: new Set(["ext_fields"]),
   inspection_param_interfaces: new Set(["config"]),
-  sample_receipts: new Set(["judgment_basis", "testing_basis", "test_parameters", "flow_history"]),
+  sample_receipts: new Set([
+    "judgment_basis",
+    "testing_basis",
+    "test_parameters",
+    "flow_history",
+  ]),
   samples: new Set(["ext"]),
   inspection_param_interface_links: new Set(["config"]),
 };
@@ -162,7 +189,8 @@ function buildRow(table: string, row: Record<string, unknown>): Record<string, u
   const jsonb = JSONB_COLUMNS[table];
   if (jsonb) {
     for (const [k, v] of Object.entries(cols)) {
-      if (jsonb.has(k) && v !== null && typeof v !== "string") cols[k] = JSON.stringify(v);
+      if (jsonb.has(k) && v !== null && typeof v !== "string")
+        cols[k] = JSON.stringify(v);
     }
   }
   const fkCols = FK_NULLIFY_BLANK[table];
@@ -204,7 +232,10 @@ async function insertTable(table: string, rows: Array<Record<string, unknown>>) 
         const k = keys[i]!;
         // buildRow 已把 jsonb 列 stringify（unsafe 时代的遗产）；tagged 路径
         // 需要 JS 值让 postgres-js 自行序列化 → parse 回来。
-        const v = jsonb.has(k) && typeof cols[k] === "string" ? JSON.parse(cols[k] as string) : cols[k];
+        const v =
+          jsonb.has(k) && typeof cols[k] === "string"
+            ? JSON.parse(cols[k] as string)
+            : cols[k];
         const piece = sql`${v}`;
         values = i === 0 ? piece : sql`${values}, ${piece}`;
       }
@@ -213,7 +244,10 @@ async function insertTable(table: string, rows: Array<Record<string, unknown>>) 
     }
     const text = `insert into "${table}" (${keys.map((k) => `"${k}"`).join(", ")})
       values (${keys.map((_, i) => `$${i + 1}`).join(", ")})`;
-    await sql.unsafe(text, keys.map((k) => cols[k]));
+    await sql.unsafe(
+      text,
+      keys.map((k) => cols[k]),
+    );
   }
 }
 
@@ -221,7 +255,7 @@ async function insertTable(table: string, rows: Array<Record<string, unknown>>) 
 // 灌库时归一成 null。覆盖已知 6 处真实 FK（其余 *_code 列均非空且已验证）。
 const FK_NULLIFY_BLANK: Record<string, Set<string>> = {
   inspection_technical_requirements: new Set(["brand", "model", "grade", "spec"]),
-  inspection_calculation_rules: new Set(["testing_standard_code", "report_name_code"]),
+  inspection_calculation_methods: new Set(["testing_standard_code", "report_name_code"]),
   inspection_param_interface_links: new Set(["report_name_code"]),
   inspection_brands: new Set(["inspection_object_code"]),
   inspection_models: new Set(["inspection_object_code"]),
@@ -278,16 +312,100 @@ function dedupe(
   return dropped.size;
 }
 
+// === SSO 数据面桥（2026-09-23） ===
+// lab 三前端（vue/react/nextjs）登录页全是 saas SSO orchestrator，落地租户是 saas
+// dev 平台租户 UUID（= SAAS_TENANT_ID，ACME）。业务 fixtures 全挂 demo 租户
+// TENANT-001（密码直登 /api/auth/login 的世界）→ SSO 登录后业务页空数据：
+// aspnetcore/springboot 按 token 租户严格过滤（ADR-0019）返回 0 行；nextjs 列表
+// 查询未按租户过滤，把 TENANT-001 行泄露给任意租户 token，掩盖了这条缝
+//（「react 有数据 vue 没数据」的真相）。
+// fixtures 是跨端契约（零改动红线，见上方 V011 注释），镜像只能做在 seeder
+// 转换层：4 张租户隔离表各复制一份挂 SAAS_DEV_TENANT_ID。
+//   - id 加 "-sso" 后缀（4 表 PK 全是 text；无 serial）
+//   - FK 沿 receipt.contractId → sample.receiptId → test_record.sampleId 链重映射
+//   - contracts / sample_receipts 的 (tenant_id, code) 复合唯一不冲突（不同租户）
+//   - catalog 4 表（brands/models/specs/grades）P5 起镜像：PK=code 全局唯一 +
+//     unique(tenant_id, code) → code 加 -sso 后缀；FK 指全局 objects 不重映射
+//     （aspnetcore CatalogController 全 16 端点按 token 租户过滤，SSO 世界不能空）
+//   - inspection_* 基础数据无租户列，天然共享，不镜像
+// TENANT-001 侧行数不变 → 密码直登视图（contract-test live 全走这条路）零感知；
+// 对账基线用灌库数组长度，镜像推入同数组即自动一致。
+const SAAS_DEV_TENANT_ID = "00000000-0000-0000-0000-000000000001";
+const SSO_ID_SUFFIX = "-sso";
+function mirrorTenantScopedRows(): void {
+  contracts.push(
+    ...contracts.map((r) => ({
+      ...r,
+      id: `${r.id}${SSO_ID_SUFFIX}`,
+      tenantId: SAAS_DEV_TENANT_ID,
+    })),
+  );
+  sampleReceipts.push(
+    ...sampleReceipts.map((r) => ({
+      ...r,
+      id: `${r.id}${SSO_ID_SUFFIX}`,
+      tenantId: SAAS_DEV_TENANT_ID,
+      ...(r.contractId ? { contractId: `${r.contractId}${SSO_ID_SUFFIX}` } : {}),
+    })),
+  );
+  samples.push(
+    ...samples.map((r) => ({
+      ...r,
+      id: `${r.id}${SSO_ID_SUFFIX}`,
+      tenantId: SAAS_DEV_TENANT_ID,
+      ...(r.receiptId ? { receiptId: `${r.receiptId}${SSO_ID_SUFFIX}` } : {}),
+    })),
+  );
+  testRecords.push(
+    ...testRecords.map((r) => ({
+      ...r,
+      id: `${r.id}${SSO_ID_SUFFIX}`,
+      tenantId: SAAS_DEV_TENANT_ID,
+      ...(r.sampleId ? { sampleId: `${r.sampleId}${SSO_ID_SUFFIX}` } : {}),
+    })),
+  );
+  // P5（2026-09-23）：catalog 4 表 code 镜像（id 列=code；inspection_brands 的
+  // PK=code 全局唯一 → 不加后缀会撞唯一约束，seed 即崩）
+  for (const tbl of [inspectionBrands, inspectionModels, inspectionSpecs, inspectionGrades]) {
+    tbl.push(
+      ...tbl.map((r) => ({
+        ...r,
+        code: `${r.code}${SSO_ID_SUFFIX}`,
+        tenantId: SAAS_DEV_TENANT_ID,
+      })),
+    );
+  }
+  console.log(
+    `sso mirror: +${contracts.length} contracts, +${sampleReceipts.length} receipts, +${samples.length} samples, +${testRecords.length} test_records, catalog brands=${inspectionBrands.length} models=${inspectionModels.length} specs=${inspectionSpecs.length} grades=${inspectionGrades.length} → ${SAAS_DEV_TENANT_ID}`,
+  );
+}
+
 async function main() {
   // 顺序：先 dedupe 再 synthesize。反过来（旧序）会让 synthesize 扫到随后被
   // dedupe 丢弃的 tech_req 变体行，合成只被死行引用的孤儿字典行（评审 Finding 1）。
   // 4 张复合 PK 表的 fixtures 粒度比 DDL 粗（tech_req 同 obj+param+std 下还有
   // brand/grade/spec 变体行；objStd/pil 同理）。灌库前按 PK 去重（保留最全行，
   // dropped 数打 warn — 评审 Finding 2），对账基线用去重后行数。msw fixtures 本身不动。
-  dedupe(technicalRequirements, ["inspectionObjectCode", "inspectionParameterCode", "judgmentStandardCode"], "inspection_technical_requirements");
-  dedupe(inspectionObjectStandards, ["inspectionObjectCode", "inspectionStandardCode", "role"], "inspection_object_standards");
-  dedupe(inspectionCalculationRules, ["inspectionObjectCode", "inspectionParameterCode"], "inspection_calculation_rules");
-  dedupe(inspectionParamInterfaceLinks, ["inspectionParameterCode", "inspectionParamInterfaceCode"], "inspection_param_interface_links");
+  dedupe(
+    technicalRequirements,
+    ["inspectionObjectCode", "inspectionParameterCode", "judgmentStandardCode"],
+    "inspection_technical_requirements",
+  );
+  dedupe(
+    inspectionObjectStandards,
+    ["inspectionObjectCode", "inspectionStandardCode", "role"],
+    "inspection_object_standards",
+  );
+  dedupe(
+    inspectionCalculationMethods,
+    ["inspectionObjectCode", "inspectionParameterCode"],
+    "inspection_calculation_rules",
+  );
+  dedupe(
+    inspectionParamInterfaceLinks,
+    ["inspectionParameterCode", "inspectionParamInterfaceCode"],
+    "inspection_param_interface_links",
+  );
   const { addStd, before } = synthesizeMissingDicts();
   const synth: Array<[string, number]> = [
     ["inspection_brands", inspectionBrands.length - before[0]],
@@ -298,6 +416,7 @@ async function main() {
   ];
   for (const [t, n] of synth) console.log(`synthesize ${t}: +${n} rows`);
   inspectionStandards.push(...(addStd as typeof inspectionStandards));
+  mirrorTenantScopedRows();
   const allTables = PLAN.map(([t]) => t);
   await sql`truncate table ${sql.unsafe(allTables.map((t) => `"${t}"`).join(", "))} restart identity cascade`;
   for (const [table, rows] of PLAN) {
