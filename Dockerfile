@@ -34,21 +34,27 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends git ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-# 拉 sibling 仓(file: 依赖 + gen:shared 需要 sibling 存在)
-# msw: package.json 的 @lab/management-system-msw@file:../lab-management-system-msw
+# 拉 sibling 仓（gen:shared 需要 shared sibling 存在）
+# msw: package.json 的 @lab/management-system-msw@file:vendor/msw（已 2026-09-23
+#   2cb61b6 vendor 进仓内；msw 仓 2026-09-17 已删，不能再 clone sibling）
 # shared: npm run gen:shared emit-openapi 读 ../lab-management-system-shared
-RUN git clone --depth 1 https://github.com/zcqiand/lab-management-system-msw.git ../lab-management-system-msw \
- && git clone --depth 1 https://github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
+RUN git clone --depth 1 https://github.com/zcqiand/lab-management-system-shared.git ../lab-management-system-shared
+
+# vendor/msw 必须先 COPY 进容器：package.json 的 file:vendor/msw 依赖在
+# `npm install` 阶段就要解析；COPY . . 是后续步骤（line 56 起），会把
+# vendor/msw 也带进去但 npm install 早跑完了——ENOENT path /app/vendor/msw/package.json
+# 会让 file: 依赖解不出，exit 254。
+COPY vendor/msw ./vendor/msw
 
 COPY package.json package-lock.json ./
-# 用 npm install 不是 npm ci:package.json 引用 file:../lab-management-system-msw
-# (file path 版本,无具体版本号),旧 lockfile 锁了 0.1.0 → npm ci 严格不匹配。
-# npm install 按 package.json + sibling 实际版本安装,自动重写 lockfile。
+# 用 npm install 不是 npm ci：package.json 引用 file:vendor/msw
+# (file path 版本,无具体版本号)，旧 lockfile 锁了 0.1.0 → npm ci 严格不匹配。
+# npm install 按 package.json + vendor/msw 实际版本安装，自动重写 lockfile。
 # --legacy-peer-deps 兼容某些宽松 peer 依赖。
-# --install-links: file: 依赖打包复制进 node_modules 而不是 symlink 回 sibling clone。
-#   symlink 时 TS/webpack 解析到 clone 真实路径(/lab-management-system-msw/src),
-#   clone 没装依赖,import "msw" 往上找不到 → build 阶段 module not found。
-#   复制后 msw/faker 等依赖提升到 /app/node_modules,解析恢复。
+# --install-links: file: 依赖打包复制进 node_modules 而不是 symlink 回 vendor/msw。
+#   symlink 时 TS/webpack 解析到 vendor/msw 真实路径，跨过 boundary 但 dev 装
+#   链上 msw 依赖，import "msw" 往上找不到 → build 阶段 module not found。
+#   复制后 msw/jose 等依赖提升到 /app/node_modules，解析恢复。
 RUN npm install --install-links --legacy-peer-deps --no-audit --no-fund
 
 # standalone build 不连 DB(除非某 route 顶层 open DB):gen:shared 只读
@@ -84,10 +90,10 @@ ENV PORT=5201
 ENV HOSTNAME=0.0.0.0
 # DATABASE_URL 由 deploy/ 阶段 lab.env 注入(ADR-0009)。不在 Dockerfile 写死。
 # DB_PATH=/data/lab.db 是历史 SQLite 残留,src/db/index.ts 实际用 postgres-js → DATABASE_URL。
-# sync-db.mjs 在 runtime /app/scripts/,默认算法 MIGRATIONS_DIR=/app/sql/migrations 不存在。
-# Dockerfile 把 sibling migrations 拷到 /lab-management-system-shared/sql/migrations,
-# 这里显式指过去。
-ENV MIGRATIONS_DIR=/lab-management-system-shared/sql/migrations
+# migrate-db.mjs 入口在 /lab-management-system-shared/scripts/,它本身读
+# drizzle.config.ts + drizzle/。无独立 env 变量需要 —— PG_* 由 drizzle.config.ts
+# 读,运行时由 deploy/ 阶段 lab.env 注入 DATABASE_URL,build 时 MIGRATIONS_DIR
+# 这类老 env 已死(sync-db.mjs 时代)。
 
 # standalone/server.js 是 Next 生成的入口
 COPY --from=builder --chown=node:node /app/.next/standalone ./
@@ -96,22 +102,33 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public
 
 # standalone 默认只 trace app/ pages/ src/ 入口路径下的 import 图,scripts/ 不在
-# 范围 → .next/standalone/node_modules/ 是最小集,scripts/sync-db.mjs runtime
+# 范围 → .next/standalone/node_modules/ 是最小集,scripts/migrate-db.mjs runtime
 # require('pg') 找不到。pg 是 devDep(CLAUDE.md §3 硬约束不能升 dependencies),
 # transitives(pg-types → postgres-array/date/bytea/interval, pgpass, pg-int8 等)
 # 数量多且版本相关,逐个 COPY 易漏。
 # 用 builder 全量 node_modules 覆盖 standalone minimal set —— runtime 镜像略大,
-# 但 sync-db.mjs 必能命中所有 transitives。
+# 但 migrate-db.mjs 必能命中所有 transitives。
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 
-# sync-db.mjs 路径硬编码 ../lab-management-system-shared/sql/migrations
-# (相对 /app),sibling 仓 git clone 在 builder /app 父目录,运行时容器里没有。
-# 显式 COPY 到容器同绝对路径,sync-db.mjs 不用改。
-COPY --from=builder --chown=node:node /lab-management-system-shared/sql/migrations /lab-management-system-shared/sql/migrations
-# sync-db.mjs 本身也在 sibling 仓 scripts/。lab-nextjs 自己的仓 scripts/ 没有(仓内禁
-# 业务代码,CLAUDE.md §3)。同样显式 COPY 到容器 /app/scripts/,让 entrypoint 的
-# `node scripts/sync-db.mjs` 相对路径解析能找到。
-COPY --from=builder --chown=node:node /lab-management-system-shared/scripts/sync-db.mjs ./scripts/sync-db.mjs
+# ADR-0025 / ADR-0033 阶段一(commit 4587566 2026-09-13)：lab-shared 切到
+# Drizzle schema-first 单一真源,删 sql/migrations/ V*.sql + sync-db.mjs,改
+# drizzle/ + drizzle.config.ts + scripts/migrate-db.mjs(用 drizzle-kit migrate)。
+# runtime 启 migrate-db.mjs 在 /lab-management-system-shared/ 跑(它本身
+# SHARED_ROOT = __dirname/.. 算到那里);drizzle-kit 从 sibling node_modules 解析。
+# 老的 sync-db.mjs + sql/migrations/ 路径已死,本 Dockerfile 同步替换。
+#
+# 需要 COPY 的有(都要到 /lab-management-system-shared/ 绝对路径):
+#   - drizzle/                 schema DDL + meta/_journal.json + meta/*_snapshot.json
+#   - drizzle.config.ts        drizzle-kit 读它取 PG_* env
+#   - scripts/migrate-db.mjs   入口脚本
+#   - node_modules/            drizzle-kit CLI(drizzle-kit@^0.28.1 在 shared devDep)
+#                             + drizzle-orm + pg + transitives 全套
+COPY --from=builder --chown=node:node /lab-management-system-shared/drizzle /lab-management-system-shared/drizzle
+COPY --from=builder --chown=node:node /lab-management-system-shared/drizzle.config.ts /lab-management-system-shared/drizzle.config.ts
+COPY --from=builder --chown=node:node /lab-management-system-shared/scripts/migrate-db.mjs /lab-management-system-shared/scripts/migrate-db.mjs
+# shared 整个 node_modules(含 drizzle-kit devDep + drizzle-orm + pg + transitives)。
+# 包大但只此一份能确保 migrate-db.mjs spawn drizzle-kit 一切 transitive 都到位。
+COPY --from=builder --chown=node:node /lab-management-system-shared/node_modules /lab-management-system-shared/node_modules
 
 # scripts/ 与 package.json(runtime seed-db.ts + drizzle 借链 + gen:shared 等用)
 COPY --from=builder --chown=node:node /app/scripts ./scripts
