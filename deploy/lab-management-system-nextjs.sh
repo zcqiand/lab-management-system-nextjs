@@ -145,13 +145,29 @@ if [ -f "$BASE/lab.env" ]; then
     append_if_missing LAB_SAAS_SERVICE_PASSWORD "$LAB_SAAS_SERVICE_PASSWORD"
   fi
   # 5.37（5.33/5.37 家族对齐）：saas LoginRequest.clientId 契约必填，非 secret 字面量
+  # OAuth clientId 漂移修正（2026-09-25 线上 400 事故根因）：
+  # 历史 .env.production / 早期 deploy 把 SAAS_OAUTH_CLIENT_ID 等误写成 oauth_client.id UUID 行号，
+  # saas authorize 端点查 oauth_client.client_id 列（varchar code 形如 'lab-management'），
+  # UUID 必 INVALID_CLIENT 400。append_if_missing 只补缺失不动 stale UUID，先 reconcile 再 append。
+  if grep -qE '^LAB_SAAS_SERVICE_CLIENT_ID=11111111-[0-9a-f-]+$' "$BASE/lab.env"; then
+    echo "→ reconcile LAB_SAAS_SERVICE_CLIENT_ID in $BASE/lab.env (UUID → lab-management, ADR-0019 + 登录 clientId 是字符串不是行 id)"
+    sed -i -E 's#^LAB_SAAS_SERVICE_CLIENT_ID=11111111-[0-9a-f-]+$#LAB_SAAS_SERVICE_CLIENT_ID=lab-management#' "$BASE/lab.env"
+  fi
   append_if_missing LAB_SAAS_SERVICE_CLIENT_ID 'lab-management'
   append_if_missing LAB_JWT_ISSUER 'lab-management-system'
   append_if_missing LAB_JWT_TTL_SECONDS '3600'
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
   # 2026-09-13 saas pivot: client_id = oauth_client.client_id 字符串 code（行 UUID 必 404）
+  # 2026-09-25 线上 400 事故根因：saas-shared seeds/oauth_client.json 已收敛 clientId="lab-management"，
+  # 但 VPS 旧 lab.env 里 SAAS_OAUTH_CLIENT_ID 仍是 UUID 字面（lib/auth/route.ts 走 requireEnv
+  # 服务端读这个，bundle 不参与）。先 reconcile 再 append 兜底。
+  if grep -qE '^SAAS_OAUTH_CLIENT_ID=11111111-[0-9a-f-]+$' "$BASE/lab.env"; then
+    echo "→ reconcile SAAS_OAUTH_CLIENT_ID in $BASE/lab.env (UUID → lab-management, ADR-0019 + 登录 clientId 是字符串不是行 id)"
+    sed -i -E 's#^SAAS_OAUTH_CLIENT_ID=11111111-[0-9a-f-]+$#SAAS_OAUTH_CLIENT_ID=lab-management#' "$BASE/lab.env"
+  fi
   append_if_missing SAAS_OAUTH_CLIENT_ID 'lab-management'
   # ADR-0019：浏览器 bundle 同样要显式声明,否则 build 时丢 key。
+  # NEXT_PUBLIC_* 是 build-time env，已被 Dockerfile line 79 bake，无需 reconcile（bundle 由 CI 重打整张图）。
   append_if_missing NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID 'lab-management'
   # SSO 三件套（ADR-0019：authorize/callback requireEnv,缺一 502）
   append_if_missing SAAS_OAUTH_CLIENT_SECRET 'lab-management-secret'
