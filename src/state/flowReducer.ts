@@ -1,3 +1,4 @@
+// @impl M03.F02.I01 — 任务分配流程状态机（书源锚）
 import type { FlowState, FlowAction, FlowHistory } from "@/state/flow-types";
 import { TRANSITIONS, ACTION_TARGET, ACTION_REQUIRED_ROLE } from "@/state/transitions";
 

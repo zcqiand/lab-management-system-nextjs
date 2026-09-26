@@ -1,3 +1,4 @@
+// @impl M03.F05.I01 — 流程管线阶段常量（书源锚）
 // 流程管线 UI 常量（M03）——2026-09-17 TSOT 清理 Phase C2：src/types/ 手写平行类型
 // 全量删除，实体类型改 import orval 生成物（src/api/endpoints/model/）。
 // FLOW_STAGE_ORDER / FLOW_STAGE_LABELS 是纯 UI 常量（顺序 + 中文名），契约里没有，

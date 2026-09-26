@@ -1,3 +1,4 @@
+// @impl M01.F05.I03 — SSO 授权码流入口（书源锚）
 // GET /api/auth/sso/authorize?response_type=code&client_id&redirect_uri&state
 //
 // 返回 JSON { authorizeUrl, state }（不是 302！axios 默认会 follow 302

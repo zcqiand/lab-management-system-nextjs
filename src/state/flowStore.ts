@@ -1,3 +1,4 @@
+// @impl M03.F02.I01 — 任务分配流程状态机（书源锚）
 import { create } from "zustand";
 import { flowReducer, initialState } from "@/state/flowReducer";
 import { TRANSITIONS, ACTION_REQUIRED_ROLE } from "@/state/transitions";

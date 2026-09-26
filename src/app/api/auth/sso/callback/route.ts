@@ -1,3 +1,4 @@
+// @impl M01.F05.I03 + M01.F05.I04 — 授权码回调换 token 并同步会话（书源锚）
 // POST /api/auth/sso/callback { grant_type, code, redirect_uri, state }
 //   -> LoginResponse { token, refreshToken, user, tenants }
 //
