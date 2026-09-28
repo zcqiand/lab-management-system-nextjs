@@ -71,21 +71,21 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::AppShell header 挂 user-display-name（displayName，/api/auth/me hydrate）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::SSO 真后端 displayName 为空串时回退 username 渲染（空串回退回归锁）",
         "output\\lab-management-system-contract-test\\tests\\auth-me.test.ts:644 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:515 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:1130 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:2003 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:4586 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:1603 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:1817 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:2095 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:2571 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:731 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:1939 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:1819 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:1116 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1894 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:661 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:1940 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:518 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:1133 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:2111 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:4881 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:1704 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:1836 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:2226 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:2696 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:734 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:2066 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:1977 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:1119 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1996 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:664 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:2104 (annot)"
       ],
       "entry": [
         "src\\components\\app\\app-shell.tsx"
@@ -117,16 +117,16 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:2081 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2283 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7334 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3048 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3473 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1107 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2956 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2554 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:1964 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2315 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:1863 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2403 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7980 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3332 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3710 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1110 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3274 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2944 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2321 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2468 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2177 (annot)"
       ],
       "entry": [
         "src\\app\\api\\auth\\menus\\route.ts"
@@ -155,16 +155,16 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:1047 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1750 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:3513 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:3303 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:2447 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:2849 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:3001 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2019 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:1977 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:2037 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:756 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1883 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:3843 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:3455 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:2667 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3022 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:3272 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:2146 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2295 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:2203 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:759 (annot)"
       ],
       "entry": [
         "src\\app\\(console)\\layout.tsx"
@@ -224,18 +224,18 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:939 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:1028 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1765 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2606 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2395 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:971 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:1566 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:997 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:908 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:731 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1054 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:900 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:942 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:1042 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1784 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2678 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2437 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces.test.ts:985 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:1578 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:1011 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples.test.ts:920 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:743 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1066 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:912 (annot)"
       ],
       "entry": []
     },
@@ -253,17 +253,17 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer",
         "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:3601 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1265 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:2961 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7995 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3338 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2855 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2091 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3550 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:3055 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2535 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2948 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2426 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1336 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:3147 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:8707 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3496 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2942 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2285 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3932 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:3538 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2964 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:3165 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2812 (annot)"
       ],
       "entry": [
         "src\\api\\legacy-client.ts"
@@ -442,7 +442,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 网络错误",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::初始状态",
         "output\\lab-management-system-contract-test\\tests\\receipts-lastsubmit.test.ts:1037 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:4747 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:5189 (annot)"
       ],
       "entry": [
         "src\\features\\receipts\\ReceiptList.tsx"
@@ -553,9 +553,9 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext: 命中但 sample 无 ext → 解析失败回退 —（不在此路径渲染）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext:qualityCertNo 取 samples[0].ext[qualityCertNo]",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3078 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3125 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3321 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3603 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3650 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3849 (annot)"
       ],
       "entry": [
         "src\\features\\data-entry\\SampleExtFieldsModal.tsx"
@@ -838,7 +838,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:16843 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:19171 (annot)"
       ],
       "entry": [
         "src\\app\\api\\test-records\\route.ts"
@@ -1500,12 +1500,12 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3825 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4043 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2701 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3376 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:2944 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2948 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4260 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4367 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2959 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3566 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:3250 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:3427 (annot)"
       ],
       "entry": []
     },
@@ -1517,10 +1517,10 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4482 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5071 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3236 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4359 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5030 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5553 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3581 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4662 (annot)"
       ],
       "entry": []
     },
@@ -1535,10 +1535,10 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5083 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5677 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:4032 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:5347 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5695 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6223 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:4519 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:5800 (annot)"
       ],
       "entry": []
     },
@@ -1569,9 +1569,9 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4069 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3306 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4143 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4313 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3438 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4612 (annot)"
       ],
       "entry": []
     },
@@ -1583,9 +1583,9 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5641 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6235 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4694 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6340 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6868 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5225 (annot)"
       ],
       "entry": []
     },
@@ -1600,8 +1600,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6291 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:7147 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:7103 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:7985 (annot)"
       ],
       "entry": []
     },
@@ -1632,9 +1632,9 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:6887 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:7768 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:5954 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:7763 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8670 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:6606 (annot)"
       ],
       "entry": []
     },
@@ -1646,9 +1646,9 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:4796 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3765 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:6555 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:5126 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:3942 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:7316 (annot)"
       ],
       "entry": []
     },
@@ -1663,8 +1663,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:7441 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:8339 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8404 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9328 (annot)"
       ],
       "entry": []
     },
@@ -1766,9 +1766,9 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I03 锚点 + 3 张核心指标卡（今日试验/报告产出/合格率）",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2471 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3028 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3374 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2708 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3330 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3725 (annot)"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
@@ -1785,8 +1785,8 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2593 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3953 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:2838 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\summary.test.ts:4435 (annot)"
       ],
       "entry": [
         "src\\features\\summary\\SummaryPage.tsx"
@@ -1947,9 +1947,9 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8098 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9105 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:7853 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:9174 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10238 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:8874 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -1963,9 +1963,9 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:8699 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:9721 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:8425 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:9839 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10918 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:9543 (annot)"
       ],
       "entry": []
     },
@@ -1977,7 +1977,7 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:10434 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11718 (annot)"
       ],
       "entry": []
     },
@@ -1989,7 +1989,7 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4233 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4455 (annot)"
       ],
       "entry": []
     },
@@ -2150,7 +2150,7 @@
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4727 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4994 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -2192,7 +2192,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:5713 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:6070 (annot)"
       ],
       "entry": []
     },
@@ -2259,7 +2259,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:5220 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:5532 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
@@ -2398,7 +2398,7 @@
       "flows": [],
       "designs": [],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:14380 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:16248 (annot)"
       ],
       "entry": []
     },
@@ -2412,7 +2412,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:14968 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:16943 (annot)"
       ],
       "entry": []
     },
@@ -2427,7 +2427,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:16276 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:18509 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\CalculationMethodList.tsx"
@@ -2560,7 +2560,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:12338 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13941 (annot)"
       ],
       "entry": []
     },
@@ -2575,7 +2575,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:13063 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:14736 (annot)"
       ],
       "entry": []
     },
@@ -2737,7 +2737,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）",
-        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:11002 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:12381 (annot)"
       ],
       "entry": [
         "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
