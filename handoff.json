@@ -1,0 +1,2319 @@
+{
+  "_schema": "code-suite-handoff v1",
+  "_note": "写书的事实底，非逐字引用源。book 引用该 tag 的终态文件(带 source=)；此清单供作者对账建造顺序。",
+  "project": "lab-management-system-nextjs",
+  "tag": "v0.3.86-20260926",
+  "stack": "nextjs",
+  "gate_proof": {
+    "tag": "v0.3.86-20260926",
+    "checked_at": "2026-09-26T02:52:29+00:00",
+    "verified": true,
+    "all_green": true,
+    "method": "gate.py --all",
+    "gate_command": "D:\\qiand-life\\1-projects\\xr-code-suite\\scripts\\gate.py -p lab-management-system-nextjs"
+  },
+  "function_tree": [
+    {
+      "fn_id": "M00.F01.I01",
+      "name": "会话信息展示",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M00.F02.I01",
+      "name": "租户切换组件",
+      "type": "按钮",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F04.I01",
+      "name": "动态菜单下发（GET /auth/menus）",
+      "type": "查询",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F04.I02",
+      "name": "路由守卫",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F04.I03",
+      "name": "路由守卫（未登录/无权限拦截）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F04.I04",
+      "name": "动态菜单（lab 侧边栏）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F05.I01",
+      "name": "JWT 登录",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M01.F05.I02",
+      "name": "Token 校验",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F05.I03",
+      "name": "SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F05.I04",
+      "name": "身份会话同步",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M01.F05.I05",
+      "name": "登出",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M02.F01.I01",
+      "name": "合同列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M02.F01.I02",
+      "name": "合同详情",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M02.F01.I03",
+      "name": "合同删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M02.F01.I04",
+      "name": "合同汇总",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M02.F01.I05",
+      "name": "删除合同",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M02.F01.I06",
+      "name": "创建合同",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M02.F01.I07",
+      "name": "更新合同",
+      "type": "接口",
+      "status": "开发中"
+    },
+    {
+      "fn_id": "M03.F01.I01",
+      "name": "接样单列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I02",
+      "name": "接样单新建",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I03",
+      "name": "接样单编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I04",
+      "name": "接样单删除",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I05",
+      "name": "接样单详情",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F01.I06",
+      "name": "接样单三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I07",
+      "name": "接样单 ext 字段补录",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I08",
+      "name": "接样-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F01.I09",
+      "name": "接样-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F01.I10",
+      "name": "接样-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F02.I01",
+      "name": "任务分配",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F02.I02",
+      "name": "任务编辑（客户端视角 anchor）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F02.I03",
+      "name": "任务取消（清空分配）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F02.I04",
+      "name": "任务分配三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F02.I05",
+      "name": "任务分配-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F02.I06",
+      "name": "任务分配-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F02.I07",
+      "name": "任务分配-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I01",
+      "name": "样品列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I02",
+      "name": "样品详情",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I03",
+      "name": "创建样品",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I04",
+      "name": "检测项删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I05",
+      "name": "自动评定",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I06",
+      "name": "人工改判",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I07",
+      "name": "数据录入三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I08",
+      "name": "检测记录列表 API",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I09",
+      "name": "创建检测记录 API",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I10",
+      "name": "删除检测记录",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I11",
+      "name": "检测记录改判",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I12",
+      "name": "数据录入-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F03.I13",
+      "name": "数据录入-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I14",
+      "name": "数据录入-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F03.I15",
+      "name": "数据录入三态过滤器",
+      "type": "按钮",
+      "status": "开发中"
+    },
+    {
+      "fn_id": "M03.F03.I16",
+      "name": "更新样品",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M03.F03.I17",
+      "name": "删除样品",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M03.F05.I01",
+      "name": "报告审核页面",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F05.I02",
+      "name": "报告查看",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F05.I03",
+      "name": "审核操作",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F05.I04",
+      "name": "报告审核三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F05.I05",
+      "name": "报告审核-批量提交（已废）",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F05.I06",
+      "name": "报告审核-批量退回（已废）",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F05.I07",
+      "name": "报告审核-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F05.I08",
+      "name": "报告审核-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F05.I09",
+      "name": "报告审核-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F06.I01",
+      "name": "报告批准页面",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F06.I02",
+      "name": "报告查看",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F06.I03",
+      "name": "批准操作",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F06.I04",
+      "name": "报告批准三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F06.I05",
+      "name": "报告批准-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F06.I06",
+      "name": "报告批准-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F06.I07",
+      "name": "报告批准-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F07.I01",
+      "name": "报告发放页面",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F07.I02",
+      "name": "报告查看",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F07.I03",
+      "name": "发放操作",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F07.I04",
+      "name": "报告发放三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F07.I05",
+      "name": "报告发放-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F07.I06",
+      "name": "报告发放-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F07.I07",
+      "name": "报告发放-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F08.I01",
+      "name": "报告归档页面",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F08.I02",
+      "name": "报告查看",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F08.I03",
+      "name": "归档操作",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F08.I04",
+      "name": "报告归档三态过滤器",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F08.I05",
+      "name": "报告归档-提交",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F08.I06",
+      "name": "报告归档-退回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F08.I07",
+      "name": "报告归档-撤回",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M03.F09.I01",
+      "name": "查看按钮",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F09.I02",
+      "name": "详情页",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M03.F09.I03",
+      "name": "报告预览（详情页）",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F06.I01",
+      "name": "型号列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F06.I02",
+      "name": "型号新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F06.I03",
+      "name": "型号删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M04.F06.I04",
+      "name": "删除型号",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F07.I01",
+      "name": "规格列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F07.I02",
+      "name": "规格新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F07.I03",
+      "name": "规格删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M04.F07.I04",
+      "name": "删除规格",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F08.I01",
+      "name": "等级列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F08.I02",
+      "name": "等级新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F08.I03",
+      "name": "等级删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M04.F08.I04",
+      "name": "删除等级",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F09.I01",
+      "name": "牌号列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F09.I02",
+      "name": "牌号新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M04.F09.I03",
+      "name": "牌号删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M04.F09.I04",
+      "name": "删除牌号",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M05.F01.I01",
+      "name": "汇总表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M05.F01.I02",
+      "name": "仪表盘容器",
+      "type": "页面",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M05.F01.I03",
+      "name": "核心指标卡",
+      "type": "查询",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M05.F01.I04",
+      "name": "任务状态漏斗",
+      "type": "报表",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M05.F01.I05",
+      "name": "见证取样跟踪",
+      "type": "报表",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M05.F01.I06",
+      "name": "仪表盘统计基础端点",
+      "type": "查询",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I01",
+      "name": "检测专项列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I02",
+      "name": "检测专项新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I03",
+      "name": "检测专项删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F01.I04",
+      "name": "删除专项",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I05",
+      "name": "项目↔标准 link",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I06",
+      "name": "项目↔标准 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F01.I07",
+      "name": "项目↔标准 列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I01",
+      "name": "检测项目列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I02",
+      "name": "检测项目新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I03",
+      "name": "检测项目删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F02.I04",
+      "name": "关联检测依据",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F02.I05",
+      "name": "关联判定依据",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F02.I06",
+      "name": "关联检测参数",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F02.I07",
+      "name": "关联检测专项",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F02.I08",
+      "name": "项目↔参数 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I09",
+      "name": "专项↔项目 列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I10",
+      "name": "项目↔参数 列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I11",
+      "name": "删除项目",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F02.I12",
+      "name": "更新项目",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F02.I13",
+      "name": "专项↔项目 link",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I14",
+      "name": "项目↔参数 link",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F02.I15",
+      "name": "专项↔项目 unlink",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F03.I01",
+      "name": "检测参数列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I02",
+      "name": "检测参数新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I03",
+      "name": "检测参数删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F03.I04",
+      "name": "删除参数",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I05",
+      "name": "标准↔参数 link",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I06",
+      "name": "标准↔参数 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I07",
+      "name": "参数↔界面 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F03.I08",
+      "name": "标准↔参数 列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I01",
+      "name": "检测标准列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I02",
+      "name": "检测标准新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I03",
+      "name": "检测标准删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F04.I04",
+      "name": "关联检测参数",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F04.I05",
+      "name": "项目↔报告名称 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I06",
+      "name": "报告名称↔参数 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I07",
+      "name": "报告名称↔标准 unlink",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F04.I08",
+      "name": "更新标准",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F04.I09",
+      "name": "删除标准",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F05.I01",
+      "name": "计算方法列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F05.I02",
+      "name": "计算方法新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F05.I03",
+      "name": "计算方法删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F05.I04",
+      "name": "更新计算方法",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F05.I05",
+      "name": "删除计算方法",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F06.I01",
+      "name": "技术要求列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F06.I02",
+      "name": "技术要求新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F06.I03",
+      "name": "技术要求删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F06.I04",
+      "name": "更新技术要求",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F06.I05",
+      "name": "删除技术要求",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I01",
+      "name": "报告名称列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I02",
+      "name": "报告名称新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I03",
+      "name": "报告名称删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F07.I04",
+      "name": "关联检测项目",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I05",
+      "name": "关联检测依据",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I06",
+      "name": "关联判定依据",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I07",
+      "name": "关联检测参数",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I08",
+      "name": "扩展属性维护",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F07.I09",
+      "name": "删除报告名称",
+      "type": "接口",
+      "status": "规划"
+    },
+    {
+      "fn_id": "M06.F08.I01",
+      "name": "参数界面列表",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F08.I02",
+      "name": "参数界面新建/编辑",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F08.I03",
+      "name": "参数界面删除",
+      "type": "接口",
+      "status": "已废弃"
+    },
+    {
+      "fn_id": "M06.F08.I04",
+      "name": "关联检测参数",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F08.I05",
+      "name": "参数界面预览",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F08.I06",
+      "name": "参数界面预览弹窗",
+      "type": "接口",
+      "status": "已上线"
+    },
+    {
+      "fn_id": "M06.F08.I07",
+      "name": "删除参数界面",
+      "type": "接口",
+      "status": "规划"
+    }
+  ],
+  "trace": [
+    {
+      "fn_id": "M00.F01.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::AppShell header 挂 user-display-name（displayName，/api/auth/me hydrate）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::SSO 真后端 displayName 为空串时回退 username 渲染（空串回退回归锁）"
+      ]
+    },
+    {
+      "fn_id": "M00.F02.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::TenantSwitcher 挂 data-fn + 登出左侧渲染 + switchTenant 换 token"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::动态菜单下发：route 文件 @entry M01.F04.I01 锚点存在"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::(console) layout 守卫：源文件挂 data-fn=M01.F04.I02 + 含 router.replace('/login')",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::完整正向流程：draft → submitted → testing → review → approved",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::拒绝流程：review → rejected",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换守卫：draft 上直接 APPROVE 应保持不变且显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::非法转换端到端：FlowPanel 中 draft 状态无通过按钮（UI 守卫）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::权限守卫端到端：technician 在 review 状态无通过/拒绝按钮",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::撤回流程：submitted → draft",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::重置：任何状态回到 draft",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：SUBMIT 转换正确",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/integration/flowTransition.dom.test.tsx::reducer 单元测试：终态 approved 不可逆"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::SidebarNav 顶层 aside 挂 data-fn=M01.F04.I04",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照命中：Bearer sub 有快照 → 返回快照树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::快照 miss：无 token / sub 无快照 → 401（ADR-0019 删 demo 兜底）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::getMenuSnapshot：未写入/空 userId → null；写入后可读",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 命中 → 写入子树 + 完成 title→label 映射 + 跨 app 数据不污染",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：appCode 不在响应里 → 写空快照（saas 无本 app 菜单的合法形态）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::Record 形状：响应是空对象 → 写空快照",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::5xx → 不写快照 + warn（登录主流程不阻塞）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::网络异常 → 不写快照 + warn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-route.dom.test.tsx::userId/token 空 → 静默不写不发请求",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + saas 可达 → 自愈重拉 → 200 菜单树",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + saas 登录失败 → 仍 503 MENUS_UNAVAILABLE（错误语义不变）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::miss + 网络不可达 → 仍 503（不炸不挂起）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::无 Authorization 返 401（ADR-0019 删 demo USER-A 兜底）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::自愈成功后再次 miss 应走缓存命中——不重复调 saas serviceLogin（限流兜底）"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造（SSO 流程）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 已登录态可构造（SSO 流程）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::GET /api/auth/sso/authorize 返回 authorizeUrl（lab 端 SSO 入口）"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::ContractState / ReceiptState / SampleState 结构一致"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::拦截器接线：setToken 后请求附带 Authorization: Bearer 头",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::新建合同：POST 返回带 id+contractCode 的对象，且 GET 列表能查到",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::编辑合同：PUT 改 witness 后再 GET 该 id 字段已更新"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/contracts.crud.dom.test.tsx::删除合同：DELETE 后 GET 列表不再包含该 id"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::初始状态",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 keyword 搜索",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 支持 categoryCode 过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 空列表场景",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::fetchReceipts 网络错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::clearError"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormObjectLink.dom.test.tsx::新建接样单：选择“检测项目”后展示官方 InspectionObject",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptFormParamFilter.dom.test.tsx::选水泥报告 → 检测参数收窄到该报告关联参数（骨料参数不再出现）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 失败"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 不存在时 upsert 由 msw 404 → error（REF 语义差异见任务报告）"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 不存在"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I06",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::接样页：三态过滤器挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I07",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext:qualityCertNo 取 samples[0].ext[qualityCertNo]",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::resolveSourceByTag：ext: 命中但 sample 无 ext → 解析失败回退 —（不在此路径渲染）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：manifest 含 ext:qualityCertNo 时走 ext 源而非 mock",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::RN-102-1 grid：ext:qualityCertNo 未补录 → 打印 —，无残留 {tag}",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::扁平化向后兼容：旧 5 条 source 前缀未变"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::已安排的接样单显示「取消任务」按钮 + 点击触发 PUT 清空 assignee"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 成功",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples keyword 搜索",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples status 过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::初始状态",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::fetchSamples 网络错误后 error 填充",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::clearError 清除 error"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「保存」按钮挂 M03.F03.I02 + 点击触发 PUT",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 模式: 标题\"新建样品\"，表单为空",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::edit 模式: 填充 initialValues",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::create 提交触发 onSubmit with 表单值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: projectId 为空显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::必填校验: name 为空显示错误",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::点取消触发 onCancel",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::loading 时保存按钮禁用",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/SampleFormModal.dom.test.tsx::open=false 不渲染",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 成功后追加到 list",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 失败后 error 填充"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个报告名称都关联了至少一个检测参数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::砂浆抗压强度走试件轴且强度列 kyqd 有值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntryModelDispatch.dom.test.tsx::按参数界面关联派发模型",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 输入破坏荷载 1 试件后切到 S2，S2 不被脏写",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 保存后切回 S1 看不到 dirty 值（已落库清掉）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::RC-2024-0705-01-S1 显示 IP-0055 抗压强度参数卡（不再\"无可录入的检测参数\"）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::seedData 后 RC-2024-0705-01 的 testParameters 已迁 IP-0055（无 CON002）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 成功后 list 中对应项更新",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 不存在时 error 填充"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I07",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::数据录入页：三态过滤器挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I08",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total}"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I09",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I10",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::侧栏样品卡右上角「×」按钮挂删除锚点 + 点击弹 ConfirmModal",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 不存在时 error 填充"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I11",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂改判锚点 + 选 pass 后应用"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核页壳 smoke：渲染标题「报告审核」不炸"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I07",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::flow 适配多阶段连续流转：data_entry → review → approval"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::批准页壳 smoke：渲染标题「报告批准」不炸"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::发放页壳 smoke：渲染标题「报告发放」不炸"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::归档页壳 smoke：渲染标题「报告归档」不炸"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：有 unit 显示 名称(单位)",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 为空只显示名称，不带空括号",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：unit 缺省只显示名称",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：未知 code 回退显示 code，无 IP-前缀拼接",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：code 为空显示 —",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：命中报告名称显示简称",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::报告类别：老 categoryCode 找不到回退显示原编码",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数显示为 名称(单位)，无 IP- 前缀",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::报告类别显示报告简称，不显示原始编码",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按 receipt.testParameters 过滤（IP-9999 不在白名单 → 不显示）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测参数 card 只读：select/输入框 disabled（详情页只读模式）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::检测数据按参数界面派发：IP-0001 走 default 卡（4 格 + 检测依据 + 标准名称）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::判定依据 / 检测依据 显示「标准编号 + 标准名称」（不再只显示编码）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：docx 里出现的 {tag} 但 manifest 未登记 → 补成 —（不再打印 undefined）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/extFieldsRender.test.ts::ensureAllDocxTags：忽略 docxtemplater 控制标签 {#rows} / {/rows}",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::有种子的 RN 码 → 返回 /templates/<文件名> 非空 URL",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::全部 30 个带 templatePath 的 RN → URL 指向 public/templates 下真实存在的文件名（encodeURIComponent 往返）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/reportTemplateUrl.test.ts::无模板的类别码 → null（走「暂无报告模板」分支）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::空数组：原样返回",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::sample 内建 model/grade 都有 → 合成 `model grade` 写入 sampleName",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::ext.sampleModel 优先于 sample.model（补录覆盖内建）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 都有 → 合成三者空格连接",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::model/grade/brand 全空 → 原 sampleName 不变（避免误覆盖用户输入）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::只填 grade → 合成只含 grade（model 空被 filter 掉）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/sampleNameComposition.test.ts::samples[1..] 不变（合成只对首个样品；其它样品保留 sampleName 原值）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPage.dom.test.tsx::详情页标题栏有「报告预览」按钮，点击打开预览弹窗",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
+      ]
+    },
+    {
+      "fn_id": "M04.F06.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表"
+      ]
+    },
+    {
+      "fn_id": "M04.F06.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）"
+      ]
+    },
+    {
+      "fn_id": "M04.F06.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F07.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：渲染标题不炸"
+      ]
+    },
+    {
+      "fn_id": "M04.F07.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：新建按钮开弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F07.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：行内删除按钮开确认弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F08.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：渲染标题不炸"
+      ]
+    },
+    {
+      "fn_id": "M04.F08.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：新建按钮开弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F08.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：行内删除按钮开确认弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F09.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：牌号种子行渲染（fixtures 真数据穿透）"
+      ]
+    },
+    {
+      "fn_id": "M04.F09.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：新建按钮开弹窗"
+      ]
+    },
+    {
+      "fn_id": "M04.F09.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：行内删除按钮开确认弹窗"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I02 锚点存在（仪表盘容器，包裹 I03/I04/I01 三区块）"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I03",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I03 锚点 + 3 张核心指标卡（今日试验/报告产出/合格率）"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I04 锚点 + 6 段任务状态漏斗"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialty 必备字段与时间戳可构造",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：检测标准角色只允许 TESTING/JUDGMENT",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：准备状态 catalogued/under-review/operational/disabled"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项页打开“新建专项”弹窗",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::新建检测专项 启用 复选框默认勾选",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项编辑弹窗预填并提交 PUT"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项删除自定义未引用专项成功"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=TESTING 表示检测依据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectStandard role=JUDGMENT 表示判定依据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：检测标准性质以【】呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准关联 标准性质 下拉以中文呈现"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObject 携带 sourceProjectNo/sourceProjectName/sourcePage",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::类型守卫：InspectionObject 禁止 projectId/InspectionProject/InspectionObjectVariant/InspectionScheme 字段",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionReadinessStatus 联合类型可赋合法值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页按检测专项过滤",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目清单聚合显示检测参数名"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目页打开“新建项目”弹窗"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I13",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I14",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 关系必备字段",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：资质等级 QUALIFIED/RESTRICTED",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionObjectParameter 不再持有 projectId",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionQualificationLevel 联合类型只接受枚举值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 列出/添加/移除关联",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::AssociationManager 行内前缀：必备参数以 * 呈现",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测项目编辑弹窗出现 关联检测参数 页签",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数关联 资质级别 下拉以中文呈现"
+      ]
+    },
+    {
+      "fn_id": "M06.F03.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionParameter 保存 rawName/canonicalName/methodText/aliases",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页三级级联：选专项→项目→标准后请求带全部参数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数清单分页：可翻到下一页"
+      ]
+    },
+    {
+      "fn_id": "M06.F03.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数页打开“新建参数”弹窗",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数编辑弹窗渲染补足字段（sourceType/aliases）"
+      ]
+    },
+    {
+      "fn_id": "M06.F03.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数删除被引用时展示错误"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandard 含 version/status/sourceDocumentId",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页级联下拉：选专项后请求带 inspectionSpecialtyCode",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准清单状态以中文显示（现行）"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准页打开“新建标准”弹窗"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardParameter 仅承载标准↔参数多对多关联",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测标准编辑弹窗出现 关联检测参数 页签"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationMethod 至少 object+parameter，可选 testingStandardCode",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::左树渲染检测项目",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::展开检测项目 -> 显示子级检测标准",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::选中检测标准 -> 右侧展示列表 + sortOrder + 拖拽把手",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::计算方法：点击标准 -> 用 testingStandardCode 过滤 GET",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::未选标准时右侧显示空态"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionTechnicalRequirement 必带 judgmentStandardCode+conditions+verificationStatus",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/TwoLevelObjectStandardTree.dom.test.tsx::技术要求也复用：filterParam=judgmentStandardCode"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I02）"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::RN-101 行聚合显示其检测标准编码与检测参数名"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开 5 页签编辑弹窗（基础/项目/标准/参数/扩展属性）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I06",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I07",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I08",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::页签新增「扩展属性」，data-fn=M06.F07.I08",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::列表新增「扩展属性」列展示已有 extFields",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性列存在，编辑弹窗含「扩展属性」页签",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx::扩展属性页签：空表 + + 新增 按钮 / 删除按钮 可见；type=select 时 options 输入可写"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I09",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I01",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I02",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I04",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 paramInterfaceCode 全部存在于 inspection-param-interface.json",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::压实度报告逐行取到干密度/压实度/评定",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了非默认录入卡",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::ReceiptDetail 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I05",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I06",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I07",
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
+      ]
+    }
+  ],
+  "source_index": [
+    {
+      "fn_id": "M00.F01.I01",
+      "source_paths": [
+        "src\\components\\app\\app-shell.tsx"
+      ]
+    },
+    {
+      "fn_id": "M00.F02.I01",
+      "source_paths": [
+        "src\\components\\app\\tenant-switcher.tsx"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I01",
+      "source_paths": [
+        "src\\app\\api\\auth\\menus\\route.ts"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I02",
+      "source_paths": [
+        "src\\app\\(console)\\layout.tsx"
+      ]
+    },
+    {
+      "fn_id": "M01.F04.I04",
+      "source_paths": [
+        "src\\components\\app\\sidebar-nav.tsx"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I02",
+      "source_paths": [
+        "src\\api\\legacy-client.ts"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I03",
+      "source_paths": [
+        "src\\app\\api\\auth\\sso\\authorize\\route.ts",
+        "src\\app\\api\\auth\\sso\\callback\\route.ts",
+        "src\\app\\login\\page.tsx"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I04",
+      "source_paths": [
+        "src\\state\\authStore.ts"
+      ]
+    },
+    {
+      "fn_id": "M01.F05.I05",
+      "source_paths": [
+        "src\\components\\app\\app-shell.tsx"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I01",
+      "source_paths": [
+        "src\\app\\(console)\\contracts\\page.tsx"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I02",
+      "source_paths": [
+        "src\\app\\(console)\\contracts\\page.tsx"
+      ]
+    },
+    {
+      "fn_id": "M02.F01.I05",
+      "source_paths": [
+        "src\\app\\(console)\\contracts\\page.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I01",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I02",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I03",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I04",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I06",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F01.I07",
+      "source_paths": [
+        "src\\features\\data-entry\\SampleExtFieldsModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I01",
+      "source_paths": [
+        "src\\features\\task-assignment\\TaskAssignmentPage.tsx",
+        "src\\state\\flowReducer.ts",
+        "src\\state\\flowStore.ts",
+        "src\\state\\transitions.ts"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I03",
+      "source_paths": [
+        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F02.I04",
+      "source_paths": [
+        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I01",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I02",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I03",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx",
+        "src\\features\\data-entry\\models\\ParticleGradationCard.tsx",
+        "src\\features\\data-entry\\models\\SoilCompactionCard.tsx",
+        "src\\features\\data-entry\\models\\SoilCompactionDegreeCard.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I07",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I08",
+      "source_paths": [
+        "src\\app\\api\\test-records\\route.ts"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I09",
+      "source_paths": [
+        "src\\app\\api\\test-records\\route.ts"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I10",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F03.I11",
+      "source_paths": [
+        "src\\features\\data-entry\\DataEntryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I01",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\flow-stages.ts",
+        "src\\features\\reports\\ReportReviewPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I02",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I04",
+      "source_paths": [
+        "src\\features\\reports\\ReportReviewPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F05.I07",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I01",
+      "source_paths": [
+        "src\\features\\reports\\ReportApprovePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I02",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I04",
+      "source_paths": [
+        "src\\features\\reports\\ReportApprovePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F06.I05",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I01",
+      "source_paths": [
+        "src\\features\\reports\\ReportIssuePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I02",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I04",
+      "source_paths": [
+        "src\\features\\reports\\ReportIssuePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F07.I05",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I01",
+      "source_paths": [
+        "src\\features\\reports\\ReportArchivePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I02",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I04",
+      "source_paths": [
+        "src\\features\\reports\\ReportArchivePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F08.I05",
+      "source_paths": [
+        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I01",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I02",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M03.F09.I03",
+      "source_paths": [
+        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M04.F06.I01",
+      "source_paths": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M04.F07.I01",
+      "source_paths": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M04.F08.I01",
+      "source_paths": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M04.F09.I01",
+      "source_paths": [
+        "src\\features\\dicts\\CategoryDictList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I01",
+      "source_paths": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I02",
+      "source_paths": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I03",
+      "source_paths": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I04",
+      "source_paths": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M05.F01.I06",
+      "source_paths": [
+        "src\\features\\summary\\SummaryPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I04",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F01.I05",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I11",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I13",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F02.I14",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F03.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F03.I04",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I04",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F04.I09",
+      "source_paths": [
+        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I01",
+      "source_paths": [
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F05.I05",
+      "source_paths": [
+        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I01",
+      "source_paths": [
+        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F06.I05",
+      "source_paths": [
+        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I01",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I06",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I07",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F07.I09",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ReportNameList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I01",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I02",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I04",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I05",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I06",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
+      ]
+    },
+    {
+      "fn_id": "M06.F08.I07",
+      "source_paths": [
+        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+      ]
+    }
+  ]
+}
