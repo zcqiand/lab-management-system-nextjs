@@ -252,7 +252,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::apiClient/identityClient 请求拦截器注入 Authorization Bearer",
-        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:3601 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth-read.test.ts:4261 (annot)",
         "output\\lab-management-system-contract-test\\tests\\auth-write.test.ts:1336 (annot)",
         "output\\lab-management-system-contract-test\\tests\\calculation-methods-write.test.ts:3147 (annot)",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:8707 (annot)",

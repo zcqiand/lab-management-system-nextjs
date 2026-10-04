@@ -46,6 +46,20 @@ if [ -z "${DATABASE_URL:-}" ]; then
   echo "ERROR: DATABASE_URL env is required to bootstrap lab.env (set in GitHub Actions secret DATABASE_URL)" >&2
   exit 1
 fi
+
+# PG_* 五件套从 DATABASE_URL 密码段派生(2026-10-04 L0.5 check_deploy_parity 对齐,
+# 派生块与 saas-identity-platform-nextjs.sh 同款):drizzle-kit config 强制读离散键
+# (不解析 URL),docker-entrypoint.sh 运行期已派生,这里管 lab.env 文件本体。
+PG_URL_PASSWORD="$(printf '%s' "$DATABASE_URL" | sed -n 's#^[A-Za-z][A-Za-z0-9+.-]*://[^:/@]*:\([^@]*\)@.*#\1#p')"
+case "$PG_URL_PASSWORD" in
+  *%*) PG_PASSWORD_DERIVED="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))' "$PG_URL_PASSWORD")" || {
+        echo "ERROR: DATABASE_URL 密码段 percent-decode 失败(python3 缺失?);请手工补 $BASE/lab.env 的 PG_PASSWORD" >&2
+        exit 1
+      } ;;
+  *) PG_PASSWORD_DERIVED="$PG_URL_PASSWORD" ;;
+esac
+[ -n "$PG_PASSWORD_DERIVED" ] || { echo "ERROR: 无法从 DATABASE_URL 解析密码段" >&2; exit 1; }
+
 if [ ! -f "$BASE/lab.env" ]; then
   # 禁默认值兜底(2026-08-28 CLAUDE.md 硬规则):secret 类必须显式传入并 fail-fast
   # 指明缺哪个 —— 服务账号缺失时 login/route.ts 会静默吃 dev fallback alice/dev123456,
@@ -58,6 +72,12 @@ if [ ! -f "$BASE/lab.env" ]; then
   umask 077
   {
     printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+    # PG_* 五件套(全家族统一离散键;host/port/user/db = .env.production 契约值,密码派生)
+    printf 'PG_HOST=100.79.128.25\n'
+    printf 'PG_PORT=5432\n'
+    printf 'PG_USER=postgres\n'
+    printf 'PG_PASSWORD=%s\n' "$PG_PASSWORD_DERIVED"
+    printf 'PG_DATABASE=lab_prod\n'
     printf 'LAB_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
     # Phase 4 env 对称化: SAAS_BASE_URL 拆成 SAAS_IDP_URL (IdP 端点) + SAAS_UI_BASE_URL (登录 UI 页)。
     # 非 secret 走显式 prod 字面量(值 = .env.production 契约值),不吃 ${VAR:-default} 兜底。
@@ -135,6 +155,12 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing NEXT_PUBLIC_API_MODE 'nextjs'
   # 2026-09-22 CORS 治本:老 lab.env 补白名单(值 = bootstrap 块同值)
   append_if_missing LAB_CORS_ALLOWED_ORIGINS 'https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk'
+  # PG_* 五件套(2026-10-04 L0.5 对齐;drizzle-kit config 读离散键不解析 URL)
+  append_if_missing PG_HOST '100.79.128.25'
+  append_if_missing PG_PORT '5432'
+  append_if_missing PG_USER 'postgres'
+  append_if_missing PG_PASSWORD "$PG_PASSWORD_DERIVED"
+  append_if_missing PG_DATABASE 'lab_prod'
   # 服务账号是 secret 类:老文件已有则保留;没有则从 env 传入,fail-fast 不兜底
   if ! grep -q '^LAB_SAAS_SERVICE_USER=' "$BASE/lab.env"; then
     if [ -z "${LAB_SAAS_SERVICE_USER:-}" ] || [ -z "${LAB_SAAS_SERVICE_PASSWORD:-}" ]; then
