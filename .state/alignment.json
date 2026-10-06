@@ -88,7 +88,7 @@
         "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:2104 (annot)"
       ],
       "entry": [
-        "src\\components\\app\\app-shell.tsx"
+        "src/components/app/app-shell.tsx"
       ]
     },
     "M00.F02.I01": {
@@ -102,7 +102,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/components/header-session.dom.test.tsx::TenantSwitcher 挂 data-fn + 登出左侧渲染 + switchTenant 换 token"
       ],
       "entry": [
-        "src\\components\\app\\tenant-switcher.tsx"
+        "src/components/app/tenant-switcher.tsx"
       ]
     },
     "M01.F04.I01": {
@@ -129,7 +129,7 @@
         "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2177 (annot)"
       ],
       "entry": [
-        "src\\app\\api\\auth\\menus\\route.ts"
+        "src/app/api/auth/menus/route.ts"
       ]
     },
     "M01.F04.I02": {
@@ -167,7 +167,7 @@
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:759 (annot)"
       ],
       "entry": [
-        "src\\app\\(console)\\layout.tsx"
+        "src/app/(console)/layout.tsx"
       ]
     },
     "M01.F04.I03": {
@@ -209,7 +209,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/menus-selfheal.dom.test.tsx::自愈成功后再次 miss 应走缓存命中——不重复调 saas serviceLogin（限流兜底）"
       ],
       "entry": [
-        "src\\components\\app\\sidebar-nav.tsx"
+        "src/components/app/sidebar-nav.tsx"
       ]
     },
     "M01.F05.I01": {
@@ -266,7 +266,7 @@
         "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2812 (annot)"
       ],
       "entry": [
-        "src\\api\\legacy-client.ts"
+        "src/api/legacy-client.ts"
       ]
     },
     "M01.F05.I03": {
@@ -286,7 +286,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/store.test.ts::AuthState 未登录态可构造（SSO 流程）"
       ],
       "entry": [
-        "src\\app\\login\\page.tsx"
+        "src/app/login/page.tsx"
       ]
     },
     "M01.F05.I04": {
@@ -304,7 +304,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::authStore.acceptSsoSession @entry 注释存在 + /api/auth/permissions 路由就绪"
       ],
       "entry": [
-        "src\\state\\authStore.ts"
+        "src/state/authStore.ts"
       ]
     },
     "M01.F05.I05": {
@@ -322,7 +322,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/auth.dom.test.tsx::POST /api/auth/logout 返回 204；登出按钮 data-fn=M01.F05.I05"
       ],
       "entry": [
-        "src\\components\\app\\app-shell.tsx"
+        "src/components/app/app-shell.tsx"
       ]
     },
     "M02.F01.I01": {
@@ -339,7 +339,7 @@
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:90 (annot)"
       ],
       "entry": [
-        "src\\app\\(console)\\contracts\\page.tsx"
+        "src/app/(console)/contracts/page.tsx"
       ]
     },
     "M02.F01.I02": {
@@ -358,7 +358,7 @@
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:111 (annot)"
       ],
       "entry": [
-        "src\\app\\(console)\\contracts\\page.tsx"
+        "src/app/(console)/contracts/page.tsx"
       ]
     },
     "M02.F01.I03": {
@@ -399,7 +399,7 @@
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:189 (annot)"
       ],
       "entry": [
-        "src\\app\\(console)\\contracts\\page.tsx"
+        "src/app/(console)/contracts/page.tsx"
       ]
     },
     "M02.F01.I06": {
@@ -445,7 +445,7 @@
         "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:5189 (annot)"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptList.tsx"
+        "src/features/receipts/ReceiptList.tsx"
       ]
     },
     "M03.F01.I02": {
@@ -466,7 +466,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::createReceipt 成功"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptList.tsx"
+        "src/features/receipts/ReceiptList.tsx"
       ]
     },
     "M03.F01.I03": {
@@ -485,7 +485,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::updateReceipt 成功"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptList.tsx"
+        "src/features/receipts/ReceiptList.tsx"
       ]
     },
     "M03.F01.I04": {
@@ -504,7 +504,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/receiptStore.dom.test.ts::deleteReceipt 成功"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptList.tsx"
+        "src/features/receipts/ReceiptList.tsx"
       ]
     },
     "M03.F01.I05": {
@@ -533,7 +533,7 @@
         "output\\lab-management-system-contract-test\\tests\\receipts-act-history.test.ts:1487 (annot)"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptList.tsx"
+        "src/features/receipts/ReceiptList.tsx"
       ]
     },
     "M03.F01.I07": {
@@ -558,7 +558,7 @@
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:3849 (annot)"
       ],
       "entry": [
-        "src\\features\\data-entry\\SampleExtFieldsModal.tsx"
+        "src/features/data-entry/SampleExtFieldsModal.tsx"
       ]
     },
     "M03.F01.I08": {
@@ -609,7 +609,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
       ],
       "entry": [
-        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
+        "src/features/task-assignment/TaskAssignmentPage.tsx"
       ]
     },
     "M03.F02.I02": {
@@ -641,7 +641,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::已安排的接样单显示「取消任务」按钮 + 点击触发 PUT 清空 assignee"
       ],
       "entry": [
-        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
+        "src/features/task-assignment/TaskAssignmentPage.tsx"
       ]
     },
     "M03.F02.I04": {
@@ -659,7 +659,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/task-assignment/TaskAssignmentCancel.dom.test.tsx::任务安排页 3 锚点存在"
       ],
       "entry": [
-        "src\\features\\task-assignment\\TaskAssignmentPage.tsx"
+        "src/features/task-assignment/TaskAssignmentPage.tsx"
       ]
     },
     "M03.F02.I05": {
@@ -712,7 +712,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::初始状态"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I02": {
@@ -740,7 +740,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::createSample 成功后追加到 list"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I03": {
@@ -771,10 +771,10 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 成功后 list 中对应项更新"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx",
-        "src\\features\\data-entry\\models\\ParticleGradationCard.tsx",
-        "src\\features\\data-entry\\models\\SoilCompactionCard.tsx",
-        "src\\features\\data-entry\\models\\SoilCompactionDegreeCard.tsx"
+        "src/features/data-entry/DataEntryPage.tsx",
+        "src/features/data-entry/models/ParticleGradationCard.tsx",
+        "src/features/data-entry/models/SoilCompactionCard.tsx",
+        "src/features/data-entry/models/SoilCompactionDegreeCard.tsx"
       ]
     },
     "M03.F03.I04": {
@@ -824,7 +824,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::数据录入页：三态过滤器挂 data-fn"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I08": {
@@ -841,7 +841,7 @@
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:19171 (annot)"
       ],
       "entry": [
-        "src\\app\\api\\test-records\\route.ts"
+        "src/app/api/test-records/route.ts"
       ]
     },
     "M03.F03.I09": {
@@ -857,7 +857,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/test-records.dom.test.tsx::POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子"
       ],
       "entry": [
-        "src\\app\\api\\test-records\\route.ts"
+        "src/app/api/test-records/route.ts"
       ]
     },
     "M03.F03.I10": {
@@ -877,7 +877,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::deleteSample 成功后从 list 移除"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I11": {
@@ -895,7 +895,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/DataEntryActions.dom.test.tsx::footer「改判」select 挂改判锚点 + 选 pass 后应用"
       ],
       "entry": [
-        "src\\features\\data-entry\\DataEntryPage.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I12": {
@@ -974,7 +974,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核页壳 smoke：渲染标题「报告审核」不炸"
       ],
       "entry": [
-        "src\\features\\reports\\ReportReviewPage.tsx"
+        "src/features/reports/ReportReviewPage.tsx"
       ]
     },
     "M03.F05.I02": {
@@ -992,7 +992,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F05.I03": {
@@ -1020,7 +1020,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::审核页：查看详情 + 审核通过 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\reports\\ReportReviewPage.tsx"
+        "src/features/reports/ReportReviewPage.tsx"
       ]
     },
     "M03.F05.I05": {
@@ -1060,7 +1060,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::审核通过动作穿透：review 单据 submit 后流入批准环节"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F05.I08": {
@@ -1099,7 +1099,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::批准页壳 smoke：渲染标题「报告批准」不炸"
       ],
       "entry": [
-        "src\\features\\reports\\ReportApprovePage.tsx"
+        "src/features/reports/ReportApprovePage.tsx"
       ]
     },
     "M03.F06.I02": {
@@ -1117,7 +1117,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F06.I03": {
@@ -1145,7 +1145,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\reports\\ReportApprovePage.tsx"
+        "src/features/reports/ReportApprovePage.tsx"
       ]
     },
     "M03.F06.I05": {
@@ -1163,7 +1163,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::批准页：查看详情 + 批准 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F06.I06": {
@@ -1202,7 +1202,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::发放页壳 smoke：渲染标题「报告发放」不炸"
       ],
       "entry": [
-        "src\\features\\reports\\ReportIssuePage.tsx"
+        "src/features/reports/ReportIssuePage.tsx"
       ]
     },
     "M03.F07.I02": {
@@ -1220,7 +1220,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F07.I03": {
@@ -1248,7 +1248,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\reports\\ReportIssuePage.tsx"
+        "src/features/reports/ReportIssuePage.tsx"
       ]
     },
     "M03.F07.I05": {
@@ -1266,7 +1266,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::发放页：查看详情 + 发放 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F07.I06": {
@@ -1305,7 +1305,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/reports/reportStagePages.dom.test.tsx::归档页壳 smoke：渲染标题「报告归档」不炸"
       ],
       "entry": [
-        "src\\features\\reports\\ReportArchivePage.tsx"
+        "src/features/reports/ReportArchivePage.tsx"
       ]
     },
     "M03.F08.I02": {
@@ -1323,7 +1323,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F08.I03": {
@@ -1351,7 +1351,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\reports\\ReportArchivePage.tsx"
+        "src/features/reports/ReportArchivePage.tsx"
       ]
     },
     "M03.F08.I05": {
@@ -1369,7 +1369,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/flow-pipeline/FlowStagePage.dom.test.tsx::归档页：查看详情 + 归档 按钮挂 data-fn"
       ],
       "entry": [
-        "src\\features\\flow-pipeline\\FlowStagePage.tsx"
+        "src/features/flow-pipeline/FlowStagePage.tsx"
       ]
     },
     "M03.F08.I06": {
@@ -1407,7 +1407,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+        "src/features/receipts/ReceiptDetailPage.tsx"
       ]
     },
     "M03.F09.I02": {
@@ -1439,7 +1439,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/detailLabels.dom.test.ts::检测参数：未知 code 回退显示 code，无 IP-前缀拼接"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+        "src/features/receipts/ReceiptDetailPage.tsx"
       ]
     },
     "M03.F09.I03": {
@@ -1470,7 +1470,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/receipts/ReceiptDetailPageFn.dom.test.tsx::详情页 3 锚点挂上"
       ],
       "entry": [
-        "src\\features\\receipts\\ReceiptDetailPage.tsx"
+        "src/features/receipts/ReceiptDetailPage.tsx"
       ]
     },
     "M04.F06.I01": {
@@ -1486,7 +1486,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：渲染标题 + 检测项目树 + 默认选中项目下列表"
       ],
       "entry": [
-        "src\\features\\dicts\\CategoryDictList.tsx"
+        "src/features/dicts/CategoryDictList.tsx"
       ]
     },
     "M04.F06.I02": {
@@ -1555,7 +1555,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::规格维护：渲染标题不炸"
       ],
       "entry": [
-        "src\\features\\dicts\\CategoryDictList.tsx"
+        "src/features/dicts/CategoryDictList.tsx"
       ]
     },
     "M04.F07.I02": {
@@ -1618,7 +1618,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::等级维护：渲染标题不炸"
       ],
       "entry": [
-        "src\\features\\dicts\\CategoryDictList.tsx"
+        "src/features/dicts/CategoryDictList.tsx"
       ]
     },
     "M04.F08.I02": {
@@ -1681,7 +1681,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::牌号维护：牌号种子行渲染（fixtures 真数据穿透）"
       ],
       "entry": [
-        "src\\features\\dicts\\CategoryDictList.tsx"
+        "src/features/dicts/CategoryDictList.tsx"
       ]
     },
     "M04.F09.I02": {
@@ -1736,7 +1736,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）"
       ],
       "entry": [
-        "src\\features\\summary\\SummaryPage.tsx"
+        "src/features/summary/SummaryPage.tsx"
       ]
     },
     "M05.F01.I02": {
@@ -1752,7 +1752,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I02 锚点存在（仪表盘容器，包裹 I03/I04/I01 三区块）"
       ],
       "entry": [
-        "src\\features\\summary\\SummaryPage.tsx"
+        "src/features/summary/SummaryPage.tsx"
       ]
     },
     "M05.F01.I03": {
@@ -1771,7 +1771,7 @@
         "output\\lab-management-system-contract-test\\tests\\summary.test.ts:3725 (annot)"
       ],
       "entry": [
-        "src\\features\\summary\\SummaryPage.tsx"
+        "src/features/summary/SummaryPage.tsx"
       ]
     },
     "M05.F01.I04": {
@@ -1789,7 +1789,7 @@
         "output\\lab-management-system-contract-test\\tests\\summary.test.ts:4435 (annot)"
       ],
       "entry": [
-        "src\\features\\summary\\SummaryPage.tsx"
+        "src/features/summary/SummaryPage.tsx"
       ]
     },
     "M05.F01.I05": {
@@ -1811,7 +1811,7 @@
       "designs": [],
       "tests": [],
       "entry": [
-        "src\\features\\summary\\SummaryPage.tsx"
+        "src/features/summary/SummaryPage.tsx"
       ]
     },
     "M06.F01.I01": {
@@ -1845,7 +1845,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项页打开“新建专项”弹窗"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F01.I03": {
@@ -1871,7 +1871,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测专项删除自定义未引用专项成功"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F01.I05": {
@@ -1891,7 +1891,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardRole 联合类型只接受枚举值"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+        "src/features/inspection-capability/InspectionCapabilityFormModal.tsx"
       ]
     },
     "M06.F01.I06": {
@@ -1952,7 +1952,7 @@
         "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:8874 (annot)"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F02.I03": {
@@ -2060,7 +2060,7 @@
       ],
       "tests": [],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F02.I12": {
@@ -2086,7 +2086,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionSpecialtyObject 中间表维持多对多关系"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+        "src/features/inspection-capability/InspectionCapabilityFormModal.tsx"
       ]
     },
     "M06.F02.I14": {
@@ -2109,7 +2109,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::枚举常量：资质等级 QUALIFIED/RESTRICTED"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+        "src/features/inspection-capability/InspectionCapabilityFormModal.tsx"
       ]
     },
     "M06.F02.I15": {
@@ -2153,7 +2153,7 @@
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:4994 (annot)"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F03.I03": {
@@ -2179,7 +2179,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/inspectionCapabilityCrud.dom.test.tsx::检测参数删除被引用时展示错误"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F03.I05": {
@@ -2262,7 +2262,7 @@
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:5532 (annot)"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F04.I03": {
@@ -2289,7 +2289,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionStandardParameter 仅承载标准↔参数多对多关联"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityFormModal.tsx"
+        "src/features/inspection-capability/InspectionCapabilityFormModal.tsx"
       ]
     },
     "M06.F04.I05": {
@@ -2349,7 +2349,7 @@
       ],
       "tests": [],
       "entry": [
-        "src\\features\\inspection-capability\\InspectionCapabilityPage.tsx"
+        "src/features/inspection-capability/InspectionCapabilityPage.tsx"
       ]
     },
     "M06.F05.I01": {
@@ -2370,7 +2370,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionCalculationMethod 至少 object+parameter，可选 testingStandardCode"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+        "src/features/inspection-capability/CalculationMethodList.tsx"
       ]
     },
     "M06.F05.I02": {
@@ -2387,7 +2387,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：检测项目/参数/标准/算法/试件数字段齐备"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+        "src/features/inspection-capability/CalculationMethodList.tsx"
       ]
     },
     "M06.F05.I03": {
@@ -2430,7 +2430,7 @@
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:18509 (annot)"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\CalculationMethodList.tsx"
+        "src/features/inspection-capability/CalculationMethodList.tsx"
       ]
     },
     "M06.F06.I01": {
@@ -2447,7 +2447,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/types/inspection.test.ts::InspectionTechnicalRequirement 必带 judgmentStandardCode+conditions+verificationStatus"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+        "src/features/inspection-capability/TechnicalRequirementList.tsx"
       ]
     },
     "M06.F06.I02": {
@@ -2464,7 +2464,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+        "src/features/inspection-capability/TechnicalRequirementList.tsx"
       ]
     },
     "M06.F06.I03": {
@@ -2502,7 +2502,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮挂 deleteDataFn 锚点"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\TechnicalRequirementList.tsx"
+        "src/features/inspection-capability/TechnicalRequirementList.tsx"
       ]
     },
     "M06.F07.I01": {
@@ -2519,7 +2519,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/reportNameListAggregation.dom.test.tsx::列表列：编码/简称/检测标准(聚合)/检测参数(聚合)/操作"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
+        "src/features/inspection-capability/ReportNameList.tsx"
       ]
     },
     "M06.F07.I02": {
@@ -2536,7 +2536,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（编辑态，data-fn 挂 I02）"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
+        "src/features/inspection-capability/ReportNameList.tsx"
       ]
     },
     "M06.F07.I03": {
@@ -2592,7 +2592,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
+        "src/features/inspection-capability/ReportNameList.tsx"
       ]
     },
     "M06.F07.I07": {
@@ -2608,7 +2608,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::编辑弹窗 4 关联页签可达：项目/标准(检测+判定)/参数"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
+        "src/features/inspection-capability/ReportNameList.tsx"
       ]
     },
     "M06.F07.I08": {
@@ -2641,7 +2641,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（删除保护：被关联时后端拒绝 → error 提示）"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ReportNameList.tsx"
+        "src/features/inspection-capability/ReportNameList.tsx"
       ]
     },
     "M06.F08.I01": {
@@ -2657,7 +2657,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+        "src/features/inspection-capability/ParamInterfaceList.tsx"
       ]
     },
     "M06.F08.I02": {
@@ -2673,7 +2673,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+        "src/features/inspection-capability/ParamInterfaceList.tsx"
       ]
     },
     "M06.F08.I03": {
@@ -2707,7 +2707,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+        "src/features/inspection-capability/ParamInterfaceList.tsx"
       ]
     },
     "M06.F08.I05": {
@@ -2723,7 +2723,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行预览按钮开只读预览弹窗（挂 I06 data-fn）"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+        "src/features/inspection-capability/ParamInterfaceList.tsx"
       ]
     },
     "M06.F08.I06": {
@@ -2740,7 +2740,7 @@
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:12381 (annot)"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfacePreviewModal.tsx"
+        "src/features/inspection-capability/ParamInterfacePreviewModal.tsx"
       ]
     },
     "M06.F08.I07": {
@@ -2756,7 +2756,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行删除按钮存在（isOfficial 内置模型后端拒绝 → error 提示）"
       ],
       "entry": [
-        "src\\features\\inspection-capability\\ParamInterfaceList.tsx"
+        "src/features/inspection-capability/ParamInterfaceList.tsx"
       ]
     }
   }
