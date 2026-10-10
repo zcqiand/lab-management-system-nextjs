@@ -31,25 +31,73 @@ describe("M98 frontend 接线层", () => {
   it("POST /api/auth/login 接受 username+password 返回真 HS256 token + 3 租户", async () => {
     // ADR-0019 + P2 debt：login 改用 LabJwtSigner 真签 (3 段 base64url)，
     // 与 msw/aspnetcore/springboot 3 真后端 token 形态对齐 → contract-test 4-way 一致。
-    const req = new Request("http://test/api/auth/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username: "alice", password: "dev123456" }),
+    // REQ-2026-023（2026-10-11）：账密校验代理 saas IdP——stub fetch 供
+    // saas 密码登录 200 + admin/tenants 200（富化）+ serviceLogin 200（菜单快照）。
+    const origFetch = globalThis.fetch;
+    const fetchStub = vi.fn(async (url: string | URL) => {
+      const u = String(url);
+      if (u.includes("/api/v1/auth/login")) {
+        return new Response(
+          JSON.stringify({
+            user: {
+              id: "USER-A",
+              username: "alice",
+              email: "alice@saas.local",
+              status: "active",
+            },
+            availableTenants: [
+              { tenantId: "TENANT-001", roleIds: ["admin"], status: "active" },
+              { tenantId: "TENANT-002", roleIds: ["technician"], status: "active" },
+              { tenantId: "TENANT-003", roleIds: ["viewer"], status: "active" },
+            ],
+            accessToken: "saas-access-token",
+            refreshToken: "saas-refresh-token",
+            userId: "USER-A",
+            clientId: "lab-management",
+            tokenType: "Bearer",
+            expiresIn: 3600,
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      if (u.includes("/api/v1/admin/tenants")) {
+        return new Response(
+          JSON.stringify({
+            items: [
+              { id: "TENANT-001", name: "市住建工程质量检测中心", tenantKey: "city-lab" },
+              { id: "TENANT-002", name: "区检测站", tenantKey: "district-lab" },
+              { id: "TENANT-003", name: "第三方检测实验室", tenantKey: "third-party" },
+            ],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return new Response("{}", { status: 404 });
     });
-    const res = await loginPOST(req);
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      token: string;
-      tenants: Array<{ tenantId: string }>;
-    };
-    // 真 JWT = 3 段 base64url + payload 含 sub
-    expect(body.token.split(".").length).toBe(3);
-    const payload = JSON.parse(
-      Buffer.from(body.token.split(".")[1]!, "base64url").toString("utf-8"),
-    );
-    expect(payload.sub).toBe("USER-A");
-    expect(body.tenants).toHaveLength(3);
-    expect(body.tenants[0]?.tenantId).toBe("TENANT-001");
+    globalThis.fetch = fetchStub as unknown as typeof fetch;
+    try {
+      const req = new Request("http://test/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ username: "alice", password: "dev123456" }),
+      });
+      const res = await loginPOST(req);
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        token: string;
+        tenants: Array<{ tenantId: string }>;
+      };
+      // 真 JWT = 3 段 base64url + payload 含 sub
+      expect(body.token.split(".").length).toBe(3);
+      const payload = JSON.parse(
+        Buffer.from(body.token.split(".")[1]!, "base64url").toString("utf-8"),
+      );
+      expect(payload.sub).toBe("USER-A");
+      expect(body.tenants).toHaveLength(3);
+      expect(body.tenants[0]?.tenantId).toBe("TENANT-001");
+    } finally {
+      globalThis.fetch = origFetch;
+    }
   });
 
   it("GET /api/auth/me 无 Bearer 返 401（ADR-0019 删 demo 兜底）", async () => {

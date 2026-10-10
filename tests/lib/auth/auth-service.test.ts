@@ -5,7 +5,9 @@
 // （2026-09-20 人裁）从 src 删除——测试替身就地内联，签名/返回值与原 src 版
 // 逐字对齐（dev-code / dev-refresh-token / USER-A 三租户），AuthService 的
 // refresh 嵌入与 ssoCallback 断言依赖这些字面值。
-// 覆盖 login / refresh / ssoAuthorize / ssoCallback / me / switchTenant。
+// 覆盖 refresh / ssoAuthorize / ssoCallback / me / switchTenant。
+// REQ-2026-023（2026-10-11）：AuthService.login 本地校验路径已删——账密校验
+// 代理 saas IdP，实现归 /api/auth/login route（tests/api/auth-native-login-proxy.test.ts）。
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { LabJwtSigner } from "@/lib/auth/jwt";
@@ -119,7 +121,7 @@ class StubSaasMeClient implements SaasMeClient {
 const SECRET = "test-lab-jwt-secret-test-lab-jwt-secret-test-lab-jwt-secret";
 const JWT = new LabJwtSigner(SECRET, "lab-test", 3600, 604800);
 const STCOOKIE = new StateCookieManager(SECRET);
-const DIR = new ConfigUserDirectory("dev123456");
+const DIR = new ConfigUserDirectory();
 const SVC = new AuthService(
   DIR,
   JWT,
@@ -140,22 +142,6 @@ afterEach(() => {
 });
 
 describe("M01.F05 AuthService", () => {
-  it("login success returns session with 3 tenants", () => {
-    const resp = SVC.login("alice", "dev123456");
-    expect(resp.user.id).toBe("USER-A");
-    expect(resp.tenants).toHaveLength(3);
-    expect(resp.token).toBeTruthy();
-    expect(resp.refreshToken).toBeTruthy();
-  });
-
-  it("login wrong password throws", () => {
-    expect(() => SVC.login("alice", "wrong")).toThrow(/Invalid/);
-  });
-
-  it("login blank fields throws", () => {
-    expect(() => SVC.login("", "")).toThrow(/required/);
-  });
-
   it("refresh round trip with embedded saas_refresh_token", async () => {
     const refreshToken = JWT.issueRefresh("USER-A", "saas-rt-new");
     const resp = await SVC.refresh(refreshToken);

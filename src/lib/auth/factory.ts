@@ -29,9 +29,6 @@ export interface LabConfig {
     defaultTenantId: string;
     callbackRedirectUri: string;
   };
-  auth: {
-    devPassword: string;
-  };
 }
 
 export function readLabConfig(env: NodeJS.ProcessEnv = process.env): LabConfig {
@@ -57,9 +54,6 @@ export function readLabConfig(env: NodeJS.ProcessEnv = process.env): LabConfig {
       clientSecret: env.LAB_SAAS_CLIENT_SECRET ?? "",
       defaultTenantId: env.LAB_SAAS_DEFAULT_TENANT_ID ?? "",
       callbackRedirectUri: env.LAB_SSO_CALLBACK_REDIRECT ?? "",
-    },
-    auth: {
-      devPassword: requireKey(env, "LAB_AUTH_DEV_PASSWORD"),
     },
   };
 }
@@ -90,7 +84,8 @@ export function buildAuth(env: NodeJS.ProcessEnv = process.env): BuiltAuth {
     cfg.jwt.refreshTtlSeconds,
   );
   const stateMgr = new StateCookieManager(cfg.jwt.secret);
-  const directory = new ConfigUserDirectory(cfg.auth.devPassword);
+  // REQ-2026-023：目录只承担 SSO/refresh 查找，不再持 dev 密码（账密校验代理 saas）。
+  const directory = new ConfigUserDirectory();
   const ssoAuth: SaasAuthClient = createSaasAuthClient(toSaasConfig(cfg));
   const ssoMe: SaasMeClient = createSaasMeClient(toSaasConfig(cfg));
   const service = new AuthService(

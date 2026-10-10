@@ -40,7 +40,9 @@ const ADR0019_TEST_ENV: Record<string, string> = {
   // 5.37（5.33/5.37 家族对齐）：serviceLogin body 补 clientId（requireEnv），
   // 缺 seed 则 menus 自愈/login 快照路径 serviceLogin 必 throw → 503 假红。
   LAB_SAAS_SERVICE_CLIENT_ID: "lab-management",
-  LAB_AUTH_DEV_PASSWORD: "dev123456",
+  // REQ-2026-023（2026-10-11）：原生登录代理 saas IdP——LAB_AUTH_DEV_PASSWORD
+  // 已随本地校验路径退役，不再 seed。代理 clientId 由 login route requireEnv。
+  LAB_SAAS_CLIENT_ID: "lab-management",
   // readLabConfig fail-fast 组（factory.ts requireKey，等同 .env.test 值）：
   // vitest 不读 .env*，缺这些 seed 则 login/switch-tenant 路由测试全 500。
   // LAB_SSO_PROFILE 已随 no-sso 模式退役（2026-09-20），不再 seed。

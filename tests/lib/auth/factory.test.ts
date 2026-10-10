@@ -17,7 +17,6 @@ const FULL_ENV: NodeJS.ProcessEnv = {
   LAB_JWT_ISSUER: "lab-management-system",
   LAB_JWT_TTL_SECONDS: "3600",
   LAB_JWT_REFRESH_TTL_SECONDS: "604800",
-  LAB_AUTH_DEV_PASSWORD: "dev123456",
 };
 
 const REQUIRED_KEYS = [
@@ -25,7 +24,6 @@ const REQUIRED_KEYS = [
   "LAB_JWT_ISSUER",
   "LAB_JWT_TTL_SECONDS",
   "LAB_JWT_REFRESH_TTL_SECONDS",
-  "LAB_AUTH_DEV_PASSWORD",
 ] as const;
 
 describe("readLabConfig fail-fast（CLAUDE.md §2 禁 env 默认值兜底）", () => {

@@ -1,7 +1,7 @@
 // M01.F05.I06/I07/I08/I09 — AuthService (Node 版,镜像 springboot / aspnetcore)。
 //
-// 5 端点:
-//   login()        : directory.checkPassword → session(user, tenantId, saasRefresh=null)
+// 端点（REQ-2026-023：login() 本地校验路径已删——账密校验代理 saas IdP，
+// 实现归 /api/auth/login route，AuthService 只留 refresh/SSO/会话语义）:
 //   refresh()      : jwt.verify(refresh token) → 取 saas_refresh_token → ssoAuth.token(grantType=refresh_token)
 //                    → ssoMe.whoami + listMyTenants → directory.findByEmail → session(user, tenantId, saasRefresh)
 //   ssoAuthorize() : stateMgr.issue(redirect) → ssoAuth.authorize → SsoRedirect
@@ -97,18 +97,6 @@ export class AuthService {
   /** 暴露 ssoAuth 给路由(authorize 路径)。 */
   getSsoAuth(): SaasAuthClient {
     return this.ssoAuth;
-  }
-
-  login(username: string, password: string): LoginResponse {
-    if (!username || !password) {
-      throw new Error("username and password are required");
-    }
-    if (!this.directory.checkPassword(username, password)) {
-      throw new Error("Invalid username or password");
-    }
-    const user = this.directory.findByUsername(username);
-    if (!user) throw new Error("Invalid username or password");
-    return this.session(user, null, []);
   }
 
   // === M01.F05.I08 refresh (走 saas grantType=refresh_token) ===

@@ -224,7 +224,8 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:942 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:1310 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\auth.test.ts:394 (path)",
         "output\\lab-management-system-contract-test\\tests\\calculation-methods.test.ts:1042 (annot)",
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:1784 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:2678 (annot)",

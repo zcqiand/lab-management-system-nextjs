@@ -1,8 +1,8 @@
-// M01.F05.I06 — IUserDirectory (mem-backed, dev only;V014+ 换 DB)。
+// M01.F05.I06 — IUserDirectory（mem-backed；REQ-2026-023 后只承担 SSO/refresh
+// 的用户与租户查找，账密校验已代理 saas IdP——checkPassword/devPassword 退役）。
 //
 // 镜像 springboot / aspnetcore 的 UserDirectory / IUserDirectory 语义:
 // - findByUsername / findByEmail / findById
-// - checkPassword (dev password)
 // - tenantsOf / defaultTenant / findByTenantId
 // - upsert (首次 SSO 落地)
 //
@@ -26,7 +26,6 @@ export interface IUserDirectory {
   findByUsername(username: string): LabUser | null;
   findByEmail(email: string): LabUser | null;
   findById(id: string): LabUser | null;
-  checkPassword(username: string, password: string): boolean;
   tenantsOf(username: string): LabTenant[];
   defaultTenant(): LabTenant;
   findByTenantId(tenantId: string): LabTenant | null;
@@ -62,12 +61,9 @@ const TENANTS: LabTenant[] = [
 ];
 
 export class ConfigUserDirectory implements IUserDirectory {
-  private readonly devPassword: string;
   private readonly upserted: Map<string, LabUser> = new Map();
 
-  constructor(devPassword: string) {
-    this.devPassword = devPassword;
-  }
+  constructor() {}
 
   findByUsername(username: string): LabUser | null {
     if (!username) return null;
@@ -94,10 +90,6 @@ export class ConfigUserDirectory implements IUserDirectory {
       if (u.id === id) return u;
     }
     return null;
-  }
-
-  checkPassword(username: string, password: string): boolean {
-    return DEMO_USER.username === username && this.devPassword === password;
   }
 
   tenantsOf(_username: string): LabTenant[] {
