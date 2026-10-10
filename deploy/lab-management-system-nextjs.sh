@@ -94,7 +94,8 @@ if [ ! -f "$BASE/lab.env" ]; then
     # 2026-09-22 CORS 治本:src/middleware.ts 读白名单 CSV(镜像 springboot SecurityConfig;
     # allowCredentials=true → 回显 origin 禁 *)。缺失 requireEnv throw(ADR-0019)。
     # 值 = 家族 canonical prod 值(与 lab-aspnetcore/lab-springboot .env.production 同值)。
-    printf 'LAB_CORS_ALLOWED_ORIGINS=https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk\n'
+    # lab-flutter prod origin 2026-10-11 追加(X08 槽位进 deploy 链)。
+    printf 'LAB_CORS_ALLOWED_ORIGINS=https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk,https://lab-flutter.xiangru.uk\n'
     # v0.3.56 key 对齐(2026-08-28 线上漂移修复):显式字面量 = .env.production 契约值
     printf 'LAB_SAAS_SERVICE_USER=%s\n' "$LAB_SAAS_SERVICE_USER"
     printf 'LAB_SAAS_SERVICE_PASSWORD=%s\n' "$LAB_SAAS_SERVICE_PASSWORD"
@@ -154,7 +155,19 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing NEXT_PUBLIC_LAB_APP_CODE 'lab-management'
   append_if_missing NEXT_PUBLIC_API_MODE 'nextjs'
   # 2026-09-22 CORS 治本:老 lab.env 补白名单(值 = bootstrap 块同值)
-  append_if_missing LAB_CORS_ALLOWED_ORIGINS 'https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk'
+  append_if_missing LAB_CORS_ALLOWED_ORIGINS 'https://lab-vue.xiangru.uk,https://lab-react.xiangru.uk,https://lab-nextjs.xiangru.uk,https://lab-flutter.xiangru.uk'
+  # origin 级无损追加（家族同款，lab-rails/lab-fastapi 同形）：lab 三前端 + flutter prod
+  # 都可跨源调本后端，存量 env-file 缺哪个 origin 就补哪个（不整值覆盖，运维手工 origin 保留）。
+  for cors_origin in "https://${NGINX_DOMAIN}" \
+                     "https://lab-nextjs.xiangru.uk" \
+                     "https://lab-react.xiangru.uk" \
+                     "https://lab-vue.xiangru.uk" \
+                     "https://lab-flutter.xiangru.uk"; do
+    if grep -q '^LAB_CORS_ALLOWED_ORIGINS=' "$BASE/lab.env" && ! grep '^LAB_CORS_ALLOWED_ORIGINS=' "$BASE/lab.env" | grep -qF "$cors_origin"; then
+      sed -i "s#^\(LAB_CORS_ALLOWED_ORIGINS=.*\)#\1,${cors_origin}#" "$BASE/lab.env"
+      echo "→ reconcile LAB_CORS_ALLOWED_ORIGINS: 追加缺失 origin ${cors_origin}（origin 级，不整值覆盖）"
+    fi
+  done
   # PG_* 五件套(2026-10-04 L0.5 对齐;drizzle-kit config 读离散键不解析 URL)
   append_if_missing PG_HOST '100.79.128.25'
   append_if_missing PG_PORT '5432'
