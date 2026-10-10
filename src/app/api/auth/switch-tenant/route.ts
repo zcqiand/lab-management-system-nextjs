@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { subFromBearer } from "@/lib/auth/bearer";
 import { LabJwtSigner } from "@/lib/auth/jwt";
 import { readLabConfig } from "@/lib/auth/factory";
+import { getMembershipSnapshot } from "@/lib/auth/membership-snapshot";
 
 const DEMO_TENANTS = [
   {
@@ -49,7 +50,13 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (!DEMO_TENANTS.some((t) => t.tenantId === tid)) {
+  // REQ-2026-023 live 实证（2026-10-11）：登录会话的租户体系是 saas（membership
+  // snapshot，login/sso/callback 写入；tenant_id claim=saas currentTenantId），
+  // 归属校验必须对着用户当前租户集——写死 DEMO_TENANTS 会让密码登录用户切
+  // 登录响应里的租户 404。快照 miss（重启/TTL 过期）降级 demo 列表兜底。
+  const knownTenants = getMembershipSnapshot(sub) ?? DEMO_TENANTS;
+  const target = knownTenants.find((t) => t.tenantId === tid);
+  if (!target) {
     return NextResponse.json(
       { code: "NOT_FOUND", message: "Tenant not found" },
       { status: 404 },
@@ -68,6 +75,6 @@ export async function POST(req: Request) {
     refreshToken: signer.issueRefresh(sub, "dev-refresh-token-placeholder"),
     // 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
     user: { id: sub, username: "alice", displayName: "管理员", roleCode: "admin" },
-    tenants: DEMO_TENANTS,
+    tenants: knownTenants,
   });
 }

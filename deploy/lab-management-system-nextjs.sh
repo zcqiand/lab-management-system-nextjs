@@ -101,6 +101,8 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'LAB_SAAS_SERVICE_PASSWORD=%s\n' "$LAB_SAAS_SERVICE_PASSWORD"
     # 5.37（5.33/5.37 家族对齐）：saas LoginRequest.clientId 契约必填，非 secret 字面量
     printf 'LAB_SAAS_SERVICE_CLIENT_ID=lab-management\n'
+    # REQ-2026-023：原生登录代理出站 clientId（OAuth client id，login route fail-fast 必填）
+    printf 'LAB_SAAS_CLIENT_ID=lab-management\n'
     printf 'LAB_JWT_ISSUER=lab-management-system\n'
     printf 'LAB_JWT_TTL_SECONDS=3600\n'
     printf 'LAB_JWT_REFRESH_TTL_SECONDS=604800\n'
@@ -193,6 +195,8 @@ if [ -f "$BASE/lab.env" ]; then
     sed -i -E 's#^LAB_SAAS_SERVICE_CLIENT_ID=11111111-[0-9a-f-]+$#LAB_SAAS_SERVICE_CLIENT_ID=lab-management#' "$BASE/lab.env"
   fi
   append_if_missing LAB_SAAS_SERVICE_CLIENT_ID 'lab-management'
+  # REQ-2026-023：原生登录代理出站 clientId（OAuth client id，login route fail-fast 必填）
+  append_if_missing LAB_SAAS_CLIENT_ID 'lab-management'
   append_if_missing LAB_JWT_ISSUER 'lab-management-system'
   append_if_missing LAB_JWT_TTL_SECONDS '3600'
   append_if_missing LAB_JWT_REFRESH_TTL_SECONDS '604800'
