@@ -11,8 +11,8 @@
 
 import { defineConfig } from "drizzle-kit";
 
-const pgHost = process.env.PG_HOST ?? "100.79.128.25";
-const pgPort = Number(process.env.PG_PORT ?? 5432);
+const pgHost = process.env.PG_HOST ?? "127.0.0.1";
+const pgPort = Number(process.env.PG_PORT ?? 54321);
 const pgUser = process.env.PG_USER ?? "postgres";
 const pgPassword = process.env.PG_PASSWORD ?? "";
 const pgDatabase = process.env.PG_DATABASE ?? "lab_dev";

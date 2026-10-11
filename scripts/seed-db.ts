@@ -36,7 +36,7 @@ import { toSnake } from "../src/lib/db-map";
 
 const DATABASE_URL =
   process.env.DATABASE_URL ??
-  "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_dev";
+  "postgresql://postgres:postgres@127.0.0.1:54321/lab_dev";
 const sql = postgres(DATABASE_URL, { max: 1 });
 
 // 表 → fixtures 数组（顺序 = FK 拓扑：字典先于业务，主表先于 junction）

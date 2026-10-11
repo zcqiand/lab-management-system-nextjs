@@ -16,7 +16,7 @@ const ROOT = resolve(__dirname, "..");
 const HOST = process.env.PG_HOST ?? "100.79.128.25";
 const PORT = Number(process.env.PG_PORT ?? 5432);
 const USER = process.env.PG_USER ?? "postgres";
-const PASSWORD = process.env.PG_PASSWORD ?? "qiand68+++";
+const PASSWORD = process.env.PG_PASSWORD ?? "postgres";
 const DATABASE = process.env.PG_DATABASE ?? "lab_dev";
 
 let pg;

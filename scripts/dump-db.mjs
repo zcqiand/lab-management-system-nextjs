@@ -37,7 +37,7 @@ const OUT_DIR = argOutIdx >= 0
 
 const DATABASE_URL =
   process.env.DATABASE_URL ??
-  "postgresql://postgres:qiand68%2B%2B%2B@100.79.128.25:5432/lab_dev";
+  "postgresql://postgres:postgres@127.0.0.1:54321/lab_dev";
 
 const SKIP_TABLES = new Set([
   "__schema_migrations",
