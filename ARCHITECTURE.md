@@ -121,7 +121,8 @@ sequenceDiagram
 | `NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID` / `NEXT_PUBLIC_LAB_APP_CODE` | 浏览器侧 client_id + 从 /me/menus 挑本仓菜单的 appCode | 默认 `lab-management` |
 | `LAB_SAAS_SERVICE_USER/PASSWORD/CLIENT_ID` | 菜单快照服务账号（密码登录用户拉 /me/menus 用） | requireEnv |
 | `LAB_JWT_SECRET/ISSUER/TTL_SECONDS/REFRESH_TTL_SECONDS` | 本仓自签 JWT（注意键名是 LAB_JWT_*，非 JWT_SIGNING_KEY） | dev 有示例值；prod 由 deploy 写入 |
-| `LAB_AUTH_DEV_PASSWORD` | dev 登录口令 | requireEnv（login route 必填） |
+
+> REQ-2026-023（2026-10-11）：`LAB_AUTH_DEV_PASSWORD` 已随原生登录代理 saas IdP 退役（凭据真源=saas 库），login route 不再读它。
 | `DATABASE_URL` | PostgreSQL 连接串（postgres-js 方言） | 模块顶层 throw（`src/db/index.ts`）；Docker build 用占位 ARG |
 | `NEXT_PUBLIC_SAAS_BASE_URL` | 浏览器跨域走 `/api/saas/*` 反代的目标 | 默认 `http://localhost:5101` |
 

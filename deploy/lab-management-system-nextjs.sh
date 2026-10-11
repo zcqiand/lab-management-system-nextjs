@@ -115,8 +115,6 @@ if [ ! -f "$BASE/lab.env" ]; then
     printf 'SAAS_OAUTH_CLIENT_SECRET=lab-management-secret\n'
     printf 'SAAS_TENANT_ID=00000000-0000-0000-0000-000000000001\n'
     printf 'SAAS_OAUTH_SCOPE=lab.read lab.write\n'
-    # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）
-    printf 'LAB_AUTH_DEV_PASSWORD=%s\n' "$(openssl rand -hex 16)"
   } > "$BASE/lab.env"
 fi
 # 兼容旧 lab.env:已存在但缺 DATABASE_URL,追加(不覆盖 LAB_JWT_SECRET)
@@ -216,10 +214,12 @@ if [ -f "$BASE/lab.env" ]; then
   append_if_missing SAAS_OAUTH_CLIENT_SECRET 'lab-management-secret'
   append_if_missing SAAS_TENANT_ID '00000000-0000-0000-0000-000000000001'
   append_if_missing SAAS_OAUTH_SCOPE 'lab.read lab.write'
-  # prod SSO-only:随机密码关闭密码登录入口（login route requireEnv 仍要 key 存在）
-  if ! grep -q '^LAB_AUTH_DEV_PASSWORD=' "$BASE/lab.env"; then
+  # REQ-2026-023（2026-10-11）死键清理:LAB_AUTH_DEV_PASSWORD 随原生登录代理
+  # saas IdP 退役(凭据真源=saas 库),存量 env-file 残留行删除。
+  if grep -q '^LAB_AUTH_DEV_PASSWORD=' "$BASE/lab.env"; then
+    echo "→ drop dead key LAB_AUTH_DEV_PASSWORD from $BASE/lab.env (REQ-2026-023 原生登录代理 saas)"
     umask 077
-    printf 'LAB_AUTH_DEV_PASSWORD=%s\n' "$(openssl rand -hex 16)" >> "$BASE/lab.env"
+    sed -i '/^LAB_AUTH_DEV_PASSWORD=/d' "$BASE/lab.env"
   fi
   # 死键清理:NEXT_PUBLIC_APP_ID 挂在零引用的 src/api/env.ts 上,真名
   # NEXT_PUBLIC_LAB_APP_CODE 已在上面 append,老 key 删除保 key 集合对齐。
