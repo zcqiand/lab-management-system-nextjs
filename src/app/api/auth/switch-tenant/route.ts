@@ -11,6 +11,7 @@ import { subFromBearer } from "@/lib/auth/bearer";
 import { LabJwtSigner } from "@/lib/auth/jwt";
 import { readLabConfig } from "@/lib/auth/factory";
 import { getMembershipSnapshot } from "@/lib/auth/membership-snapshot";
+import { getUserSnapshot } from "@/lib/auth/user-snapshot";
 
 const DEMO_TENANTS = [
   {
@@ -39,6 +40,19 @@ export async function POST(req: Request) {
   if (sub === null) {
     return NextResponse.json(
       { code: "UNAUTHORIZED", message: "Bearer token required (ADR-0019)" },
+      { status: 401 },
+    );
+  }
+  // 2026-10-21 ADR-0019 收口（镜像 rails resolve_user：身份解析在前）——user
+  // 来自 user 快照（login/sso/callback 写入），miss 401；写死「alice/管理员」
+  // 字面量是「业务身份字段兜底到 demo 字面量」反模式。
+  const user = getUserSnapshot(sub);
+  if (!user) {
+    return NextResponse.json(
+      {
+        code: "USER_UNAVAILABLE",
+        message: `user snapshot unavailable for user ${sub}; re-login to recover`,
+      },
       { status: 401 },
     );
   }
@@ -73,8 +87,7 @@ export async function POST(req: Request) {
   return NextResponse.json({
     token: signer.issue(sub, tid),
     refreshToken: signer.issueRefresh(sub, "dev-refresh-token-placeholder"),
-    // 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
-    user: { id: sub, username: "alice", displayName: "管理员", roleCode: "admin" },
+    user,
     tenants: knownTenants,
   });
 }

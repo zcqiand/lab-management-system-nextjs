@@ -17,6 +17,7 @@
 import { NextResponse } from "next/server";
 import { cacheMenuSnapshot } from "@/lib/auth/menu-snapshot";
 import { putMembershipSnapshot } from "@/lib/auth/membership-snapshot";
+import { putUserSnapshot } from "@/lib/auth/user-snapshot";
 import { requireEnv } from "@/lib/env-required";
 
 // v0.3.56:SAAS_BASE_URL 是 Phase 4 对称化已删的死 key(线上一直吃 localhost
@@ -160,18 +161,32 @@ export async function POST(request: Request) {
   // （2026-09-15 收敛：旧 demo 形状 tenantCode/tenantName 与 shared OpenAPI、
   // /api/auth/me 及 springboot/aspnetcore/msw 三仓全部不一致；前端切换器读
   // t.name/t.code，SSO 登录后 /me 补水前切换器显示空白。）
+  // 2026-10-20 租户标识=tenant_key（人裁「对外交互用 key」）：命中租户
+  // tenantId=code=tenantKey；miss 降级原 tenantId。
   const tenants = (me.memberships ?? [])
     .filter((m) => m.status !== "removed")
-    .map((m) => ({
-      tenantId: m.tenantId,
-      code: tenantNameById.get(m.tenantId)?.key ?? m.tenantId,
-      name: tenantNameById.get(m.tenantId)?.name ?? m.tenantId,
-      roleIds: m.roleIds ?? [],
-    }));
+    .map((m) => {
+      const tid = tenantNameById.get(m.tenantId)?.key ?? m.tenantId;
+      return {
+        tenantId: tid,
+        code: tid,
+        name: tenantNameById.get(m.tenantId)?.name ?? m.tenantId,
+        roleIds: m.roleIds ?? [],
+      };
+    });
   if (me.id) {
     // 2026-09-03 租户体系对齐：memberships 快照（/api/auth/me 按同 key 读取）。
     // 快照与响应同源同形 —— hydrateAuth 的 find 必命中。
     putMembershipSnapshot(me.id, tenants);
+    // 2026-10-21 ADR-0019 收口：user 快照同步写（/api/auth/me 与 switch-tenant
+    // 按同 key 读，镜像 rails resolve_user）——me/switch 不再有 DEMO_USER 兜底。
+    putUserSnapshot(me.id, {
+      id: me.id ?? "unknown",
+      username: me.email ?? "unknown",
+      // 回退链用 ||（记忆陷阱：saas user 无 displayName 且空串 falsy，?? 拦不住）
+      displayName: me.displayName || me.email || "未知用户",
+      roleCode: me.memberships?.[0]?.roleIds?.[0] ?? "member",
+    });
   }
 
   return NextResponse.json({

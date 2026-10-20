@@ -141,7 +141,8 @@ describe("switch-tenant 密码登录会话租户体系（REQ-2026-023 live 回�
       tenants: { tenantId: string }[];
     };
     const tid = loginBody.tenants[0]?.tenantId ?? "";
-    expect(tid).toBe("00000000-0000-0000-0000-000000000001");
+    // 2026-10-20 tenant_key 人裁：命中富化租户 tenantId=tenantKey
+    expect(tid).toBe("city-lab");
 
     const res = await postSwitch(loginBody.token, tid);
     expect(res.status, `switch(登录租户) 期望 200 实得 ${res.status}`).toBe(200);

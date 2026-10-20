@@ -16,6 +16,7 @@
 import { NextResponse } from "next/server";
 import { cacheMenuSnapshot, putMenuSnapshot } from "@/lib/auth/menu-snapshot";
 import { putMembershipSnapshot } from "@/lib/auth/membership-snapshot";
+import { putUserSnapshot } from "@/lib/auth/user-snapshot";
 import { requireEnv } from "@/lib/env-required";
 import { LabJwtSigner } from "@/lib/auth/jwt";
 import { readLabConfig } from "@/lib/auth/factory";
@@ -188,18 +189,28 @@ export async function POST(req: Request) {
 
   // 映射复用 sso/callback 富化链：availableTenants 无租户名 → admin/tenants
   // best-effort 填真名，失败降级 code/name=tenantId（整体仍 200）。
+  // 2026-10-20 租户标识=tenant_key（人裁「对外交互用 key」）：命中租户
+  // tenantId=code=tenantKey；miss 降级原 tenantId。
   const nameById = await fetchTenantNames(saasLogin.accessToken);
   const tenants = (saasLogin.availableTenants ?? [])
     .filter(
       (t): t is SaasAvailableTenant & { tenantId: string } =>
         !!t.tenantId && t.status !== "removed",
     )
-    .map((t) => ({
-      tenantId: t.tenantId,
-      code: nameById.get(t.tenantId)?.key ?? t.tenantId,
-      name: nameById.get(t.tenantId)?.name ?? t.tenantId,
-      roleIds: t.roleIds ?? [],
-    }));
+    .map((t) => {
+      const tid = nameById.get(t.tenantId)?.key ?? t.tenantId;
+      return {
+        tenantId: tid,
+        code: tid,
+        name: nameById.get(t.tenantId)?.name ?? t.tenantId,
+        roleIds: t.roleIds ?? [],
+      };
+    });
+  // 2026-10-20 tenant_key 人裁：会话 tenant_id claim 同走 key 解析（currentTenantId
+  // 是 saas 原始 id → 平台列表命中换 key，miss 降级原值）
+  const currentTenantId = saasLogin.currentTenantId
+    ? (nameById.get(saasLogin.currentTenantId)?.key ?? saasLogin.currentTenantId)
+    : null;
   // 回退链用 ||（记忆陷阱：saas user 无 displayName 且空串 falsy，?? 拦不住）。
   const saasUser = saasLogin.user ?? {};
   const user = {
@@ -221,13 +232,13 @@ export async function POST(req: Request) {
   // membership-snapshot 同步写（与响应 tenants 同源同形，/api/auth/me 按同 key 读取，
   // hydrateAuth 的 find 必命中）——与 sso/callback 同语义，数据源换成 saas 真实租户。
   putMembershipSnapshot(user.id, tenants);
+  // 2026-10-21 ADR-0019 收口：user 快照同步写（/api/auth/me 与 switch-tenant 按
+  // 同 key 读，镜像 rails resolve_user）——me/switch 不再有 DEMO_USER 字面量兜底。
+  putUserSnapshot(user.id, user);
   return NextResponse.json({
     // lab 自家 JWT 重签（REQ-2026-023 Q3 人裁：不透传 saas token）；tenantId 取
     // saas currentTenantId，缺省落首租户。
-    token: signer.issue(
-      user.id,
-      saasLogin.currentTenantId ?? tenants[0]?.tenantId ?? null,
-    ),
+    token: signer.issue(user.id, currentTenantId ?? tenants[0]?.tenantId ?? null),
     // refresh 维持 dev-placeholder 机制（REQ-2026-023 非目标：refresh 代理化留后续）。
     refreshToken: signer.issueRefresh(user.id, "dev-refresh-token-placeholder"),
     user,

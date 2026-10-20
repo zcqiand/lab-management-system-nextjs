@@ -89,7 +89,8 @@ describe("POST /api/auth/sso/callback 租户显示名", () => {
       tenants: Array<{ tenantId: string; code: string; name: string; roleIds: string[] }>;
     };
     expect(body.tenants).toHaveLength(1);
-    expect(body.tenants[0]!.tenantId).toBe(TENANT_A);
+    // 2026-10-20 tenant_key 人裁：命中富化租户 tenantId=code=tenantKey
+    expect(body.tenants[0]!.tenantId).toBe(TENANT_KEY);
     expect(body.tenants[0]!.name).toBe(TENANT_NAME);
     expect(body.tenants[0]!.code).toBe(TENANT_KEY);
     expect(body.tenants[0]!.roleIds).toEqual([]);

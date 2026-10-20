@@ -132,8 +132,9 @@ describe("原生登录代理 saas IdP（REQ-2026-023）", () => {
     expect(body.user.roleCode).toBe("admin");
     // tenants 四字段齐全 + admin/tenants 富化真名/tenantKey
     expect(body.tenants).toHaveLength(2);
+    // 2026-10-20 租户标识=tenant_key（人裁「对外交互用 key」）：命中租户 tenantId=tenantKey
     expect(body.tenants[0]).toEqual({
-      tenantId: "TENANT-001",
+      tenantId: "city-lab",
       code: "city-lab",
       name: "市住建工程质量检测中心",
       roleIds: ["admin"],
@@ -141,7 +142,7 @@ describe("原生登录代理 saas IdP（REQ-2026-023）", () => {
     // lab 自家 JWT 重签（可被本仓 signer 验签；tenant_id 取首租户）
     const claims = SIGNER.verify(body.token);
     expect(claims.sub).toBe("saas-user-alice");
-    expect(claims.tenant_id).toBe("TENANT-001");
+    expect(claims.tenant_id).toBe("city-lab");
     expect(claims.iss).toBe(ISSUER);
     // refreshToken 维持 dev-placeholder（不透传 saas refreshToken）
     const refreshPayload = JSON.parse(

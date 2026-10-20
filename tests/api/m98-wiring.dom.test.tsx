@@ -94,7 +94,8 @@ describe("M98 frontend 接线层", () => {
       );
       expect(payload.sub).toBe("USER-A");
       expect(body.tenants).toHaveLength(3);
-      expect(body.tenants[0]?.tenantId).toBe("TENANT-001");
+      // 2026-10-20 tenant_key 人裁：命中富化租户 tenantId=tenantKey
+      expect(body.tenants[0]?.tenantId).toBe("city-lab");
     } finally {
       globalThis.fetch = origFetch;
     }
@@ -187,7 +188,7 @@ describe("M98 frontend 接线层", () => {
         "content-type": "application/json",
         authorization: `Bearer ${signer.issue("USER-A", "TENANT-001")}`,
       },
-      body: JSON.stringify({ tenantId: "TENANT-002" }),
+      body: JSON.stringify({ tenantId: "district-lab" }),
     });
     const res = await switchTenantPOST(req);
     expect(res.status).toBe(200);
@@ -204,7 +205,9 @@ describe("M98 frontend 接线层", () => {
       tenant_id?: string;
     };
     expect(payload.sub).toBe("USER-A");
-    expect(payload.tenant_id).toBe("TENANT-002");
+    // 2026-10-20 tenant_key 人裁：登录响应/snapshot 租户已是 key，切 key 命中，
+    // 换发 claim=目标 key
+    expect(payload.tenant_id).toBe("district-lab");
     expect(body.user?.id).toBe("USER-A");
     expect(body.tenants?.length).toBeGreaterThan(0);
   });

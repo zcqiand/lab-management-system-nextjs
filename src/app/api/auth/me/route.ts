@@ -14,15 +14,8 @@
 
 import { NextResponse } from "next/server";
 import { getMembershipSnapshot } from "@/lib/auth/membership-snapshot";
-import { subFromBearer } from "@/lib/auth/bearer";
-
-// 2026-09-02 契约收敛：username=alice（四方统一，见 lib/auth/directory.ts）
-const DEMO_USER = {
-  id: "USER-A",
-  username: "alice",
-  displayName: "管理员",
-  roleCode: "admin",
-};
+import { getUserSnapshot } from "@/lib/auth/user-snapshot";
+import { subFromBearer, tenantIdFromBearer } from "@/lib/auth/bearer";
 
 export async function GET(request: Request) {
   const sub = subFromBearer(request.headers.get("authorization"));
@@ -34,6 +27,19 @@ export async function GET(request: Request) {
     );
   }
   const tenants = getMembershipSnapshot(sub);
+  // 2026-10-21 ADR-0019 收口（镜像 rails resolve_user）：user 一律来自 user
+  // 快照（login/sso/callback 写入）——写死 DEMO_USER 字面量是「业务身份字段
+  // 兜底到 demo 字面量」反模式；miss 401（可恢复态：重登重建）。
+  const user = getUserSnapshot(sub);
+  if (!user) {
+    return NextResponse.json(
+      {
+        code: "USER_UNAVAILABLE",
+        message: `user snapshot unavailable for user ${sub}; re-login to recover`,
+      },
+      { status: 401 },
+    );
+  }
   if (!tenants) {
     // miss 如实报错（可恢复态：前端 refresh / 重登重建快照）
     return NextResponse.json(
@@ -65,8 +71,13 @@ export async function GET(request: Request) {
     };
   });
   return NextResponse.json({
-    user: DEMO_USER,
+    user,
     tenants: fullTenants,
-    currentTenantId: fullTenants[0]?.tenantId ?? "",
+    // currentTenantId 优先 JWT tenant_id claim（登录链已写 tenant_key，2026-10-20
+    // 人裁），镜像 rails me() 的 claims['tenant_id'].presence || 首租户 || ''
+    currentTenantId:
+      tenantIdFromBearer(request.headers.get("authorization")) ??
+      fullTenants[0]?.tenantId ??
+      "",
   });
 }
