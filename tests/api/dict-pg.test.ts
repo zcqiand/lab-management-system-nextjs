@@ -23,8 +23,7 @@ const TENANT = "TENANT-001";
 const TENANT_OTHER = "TENANT-OTHER";
 
 const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
+  process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
 
 // 自播种子 marker：code 前缀。afterAll 按前缀 DELETE 整批清理。
 const MARKER = "__dict_pg_test_";

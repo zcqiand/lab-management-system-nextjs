@@ -22,8 +22,7 @@ const TENANT_SSO = "00000000-0000-0000-0000-000000000001";
 // postgres-js 是仓 dependencies（不是 devDep），缺包即 module-load 失败，
 // 无需运行时 hasPg 探测 —— 与 db.smoke.test.ts 的 devDep pg 探测不是同一回事。
 const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
+  process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
 
 // 自播种子 marker：commission_code 前缀。afterAll 按前缀 DELETE 整批清理。
 const TEST_MARKER = "__receipts_pg_test_";

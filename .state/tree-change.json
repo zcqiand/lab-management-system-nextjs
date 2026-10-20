@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "approved": true,
+  "mirror": true,
+  "summary": "REQ-2026-023：M01.F05.I06 原生登录 GA 翻转（mirror 免批③）——本仓 REQ-2026-023 验收记录已留痕（T-1 commit/T-7 prod 探针/AC-7 闭环摘自 shared），开发中→已上线",
+  "changes": [
+    {
+      "id": "M01.F05.I06",
+      "action": "变更",
+      "name": "原生登录",
+      "reason": "REQ-2026-023：mirror 免批③ GA 翻转——本仓 docs/requirements/REQ-2026-023-native-login-saas-proxy.md 已记录人工验收通过（2026-10-12 AC-7 闭环，摘自 shared 家族 REQ）；本仓 TDD 实现+测试锚定在库，T-7 prod 探针 200/401 通过"
+    }
+  ],
+  "sync_files": [],
+  "base_sha": "6469ea17161906b7"
+}

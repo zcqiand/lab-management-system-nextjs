@@ -17,8 +17,7 @@ import {
 } from "@/lib/db-queries";
 
 const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
+  process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
 
 const MARKER = "__contracts_pg_test_";
 const TENANT_DEMO = "TENANT-001";

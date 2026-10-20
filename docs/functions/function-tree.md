@@ -88,6 +88,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M01.F05.I03 | SSO OAuth 2.0 授权码流（client_secret 后端持 + state CSRF 防护） | 接口 | 前端+后端 | 授权码流：authorize 收 response_type=code&client_id=lab&redirect_uri=<callback>&state=<random>（sessionStorage「lab.sso.state」）→ callback body {grant_type:authorization_code, code, redirect_uri}；saas token 不出 lab 后端 | 已上线 |
 | M01.F05.I04 | 身份会话同步 | 接口 | 前端+后端 | 用身份平台 token+user 建会话，并从 /auth/permissions 拉取权限集（机构=租户 1:1） | 已上线 |
 | M01.F05.I05 | 登出 | 接口 | 前端+后端 | Layout 侧边栏底部展示当前用户 + 退出按钮：点击调 authStore.logout() 清 token/user 并跳 /login | 已上线 |
+| M01.F05.I06 | 原生登录 | 接口 | 前端+后端 | POST /api/auth/native-login：非浏览器客户端密码通道；校验代理 saas IdP——请求体账密调 saas /api/v1/auth/login（clientId=lab-management），saas 4xx→401 INVALID_CREDENTIALS 不透传、5xx/不可达→502 SAAS_UNAVAILABLE；lab 自家 JWT 重签（HS256），LoginResponse 契约形状不变（REQ-2026-023；shared 树已上线，本仓 BFF route 已实现且有测试锚定，2026-10-19 免批③翻转） | 已上线 |
 
 ---
 

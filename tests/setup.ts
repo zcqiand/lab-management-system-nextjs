@@ -10,8 +10,7 @@
  */
 // 家族统一：默认连共享 lab_test（gate 跑真库）。lab_dev 只在显式 DATABASE_URL 时用。
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL =
-    "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
+  process.env.DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54321/lab_test";
 }
 
 // API base URL 引导（同 lab-react .env.test 语义）：vitest 不读 .env*，
