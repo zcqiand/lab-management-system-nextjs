@@ -19,8 +19,15 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 
-const HOST = process.env.PG_HOST ?? "100.79.128.25";
-const PORT = Number(process.env.PG_PORT ?? 5432);
+// 5.115 fail-fast：禁远程缺省兜底（suite-hard-rules §1；真源=本机 54321）——
+// HOST/PORT 必显式给出，静默落远程会让 sanity 绿光盖住错源
+const HOST = process.env.PG_HOST;
+const PORT = Number(process.env.PG_PORT);
+if (!HOST || !PORT) {
+  console.error("[borrow-from-nextjs-pg] FATAL: PG_HOST/PG_PORT 未设（5.115 禁远程缺省兜底——suite-hard-rules §1）");
+  console.error("                        用法：PG_HOST=127.0.0.1 PG_PORT=54321 node scripts/borrow-from-nextjs-pg.mjs");
+  process.exit(2);
+}
 const USER = process.env.PG_USER ?? "postgres";
 const PASSWORD = process.env.PG_PASSWORD ?? "postgres";
 const DATABASE = process.env.PG_DATABASE ?? "lab_dev";

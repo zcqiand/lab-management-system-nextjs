@@ -25,8 +25,14 @@ SCHEMA_FILE="src/db/schema.ts"
 PULL_OUT_DIR="drizzle"
 
 echo "[pull-schema] step 1/5 — drizzle-kit pull → ${PULL_OUT_DIR}/schema.ts"
-PG_HOST="${PG_HOST:-100.79.128.25}"
-PG_PORT="${PG_PORT:-5432}"
+# 5.115 fail-fast：禁远程缺省兜底（suite-hard-rules §1；2026-10-12 人裁 schema
+# 真源=本机 _dev 库）。PG_HOST/PG_PORT 必显式给出（门禁经 .env.test 通道注入；
+# 人跑按用法行）；USER/DATABASE 缺省为文档化本机族值，不属远程耦合面。
+if [ -z "${PG_HOST:-}" ] || [ -z "${PG_PORT:-}" ]; then
+  echo "[pull-schema] FATAL: PG_HOST/PG_PORT 未设（5.115 禁远程缺省兜底——suite-hard-rules §1）" >&2
+  echo "[pull-schema]        用法：PG_HOST=127.0.0.1 PG_PORT=54321 PG_PASSWORD=… PG_DATABASE=lab_dev bash scripts/pull-schema.sh" >&2
+  exit 2
+fi
 PG_USER="${PG_USER:-postgres}"
 PG_PASSWORD="${PG_PASSWORD:-}"
 PG_DATABASE="${PG_DATABASE:-lab_dev}"
