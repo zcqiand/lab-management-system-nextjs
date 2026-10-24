@@ -41,7 +41,7 @@ npm run build          # 生产构建
 
 > 同一案例仓后续接入其他书籍时，在此节下新增书籍小节。
 
-### 《Next.js 从入门到项目实战》
+### 书一《Next.js 从入门到项目实战》
 
 - 书稿定位：案例一「实验室管理系统」，第 28-34 章正文代码块挂本仓 source= 锚点；第 41 章「测试策略」跨仓取材本仓 vitest 体系；第 42 章为概念收官章（无摘码）
 - 书稿绑定 tag：`v0.3.86-20260926`（指向 xr-know-004 fn 源锚点提交 e10c075，src/ 与当前 HEAD 一致；正文 source= 锚点文件均在该 tag 内）
@@ -57,6 +57,69 @@ npm run build          # 生产构建
 | 34 | 报告六阶段管线与汇总仪表盘 | features/reports、features/summary |
 | 41 | 测试策略（跨仓部分） | vitest.config、tests/fn*、tests/api/* |
 
+### 书二《Claude Code 从入门到项目实践》（卷三）
+
+- 书稿定位：xr-know-002，第 27、28、29、30、31、32、33 章正文代码块挂本仓 `source=` 锚点
+- 配套版本：`v0.3.86-20260926`（registry 冻结 tag，代码以此为准）
+
+| 章 | 章题 | 对应源文件 |
+| :--- | :--- | :--- |
+| 27 | 需求规约与项目初始化 | `src/components/app/app-shell.tsx` + `src/components/app/tenant-switcher.tsx` + `src/components/app/sidebar-nav.tsx` |
+| 28 | 架构决策与生成约束 | `src/api/legacy-client.ts` + `src/app/api/test-records/route.ts` |
+| 29 | 领域建模与数据库接入 | `src/features/inspection-capability/InspectionCapabilityFormModal.tsx` |
+| 30 | 任务拆解与核心编码 | `src/features/flow-pipeline/flow-stages.ts` + `src/features/reports/ReportReviewPage.tsx` + `src/features/flow-pipeline/FlowStagePage.tsx` + `src/features/reports/ReportApprovePage.tsx` + `src/features/reports/ReportIssuePage.tsx` + `src/features/reports/ReportArchivePage.tsx` |
+| 31 | 测试驱动与缺陷自动修复 | `src/features/receipts/ReceiptList.tsx` + `src/features/task-assignment/TaskAssignmentPage.tsx` + `src/features/reports/ReportReviewPage.tsx` + `src/app/(console)/contracts/page.tsx` |
+| 32 | 版本控制与提交管理 | `src/features/summary/SummaryPage.tsx` |
+| 33 | 本地构建与交付复盘 | `src/features/receipts/ReceiptDetailPage.tsx` |
+
+### 书三《Codex 从入门到项目实践》
+
+- 书稿定位：xr-know-003，第 28、29、30、31、32、33、34 章正文代码块挂本仓 `source=` 锚点
+- 配套版本：`v0.3.86-20260926`（registry 冻结 tag，代码以此为准）
+
+| 章 | 章题 | 对应源文件 |
+| :--- | :--- | :--- |
+| 28 | 产品定位与首版范围 | `src/app/(console)/layout.tsx` + `src/app/api/auth/menus/route.ts` |
+| 29 | 功能蓝图与优先级 | — |
+| 30 | 数据骨架与核心模型 | `src/features/inspection-capability/CalculationMethodList.tsx` + `src/features/inspection-capability/TechnicalRequirementList.tsx` |
+| 31 | 基础数据先行 | `src/features/dicts/CategoryDictList.tsx` |
+| 32 | 检测能力从无到有 | `src/features/inspection-capability/InspectionCapabilityPage.tsx` |
+| 33 | 第一次端到端走通 | `src/features/data-entry/DataEntryPage.tsx` + `src/features/task-assignment/TaskAssignmentPage.tsx` + `src/state/flowStore.ts` + `src/features/flow-pipeline/FlowStagePage.tsx` + `src/features/receipts/ReceiptDetailPage.tsx` |
+| 34 | 上线验收与产品复盘 | `src/features/inspection-capability/ParamInterfaceList.tsx` + `src/features/inspection-capability/ParamInterfacePreviewModal.tsx` |
+
+### 书四《Pi 从入门到项目实践》
+
+- 书稿定位：xr-know-017，第 28、29、30、31、32、33、34、35、36 章正文代码块挂本仓 `source=` 锚点
+- 配套版本：`v0.3.87-20261004`（registry 冻结 tag，代码以此为准）
+
+| 章 | 章题 | 对应源文件 |
+| :--- | :--- | :--- |
+| 28 | 七仓家族中的 lab 仓定位 | — |
+| 29 | schema 变更链 | `src/features/data-entry/SampleExtFieldsModal.tsx` |
+| 30 | 预约模块 | `src/features/receipts/ReceiptList.tsx` |
+| 31 | 资源管理与联动 | `src/features/dicts/CategoryDictList.tsx` + `src/features/task-assignment/TaskAssignmentPage.tsx` + `src/state/flowReducer.ts` + `src/state/flowStore.ts` + `src/state/transitions.ts` |
+| 32 | 跨仓协同 | `src/api/legacy-client.ts` |
+| 33 | 复杂缺陷攻坚 | `src/app/api/test-records/route.ts` + `src/features/data-entry/DataEntryPage.tsx` |
+| 34 | 慢查询定位优化 | `src/features/summary/SummaryPage.tsx` |
+| 35 | 工程化沉淀 | — |
+| 36 | 双仓复盘与工作流 | — |
+
+### 书五《OpenCode 从入门到项目实践》（卷四）
+
+- 书稿定位：xr-know-018，第 25、26、27、28、29、30、31、32、33 章正文代码块挂本仓 `source=` 锚点
+- 配套版本：`v0.3.86-20260926`（registry 冻结 tag，代码以此为准）
+
+| 章 | 章题 | 对应源文件 |
+| :--- | :--- | :--- |
+| 25 | 项目一启动 | `src/app/api/auth/menus/route.ts` + `src/components/app/sidebar-nav.tsx` |
+| 26 | 脚手架与数据模型落地 | `src/features/inspection-capability/InspectionCapabilityFormModal.tsx` |
+| 27 | 核心业务模块（一） | `src/app/(console)/contracts/page.tsx` + `src/api/legacy-client.ts` |
+| 28 | 核心业务模块（二） | `src/features/receipts/ReceiptList.tsx` + `src/components/app/app-shell.tsx` + `src/components/app/tenant-switcher.tsx` |
+| 29 | 前端组件体系与页面打磨 | `src/features/flow-pipeline/FlowStagePage.tsx` + `src/features/dicts/CategoryDictList.tsx` + `src/features/summary/SummaryPage.tsx` |
+| 30 | 用 OpenCode 建测试防线 | `src/features/task-assignment/TaskAssignmentPage.tsx` + `src/state/flowReducer.ts` + `src/state/flowStore.ts` + `src/state/transitions.ts` + `src/features/flow-pipeline/FlowStagePage.tsx` |
+| 31 | 调试实战 | `src/app/(console)/layout.tsx` + `src/components/app/app-shell.tsx` |
+| 32 | 容器化与 CI 上线 | — |
+| 33 | 项目一收官 | — |
 ## 快速链接
 
 - [CLAUDE.md](CLAUDE.md) — 入口、门禁、禁止事项
