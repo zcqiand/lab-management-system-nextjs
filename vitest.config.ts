@@ -63,6 +63,10 @@ export default defineConfig({
           setupFiles: ["tests/setup.ts", "tests/setup.dom.ts"],
           env: { DB_PATH: ":memory:" },
           testTimeout: 10000,
+          // setup.dom.ts beforeAll 动态 import vendor/msw：全量并行时各 worker 冷
+          // transform 竞态可超默认 10s（单跑 122ms，全量偶发挂死整套 suite——
+          // 2026-10-31 实证，挂的 suite 每轮不同）。与 node 项目 hookTimeout 同款豁免。
+          hookTimeout: 120000,
         },
       },
     ],
