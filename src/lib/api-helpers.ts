@@ -113,7 +113,7 @@ export function wrapDict(rows: Row[], req: Request, junctions?: DictJunctions) {
   const paged = pageOf(
     items,
     num(url.searchParams.get("page"), 1),
-    num(url.searchParams.get("pageSize"), items.length || 1),
+    num(url.searchParams.get("pageSize"), items.length),
   );
   if (!junctions?.aggregate?.length) return NextResponse.json(paged);
   return NextResponse.json({
@@ -153,7 +153,8 @@ export function wrapLinks(rows: Row[], req: Request, filterKeys: Record<string, 
     if (v) items = items.filter((r) => r[col] === v);
   }
   const page = num(url.searchParams.get("page"), 1);
-  const pageSize = num(url.searchParams.get("pageSize"), items.length || 1);
+  // 空集 pageSize = total = 0（2026-11-01 CT live 四方比对收口，禁 || 1 兜底）
+  const pageSize = num(url.searchParams.get("pageSize"), items.length);
   return NextResponse.json({ items, total: items.length, page, pageSize });
 }
 

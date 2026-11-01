@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "project": "lab-management-system-nextjs",
+  "evidence_at": "2026-11-01T18:05:53+0800",
+  "levels": {
+    "L4": 1
+  },
+  "note": "ADR-0044 红灯证据：red 期测试门失败自动落盘，供 phase.py --to green 核验"
+}

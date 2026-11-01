@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   if (pic) items = items.filter((l) => l["paramInterfaceCode"] === pic);
   if (rn) items = items.filter((l) => (l["reportNameCode"] ?? undefined) === rn);
   return NextResponse.json(
-    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length || 1)),
+    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length)),
   );
 }
 

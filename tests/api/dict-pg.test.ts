@@ -122,13 +122,24 @@ describe(
       expect(seeded!.name).toBe("PG字典测试专项");
     });
 
+    it("空集：pageSize 缺省 = total = 0（2026-11-01 CT live 四方比对收口）", async () => {
+      const empty = await listDictDb(TENANT, DICT_CFGS.specialties, {
+        keyword: "zzz-no-such-marker",
+        page: 1,
+        pageSizeParam: undefined,
+      });
+      expect(empty.total).toBe(0);
+      // 修前 `total || 1` 兜底空集发 1，与家族语义（pageSize=total 含 0）分叉
+      expect(empty.pageSize).toBe(0);
+    });
+
     it("keyword：code/name 字面子串命中", async () => {
       const byCode = await listDictDb(TENANT, DICT_CFGS.specialties, {
         keyword: MARKER,
         page: 1,
         pageSizeParam: undefined,
       });
-      // pageSize 缺省 = total（wrapDict items.length || 1 语义）
+      // pageSize 缺省 = total（含 0，2026-11-01 CT live 收口语义）
       expect(byCode.total).toBe(1);
       expect(byCode.pageSize).toBe(1);
       expect(byCode.items[0]!.code).toBe(SP);

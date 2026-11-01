@@ -477,7 +477,7 @@ export interface ListDictQuery {
   /** 1-based 页码（调用方已按 num(…,1) 归一） */
   page: number;
   /**
-   * pageSize 原始 query 串：wrapDict 缺省/非法 → 全量（items.length || 1，空集 → 1），
+   * pageSize 原始 query 串：wrapDict 缺省/非法 → 全量（= total，空集 → 0；CT live 收口），
    * 由本函数在 count 之后解析（默认值依赖 total）。
    */
   pageSizeParam?: string | null;
@@ -513,13 +513,13 @@ export async function listDictDb(
   q: ListDictQuery,
 ): Promise<{ items: Row[]; page: number; pageSize: number; total: number }> {
   const where = dictWhere(tenantId, cfg, q);
-  // count 先行：pageSize 缺省值 = total（wrapDict items.length || 1 同款）
+  // count 先行：pageSize 缺省值 = total（含 0）
   const counted = await db
     .select({ n: dsql<number>`count(*)::int` })
     .from(cfg.table)
     .where(where);
   const total = counted[0]?.n ?? 0;
-  const pageSize = posNum(q.pageSizeParam) ?? (total || 1);
+  const pageSize = posNum(q.pageSizeParam) ?? total; // 空集=0（CT live 收口，禁 || 1 兜底）
   const rows = (await db
     .select()
     .from(cfg.table)

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     );
   }
   return NextResponse.json(
-    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length || 1)),
+    pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length)),
   );
 }
 
