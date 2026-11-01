@@ -20,7 +20,7 @@
     "status": "active",
     "createdAt": "",
     "updatedAt": "",
-    "tenantId": "TENANT-001"
+    "tenantId": "acme"
   },
   {
     "id": "CONTRACT-002",
@@ -43,7 +43,7 @@
     "status": "active",
     "createdAt": "",
     "updatedAt": "",
-    "tenantId": "TENANT-001"
+    "tenantId": "acme"
   },
   {
     "id": "CONTRACT-003",
@@ -66,6 +66,6 @@
     "status": "archived",
     "createdAt": "",
     "updatedAt": "",
-    "tenantId": "TENANT-001"
+    "tenantId": "acme"
   }
 ]

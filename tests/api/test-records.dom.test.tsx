@@ -8,14 +8,14 @@ import { LabJwtSigner } from "@/lib/auth/jwt";
 import { fnTest } from "../fn";
 
 // BFF 全域 token 化（2026-09-23 P3）：路由按 Bearer tenant_id claim 过滤，
-// 直接调 handler 的测试自带 TENANT-001 token（fixtures 种子行所在世界）
+// 直接调 handler 的测试自带 acme token（种子租户收口后的 tenant_key 世界，2026-11-02 种子 acme 收口批）
 const signer = new LabJwtSigner(
   "dev-key-32-bytes-minimum-length!",
   "lab-management-system",
   3600,
   604800,
 );
-const AUTHZ = `Bearer ${signer.issue("USER-A", "TENANT-001")}`;
+const AUTHZ = `Bearer ${signer.issue("USER-A", "acme")}`;
 
 function req(url: string, init?: RequestInit) {
   return new Request(url, {

@@ -57,8 +57,9 @@ const emptyForm = {
 
 export function TechnicalRequirementList({
   dataFn = "M06.F06.I01",
-  createDataFn = "M06.F06.I02",
-  editDataFn = "M06.F06.I02",
+  // 功能树对齐（2026-11-02）：I02=详情 GET、I03=创建 POST、I04=更新 PUT、I05=删除 DELETE
+  createDataFn = "M06.F06.I03",
+  editDataFn = "M06.F06.I04",
   deleteDataFn = "M06.F06.I05",
 }: {
   dataFn?: string;
@@ -193,10 +194,13 @@ export function TechnicalRequirementList({
         title="技术要求"
         dataFn={dataFn}
         listName="technical-requirements"
-        listFn={(standardCode) =>
-          technicalRequirementsListTechnicalRequirements({
-            judgmentStandardCode: standardCode,
-          }).then((rows) => (rows ?? []) as TechRow[])
+        // 不按选中标准过滤：GET 传 judgmentStandardCode 会把「新建时填了列表外
+        // 新标准」的行立刻滤没（创建后不可见 = 真 UX bug）；react/vue 平铺表格
+        // 本就全量展示，三端列表口径对齐（e2e techreq AC-2/AC-3 实证）。
+        listFn={() =>
+          technicalRequirementsListTechnicalRequirements().then(
+            (rows) => (rows ?? []) as TechRow[],
+          )
         }
         createDataFn={createDataFn}
         editDataFn={editDataFn}

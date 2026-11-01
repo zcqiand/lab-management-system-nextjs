@@ -11,7 +11,7 @@ export default function Page() {
       hint="InspectionBrand 实体码表，按检测项目过滤；拖拽调整顺序"
       dataFn="M04.F09.I01"
       createDataFn="M04.F09.I02"
-      editDataFn="M04.F09.I02"
+      editDataFn="M04.F09.I03"
       deleteDataFn="M04.F09.I04"
     />
   );

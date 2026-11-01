@@ -65,7 +65,7 @@ const TRANSITION_OPERATOR = [
 
 const TRANSITION_HOUR = ["10", "09", "16", "10", "15", "15", "16"];
 
-const TENANT = "TENANT-001";
+const TENANT = "acme";
 const DATA_ENTRY_IDX = STAGES.indexOf("data_entry");
 const ISSUANCE_IDX = STAGES.indexOf("issuance");
 

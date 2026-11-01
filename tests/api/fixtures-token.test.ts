@@ -19,7 +19,7 @@ const signer = new LabJwtSigner(
   604800,
 );
 
-const TOKEN_DEMO = `Bearer ${signer.issue("USER-A", "TENANT-001")}`;
+const TOKEN_DEMO = `Bearer ${signer.issue("USER-A", "acme")}`;
 const TOKEN_SSO = `Bearer ${signer.issue("USER-A", "00000000-0000-0000-0000-000000000001")}`;
 
 function req(url: string, authz?: string, init?: RequestInit): NextRequest {
@@ -39,7 +39,7 @@ const BASE = "http://localhost:5201/api";
 describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
   // ———— 租户过滤域 ————
 
-  it("samples GET：匿名 401；TENANT-001 token 见种子行；SSO token 空列表", async () => {
+  it("samples GET：匿名 401；acme token 见种子行；SSO token 空列表", async () => {
     const { GET } = await import("@/app/api/samples/route");
     expect((await GET(req(`${BASE}/samples`))).status).toBe(401);
     const demo = (await (await GET(req(`${BASE}/samples`, TOKEN_DEMO))).json()) as {
@@ -47,7 +47,7 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
       total: number;
     };
     expect(demo.total).toBeGreaterThan(0);
-    expect(demo.items.every((s) => s.tenantId === "TENANT-001")).toBe(true);
+    expect(demo.items.every((s) => s.tenantId === "acme")).toBe(true);
     const sso = (await (await GET(req(`${BASE}/samples`, TOKEN_SSO))).json()) as {
       total: number;
     };
@@ -67,7 +67,7 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
     const res = await POST(req(`${BASE}/samples`, TOKEN_DEMO, { method: "POST", body }));
     expect(res.status).toBe(201);
     const created = (await res.json()) as { id: string; tenantId: string };
-    expect(created.tenantId).toBe("TENANT-001");
+    expect(created.tenantId).toBe("acme");
     // 清理：fixtures 数组跨测试共享，pop 掉本条
     const { samples } = await import("@lab/management-system-msw/fixtures");
     const i = samples.findIndex((s) => s.id === created.id);
@@ -142,14 +142,14 @@ describe("fixtures 域 token 化（BFF 全域 token 化 P3）", () => {
     expect(body["funnelByStage"]).toBeDefined();
   });
 
-  it("technical-requirements：匿名 401；TENANT-001 见种子行、SSO 空；POST stamp claim", async () => {
+  it("technical-requirements：匿名 401；acme 见种子行、SSO 空；POST stamp claim", async () => {
     const { GET, POST } = await import("@/app/api/technical-requirements/route");
     expect((await GET(req(`${BASE}/technical-requirements`))).status).toBe(401);
     const demo = (await (
       await GET(req(`${BASE}/technical-requirements`, TOKEN_DEMO))
     ).json()) as Array<{ tenantId: string }>;
     expect(demo.length).toBeGreaterThan(0);
-    expect(demo.every((r) => r.tenantId === "TENANT-001")).toBe(true);
+    expect(demo.every((r) => r.tenantId === "acme")).toBe(true);
     const sso = (await (
       await GET(req(`${BASE}/technical-requirements`, TOKEN_SSO))
     ).json()) as unknown[];

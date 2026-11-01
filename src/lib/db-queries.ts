@@ -104,7 +104,10 @@ export async function listReceiptsDb(
     .select()
     .from(t)
     .where(where)
-    .orderBy(desc(t.commissionDate))
+    // 排序=家族约定（springboot SampleReceiptRepository：commissionDate DESC,
+    // commissionCode）。此前只有 commissionDate DESC：同日期平局序=堆序不定，
+    // e2e 残留行攒多后新建行会随堆位漂出首屏窗口（2026-11-02 e2e AC-4 实证）。
+    .orderBy(desc(t.commissionDate), asc(t.commissionCode))
     .limit(q.pageSize)
     .offset((q.page - 1) * q.pageSize);
   const counted = await db
@@ -1000,6 +1003,10 @@ export async function listContractsDb(
         .select()
         .from(t)
         .where(and(...conds))
+        // 排序=家族约定（springboot ContractRepository：updatedAt DESC, contractCode）。
+        // 此前完全无 ORDER BY：堆序随 insert/delete 死元组复用漂移，新建行会随机
+        // 落出路由层 slice 首屏窗口（2026-11-02 e2e contract AC-4 双 retry 实证）。
+        .orderBy(desc(t.updatedAt), asc(t.contractCode))
     : await db.select().from(t);
   return rows as Row[];
 }

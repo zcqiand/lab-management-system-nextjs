@@ -172,9 +172,12 @@ export default function LoginPage() {
       const flowBackend = sessionStorage.getItem(SSO_FLOW_BACKEND_KEY);
       if (!expectedState || expectedState !== stateParam) {
         if (callbackStartedRef.current) return;
+        // state 不匹配 = session 过期或 state 被偷换（CSRF 语义）——与 react/vue
+        // 同语义：停留 /login 显示错误让人重登，不静默自愈重启跳 saas
+        //（自动重启会把攻击/过期信号掩盖掉，e2e login AC-2 实证）。
         sessionStorage.removeItem(SSO_STATE_STORAGE_KEY);
         cleanCallbackParams();
-        restartAuthorize("state 校验失败（登录流程已过期）");
+        setStatus("state 校验失败（可能 session 过期或被攻击），请重新登录");
         return;
       }
       if (

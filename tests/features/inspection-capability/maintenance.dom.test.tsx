@@ -105,19 +105,23 @@ describe("M06.F06 技术要求维护", () => {
     expect(await screen.findByText(/新建技术要求/)).toBeTruthy();
   });
 
-  fnTest(["M06.F06.I02"], "行编辑按钮开弹窗（data-fn 挂 I02）", async () => {
-    render(<TechnicalRequirementList />);
-    await selectStandard("object-OBJ-SP01-P1", "GB 175-2023");
-    const editBtn = await waitFor(() => {
-      const btn = screen.getAllByRole("button", { name: "编辑" })[0]!;
-      expect(btn).toBeTruthy();
-      return btn;
-    });
-    expect(editBtn.getAttribute("data-fn")).toBe("M06.F06.I02");
-    const user = userEvent.setup();
-    await user.click(editBtn);
-    expect(await screen.findByText(/编辑技术要求/)).toBeTruthy();
-  });
+  fnTest(
+    ["M06.F06.I04"],
+    "行编辑按钮开弹窗（data-fn 挂 I04——BASE 编号对齐：行编辑=更新语义，2026-11-02）",
+    async () => {
+      render(<TechnicalRequirementList />);
+      await selectStandard("object-OBJ-SP01-P1", "GB 175-2023");
+      const editBtn = await waitFor(() => {
+        const btn = screen.getAllByRole("button", { name: "编辑" })[0]!;
+        expect(btn).toBeTruthy();
+        return btn;
+      });
+      expect(editBtn.getAttribute("data-fn")).toBe("M06.F06.I04");
+      const user = userEvent.setup();
+      await user.click(editBtn);
+      expect(await screen.findByText(/编辑技术要求/)).toBeTruthy();
+    },
+  );
 
   fnTest(["M06.F06.I05"], "行删除按钮挂 deleteDataFn 锚点", async () => {
     render(<TechnicalRequirementList />);

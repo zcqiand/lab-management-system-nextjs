@@ -6,7 +6,7 @@
     "features": 26,
     "items": 173
   },
-  "warnings_total": 41,
+  "warnings_total": 40,
   "warnings": {
     "已上线但无设计映射": [
       "M00.F01.I01",
@@ -36,8 +36,7 @@
       "M06.F03.I08",
       "M06.F04.I05",
       "M06.F04.I06",
-      "M06.F04.I07",
-      "M06.F06.I04"
+      "M06.F04.I07"
     ],
     "已上线但不在任何流程且非孤儿白名单": [
       "M00.F01.I01",
@@ -2478,7 +2477,6 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I02）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::选标准后新建按钮开弹窗：新建技术要求表单可见"
       ],
       "entry": [
@@ -2504,7 +2502,9 @@
       "designs": [
         "docs\\design\\design-function-map.md"
       ],
-      "tests": [],
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::行编辑按钮开弹窗（data-fn 挂 I04——BASE 编号对齐：行编辑=更新语义，2026-11-02）"
+      ],
       "entry": []
     },
     "M06.F06.I05": {
