@@ -4,9 +4,13 @@
 // POST 后立刻 GET 该 id 拿回，再 DELETE 验证 204 / 数组收缩。
 // BFF 全域 token 化（2026-09-23 P4）：body 不再带 tenantId（BFF 按 token
 // claim stamp）；附带锁 legacy-client 拦截器把 setToken 的值发成 Bearer 头。
-import { describe, expect } from "vitest";
+import { describe, expect, vi } from "vitest";
 import { apiClient, API_ROUTES, setToken } from "@/api/legacy-client";
 import { fnTest } from "../fn";
+
+// 内存饥饿下（--all 连跑 / dev server 共存）jsdom 环境启动可超 10s——
+// probe14 同款：文件级放宽，不动断言（2026-11-04 两轮 --all 实证指纹）。
+vi.setConfig({ testTimeout: 60_000 });
 
 const BASE = API_ROUTES["/contracts"]; // "/api/contracts"
 

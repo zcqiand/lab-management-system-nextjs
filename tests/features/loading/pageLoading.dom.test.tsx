@@ -12,6 +12,10 @@ import { render, screen, waitFor, cleanup, fireEvent } from "@testing-library/re
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { server } from "../../setup.dom";
 
+// 内存饥饿下（--all 连跑 / dev server 共存）jsdom 环境启动可超 10s——
+// probe14 同款：文件级放宽，不动断言（2026-11-04 两轮 --all 实证指纹）。
+vi.setConfig({ testTimeout: 60_000 });
+
 // ReceiptDetailPage 用 next/navigation 的 useParams 取路由参数：
 // vi.hoisted 提供可变 mockParams，用例内改值构造「无 id」场景（B6 修复 R1）。
 const mockParams = vi.hoisted(() => ({ id: "" as string }));
@@ -117,7 +121,13 @@ describe("页面级加载态（PageLoading 门控）", () => {
       },
       { timeout: 3000 },
     );
-    expect(screen.queryByTestId("page-loading")).not.toBeInTheDocument();
+    // 门控解除断言用 waitFor 容忍切换/重挂载瞬间的瞬时再门控（171ms 快败竞态，2026-11-04）
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("page-loading")).not.toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
 
     // 切一次 categoryCode → 汇总表 refetch：门控必须仍然解除（stats 已落定）
     const select = await waitFor(() => {
