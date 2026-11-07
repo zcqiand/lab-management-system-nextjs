@@ -1,16 +1,21 @@
 {
   "schema": 1,
   "approved": true,
-  "mirror": true,
-  "summary": "REQ-2026-023：M01.F05.I06 原生登录 GA 翻转（mirror 免批③）——本仓 REQ-2026-023 验收记录已留痕（T-1 commit/T-7 prod 探针/AC-7 闭环摘自 shared），开发中→已上线",
+  "summary": "M05.F01.I05 见证取样跟踪落地翻转：I05 + M05 模块行 规划→已上线——TDD 全流程（redcheck 双红认证 → computeWitnessStats 纯函数 + BFF route + vendor msw 镜像 + SummaryPage I05 区块 UI 锚，11/11 绿，gate L0-L5 exit 0）；witnessStats 走 B 通道（本仓路由层扩展，契约外加字段，2026-11-07 人裁），shared 契约化与 contract-test 断言列 CHANGELOG 同步清单",
   "changes": [
     {
-      "id": "M01.F05.I06",
+      "id": "M05",
       "action": "变更",
-      "name": "原生登录",
-      "reason": "REQ-2026-023：mirror 免批③ GA 翻转——本仓 docs/requirements/REQ-2026-023-native-login-saas-proxy.md 已记录人工验收通过（2026-10-12 AC-7 闭环，摘自 shared 家族 REQ）；本仓 TDD 实现+测试锚定在库，T-7 prod 探针 200/401 通过"
+      "name": "数据统计",
+      "reason": "父行补账：随本批 M05.F01.I05 落地，M05.F01 全部子项已上线（I01-I04/I06 早已上线），报告汇总表模块整体交付（模块行翻后 BASE M05 仍开发中，family GA 列 CHANGELOG 同步清单待人裁）"
+    },
+    {
+      "id": "M05.F01.I05",
+      "action": "变更",
+      "name": "见证取样跟踪",
+      "reason": "TDD 落地：tests/lib/summary-witness.test.ts（纯函数 4 例）+ tests/api/summary-witness-stats.test.ts（路由形状不变式）+ summary.dom.test.tsx fnTest（UI 锚 + 渲染）三面先红（redcheck 认证）后绿；实现 = src/lib/summary-witness.ts + GET /api/summary/stats 扩展 witnessStats + vendor/msw handlers-extra 同款镜像 + SummaryPage data-fn=M05.F01.I05 区块；gate L0-L5 exit 0"
     }
   ],
   "sync_files": [],
-  "base_sha": "6469ea17161906b7"
+  "base_sha": "5ab301b6530bfc70"
 }

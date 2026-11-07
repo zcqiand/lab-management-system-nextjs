@@ -4,12 +4,43 @@
 //   I02 仪表盘容器锚点
 //   I03 核心指标卡（3 个 metric card + 各 detail）
 //   I04 任务状态漏斗（6 段）
+//   I05 见证取样跟踪（见证率 + 到位明细，server.use 注入固定载荷）
 //   I01 汇总表（原行为：默认 ALL + 切换 categoryCode）
 import { describe, expect } from "vitest";
+import { http, HttpResponse } from "msw";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SummaryPage } from "@/features/summary/SummaryPage";
 import { fnTest } from "../../fn";
+import { server } from "../../setup.dom";
+
+// 完整 stats 形状（vendor msw 真 handler 对空 fixtures 返回全零形状同款），
+// 供 per-test 覆盖注入 witnessStats 等扩展字段。
+function fullStats(overrides: Record<string, unknown> = {}) {
+  return {
+    contractCount: 3,
+    receiptCount: 2,
+    sampleCount: 4,
+    reportCountByStatus: { draft: 0, reviewing: 0, issued: 0 },
+    pendingTaskCount: 0,
+    todayTestCount: 0,
+    qualifiedRateByMaterial: {
+      concrete: { total: 0, pass: 0, rate: 0 },
+      rebar: { total: 0, pass: 0, rate: 0 },
+      sand: { total: 0, pass: 0, rate: 0 },
+    },
+    reportOutputByStatus: { generated: 0, pending: 0, issued: 0 },
+    funnelByStage: {
+      pending_collect: 0,
+      received: 0,
+      testing: 0,
+      reporting: 0,
+      reviewing: 0,
+      issued: 0,
+    },
+    ...overrides,
+  };
+}
 
 function mount() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -91,6 +122,59 @@ describe("M05.F01 试验报告汇总表 + 仪表盘", () => {
     expect(funnelEl.textContent).toContain("待审核");
     expect(funnelEl.textContent).toContain("已签发");
   });
+
+  fnTest(
+    ["M05.F01.I05"],
+    "data-fn=M05.F01.I05 锚点 + 见证取样跟踪（见证率 + 到位明细表）",
+    async () => {
+      // stats handler 注入固定 witnessStats 载荷（语义真源在 BFF route，dom 层只认渲染）
+      server.use(
+        http.get("*/api/summary/stats", () =>
+          HttpResponse.json(
+            fullStats({
+              witnessStats: {
+                requireWitness: 2,
+                witnessed: 1,
+                witnessRate: 0.5,
+                details: [
+                  {
+                    commissionCode: "WT-001",
+                    projectName: "项目甲",
+                    witnessUnit: "监理甲",
+                    witness: "王见证",
+                    witnessed: true,
+                  },
+                  {
+                    commissionCode: "WT-002",
+                    projectName: "项目乙",
+                    witnessUnit: "监理乙",
+                    witness: "赵见证",
+                    witnessed: false,
+                  },
+                ],
+              },
+            }),
+          ),
+        ),
+      );
+      mount();
+      const section = await waitFor(() => {
+        const el = document.querySelector('[data-fn="M05.F01.I05"]');
+        expect(el).not.toBeNull();
+        return el as HTMLElement;
+      });
+      expect(section.textContent).toContain("见证取样");
+      // 等 stats 拉回后明细区出现
+      await waitFor(() => {
+        expect(screen.getByTestId("witness-tracking-body")).toBeInTheDocument();
+      });
+      // 见证率 50.0%（witnessRate=0.5）
+      expect(screen.getByTestId("witness-rate").textContent).toContain("50.0%");
+      // 到位明细：需见证 2 行
+      const rows = section.querySelectorAll('[data-testid="witness-details"] tbody tr');
+      expect(rows.length).toBe(2);
+    },
+  );
 
   fnTest(["M05.F01.I01"], "data-fn=M05.F01.I01 锚点 + 默认 ALL 拉表格有行", async () => {
     const { container } = mount();

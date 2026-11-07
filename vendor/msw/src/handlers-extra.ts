@@ -1308,6 +1308,39 @@ export const summaryExtraHandlers = [
       reviewing: byStatus("review") + byStatus("approval"),
       issued: issuedCount,
     };
+    // ── M05.F01.I05 见证取样跟踪（B 通道：契约外加字段，与 nextjs BFF route 同语义镜像；
+    //    shared DashboardStats 契约化后随各仓 regenerate 转正）──
+    const contractById = new Map(contracts.map((c) => [c.id, c]));
+    const witnessDetails: Array<{
+      commissionCode: string;
+      projectName: string;
+      witnessUnit: string;
+      witness: string;
+      witnessed: boolean;
+    }> = [];
+    let witnessDone = 0;
+    for (const r of sampleReceipts) {
+      const c = contractById.get(r.contractId);
+      if (!c || !String(c.witness ?? "").trim()) continue; // 合同无见证安排 → 不计入
+      const done = Boolean(String(r.witness ?? "").trim());
+      if (done) witnessDone += 1;
+      witnessDetails.push({
+        commissionCode: r.commissionCode ?? "",
+        projectName: r.projectName ?? c.projectName ?? "",
+        witnessUnit: c.witnessUnit ?? "",
+        witness: done ? String(r.witness) : String(c.witness ?? ""),
+        witnessed: done,
+      });
+    }
+    const witnessStats = {
+      requireWitness: witnessDetails.length,
+      witnessed: witnessDone,
+      witnessRate:
+        witnessDetails.length > 0
+          ? Math.round((witnessDone / witnessDetails.length) * 1000) / 1000
+          : 0,
+      details: witnessDetails,
+    };
     return HttpResponse.json({
       contractCount: contracts.length,
       receiptCount: sampleReceipts.length,
@@ -1322,6 +1355,7 @@ export const summaryExtraHandlers = [
       qualifiedRateByMaterial,
       reportOutputByStatus,
       funnelByStage,
+      witnessStats,
     });
   }),
 ];

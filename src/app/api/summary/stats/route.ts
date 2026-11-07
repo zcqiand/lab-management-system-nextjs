@@ -12,11 +12,19 @@
 //
 // 新增 M05.F01.I04 任务漏斗：
 //   funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued}
+//
+// 新增 M05.F01.I05 见证取样跟踪（B 通道：契约外加字段，shared 批后转正）：
+//   witnessStats:{requireWitness, witnessed, witnessRate, details[]}
 
 import { NextRequest, NextResponse } from "next/server";
 import { sampleReceipts, samples } from "@/lib/api-helpers";
 import { contracts, inspectionReportNames } from "@lab/management-system-msw/fixtures";
 import { requireTenant } from "@/lib/auth/require-tenant";
+import { computeWitnessStats } from "@/lib/summary-witness";
+import type {
+  WitnessStatsInputContract,
+  WitnessStatsInputReceipt,
+} from "@/lib/summary-witness";
 
 // 材料类型映射：categoryCode → inspectionReportNames.summaryName → 关键词匹配
 const MATERIAL_KEYWORDS: Record<string, string[]> = {
@@ -134,5 +142,10 @@ export async function GET(req: NextRequest) {
     reportOutputByStatus,
     // M05.F01.I04
     funnelByStage,
+    // M05.F01.I05 见证取样跟踪（rows 已按 token 租户过滤，helper 租户无关）
+    witnessStats: computeWitnessStats(
+      rows as unknown as WitnessStatsInputReceipt[],
+      contracts as unknown as WitnessStatsInputContract[],
+    ),
   });
 }

@@ -32,13 +32,13 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 模块 ID | 模块名称 | 说明 | 状态 |
 |---|---|---|---|
-| M00 | 租户管理 | 当前用户关联租户列表、登录选租户、切换租户 | 规划 |
-| M01 | 认证管理 | 权限管理（RBAC/路由守卫/动态菜单）、认证（登录/SSO/JWT） | 规划 |
-| M02 | 资源管理 | 合同管理 | 规划 |
-| M03 | 试验过程管理 | 接样 → 任务分配 → 数据录入 → 报告审核 → 批准 → 发放 → 归档 | 规划 |
-| M04 | 基础数据 | 型号/规格/等级/牌号维护 | 规划 |
-| M05 | 数据统计 | 报告汇总表（按报告名称） | 规划 |
-| M06 | 检测能力 | 检测专项/项目/参数/标准/计算方法/技术要求/报告名称/参数界面 | 规划 |
+| M00 | 租户管理 | 当前用户关联租户列表、登录选租户、切换租户 | 已上线 |
+| M01 | 认证管理 | 权限管理（RBAC/路由守卫/动态菜单）、认证（登录/SSO/JWT） | 已上线 |
+| M02 | 资源管理 | 合同管理 | 已上线 |
+| M03 | 试验过程管理 | 接样 → 任务分配 → 数据录入 → 报告审核 → 批准 → 发放 → 归档 | 已上线 |
+| M04 | 基础数据 | 型号/规格/等级/牌号维护 | 已上线 |
+| M05 | 数据统计 | 报告汇总表（按报告名称） | 已上线 |
+| M06 | 检测能力 | 检测专项/项目/参数/标准/计算方法/技术要求/报告名称/参数界面 | 已上线 |
 
 ---
 
@@ -46,8 +46,8 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 说明 | 状态 |
 |---|---|---|---|
-| M00.F01 | 当前用户会话 | 当前用户信息 + 关联租户列表 + 当前选中租户（GET /auth/me） | 规划 |
-| M00.F02 | 登录选租户 | 登录后选择租户，换发携带 tenant_id claim 的 token（POST /auth/switch-tenant） | 规划 |
+| M00.F01 | 当前用户会话 | 当前用户信息 + 关联租户列表 + 当前选中租户（GET /auth/me） | 已上线 |
+| M00.F02 | 登录选租户 | 登录后选择租户，换发携带 tenant_id claim 的 token（POST /auth/switch-tenant） | 已上线 |
 
 ### M00.F01 当前用户会话
 
@@ -67,8 +67,8 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 
 | 功能 ID | 功能名称 | 说明 | 状态 |
 |---|---|---|---|
-| M01.F04 | 权限管理 | RBAC 角色权限、路由守卫、权限指令、动态菜单（身份平台下发） | 规划 |
-| M01.F05 | 认证管理 | 用户名+密码登录 + SSO 统一登录（对接身份平台），JWT 签发与校验 | 规划 |
+| M01.F04 | 权限管理 | RBAC 角色权限、路由守卫、权限指令、动态菜单（身份平台下发） | 已上线 |
+| M01.F05 | 认证管理 | 用户名+密码登录 + SSO 统一登录（对接身份平台），JWT 签发与校验 | 已上线 |
 
 ### M01.F04 权限管理
 
@@ -108,7 +108,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M02.F01.I04 | 合同汇总 | 接口 | 前端+后端 | 按合同统计汇总数据 | 已废弃 |
 | M02.F01.I05 | 删除合同 | 接口 | 前端+后端 | BASE 编号对齐：DELETE /api/contracts/{id}：204；被接样引用 FK RESTRICT 拒（实现即原 M02.F01.I03） | 已上线 |
 | M02.F01.I06 | 创建合同 | 接口 | 前端+后端 | BASE I03 编号被废弃行占用顺延 I06；POST /api/contracts：code/clientUnit/projectName/constructionUnit/witnessUnit/witness 必填 | 已上线 |
-| M02.F01.I07 | 更新合同 | 接口 | 前端+后端 | BASE I04 顺延 I07；PUT /api/contracts/{id} PATCH 语义；随 BASE 状态 开发中 | 开发中 |
+| M02.F01.I07 | 更新合同 | 接口 | 前端+后端 | BASE I04 顺延 I07；PUT /api/contracts/{id} PATCH 语义；随 BASE 状态 开发中 | 已上线 |
 
 ---
 
@@ -170,9 +170,9 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M03.F03.I12 | 数据录入-提交 | 接口 | 前端+后端 | POST /api/receipts/data-entry/act，body.action={SUBMIT、RETURN、WITHDRAW} 三动作统一（2026-09-18：I13 退回/I14 撤回语义并入本行；7 阶段全 act 模式） | 已上线 |
 | M03.F03.I13 | 数据录入-退回 | 接口 | 前端+后端 | 2026-09-18 标记 已废弃：语义并入 M03.F03.I12（act 端点以 body.action=RETURN 区分，无独立端点） | 已废弃 |
 | M03.F03.I14 | 数据录入-撤回 | 接口 | 前端+后端 | 2026-09-18 标记 已废弃：语义并入 M03.F03.I12（act 端点以 body.action=WITHDRAW 区分，无独立端点） | 已废弃 |
-| M03.F03.I15 | 数据录入三态过滤器 | 按钮 | 仅前端 | 全部/未提交/已提交：按 flowStatus 过滤数据录入列表（前端过滤器，触发 GET /api/receipts?flowStatus=…） | 开发中 |
-| M03.F03.I16 | 更新样品 | 接口 | 前端+后端 | BASE I04 编号被废弃行（原检测项删除→I10）占用顺延 I16；PUT /api/samples/{id} PATCH 语义 | 规划 |
-| M03.F03.I17 | 删除样品 | 接口 | 前端+后端 | BASE I05 同上顺延 I17；DELETE /api/samples/{id}：204 | 规划 |
+| M03.F03.I15 | 数据录入三态过滤器 | 按钮 | 仅前端 | 2026-11-07 标记 已废弃：双胞收敛（与 I07 同名同语义，语义归属 M03.F03.I07——I07 已上线且带 UI 锚 DataEntryPage.tsx:709/718）；本行 ID 保留作历史，不再挂新引用 | 已废弃 |
+| M03.F03.I16 | 更新样品 | 接口 | 前端+后端 | BASE I04 编号被废弃行（原检测项删除→I10）占用顺延 I16；PUT /api/samples/{id} PATCH 语义 | 已上线 |
+| M03.F03.I17 | 删除样品 | 接口 | 前端+后端 | BASE I05 同上顺延 I17；DELETE /api/samples/{id}：204 | 已上线 |
 
 ### M03.F05 报告审核
 
@@ -295,7 +295,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M05.F01.I02 | 仪表盘容器 | 页面 | 仅前端 | SummaryPage 最外层 layout 锚点，包裹 I03/I04/I05 三区块 | 已上线 |
 | M05.F01.I03 | 核心指标卡 | 查询 | 前端+后端 | 今日试验总数 + 检测合格率（按材料类型 concrete/rebar/sand）+ 报告产出量（已生成/已签发/待审核）；GET /api/summary/stats 扩展 todayTestCount/qualifiedRateByMaterial/reportOutputByStatus | 已上线 |
 | M05.F01.I04 | 任务状态漏斗 | 报表 | 前端+后端 | 6 段实时计数：待取样→已收样→试验中→报告编制→待审核→已签发；GET /api/summary/stats 扩展 funnelByStage:{pending_collect, received, testing, reporting, reviewing, issued} | 已上线 |
-| M05.F01.I05 | 见证取样跟踪 | 报表 | 前端+后端 | 见证率（合同需见证的接样单中已完成见证的比例）+ 见证到位情况明细；GET /api/summary/stats 扩展 witnessStats:{requireWitness, witnessed, witnessRate, details[]} | 规划 |
+| M05.F01.I05 | 见证取样跟踪 | 报表 | 前端+后端 | 见证率（合同需见证的接样单中已完成见证的比例）+ 见证到位情况明细；GET /api/summary/stats 扩展 witnessStats:{requireWitness, witnessed, witnessRate, details[]}；B 通道实现（2026-11-07 人裁：契约外加字段，shared 批后转正） | 已上线 |
 | M05.F01.I06 | 仪表盘统计基础端点 | 查询 | 前端+后端 | GET /api/summary/stats 基础字段：contractCount/receiptCount/sampleCount + 报告状态 3 桶（draft=receiving+task+data_entry；reviewing=review+approval；issued=issuance+archived）+ pendingTaskCount。ADR-0033 阶段二自 M05.F02.I01 改挂 F01（BASE I06 下沉对齐） | 已上线 |
 
 ---
@@ -339,11 +339,11 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F02.I08 | 项目↔参数 unlink | 接口 | 前端+后端 | BASE 编号对齐：DELETE /api/inspection/links/object-parameter：404 if 不存在 | 已上线 |
 | M06.F02.I09 | 专项↔项目 列表 | 接口 | 前端+后端 | BASE 编号对齐：GET /api/inspection/links/specialty-object?inspectionSpecialtyCode=：按专项 code 过滤 | 已上线 |
 | M06.F02.I10 | 项目↔参数 列表 | 接口 | 前端+后端 | BASE 编号对齐：GET /api/inspection/links/object-parameter?inspectionObjectCode=&inspectionParameterCode=：按 objectCode/parameterCode 过滤 | 已上线 |
-| M06.F02.I11 | 删除项目 | 接口 | 前端+后端 | BASE I04 编号被废弃行占用顺延 I11；DELETE /api/inspection/objects/{code}：204 if exists | 规划 |
-| M06.F02.I12 | 更新项目 | 接口 | 前端+后端 | BASE I03 语义顺延补齐 I12；PUT /api/inspection/objects/{code} PATCH 语义 | 规划 |
+| M06.F02.I11 | 删除项目 | 接口 | 前端+后端 | BASE I04 编号被废弃行占用顺延 I11；DELETE /api/inspection/objects/{code}：204 if exists | 已上线 |
+| M06.F02.I12 | 更新项目 | 接口 | 前端+后端 | BASE I03 语义顺延补齐 I12；PUT /api/inspection/objects/{code} PATCH 语义 | 已上线 |
 | M06.F02.I13 | 专项↔项目 link | 接口 | 前端+后端 | BASE I05 顺延 I13；POST /api/inspection/links/specialty-object（实现即原 I07） | 已上线 |
 | M06.F02.I14 | 项目↔参数 link | 接口 | 前端+后端 | BASE I07 顺延 I14；POST /api/inspection/links/object-parameter（实现即原 I06，含资质必备/可选 + prefilter） | 已上线 |
-| M06.F02.I15 | 专项↔项目 unlink | 接口 | 前端+后端 | BASE I06 顺延 I15；DELETE /api/inspection/links/specialty-object：404 if 不存在 | 规划 |
+| M06.F02.I15 | 专项↔项目 unlink | 接口 | 前端+后端 | BASE I06 顺延 I15；DELETE /api/inspection/links/specialty-object：404 if 不存在 | 已上线 |
 
 ### M06.F03 检测参数
 
@@ -369,8 +369,8 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F04.I05 | 项目↔报告名称 unlink | 接口 | 前端+后端 | BASE 编号对齐：DELETE /api/report-names/links/object：404 if 不存在 | 已上线 |
 | M06.F04.I06 | 报告名称↔参数 unlink | 接口 | 前端+后端 | BASE 编号对齐：DELETE /api/report-names/links/parameter：404 if 不存在 | 已上线 |
 | M06.F04.I07 | 报告名称↔标准 unlink | 接口 | 前端+后端 | BASE 编号对齐：DELETE /api/report-names/links/standard：404 if 不存在 | 已上线 |
-| M06.F04.I08 | 更新标准 | 接口 | 前端+后端 | BASE I03 顺延 I08；PUT /api/inspection/standards/{code} PATCH 语义 | 规划 |
-| M06.F04.I09 | 删除标准 | 接口 | 前端+后端 | BASE I04 顺延 I09；DELETE /api/inspection/standards/{code}：204 if exists | 规划 |
+| M06.F04.I08 | 更新标准 | 接口 | 前端+后端 | BASE I03 顺延 I08；PUT /api/inspection/standards/{code} PATCH 语义 | 已上线 |
+| M06.F04.I09 | 删除标准 | 接口 | 前端+后端 | BASE I04 顺延 I09；DELETE /api/inspection/standards/{code}：204 if exists | 已上线 |
 
 ### M06.F05 计算方法
 
@@ -404,7 +404,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F07.I06 | 关联判定依据 | 接口 | 前端+后端 | 维护 InspectionReportNameStandard role=JUDGMENT（2026-09-18 批次 2 注记：BASE I07=报告名称↔标准 link（role=JUDGMENT），本仓号顺延不变） | 已上线 |
 | M06.F07.I07 | 关联检测参数 | 接口 | 前端+后端 | 维护 InspectionReportNameParameter 中间表；prefilter 弹窗（先选检测项目→过滤参数）+ 参数清单行追加「· 对象名」，见 REQ-2026-012（2026-09-18 批次 2 注记：BASE I08=报告名称↔参数 link，本仓号顺延不变） | 已上线 |
 | M06.F07.I08 | 扩展属性维护 | 接口 | 前端+后端 | 维护 InspectionReportName.extFields 列表（key/label/type/required/tag/source/options）；预览前若样品 ext 未覆盖对应 key，会自动弹 SampleExtFieldsModal（M03.F01.I07）让用户补录（2026-09-18 批次 2 注记：BASE 无本行——本仓 extFields 补录弹窗为本地功能，BASE 无对应端点） | 已上线 |
-| M06.F07.I09 | 删除报告名称 | 接口 | 前端+后端 | BASE I05 顺延 I09；DELETE /api/report-names/{code}：204 if exists | 规划 |
+| M06.F07.I09 | 删除报告名称 | 接口 | 前端+后端 | BASE I05 顺延 I09；DELETE /api/report-names/{code}：204 if exists | 已上线 |
 
 ### M06.F08 参数界面
 
@@ -416,7 +416,7 @@ M00..M06 是 shared BASE 镜像（full-feature-parity Task 6）：26 个 BASE F 
 | M06.F08.I04 | 关联检测参数 | 接口 | 前端+后端 | 维护 InspectionParameterParamInterface 中间表（参数↔界面 M:N，支持 reportNameCode 报告作用域）（2026-09-18 批次 2 注记：BASE I06=参数↔界面 link，本仓号顺延不变） | 已上线 |
 | M06.F08.I05 | 参数界面预览 | 接口 | 前端+后端 | 列表行按钮：按绑定 componentPath 渲染该录入卡只读预览（mock 单样品 + 示例技术要求） | 已上线 |
 | M06.F08.I06 | 参数界面预览弹窗 | 接口 | 前端+后端 | 模态：渲染注册的参数录入卡组件只读模式，供配置时查看录入卡样式 | 已上线 |
-| M06.F08.I07 | 删除参数界面 | 接口 | 前端+后端 | BASE I05 顺延 I07；DELETE /api/param-interfaces/{code}：204 if exists | 规划 |
+| M06.F08.I07 | 删除参数界面 | 接口 | 前端+后端 | BASE I05 顺延 I07；DELETE /api/param-interfaces/{code}：204 if exists | 已上线 |
 
 ---
 

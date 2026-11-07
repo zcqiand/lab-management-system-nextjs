@@ -1,11 +1,11 @@
-// M05.F01.I01 汇总表 + M05.F01.I02 仪表盘容器（含 I03 核心指标 + I04 任务漏斗）
+// M05.F01.I01 汇总表 + M05.F01.I02 仪表盘容器（含 I03 核心指标 + I04 任务漏斗 + I05 见证跟踪）
 //
 // 数据源：
 //   GET /api/report-names           报告名称下拉选项
 //   GET /api/summary?categoryCode=   汇总表数据
-//   GET /api/summary/stats          仪表盘核心指标 + 任务漏斗
+//   GET /api/summary/stats          仪表盘核心指标 + 任务漏斗 + 见证取样跟踪
 //
-// UI 顺序：仪表盘容器(I02) → 核心指标(I03) → 任务漏斗(I04) → 报告类别筛选 + 汇总表(I01)
+// UI 顺序：仪表盘容器(I02) → 核心指标(I03) → 任务漏斗(I04) → 见证跟踪(I05) → 报告类别筛选 + 汇总表(I01)
 import { useEffect, useState } from "react";
 import type {
   DashboardStats,
@@ -19,6 +19,11 @@ import {
   summaryGetReportSummary,
 } from "@/api/endpoints/summary/summary";
 import { PageLoading } from "@/components/app/page-loading";
+import type { WitnessStats } from "@/lib/summary-witness";
+
+// B 通道（2026-11-07 人裁）：witnessStats 在 shared DashboardStats 契约之外，
+// BFF 路由层扩展字段——生成物类型不手改，用交集投影读取；shared 批后转正删除。
+type StatsWithWitness = DashboardStats & { witnessStats?: WitnessStats };
 
 const FUNNEL_LABELS: Array<{
   key: keyof DashboardStats["funnelByStage"];
@@ -195,6 +200,79 @@ export function SummaryPage() {
         ) : (
           <div className="text-sm text-slate-500">载入中…</div>
         )}
+      </section>
+
+      {/* —— M05.F01.I05 见证取样跟踪 —— */}
+      <section data-fn="M05.F01.I05" data-testid="witness-tracking" className="space-y-3">
+        <h2 className="text-base font-semibold">见证取样跟踪</h2>
+        {(() => {
+          const w = (stats as StatsWithWitness | null)?.witnessStats;
+          if (!w) return <div className="text-sm text-slate-500">载入中…</div>;
+          return (
+            <div data-testid="witness-tracking-body" className="space-y-2">
+              <div className="border rounded bg-white p-4 flex items-center gap-4">
+                <div className="text-sm text-slate-600">
+                  需见证 <b className="tabular-nums">{w.requireWitness}</b> 单
+                </div>
+                <div className="text-sm text-slate-600">
+                  已见证 <b className="tabular-nums">{w.witnessed}</b> 单
+                </div>
+                <div className="text-sm text-slate-600" data-testid="witness-rate">
+                  见证率 <b className="text-lg tabular-nums">{pct(w.witnessRate)}</b>
+                </div>
+              </div>
+              <div
+                className="border rounded bg-white overflow-x-auto"
+                data-testid="witness-details"
+              >
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50">
+                      <th className="text-left px-2 py-1 border-b font-medium">
+                        委托书编号
+                      </th>
+                      <th className="text-left px-2 py-1 border-b font-medium">
+                        工程名称
+                      </th>
+                      <th className="text-left px-2 py-1 border-b font-medium">
+                        见证单位
+                      </th>
+                      <th className="text-left px-2 py-1 border-b font-medium">见证人</th>
+                      <th className="text-left px-2 py-1 border-b font-medium">
+                        见证状态
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {w.details.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="text-center text-slate-500 px-2 py-4">
+                          暂无需见证接样单
+                        </td>
+                      </tr>
+                    ) : (
+                      w.details.map((d, i) => (
+                        <tr key={i} className="border-b last:border-b-0">
+                          <td className="px-2 py-1">{d.commissionCode}</td>
+                          <td className="px-2 py-1">{d.projectName}</td>
+                          <td className="px-2 py-1">{d.witnessUnit}</td>
+                          <td className="px-2 py-1">{d.witness}</td>
+                          <td className="px-2 py-1">
+                            {d.witnessed ? (
+                              <span className="text-green-700">已到位</span>
+                            ) : (
+                              <span className="text-amber-700">未到位</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
       {/* —— M05.F01.I01 汇总表 —— */}

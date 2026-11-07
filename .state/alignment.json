@@ -6,7 +6,7 @@
     "features": 26,
     "items": 173
   },
-  "warnings_total": 40,
+  "warnings_total": 54,
   "warnings": {
     "已上线但无设计映射": [
       "M00.F01.I01",
@@ -14,29 +14,44 @@
       "M01.F04.I03",
       "M01.F05.I06",
       "M02.F01.I06",
+      "M02.F01.I07",
       "M03.F01.I08",
       "M03.F02.I05",
       "M03.F03.I12",
-      "M05.F01.I06"
+      "M03.F03.I16",
+      "M03.F03.I17",
+      "M05.F01.I05",
+      "M05.F01.I06",
+      "M06.F02.I12",
+      "M06.F02.I15",
+      "M06.F04.I08"
     ],
     "已上线但无测试引用": [
       "M01.F04.I03",
       "M02.F01.I06",
+      "M02.F01.I07",
       "M03.F02.I02",
       "M03.F02.I05",
       "M03.F03.I12",
+      "M03.F03.I16",
+      "M03.F03.I17",
       "M05.F01.I06",
       "M06.F01.I06",
       "M06.F01.I07",
       "M06.F02.I08",
       "M06.F02.I09",
       "M06.F02.I10",
+      "M06.F02.I11",
+      "M06.F02.I12",
+      "M06.F02.I15",
       "M06.F03.I06",
       "M06.F03.I07",
       "M06.F03.I08",
       "M06.F04.I05",
       "M06.F04.I06",
-      "M06.F04.I07"
+      "M06.F04.I07",
+      "M06.F04.I08",
+      "M06.F04.I09"
     ],
     "已上线但不在任何流程且非孤儿白名单": [
       "M00.F01.I01",
@@ -45,18 +60,13 @@
       "M01.F04.I03",
       "M01.F05.I06",
       "M02.F01.I06",
+      "M02.F01.I07",
       "M03.F02.I05",
       "M05.F01.I02",
       "M05.F01.I03",
       "M05.F01.I04",
+      "M05.F01.I05",
       "M05.F01.I06"
-    ],
-    "开发中但无需求文档引用": [
-      "M02.F01.I07",
-      "M03.F03.I15"
-    ],
-    "开发中但代码里无 UI 入口(用户还点不到)": [
-      "M03.F03.I15"
     ]
   },
   "unreachable_shipped": [],
@@ -431,7 +441,7 @@
     },
     "M02.F01.I07": {
       "name": "更新合同",
-      "status": "开发中",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -947,7 +957,7 @@
     },
     "M03.F03.I15": {
       "name": "数据录入三态过滤器",
-      "status": "开发中",
+      "status": "已废弃",
       "type": "按钮",
       "requirements": [],
       "flows": [],
@@ -957,7 +967,7 @@
     },
     "M03.F03.I16": {
       "name": "更新样品",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -967,7 +977,7 @@
     },
     "M03.F03.I17": {
       "name": "删除样品",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -1811,13 +1821,17 @@
     },
     "M05.F01.I05": {
       "name": "见证取样跟踪",
-      "status": "规划",
+      "status": "已上线",
       "type": "报表",
       "requirements": [],
       "flows": [],
       "designs": [],
-      "tests": [],
-      "entry": []
+      "tests": [
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/summary/summary.dom.test.tsx::data-fn=M05.F01.I05 锚点 + 见证取样跟踪（见证率 + 到位明细表）"
+      ],
+      "entry": [
+        "src/features/summary/SummaryPage.tsx"
+      ]
     },
     "M05.F01.I06": {
       "name": "仪表盘统计基础端点",
@@ -2068,7 +2082,7 @@
     },
     "M06.F02.I11": {
       "name": "删除项目",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2082,7 +2096,7 @@
     },
     "M06.F02.I12": {
       "name": "更新项目",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2131,7 +2145,7 @@
     },
     "M06.F02.I15": {
       "name": "专项↔项目 unlink",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2347,7 +2361,7 @@
     },
     "M06.F04.I08": {
       "name": "更新标准",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2357,7 +2371,7 @@
     },
     "M06.F04.I09": {
       "name": "删除标准",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2648,7 +2662,7 @@
     },
     "M06.F07.I09": {
       "name": "删除报告名称",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],
@@ -2763,7 +2777,7 @@
     },
     "M06.F08.I07": {
       "name": "删除参数界面",
-      "status": "规划",
+      "status": "已上线",
       "type": "接口",
       "requirements": [],
       "flows": [],

@@ -3,20 +3,20 @@
   "project": "lab-management-system-nextjs",
   "tier": "full",
   "excluded_tier": [],
-  "passed": false,
+  "passed": true,
   "partial": true,
   "ran": [
-    "L4"
+    "L1"
   ],
-  "checked_at": "2026-11-02T02:02:37+0800",
+  "checked_at": "2026-11-07T22:24:02+0800",
   "gates": [
     {
-      "level": "L4",
-      "name": "测试",
-      "passed": false,
-      "returncode": 1,
-      "duration_s": 86.093,
-      "output": "[INFO][gate-inject] DATABASE_URL <- L4_DB_INJECT_REPOS 表驱动通道（lab_test @ 127.0.0.1:54321，镜像 db-env.sh）\n[INFO][gate-inject] LAB_JWT_SECRET <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_JWT_ISSUER <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_JWT_TTL_SECONDS <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_JWT_REFRESH_TTL_SECONDS <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] NEXT_PUBLIC_API_BASE_URL <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] NEXT_PUBLIC_API_MODE <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_IDP_URL <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_UI_BASE_URL <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] NEXT_PUBLIC_SAAS_BASE_URL <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] NEXT_PUBLIC_SAAS_OAUTH_CLIENT_ID <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] NEXT_PUBLIC_LAB_APP_CODE <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_SAAS_SERVICE_USER <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_SAAS_SERVICE_PASSWORD <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_SAAS_SERVICE_CLIENT_ID <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_SAAS_CLIENT_ID <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_OAUTH_CLIENT_ID <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_OAUTH_CLIENT_SECRET <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_TENANT_ID <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] SAAS_OAUTH_SCOPE <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] PG_HOST <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] PG_PORT <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] PG_USER <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] PG_DATABASE <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\n[INFO][gate-inject] LAB_CORS_ALLOWED_ORIGINS <- lab-management-system-nextjs/.env.test（通用通道，调用方未设）\nRUN  v4.1.11 D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs\n\n ❯ |jsdom| tests/api/test-records.dom.test.tsx (2 tests | 1 failed) 6241ms\n     × GET /api/test-records 按 sampleId 过滤 + 分页结构 {items,page,pageSize,total} 11ms\n     ✓ POST /api/test-records 创建后返回 201 带 TR- 前缀 id，GET 立即可见；清理不留种子 3ms\n ✓ |jsdom| tests/api/contracts-auth.dom.test.tsx (2 tests) 7262ms\n ✓ |jsdom| tests/integration/flowTransition.dom.test.tsx (9 tests) 7852ms\n     ✓ 完整正向流程：draft → submitted → testing → review → approved  516ms\n ✓ |jsdom| tests/features/samples/SampleFormModal.dom.test.tsx (9 tests | 1 skipped) 8310ms\n     ✓ create 提交触发 onSubmit with 表单值  659ms\n ✓ |jsdom| tests/features/inspection-capability/reportNameExtFieldsEditor.dom.test.tsx (4 tests) 2343ms\n     ✓ 页签新增「扩展属性」，data-fn=M06.F07.I08  549ms\n     ✓ 扩展属性页签：空表 + + 新增 按钮 / 删除按钮 可见；type=select 时 options 输入可写  584ms\n ✓ |jsdom| tests/features/summary/summary.dom.test.tsx (5 tests) 2480ms\n     ✓ data-fn=M05.F01.I02 锚点存在（仪表盘容器，包裹 I03/I04/I01 三区块）  343ms\n     ✓ 切换 categoryCode=RN-101 → 表格重新渲染（MSW 返回水泥行）  423ms\n ✓ |jsdom| tests/features/loading/pageLoading.dom.test.tsx (5 tests) 7572ms\n     ✓ ContractsPage：fetch pending 时整页加载态，空表壳不先渲染；resolve 后内容可见  3417ms\n     ✓ SummaryPage：三个数据源任一未到即整页加载态，全部到齐才显示界面  567ms\n     ✓ SummaryPage：stats 源失败后切换 categoryCode 不得永久卡在整页加载态（B6 修复 R1）  451ms\n     ✓ ReceiptDetailPage：路由无 id 时不得永久卡在整页加载态（B6 修复 R1）  1016ms\n ✓ |jsdom| tests/features/dicts/categoryDictPages.dom.test.tsx (12 tests) 4842ms\n     ✓ 型号维护：新建按钮开弹窗（检测项目/名称/备注表单）  830ms\n     ✓ 型号维护：行内删除按钮开确认弹窗  588ms\n     ✓ 规格维护：新建按钮开弹窗  325ms\n     ✓ 规格维护：行内删除按钮开确认弹窗  450ms\n     ✓ 等级维护：行内删除按钮开确认弹窗  "
+      "level": "L1",
+      "name": "格式",
+      "passed": true,
+      "returncode": 0,
+      "duration_s": 5.438,
+      "output": "Checking formatting...\nAll matched files use Prettier code style!"
     }
   ]
 }
