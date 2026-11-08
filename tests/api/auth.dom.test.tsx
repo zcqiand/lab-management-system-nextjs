@@ -58,9 +58,10 @@ describe("M01.F04/F05 认证管理集成层", () => {
         path.resolve(process.cwd(), "src/api/legacy-client.ts"),
         "utf8",
       );
-      // 拦截器存在 + 注 Bearer
+      // 拦截器存在 + 注 Bearer（token 来源 2026-11-09 改 localStorage SSOT 直读，
+      // 不再钉旧模块变量名 currentToken；行为级覆盖见 legacy-client-token.dom.test.ts）
       expect(src).toMatch(/@entry M01\.F05\.I02/);
-      expect(src).toMatch(/Authorization.*Bearer.*currentToken/);
+      expect(src).toMatch(/Authorization.*Bearer/);
       // 401 处理
       expect(src).toMatch(/401.*unauthorizedHandler/);
     },

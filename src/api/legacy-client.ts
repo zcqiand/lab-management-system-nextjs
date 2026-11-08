@@ -2,20 +2,29 @@
 // REF api/client.ts 的移植形态：组件代码 import 这里，签名与 REF src/api/client.ts 一致。
 // 路由经 API_ROUTES 映射到 lab-msw 当前 OpenAPI 路由（见计划 M1 表）。
 import axios, { AxiosError, type AxiosInstance } from "axios";
-import { getApiBaseUrl } from "./backend-config";
+import { getApiBaseUrl, getToken, TOKEN_STORAGE_KEY } from "./backend-config";
 import { env } from "./env";
 
-let currentToken: string | null = null;
+// token SSOT = localStorage lab.token（backend-config.getToken()）。
+// 2026-11-09 事故修复：原模块作用域 currentToken 只在登录瞬间被 setToken，
+// 刷新后归零且不回填 → legacy 页面（检测能力等）刷新即裸发 401；
+// orval 链路（http-client 拦截器直读 localStorage）一直正常——分叉即病灶。
+// setToken 保留（登录页调用面不变），改为同步写 localStorage 完成持久化。
+
 let unauthorizedHandler: (() => void) | null = null;
 
 export function setToken(token: string | null) {
-  currentToken = token;
+  try {
+    if (token) localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    else localStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch {
+    // localStorage 不可用（隐私模式等）：忽略
+  }
 }
 export function onUnauthorized(handler: () => void) {
   unauthorizedHandler = handler;
 }
 export function resetApiClient() {
-  currentToken = null;
   unauthorizedHandler = null;
 }
 
@@ -26,14 +35,18 @@ export const identityClient: AxiosInstance = axios.create({
 
 // @entry M01.F05.I02
 //   apiClient / identityClient 请求拦截器：注入 Authorization: Bearer <token>
+//   （每请求直读 localStorage——与 http-client installHttpClient 同源同 key，
+//   登录/登出/切后端清 key 后下一请求即生效）
 //   响应拦截器：401 调 unauthorizedHandler（路由守卫跳 /login）
 apiClient.interceptors.request.use((config) => {
   if (!config.baseURL) config.baseURL = getApiBaseUrl() || "";
-  if (currentToken) config.headers.set("Authorization", `Bearer ${currentToken}`);
+  const token = getToken();
+  if (token) config.headers.set("Authorization", `Bearer ${token}`);
   return config;
 });
 identityClient.interceptors.request.use((config) => {
-  if (currentToken) config.headers.set("Authorization", `Bearer ${currentToken}`);
+  const token = getToken();
+  if (token) config.headers.set("Authorization", `Bearer ${token}`);
   return config;
 });
 for (const client of [apiClient, identityClient]) {

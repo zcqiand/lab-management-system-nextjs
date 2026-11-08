@@ -4,6 +4,42 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Fixed — legacy-client token 注入刷新即失（2026-11-09 事故修复，TDD 先红）
+
+**事故指纹**：`/inspection-specialties` 刷新后恒 401（`Request failed with status code 401`），
+重登无效。端到端定谳：BFF/数据/新签 token 全部健康（curl 登录 → 带 token 调
+specialties 200），病灶在前端注入链——
+
+- `src/api/legacy-client.ts` 请求拦截器注入的是**模块作用域 `currentToken`**，
+  只在登录瞬间被 `setToken`；页面刷新后模块重置为 null，且从不从 localStorage
+  （`lab.token`）回填。检测能力页等 legacy 页面全部取数走 apiClient → 裸发 →
+  msw worker（NEXT_PUBLIC_API_MODE=msw）requireBearer 401。
+- orval 链路（http-client 拦截器直读 localStorage）一直正常——同 token 两条链
+  一活一死，分叉即病灶。
+
+**修复（SSOT=backend-config.getToken()）**
+
+- 两个拦截器（apiClient/identityClient）改为每请求直读 localStorage（与
+  installHttpClient 同源同 key）；登出/切后端清 key 后下一请求即生效，无内存残留。
+- `setToken()` 保留（登录页调用面不变），改为同步写 localStorage 完成持久化。
+- 新测试 `tests/api/legacy-client-token.dom.test.ts`（TDD：redcheck 认证红后转绿，
+  3 例——预置 token 请求自带 Bearer / localStorage 清除无残留 / setToken 写盘；
+  axios per-request adapter 捕获，零网络）。
+- `tests/api/auth.dom.test.tsx` M01.F05.I02 源码形状正则随实现收紧放宽
+  （`Authorization.*Bearer.*currentToken` → `Authorization.*Bearer`；旧正则钉死
+  已退役的模块变量名；行为级覆盖由新测试承担）。
+- gate L0-L5 全绿 exit 0（206 条目）。
+
+**本批顺带定谳、另批处理的账**
+
+- **SSO callback 签发分叉**：SSO 路径 token 的 tenant_id 是 saas 原始 UUID，
+  原生登录路径已按 2026-10-20 人裁解析为 tenant_key（acme）——callback 未做
+  同款解析（本批实测：浏览器 SSO token=UUID，curl 原生 token=acme）。非本事故
+  根因（requireTenant 只查非空），一致性债另批。
+- **refresh 自愈缺口**：`POST /api/auth/refresh` 后端在、orval `authRefresh`
+  客户端在，全仓零调用方；token TTL 1h 过期后无自动续期，页面甩 axios 原始
+  401。修法（401 → authRefresh 自愈 → 失败跳 /login）另批 TDD。
+
 ### Added — M05.F01.I05 见证取样跟踪落地（B 通道，2026-11-07 人裁；接上批「明确不动」项，按已上线方式制作）
 
 **实现（TDD 三面先红后绿，redcheck.py 双红认证）**
@@ -89,6 +125,15 @@
 ### 兄弟仓同步清单（「同步其他仓」照单回放，不依赖会话记忆）
 
 以下挂点均为 2026-11-07 当轮 grep 实测：
+
+**legacy-client token 注入修复（2026-11-09 批新增）**
+
+- **lab-react / lab-vue**：检查自家 legacy 客户端（REF `src/api/client.ts` 移植形态）
+  是否同样持有**模块作用域 token 变量、只登录时 set 不刷新回填**——同款指纹
+  （legacy 页面刷新 401 / orval 链路正常）即回放本修复：拦截器直读 localStorage
+  SSOT + setToken 写盘。nextjs 本批测试配方（axios per-request adapter 捕获）
+  可直接照抄。
+- **lab-aspnetcore / springboot / rails**：后端仓无此链路，无需回放。
 
 **I05 见证取样跟踪（本批新增，兄弟仓按角色取舍）**
 
