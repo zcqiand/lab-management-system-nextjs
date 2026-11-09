@@ -4,6 +4,36 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Changed — DB 六裁定回放（ADR-0055，shared re-baseline 后首仓回放，2026-11-10）
+
+**src/db/schema.ts（pull 产物，入 git）**
+
+- `bash scripts/pull-schema.sh`（PG 指向重打后的 lab_dev）重出；随 shared 六裁定
+  全量换血（详见 shared CHANGELOG / suite ADR-0055）。7 处纯 CHECK 回调
+  `(table) =>` → `() =>`（drizzle-kit pull 对无索引表省略 table 参数的未用清理，
+  非表结构改动）。
+
+**src/lib/db-queries.ts**
+
+- **catalog 四表全局共享**（六裁定 #1/#2 人批）：catalogCfg 去 tenantCol，
+  dict 层 `if (cfg.tenantCol)` 守卫自动忽略 tenantId 参数；认证 401 边界不变，
+  数据面全局。DictCfg 新增 `junctionDirect` 机制（`exists where from=<值> and
+  to=code` 的真值匹配，区别于 reverse「挂链即保留」怪癖语义）；objects
+  `?inspectionSpecialtyCode=` 直挂列退役后走 junction 值过滤（六裁定 #5）。
+- **时间列空串兜底退役**（timestamptz 化连带，4 处）：createReportNameDb /
+  updateReportNameDb / createContractDb / updateContractDb 的 `?? ""` →
+  缺省 `new Date().toISOString()`（'' 现为 PG 22007 非法输入）。
+
+**seeds 双源同步 + 测试回放（改测试理由：断言钉死已退役列语义）**
+
+- src/seeds 同步 shared 变换后种子；两个 JSON 以本仓 prettier 规范形为准写回
+  shared（两仓 prettier 规范形不一致，parity 门字节等双向成立）。
+- tests/api/dict-pg.test.ts：objects 种子去直挂列；brands 种子去 tenant_id；
+  「catalog tenant 隔离」用例重写为「全局共享」语义（tenantId 断言退役）。
+- tests/api/receipts-pg.test.ts：合同种子显式补 tenant_id（六裁定 #8——
+  default '' 废除后 notNull，缺失不再有兜底）。
+- 全量 vitest 80 文件 536 测试全绿；gate L0-L5 全绿 exit 0。
+
 ### Fixed — legacy-client token 注入刷新即失（2026-11-09 事故修复，TDD 先红）
 
 **事故指纹**：`/inspection-specialties` 刷新后恒 401（`Request failed with status code 401`），

@@ -75,12 +75,13 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
             ${"2026-09-04T00:00:00Z"}, ${"2026-09-04T00:00:00Z"})
     on conflict (code) do nothing`;
   // contract（NOT NULL: contract_code / client_unit / project_name / construction_unit /
-  // witness_unit / witness / status / created_at / updated_at）
+  // witness_unit / witness / status / created_at / updated_at / tenant_id）
+  // tenant_id 显式落列（2026-11-09 六裁定废除 default '' 兜底——业务表身份必显式）
   await s`insert into contracts (
-    id, contract_code, client_unit, project_name, construction_unit,
+    id, tenant_id, contract_code, client_unit, project_name, construction_unit,
     witness_unit, witness, status, created_at, updated_at
   ) values (
-    ${TEST_CONTRACT_ID}, ${TEST_MARKER + "contract-001"},
+    ${TEST_CONTRACT_ID}, ${TENANT}, ${TEST_MARKER + "contract-001"},
     ${"PG 测试委托单位"}, ${"PG 测试项目"}, ${"PG 测试施工单位"},
     ${"PG 测试见证单位"}, ${"PG 测试见证人"}, ${"active"},
     ${"2026-09-04T00:00:00Z"}, ${"2026-09-04T00:00:00Z"}

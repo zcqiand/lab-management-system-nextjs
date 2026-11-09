@@ -1,25 +1,24 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "功能树补账收官 + M05.F01.I05 见证取样跟踪落地（B 通道，2026-11-07 人裁）——树/实现/测试/CHANGELOG 全落账，gate L0-L5 exit 0",
+  "current_task": "DB 六裁定回放收官（ADR-0055 首仓回放）——pull schema + 查询层/测试/seeds 全落账，双 gate 全绿",
   "done": [
-    "树补账两笔人批提案（2026-11-07）：M00 父行 3 行 + M01-M06 模块/功能/子项 17 行规划→已上线（逐行 grep 实测）+ M03.F03.I15 双胞收敛→已废弃（人裁）",
-    "M05.F01.I05 见证取样跟踪 TDD 落地（第三笔提案人批）：src/lib/summary-witness.ts + GET /api/summary/stats 扩展 witnessStats + SummaryPage I05 区块（data-fn=M05.F01.I05）+ vendor/msw handlers-extra 同款镜像（两处同步）+ 测试三件 11/11 绿",
-    "redcheck.py Windows 修复（suite 仓）：bare subprocess npx 不解析 → nt 下引号拼接 + shell=True（照抄 harness.py）",
-    "CHANGELOG [Unreleased] 三批全落账 + 兄弟仓同步清单",
-    "gate L0-L5 全绿 exit 0（206 条目，软告警 54）"
+    "src/db/schema.ts pull 重出（六裁定全量换血；7 处纯 CHECK 回调去 table 参数）",
+    "db-queries.ts：catalogCfg 去 tenantCol（catalog 全局共享，401 边界不变）+ DictCfg.junctionDirect 机制（objects 专项过滤走 junction 值匹配，六裁定 #5）+ 4 处时间列空串兜底退役（timestamptz 化连带）",
+    "src/seeds 双源同步（两个 JSON 以本仓 prettier 规范形为准写回 shared，parity 字节等双向成立）",
+    "tests/api/dict-pg.test.ts 语义重写（objects 直挂列/brands 租户对照退役，catalog 全局共享语义）+ receipts-pg.test.ts 合同种子显式补 tenant_id",
+    "全量 vitest 80 文件 536 测试全绿；gate L0-L5 exit 0"
   ],
   "next": [
-    "提交裁定待人：lab-nextjs 改动与 suite 仓改动是否分两 commit 提交推送；suite CHANGELOG 是否补 redcheck.py 条目",
-    "兄弟仓回放（另批）：lab-react/vue/aspnetcore/springboot/rails 父行补账各需本仓证据核 + 自家提案人批；shared BASE M01/M02/M03/M05/M06 模块行 GA 与 M03.F03.I15 废弃须人批正门",
-    "witnessStats shared 契约化（另批人批）：witnessStats 收进 shared/tsp/routes/summary.tsp DashboardStats → 奴族重生成 → contract-test 加断言 → 本仓删投影类型转正",
-    "兄弟仓 I05 跟随实现（依赖契约化）：前端仓补 I05 页面区块、后端仓补 stats 扩展，语义以 src/lib/summary-witness.ts 为家族真源"
+    "兄弟仓回放队列（shared CHANGELOG [Unreleased] 七步清单）：aspnetcore/springboot/rails/react/vue/fastapi/laravel/go/ktor/django 按家族批次排队",
+    "legacy-client 批挂账的三笔债照旧排队：SSO callback tenant_key 解析缺口 / refresh 自愈接线 / witnessStats shared 契约化"
   ],
-  "open_questions": [
-    "提交裁定待人：lab-nextjs 与 suite 仓改动是否现在 commit/push；suite CHANGELOG 补 redcheck.py 条目与否"
+  "open_questions": [],
+  "dont": [
+    "时间列写入禁止空串兜底（'' 现为 PG 22007 非法输入）",
+    "字典/目录表查询禁止再按 tenant_id 过滤（列已退役，改全局查询）"
   ],
-  "dont": [],
   "active_branch": "master",
-  "last_session_at": "2026-11-08",
-  "last_session_summary": "树补账收官 + M05.F01.I05 见证取样 B 通道落地（TDD 11/11 绿 + gate exit 0）+ redcheck.py Windows 修复 + CHANGELOG 三批落账；提交裁定待人"
+  "last_session_at": "2026-11-10",
+  "last_session_summary": "DB 六裁定回放收官：pull schema 重出 + catalog 全局共享/junctionDirect + 时间空串兜底退役 + dict/receipts-pg 测试回放 + seeds 双源同步，536 测试与 gate L0-L5 全绿"
 }

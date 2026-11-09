@@ -72,8 +72,9 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
   await cleanupTestRows(s);
   await s`insert into inspection_specialties (code, official_no, name, sort_order, created_at, updated_at)
     values (${SP}, ${MARKER + "off"}, ${"PG字典测试专项"}, 9999, ${NOW_STAMP}, ${NOW_STAMP})`;
-  await s`insert into inspection_objects (code, inspection_specialty_code, source_project_no, source_project_name, name, sort_order, created_at, updated_at)
-    values (${OBJ}, ${SP}, ${"T"}, ${"PG字典测试项目"}, ${"PG字典测试对象"}, 9999, ${NOW_STAMP}, ${NOW_STAMP})`;
+  // 2026-11-09 shared 六裁定 #5：objects 直挂列退役——专项归属只走 junction
+  await s`insert into inspection_objects (code, source_project_no, source_project_name, name, sort_order, created_at, updated_at)
+    values (${OBJ}, ${"T"}, ${"PG字典测试项目"}, ${"PG字典测试对象"}, 9999, ${NOW_STAMP}, ${NOW_STAMP})`;
   await s`insert into inspection_parameters (code, name, raw_name, canonical_name, sort_order, created_at, updated_at)
     values (${IP_A}, ${"PG字典测试参数A"}, ${"A"}, ${"A"}, 9999, ${NOW_STAMP}, ${NOW_STAMP}),
            (${IP_B}, ${"PG字典测试参数B"}, ${"B"}, ${"B"}, 9999, ${NOW_STAMP}, ${NOW_STAMP}),
@@ -90,10 +91,11 @@ async function seedFixture(s: ReturnType<typeof postgres>) {
     values (${OBJ}, ${STD}, ${"TESTING"}, ${NOW_STAMP}, ${NOW_STAMP})`;
   await s`insert into inspection_standard_parameters (inspection_standard_code, inspection_parameter_code, created_at, updated_at)
     values (${STD}, ${IP_A}, ${NOW_STAMP}, ${NOW_STAMP})`;
-  // catalog tenant 隔离对照：同 marker 前缀、不同 tenant
-  await s`insert into inspection_brands (code, name, tenant_id, sort_order, created_at, updated_at)
-    values (${BRAND_TENANT}, ${"PG字典测试牌号"}, ${TENANT}, 9999, ${NOW_STAMP}, ${NOW_STAMP}),
-           (${BRAND_OTHER}, ${"PG字典测试牌号-他租"}, ${"TENANT-OTHER"}, 9999, ${NOW_STAMP}, ${NOW_STAMP})`;
+  // catalog 全局共享对照（2026-11-09 六裁定：字典表无 tenant_id 列——原
+  // 「同 marker 双租户行」对照退役，两行均全局可见）
+  await s`insert into inspection_brands (code, name, sort_order, created_at, updated_at)
+    values (${BRAND_TENANT}, ${"PG字典测试牌号"}, 9999, ${NOW_STAMP}, ${NOW_STAMP}),
+           (${BRAND_OTHER}, ${"PG字典测试牌号-他租"}, 9999, ${NOW_STAMP}, ${NOW_STAMP})`;
 }
 
 describe(
@@ -204,27 +206,29 @@ describe(
       expect(a.standardCodes).toBe(STD);
     });
 
-    it("catalog：inspectionObjectCode 直列过滤 + tenant 隔离", async () => {
+    it("catalog：inspectionObjectCode 直列过滤 + 全局共享（2026-11-09 六裁定：无租户隔离）", async () => {
       const r = await listDictDb(TENANT, CATALOG_CFGS.brands, {
         keyword: MARKER,
         page: 1,
       });
-      expect(r.items.length).toBe(1); // TENANT-OTHER 行被 tenant 过滤
-      expect(r.items[0]!.code).toBe(BRAND_TENANT);
-      expect(r.items[0]!.tenantId).toBe(TENANT);
-      expect(r.items[0]!.id).toBe(BRAND_TENANT);
+      // 两行全可见（原 tenant 过滤语义随列退役）；tenantCol 未设 → tenantId 参数被忽略
+      expect(r.items.length).toBe(2);
+      expect(r.items.map((it) => it.code).sort()).toEqual(
+        [BRAND_TENANT, BRAND_OTHER].sort(),
+      );
+      expect(r.items[0]!.tenantId).toBeUndefined();
+      expect(r.items[0]!.id).toBeDefined();
       const byObj = await listDictDb(TENANT, CATALOG_CFGS.brands, {
         direct: { inspectionObjectCode: OBJ },
         page: 1,
       });
       expect(byObj.total).toBe(0); // 种子牌号未挂对象
-      // 反向视角：TENANT-OTHER 的 token 只见自己世界的行（token 化后 tenantId 显式）
+      // 反向视角：任何 token 看到同一全局集合（认证面不变，数据面全局）
       const other = await listDictDb(TENANT_OTHER, CATALOG_CFGS.brands, {
         keyword: MARKER,
         page: 1,
       });
-      expect(other.total).toBe(1);
-      expect(other.items[0]!.code).toBe(BRAND_OTHER);
+      expect(other.total).toBe(2);
     });
 
     it("POST：重复 code 返回 fixture 版原句 400 语义；新码创建成功", async () => {

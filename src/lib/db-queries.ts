@@ -399,6 +399,15 @@ export interface DictReverseHop {
   to: PgColumn;
 }
 
+/** junction 值过滤配置（objects ?inspectionSpecialtyCode= 用；语义见 DictCfg.junctionDirect）。 */
+export interface DictJunctionDirect {
+  link: PgTable;
+  /** 匹配查询参数值的列（specialty 一侧） */
+  from: PgColumn;
+  /** 连回本表 code 的列（object 一侧） */
+  to: PgColumn;
+}
+
 export interface DictCfg {
   /** 主表（须有 code/name 列） */
   table: PgTable;
@@ -406,12 +415,17 @@ export interface DictCfg {
   name: PgColumn;
   /** query 参数 → 直列等值过滤（wrapDict「key in items[0]」分支） */
   direct: Record<string, PgColumn>;
+  /** query 参数 → junction 值过滤（2026-11-09 objects 直挂列退役后新增）：
+   * exists (select 1 from link where link.from = <参数值> and link.to = 本表 code)。
+   * 与 reverse 的「挂链即保留、值不参与过滤」怪癖语义不同——本字段是真正的值匹配。 */
+  junctionDirect?: Record<string, DictJunctionDirect>;
   /** query 参数 → junction 反查链（wrapDict junctions.reverse；逐跳 EXISTS） */
   reverse: Record<string, DictReverseHop[]>;
   /** 聚合列（wrapDict junctions.aggregate；分页后逐行补列） */
   aggregate: DictAggregateCfg[];
-  /** tenant 列：catalog 4 表有 tenant_id（按 token 租户过滤）；dict 4 表 schema
-   * 无此列（SSOT schema.ts）——认证但全局域，传入 tenantId 被忽略。 */
+  /** tenant 列：catalog 4 表历史上按 token 租户过滤；2026-11-09 shared 六裁定后
+   * 全部 dict/catalog 表均全局共享无 tenant 列——tenantCol 不设，tenantId 参数
+   * 被 `if (cfg.tenantCol)` 守卫忽略（认证面不变，数据面全局）。 */
   tenantCol?: PgColumn;
   /** 排序列：缺省按 code 单键。两键合一仍是全序（code 唯一）。 */
   sortCol?: PgColumn;
@@ -465,6 +479,13 @@ function dictWhere(tenantId: string, cfg: DictCfg, q: ListDictQuery) {
   for (const [param, col] of Object.entries(cfg.direct)) {
     const v = direct[param];
     if (v) conds.push(eq(col, v));
+  }
+  for (const [param, jd] of Object.entries(cfg.junctionDirect ?? {})) {
+    const v = direct[param];
+    if (v)
+      conds.push(
+        dsql`exists (select 1 from ${jd.link} where ${jd.from} = ${v} and ${jd.to} = ${cfg.code})`,
+      );
   }
   for (const [param, hops] of Object.entries(cfg.reverse)) {
     if (direct[param]) conds.push(reverseExists(hops, cfg.code));
@@ -706,7 +727,15 @@ export const DICT_CFGS = {
     code: obj.code,
     name: obj.name,
     sortCol: obj.sortOrder,
-    direct: { inspectionSpecialtyCode: obj.inspectionSpecialtyCode },
+    // 2026-11-09 shared 六裁定 #5：objects 直挂列退役，专项过滤走 junction 值匹配
+    direct: {},
+    junctionDirect: {
+      inspectionSpecialtyCode: {
+        link: specObj,
+        from: specObj.inspectionSpecialtyCode,
+        to: specObj.inspectionObjectCode,
+      },
+    },
     reverse: {},
     aggregate: [
       {
@@ -816,14 +845,15 @@ export const DICT_CFGS = {
   },
 } satisfies Record<string, DictCfg>;
 
-/** M04 catalog 4 表配置（catalog/{brands,models,specs,grades}；同构，tenant 列齐全）。 */
+/** M04 catalog 4 表配置（catalog/{brands,models,specs,grades}；同构）。
+ * 2026-11-09 shared 六裁定：字典表全局共享、无 tenant_id 列——tenantCol 不设
+ * （dict 层 `if (cfg.tenantCol)` 守卫自动忽略 tenantId 参数）。 */
 function catalogCfg(
   table: PgTable & {
     code: PgColumn;
     name: PgColumn;
     sortOrder: PgColumn;
     inspectionObjectCode: PgColumn;
-    tenantId: PgColumn;
   },
 ): DictCfg {
   return {
@@ -835,7 +865,6 @@ function catalogCfg(
     direct: { inspectionObjectCode: table.inspectionObjectCode },
     reverse: {},
     aggregate: [],
-    tenantCol: table.tenantId,
     dupMessage: "编码已存在",
   };
 }
@@ -881,8 +910,9 @@ export async function createReportNameDb(dto: Row): Promise<Row> {
     extFields: (dto.extFields as unknown) ?? null,
     description: (dto.description as string | null) ?? null,
     sortOrder: (dto.sortOrder as number | undefined) ?? 0,
-    createdAt: String(dto.createdAt ?? ""),
-    updatedAt: String(dto.updatedAt ?? ""),
+    // 2026-11-09 timestamptz 化：缺省落 now()，空串兜底退役（'' 已是非法输入）
+    createdAt: dto.createdAt ? String(dto.createdAt) : new Date().toISOString(),
+    updatedAt: dto.updatedAt ? String(dto.updatedAt) : new Date().toISOString(),
   });
   return dto;
 }
@@ -903,7 +933,7 @@ export async function updateReportNameDb(code: string, patch: Row): Promise<Row 
   for (const k of RN_MAIN_COLUMNS) {
     if (k in patch) sets[k] = patch[k] as never;
   }
-  sets.updatedAt = String(patch.updatedAt ?? "");
+  sets.updatedAt = patch.updatedAt ? String(patch.updatedAt) : new Date().toISOString();
   const rows = await db
     .update(RN_MAIN)
     .set(sets)
@@ -1028,8 +1058,9 @@ export async function createContractDb(tenantId: string, dto: Row): Promise<Row>
   for (const k of CONTRACT_COLUMNS) {
     if (k in dto && dto[k] !== undefined) values[k] = dto[k];
   }
-  values.createdAt = String(dto.createdAt ?? "");
-  values.updatedAt = String(dto.updatedAt ?? "");
+  // 2026-11-09 timestamptz 化：缺省落 now()，空串兜底退役
+  values.createdAt = dto.createdAt ? String(dto.createdAt) : new Date().toISOString();
+  values.updatedAt = dto.updatedAt ? String(dto.updatedAt) : new Date().toISOString();
   const rows = await db
     .insert(t)
     .values(values as never)
@@ -1048,7 +1079,7 @@ export async function updateContractDb(
   for (const k of CONTRACT_COLUMNS) {
     if (k in patch && patch[k] !== undefined) sets[k] = patch[k];
   }
-  sets.updatedAt = String(patch.updatedAt ?? "");
+  sets.updatedAt = patch.updatedAt ? String(patch.updatedAt) : new Date().toISOString();
   const rows = await db
     .update(t)
     .set(sets)
