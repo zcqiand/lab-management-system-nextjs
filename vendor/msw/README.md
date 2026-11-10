@@ -1,4 +1,4 @@
-# 实验室管理系统 · Mock 后端
+# 建筑工程实验室管理系统 · Mock 后端
 
 建筑工程实验室管理系统的 mock 边界 —— MSW v2 handler + 跨前端一致 fixture，独立 HTTP 后端（`:5200`）。
 

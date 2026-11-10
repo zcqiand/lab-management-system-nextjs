@@ -1,11 +1,11 @@
-# CLAUDE.md — 实验室管理系统Next.js全栈
+# CLAUDE.md — 建筑工程实验室管理系统Next.js全栈
 
 > 书稿配套仓 + harness 门禁仓双身份。入口，不是手册。L0 门强制上限 60 行。
 > 本仓为《（书稿信息待补）》案例（待补）的可运行配套工程，是书稿代码块的 **source of truth**。
 
 ## 1. 项目定位
 
-实验室管理系统的 Next.js 全栈仓，双角色：
+建筑工程实验室管理系统的 Next.js 全栈仓，双角色：
 
 1. **前端**：消费 shared OpenAPI（`src/api/` orval + axios），AppShell + SidebarNav + M01 合同管理页面
 2. **后端**：`src/app/api/auth/*` M00 auth 路由 + `/api/contracts/*` 业务路由（数据来自 msw 仓 fixtures）

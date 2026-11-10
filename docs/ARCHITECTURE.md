@@ -161,7 +161,7 @@ lab-management-system-nextjs/
 │   │   │   ├── helpers.ts      ← token 校验、tenant 提取
 │   │   │   ├── jwt.ts          ← jose HS256 真签发（prod 替换 dev echo）
 │   │   │   ├── menu-snapshot.ts← 菜单快照缓存（ADR-0009 saas snapshot）
-│   │   │   ├── saas.ts         ← 调 saas 身份平台反代
+│   │   │   ├── saas.ts         ← 调 SaaS 多租户多应用身份平台反代
 │   │   │   └── state-cookie.ts ← httpOnly cookie 工具
 │   │   ├── catalog-handlers.ts ← M06 码表读写
 │   │   ├── db-map.ts           ← DB↔domain 映射

@@ -30,7 +30,7 @@ REF 组件保留 zustand store + `apiClient`(axios) 调用风格。本仓提供�
 
 - REF `src/api/client.ts` 的 `apiClient` → 本仓 `src/api/http-client.ts` 已有的 axios 实例（baseURL 由 backend-switcher 决定，默认 msw）
 - `setToken` / `onUnauthorized` / `resetApiClient` 三个导出原样保留（authStore 依赖）
-- `identityClient`（saas 身份平台 4 端点）→ 同样走 http-client，baseURL 取 `NEXT_PUBLIC_IDENTITY_BASE_URL`（默认 `/api`，测试走 msw）
+- `identityClient`（SaaS 多租户多应用身份平台 4 端点）→ 同样走 http-client，baseURL 取 `NEXT_PUBLIC_IDENTITY_BASE_URL`（默认 `/api`，测试走 msw）
 - orval `src/api/endpoints/` 产物**不删不重写**：类型（`endpoints.schemas.ts`）供本仓自有代码引用；函数闲置可接受（Wave 6 复查是否收敛）
 
 ### 2.2 路由映射
@@ -56,7 +56,7 @@ REF react-router → Next.js App Router 文件路由（全部 client components�
 
 ### 2.2.1 认证：不做本地登录页，委托 saas（用户决策 2026-08-14）
 
-REF 的 `Login.tsx` / `SsoCallback.tsx`（用户名密码表单 + 回调页）**不移植**。本仓 `/login` 维持现有「SSO orchestrator」形态：未登录 → `authSsoAuthorize` 拿 authorizeUrl → 直接 `window.location` 跳 saas 身份平台登录页；saas 带 token/code 回 `/login` → 存 token 跳 `/`。即：
+REF 的 `Login.tsx` / `SsoCallback.tsx`（用户名密码表单 + 回调页）**不移植**。本仓 `/login` 维持现有「SSO orchestrator」形态：未登录 → `authSsoAuthorize` 拿 authorizeUrl → 直接 `window.location` 跳 SaaS 多租户多应用身份平台登录页；saas 带 token/code 回 `/login` → 存 token 跳 `/`。即：
 
 - 不出现本仓自有的账号密码表单（REF features/auth/Login.tsx 不进本仓）
 - `/sso-callback` 路由不建（code+state 直接回 `/login` 解析，现有逻辑已覆盖）

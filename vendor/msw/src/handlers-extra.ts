@@ -51,6 +51,8 @@ import {
   inspectionReportNameParameters,
   inspectionParamInterfaces,
   inspectionParamInterfaceLinks,
+  inspectionReportNameInterfaces,
+  inspectionReportNameInterfaceLinks,
   getContract,
   getReceipt,
   getSample,
@@ -65,6 +67,7 @@ import {
   getStandard,
   getReportName,
   getInspectionParamInterface,
+  getReportNameInterface,
   getCalculationMethod,
 } from "./fixtures/seed";
 
@@ -296,7 +299,7 @@ export const authExtraHandlers = [
     return HttpResponse.json([]);
   }),
 
-  // SSO → saas 身份平台走 OAuth 2.0 授权码模式（RFC 6749）
+  // SSO → SaaS 多租户多应用身份平台走 OAuth 2.0 授权码模式（RFC 6749）
   //   authorize 收 {response_type=code, client_id, redirect_uri, state}，
   //   生成一次性 code 存内存映射（authorize→callback 用），返 authorizeUrl
   //   （dev mock：直接跳回 lab 的 redirect_uri 带 code+state，模拟 saas 已登录态；
@@ -1232,6 +1235,66 @@ export const m06ExtraHandlers = [
     return HttpResponse.json(row, { status: 201 });
   }),
   // （links GET / DELETE 均已上移到 dictCrud 之前——注册顺序防 :code 吞并）
+
+  // 报告名称级扩展属性界面 CRUD + link/unlink（2026-11-10 人裁，param-interfaces 同构；
+  // 取代 inspection_report_names.ext_fields）。links 三端点同样在 dictCrud 之前注册。
+  http.get(`*${BASE}/report-name-interfaces/links`, ({ request }) => {
+    const url = new URL(request.url);
+    // 契约 query：reportNameCode / reportNameInterfaceCode
+    const reportCode = url.searchParams.get("reportNameCode");
+    const interfaceCode = url.searchParams.get("reportNameInterfaceCode");
+    const items = inspectionReportNameInterfaceLinks.filter(
+      (l) =>
+        (!reportCode || l.reportNameCode === reportCode) &&
+        (!interfaceCode || l.reportNameInterfaceCode === interfaceCode),
+    );
+    return HttpResponse.json(pageOf(items, 1, items.length));
+  }),
+  http.delete(`${BASE}/report-name-interfaces/links`, async ({ request }) => {
+    // 契约 unlink 是 @body
+    const b = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+    const i = inspectionReportNameInterfaceLinks.findIndex(
+      (l) =>
+        l.reportNameCode === b["reportNameCode"] &&
+        l.reportNameInterfaceCode === b["reportNameInterfaceCode"],
+    );
+    if (i >= 0) inspectionReportNameInterfaceLinks.splice(i, 1);
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.post(`${BASE}/report-name-interfaces`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const now = NOW();
+    const entry = {
+      createdAt: now,
+      updatedAt: now,
+      ...body,
+      version: (body["version"] as number | undefined) ?? 1,
+    } as never;
+    inspectionReportNameInterfaces.push(entry);
+    return HttpResponse.json(entry, { status: 201 });
+  }),
+  ...dictCrud(`${BASE}/report-name-interfaces`, inspectionReportNameInterfaces as unknown as { code: string }[], getReportNameInterface as (c: string) => { code: string } | undefined, "ReportNameInterface", true),
+  http.post(`${BASE}/report-name-interfaces/links`, async ({ request }) => {
+    const b = (await request.json()) as Record<string, unknown>;
+    if (!b["reportNameCode"] || !b["reportNameInterfaceCode"])
+      return HttpResponse.json({ message: "reportNameCode/reportNameInterfaceCode 必填" }, { status: 400 });
+    const dup = inspectionReportNameInterfaceLinks.some(
+      (l) =>
+        l.reportNameCode === b["reportNameCode"] &&
+        l.reportNameInterfaceCode === b["reportNameInterfaceCode"],
+    );
+    if (dup)
+      return HttpResponse.json({ message: "关联已存在" }, { status: 400 });
+    const now = NOW();
+    const row = {
+      reportNameCode: String(b["reportNameCode"]),
+      reportNameInterfaceCode: String(b["reportNameInterfaceCode"]),
+      createdAt: now,
+      updatedAt: now,
+    } as (typeof inspectionReportNameInterfaceLinks)[number];
+    inspectionReportNameInterfaceLinks.push(row);
+    return new HttpResponse(null, { status: 201 });
+  }),
 ];
 
 // === M05.F01 — Summary + stats ===

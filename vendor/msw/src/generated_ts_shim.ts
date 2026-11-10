@@ -39,7 +39,7 @@ export interface CurrentUser {
   roleCode?: string;
 }
 
-// 从 saas 身份平台下发的租户视图（lab 不拥有 tenants 表）
+// 从 SaaS 多租户多应用身份平台下发的租户视图（lab 不拥有 tenants 表）
 export interface MyTenant {
   tenantId: string;
   code: string;
@@ -132,6 +132,7 @@ export interface SampleReceipt {
   testStartDate?: string;
   testEndDate?: string;
   originalRecordNo?: string;
+  retestMode?: string;
   remark?: string;
   judgmentBasis?: string[];
   testingBasis?: string[];
@@ -169,8 +170,6 @@ export interface Sample {
   supplyUnit?: string;
   arrivalDate?: string;
   samplingDate?: string;
-  curingCondition?: string;
-  age?: string;
   ext: Record<string, string>;
   remark?: string;
   createdAt: string;
@@ -184,7 +183,7 @@ export interface TestRecord {
   parameterCode: string;
   standardCode?: string;
   /** 动态表单采集数据（key-value 原值 + 计算产物快照），缺省 {}（ADR-0056） */
-  data: Record<string, unknown>;
+  ext: Record<string, unknown>;
   requirement: string;
   result: string;
   verdict?: string;
@@ -333,23 +332,12 @@ export interface CalculationMethod {
   updatedAt: string;
 }
 
-export interface ExtFieldDef {
-  key: string;
-  label: string;
-  type: "text" | "number" | "date" | "select";
-  required?: boolean;
-  options?: string[];
-  tag?: string;
-  source?: "sample" | "receipt";
-}
-
 export interface InspectionReportName {
   code: string;
   name: string;
   fullName?: string;
   templatePath?: string;
   summaryName?: string;
-  extFields?: ExtFieldDef[];
   description?: string;
   sortOrder: number;
   createdAt: string;
@@ -414,4 +402,22 @@ export interface ParamInterfaceLink {
   paramInterfaceCode: string;
   reportNameCode?: string;
   config?: Record<string, unknown>;
+}
+
+// 样品信息扩展属性界面（2026-11-10 人裁，参考 InspectionParamInterface 同构）：
+// schema 驱动的报告名称级扩展属性定义 + (报告名称, 界面) junction。
+export interface ReportNameInterface {
+  code: string;
+  name?: string;
+  description?: string;
+  /** 表单结构版本，结构迭代升级用，服务端管理，缺省 1 */
+  version: number;
+  /** 表单结构定义（Schema）：{ title?, fields[], computed?, params? }（ADR-0056 同款） */
+  config?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ReportNameInterfaceLink {
+  reportNameCode: string;
+  reportNameInterfaceCode: string;
 }

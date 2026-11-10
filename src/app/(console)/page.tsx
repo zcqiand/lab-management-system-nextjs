@@ -38,7 +38,7 @@ function Dashboard() {
         <h2 className="text-lg font-semibold mb-1">建筑工程实验室管理系统</h2>
         <p className="text-sm text-slate-500">
           lab-management-system-nextjs 是 lab 家族的 <strong>接线层</strong>： 提供
-          SSO（委托 saas 身份平台）、菜单（来自 saas /me/menus 按{" "}
+          SSO（委托 SaaS 多租户多应用身份平台）、菜单（来自 saas /me/menus 按{" "}
           <code className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">
             NEXT_PUBLIC_LAB_APP_CODE
           </code>{" "}
