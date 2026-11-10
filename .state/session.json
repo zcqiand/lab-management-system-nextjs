@@ -1,8 +1,14 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "动态表单改造（ADR-0056 首仓回放）——schema 渲染 + 算法域承接 + live 排障收官，gate 全绿",
+  "current_task": "动态表单结构化表格列批（2026-11-10 人裁「落这个批」）——渲染器三 mode + highlight + 钢筋力学四接口种子转换 + 种子漂移回灌，双 gate 全绿",
   "done": [
+    "渲染器扩展：SchemaTableColumn{mode:input|computed|static,algorithm?,text?} + columns 数字|对象数组 union + highlight{column,rule}；数据形状 data[field]={[col.field]:number[]}（报表模板 record:参数:列键 直取）；computed 列逐行派发 variant ?? algorithm",
+    "钢筋力学四接口（yield/tensile + connection）种子转结构化表格；阈值 tech_req 背书不编数（IP-0086 ≥400 / IP-0087 ≥540，GB 1499.2-2024）；connection-tensile 断裂位置保留独立 select_series",
+    "种子漂移收口：发现 nextjs src/seeds 在 ADR-0056 回放时只改消费仓没回灌 shared SSOT（16/18 行 variant/字段细化领先）——以 nextjs HEAD 语义为基准叠加四个结构化 config 回灌 shared，三镜像 byte-identical",
+    "entryToReportChain M06.F08.I04 谓词扩：结构化 computed 列同算「会输出 JSON 的 schema」",
+    "新 dom 测试 tableStructuredColumns ×5；全量 vitest 537 绿 + tsc + prettier + shared/nextjs gate 双 exit 0；lab_dev 重灌后 4 接口 config 为 strengthTable 形状",
+    "运维指纹复验：node_modules/@lab/management-system-msw（file: 拷贝）npm install 不重拷（lock 未变）——改 vendor 种子须 rm -rf node_modules/@lab/... + npm install，且 rm -rf .next",
     "src/db/schema.ts 重 pull（三表新结构）；orval 端点模型重生成（paramInterface/paramInterfaceLink/testRecord）",
     "前端渲染链：DynamicFormRenderer（schema 解析 gate + GenericParamCard 兜底）+ models/schema.ts 8 字段类型 + algorithms.ts 17 键 registry（variant ?? algorithm 派发）；11 张内嵌卡 + registry 退役，算法域新增 concrete/gradation/soil/requirement",
     "resolveInterfaceByParam 重写：三级作用域特异性（inspectionStandardCode > reportNameCode > 兜底），去 sortOrder",
@@ -25,6 +31,6 @@
   ],
   "active_branch": "master",
   "last_session_at": "2026-11-10",
-  "last_session_summary": "DB 六裁定回放收官：pull schema 重出 + catalog 全局共享/junctionDirect + 时间空串兜底退役 + dict/receipts-pg 测试回放 + seeds 双源同步，536 测试与 gate L0-L5 全绿",
+  "last_session_summary": "结构化表格列批收官：渲染器三 mode + highlight；钢筋力学四接口种子转换；ADR-0056 种子漂移回灌 shared SSOT；537 测试与双 gate 全绿",
   "history": []
 }
