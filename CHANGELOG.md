@@ -4,6 +4,23 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Fixed — seed:db 三处 ADR-0055/0056 漏网 + lab_dev 重灌 schema 化种子（2026-11-10）
+
+- **现场**：ADR-0056 只 migrate 了表结构没灌种子（批记「数据零动」），lab_dev 库里
+  param_interfaces.config 还是旧卡参数形状；跑 `npm run seed:db` 连炸三处——全是
+  ADR-0055/0056 回放时 seed-db.ts 没跟着换血的漏网：
+  1. fixtures 空串时间戳灌 timestamptz 列 → postgres.js date.serialize
+     `new Date('')` RangeError（TEXT 时代合法值）→ buildRow 统一归一
+     `2026-01-01T00:00:00Z`（rebaseline 种子变换同款 canonical）；
+  2. objects 直挂列 inspection_specialty_code 已删（裁定 #5）→ 镜像旧键丢弃；
+  3. 四小字典 + technical_requirements 去 tenant_id（裁定 #1，含 sso mirror
+     追加行）→ GLOBAL_DICT_TABLES 丢键；顺手清 links 退役 config jsonb 残留。
+- **lab_dev 已全量重灌**：28 表行数对账全 OK；param_interfaces.config 18/18
+  schema 化（fields/computed/params），test_records 300 行全带 data。
+- 挂账：`vendor/msw`（file: 安装名 @lab/management-system-msw）是独立 msw 仓
+  2026-09-17 淘汰后的本仓残部、现役 /api 数据层，命名误导；候选改名 @lab/fixtures
+  纯重构另批。
+
 ### Fixed — 登录后默认选中一个租户（SSO 裸 token 租户错位，2026-11-10 人裁）
 
 - **现场**：SSO 回调按 ADR-0009 存 saas 原生 token（tenant_id claim = saas 租户

@@ -11,7 +11,8 @@
     "vendor/msw 全同步（seeds/schema/handlers orval 重生成/handlers-extra/flow-matrix）；node_modules @lab/management-system-msw 陈旧副本 + .next 编译缓存不追踪 node_modules 变更 = live 旧形状根因，rm -rf .next 重启解决（挂账：下次 vendor 再变需重装或清 .next）",
     "全量 vitest 78 文件 530 绿（+1 skip 既有）；tsc 全仓绿；gate 全绿（prettier 4 文件漂移已修）",
     "live 验证：5201 重启（默认 msw 模式），param-interfaces 18/18 schema 化、test-records 带 data、links 带 inspectionStandardCode，/data-entry 200",
-    "fnTest 新增 M06.F08.I01 三条（POST 契约语义回放）；CHANGELOG ADR-0056 段落"
+    "fnTest 新增 M06.F08.I01 三条（POST 契约语义回放）；CHANGELOG ADR-0056 段落",
+    "seed:db 三处 ADR-0055/0056 漏网修复（空串时间戳归一 timestamptz / objects 直挂列丢键 / 字典表丢 tenant_id + links config 残留清理）+ lab_dev 全量重灌：28 表对账全 OK，config 18/18 schema 化，test_records 全带 data"
   ],
   "next": [
     "兄弟仓回放队列（shared CHANGELOG [Unreleased] 七步清单）：aspnetcore/springboot/rails/react/vue/fastapi/laravel/go/ktor/django 按家族批次排队",

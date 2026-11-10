@@ -35,8 +35,7 @@ import {
 import { toSnake } from "../src/lib/db-map";
 
 const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@127.0.0.1:54321/lab_dev";
+  process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54321/lab_dev";
 const sql = postgres(DATABASE_URL, { max: 1 });
 
 // 表 → fixtures 数组（顺序 = FK 拓扑：字典先于业务，主表先于 junction）
@@ -158,6 +157,15 @@ const KEY_RENAME: Record<string, Record<string, string>> = {
 
 // jsonb 列清单：postgres-js 对 JS 数组会走 pg array 序列化而不是 JSON，
 // 必须显式 JSON.stringify 后以文本参数传入（PG 依目标列自动 cast jsonb）。
+// ADR-0055 裁定 #1：四小字典 + technical_requirements 全局共享（无 tenant_id 列）
+const GLOBAL_DICT_TABLES = new Set([
+  "inspection_brands",
+  "inspection_models",
+  "inspection_specs",
+  "inspection_grades",
+  "inspection_technical_requirements",
+]);
+
 const JSONB_COLUMNS: Record<string, Set<string>> = {
   inspection_parameters: new Set(["aliases"]),
   inspection_report_names: new Set(["ext_fields"]),
@@ -169,7 +177,6 @@ const JSONB_COLUMNS: Record<string, Set<string>> = {
     "flow_history",
   ]),
   samples: new Set(["ext"]),
-  inspection_param_interface_links: new Set(["config"]),
 };
 
 // NOT NULL 列在 fixtures 里缺值时补的默认值（逐表核对 DDL 后落；空 = 未发现缺失）。
@@ -181,7 +188,23 @@ function buildRow(table: string, row: Record<string, unknown>): Record<string, u
   for (const [k, v] of Object.entries(row)) {
     if (v === undefined) continue; // 缺失键交给 FILL_DEFAULTS / 列 DEFAULT
     const renamed = KEY_RENAME[table]?.[k];
-    cols[toSnake(renamed ?? k)] = v;
+    const sk = toSnake(renamed ?? k);
+    // ADR-0055 连带修复（2026-11-10）：时间列 TEXT → timestamptz notNull 后，
+    // fixtures 里的空串时间戳（TEXT 时代合法值）灌库即炸——postgres.js 对
+    // timestamptz 参数 date.serialize 走 new Date('') → RangeError。统一归一到
+    // rebaseline 种子变换同款 canonical instant（shared _work/seed-transform.mjs 先例）。
+    // 业务日期列（commission_date 等）仍 TEXT，不在此列。
+    // ADR-0055 连带修复（2026-11-10）：objects 直挂列 inspection_specialty_code
+    // 已删（专项归属 junction 表 inspection_specialty_objects 唯一真源，裁定 #5）；
+    // fixtures 镜像还带旧键，灌库前丢弃（junction 行由 PLAN 内该表自身灌入）。
+    if (table === "inspection_objects" && sk === "inspection_specialty_code") continue;
+    // ADR-0056 连带：links 的 config 已随契约退役，旧镜像键丢弃。
+    if (table === "inspection_param_interface_links" && sk === "config") continue;
+    // ADR-0055 连带（裁定 #1）：四小字典 + technical_requirements 去 tenant_id
+    // （全局共享），fixtures 镜像（含 sso mirror 追加）旧键丢弃。
+    if (GLOBAL_DICT_TABLES.has(table) && (sk === "tenant_id" || k === "tenantId"))
+      continue;
+    cols[sk] = sk.endsWith("_at") && v === "" ? "2026-01-01T00:00:00Z" : v;
   }
   for (const [k, v] of Object.entries(FILL_DEFAULTS[table] ?? {})) {
     if (cols[k] === undefined) cols[k] = v;
@@ -366,7 +389,12 @@ function mirrorTenantScopedRows(): void {
   );
   // P5（2026-09-23）：catalog 4 表 code 镜像（id 列=code；inspection_brands 的
   // PK=code 全局唯一 → 不加后缀会撞唯一约束，seed 即崩）
-  for (const tbl of [inspectionBrands, inspectionModels, inspectionSpecs, inspectionGrades]) {
+  for (const tbl of [
+    inspectionBrands,
+    inspectionModels,
+    inspectionSpecs,
+    inspectionGrades,
+  ]) {
     tbl.push(
       ...tbl.map((r) => ({
         ...r,
