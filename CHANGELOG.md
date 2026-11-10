@@ -4,6 +4,17 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Fixed — 登录后默认选中一个租户（SSO 裸 token 租户错位，2026-11-10 人裁）
+
+- **现场**：SSO 回调按 ADR-0009 存 saas 原生 token（tenant_id claim = saas 租户
+  UUID），而数据种子全挂 tenant key（tenant_key 收口批后形态）→ 租户过滤页全空
+  且无报错（/data-entry 接样单 33 条滤成 0）。
+- **修法**（auth-context）：`/me` hydrate 后 `currentTenantId ∉ tenants`（keyed
+  列表）时自动 `switchTenant(首租户)` 换铸 keyed token；密码登录 keyed 会话不受
+  影响（claim ∈ 列表即不触发）。fail-soft：switch 失败走既有 /me catch 分支。
+- 新 fnTest ×2（M00.F02.I01 消费面：SSO 裸 token 自动切 / keyed token 不切）；
+  TDD 先红后绿；相邻 auth 测试 4 文件 11 用例绿。
+
 ### Changed — 动态表单改造（ADR-0056 首仓回放，2026-11-10 人批 + 批中补充裁定）
 
 **契约/DB 面（随 shared ADR-0056）**

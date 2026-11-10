@@ -72,31 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // 会话信息 hydrate：有 token 且无 user → GET /api/auth/me
-  // （M00.F01：顶栏 displayName + TenantSwitcher 的数据源）
-  useEffect(() => {
-    if (!token || user || hydrating.current) return;
-    hydrating.current = true;
-    authGetCurrentUser({
-      headers: { Authorization: `Bearer ${token}` },
-      baseURL: getApiBaseUrl(),
-    })
-      .then((session) => {
-        setUser(session.user);
-        setTenants(session.tenants ?? []);
-        setCurrentTenantId(
-          session.currentTenantId ?? session.tenants?.[0]?.tenantId ?? null,
-        );
-      })
-      .catch(() => {
-        // /me 失败（快照 miss / 后端不可达）：不阻断 UI，顶栏显示占位。
-        // 401 重定向语义由 useBackendMenus 统一处理，这里不重复。
-      })
-      .finally(() => {
-        hydrating.current = false;
-      });
-  }, [token, user]);
-
   const setToken = useCallback((next: string | null) => {
     setTokenState(next);
     try {
@@ -132,6 +107,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [token, setToken],
   );
+
+  // 会话信息 hydrate：有 token 且无 user → GET /api/auth/me
+  // （M00.F01：顶栏 displayName + TenantSwitcher 的数据源）
+  useEffect(() => {
+    if (!token || user || hydrating.current) return;
+    hydrating.current = true;
+    authGetCurrentUser({
+      headers: { Authorization: `Bearer ${token}` },
+      baseURL: getApiBaseUrl(),
+    })
+      .then((session) => {
+        setUser(session.user);
+        setTenants(session.tenants ?? []);
+        const cid = session.currentTenantId ?? session.tenants?.[0]?.tenantId ?? null;
+        setCurrentTenantId(cid);
+        // M00.F02.I01 登录后默认选中一个租户（2026-11-10 人裁）：SSO 回调存的是
+        // saas 原生 token（tenant_id claim = saas 租户 UUID），与按 tenant key
+        // 过滤的数据面对不上 → 租户过滤页全空且无报错。claim 不在租户列表
+        // （keyed）内时自动切首租户，走既有 switch-tenant 换铸 keyed token。
+        const first = session.tenants?.[0];
+        if (
+          first &&
+          cid !== first.tenantId &&
+          !session.tenants?.some((t) => t.tenantId === cid)
+        ) {
+          return switchTenant(first.tenantId);
+        }
+      })
+      .catch(() => {
+        // /me 失败（快照 miss / 后端不可达）：不阻断 UI，顶栏显示占位。
+        // 401 重定向语义由 useBackendMenus 统一处理，这里不重复。
+      })
+      .finally(() => {
+        hydrating.current = false;
+      });
+  }, [token, user, switchTenant]);
 
   const value = useMemo<AuthContextValue>(
     () => ({ token, user, tenants, currentTenantId, setToken, clearToken, switchTenant }),
