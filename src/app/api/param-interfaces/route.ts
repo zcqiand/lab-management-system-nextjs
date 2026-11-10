@@ -2,7 +2,8 @@
 // /api/inspection-param-interfaces 私生路径收敛而来）。
 // GET  /api/param-interfaces?page=&pageSize=&keyword= → {items,page,pageSize,total}
 //      （keyword 按 code/name 模糊，契约 Page<ParamInterface> 包）
-// POST /api/param-interfaces → 201（code/componentPath 必填，重复 code 400）
+// POST /api/param-interfaces → 201（code 必填 + config 若给必须为对象（表单结构
+// schema，ADR-0056）；重复 code 400；version 服务端缺省 1）
 //
 // 详情 GET/PUT/DELETE 走 /api/param-interfaces/[code]。
 
@@ -36,9 +37,20 @@ export async function POST(req: NextRequest) {
   if (auth instanceof NextResponse) return auth;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const code = String(body["code"] ?? "").trim();
-  if (!code || !body["componentPath"])
+  if (!code)
     return NextResponse.json(
-      { code: "BAD_REQUEST", message: "code/componentPath 必填" },
+      { code: "BAD_REQUEST", message: "code 必填" },
+      { status: 400 },
+    );
+  // ADR-0056：config 升级为表单结构 schema（{title?, fields[], computed?, params?}），
+  // 若给必须是对象（数组不算；componentPath 已随契约删除，不再校验）
+  if (
+    body["config"] !== undefined &&
+    body["config"] !== null &&
+    (typeof body["config"] !== "object" || Array.isArray(body["config"]))
+  )
+    return NextResponse.json(
+      { code: "BAD_REQUEST", message: "config 必须为对象（表单结构 schema）" },
       { status: 400 },
     );
   const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
@@ -51,10 +63,9 @@ export async function POST(req: NextRequest) {
   const row = {
     code,
     name: String(body["name"] ?? ""),
-    componentPath: String(body["componentPath"] ?? ""),
     description: String(body["description"] ?? ""),
-    isOfficial: Boolean(body["isOfficial"] ?? false),
-    sortOrder: Number(body["sortOrder"] ?? 0),
+    // ADR-0056：version 服务端管理，缺省 1；isOfficial/sortOrder 随契约退役
+    version: Number(body["version"] ?? 1),
     config: body["config"] ?? {},
     createdAt: now,
     updatedAt: now,

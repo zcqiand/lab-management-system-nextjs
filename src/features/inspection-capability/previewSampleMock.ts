@@ -5,10 +5,10 @@ import type {
 } from "@/features/data-entry/models/types";
 import type { InspectionParameter } from "@/api/endpoints/model";
 
-/** 参数界面预览的最小输入：一行参数界面（componentPath + config + name）。 */
+/** 参数界面预览的最小输入：一行参数界面（name + version + config）。 */
 export interface PreviewInterfaceRow {
   name?: string;
-  componentPath?: string;
+  version?: number;
   config?: Record<string, unknown> | null;
 }
 
@@ -36,8 +36,16 @@ export function buildPreviewProps(row: PreviewInterfaceRow): ParamModelProps {
     createdAt: "",
     updatedAt: "",
   } as InspectionParameter;
-  const specimenCount =
-    typeof cfg?.specimenCount === "number" ? (cfg.specimenCount as number) : 3;
+  // ADR-0056：schema 驱动后 specimenCount 从首个 number_series 字段的 count 推导
+  // （无 schema / 无序列字段时回退 3，维持旧预览的组数形状）。
+  const fields = Array.isArray(cfg?.fields) ? (cfg?.fields as unknown[]) : [];
+  const seriesField = fields.find(
+    (f) =>
+      typeof f === "object" &&
+      f !== null &&
+      (f as { type?: unknown }).type === "number_series",
+  ) as { count?: unknown } | undefined;
+  const specimenCount = typeof seriesField?.count === "number" ? seriesField.count : 3;
   const techReq: InspectionTechnicalRequirement = {
     id: "preview-req",
     // 纯预览 mock（不落库）；tenantId 用种子域字面量占位，非运行时身份兜底

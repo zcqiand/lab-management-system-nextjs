@@ -164,21 +164,20 @@ export interface BackendConfig {
  * 已废弃 (ADR-0014);后端能力矩阵
  */
 export interface BackendFeatures {
-  /** 是否启用 SSO 跳转(msw=false / nextjs=true / springboot/aspnetcore 视实现) */
+  /** 是否启用 SSO 跳转(nextjs=true / springboot/aspnetcore 视实现) */
   sso: boolean;
   /** 是否对接真实数据库(vs mock seed) */
   realDb: boolean;
 }
 
 /**
- * 已废弃 (ADR-0014);4 个槽位,id 锁定避免拼写漂移
+ * 已废弃 (ADR-0014);3 个槽位,id 锁定避免拼写漂移。msw 成员 2026-09-17 随 msw 仓剔除删除
  */
 export type BackendId = typeof BackendId[keyof typeof BackendId];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BackendId = {
-  msw: 'msw',
   nextjs: 'nextjs',
   springboot: 'springboot',
   aspnetcore: 'aspnetcore',
@@ -358,10 +357,8 @@ export type CreateParamInterfaceRequestConfig = {[key: string]: unknown};
 export interface CreateParamInterfaceRequest {
   code: string;
   name?: string;
-  componentPath: string;
   description?: string;
-  isOfficial?: boolean;
-  sortOrder?: number;
+  version?: number;
   config?: CreateParamInterfaceRequestConfig;
 }
 
@@ -448,11 +445,13 @@ export interface CreateTechnicalRequirementRequest {
   sortOrder?: number;
 }
 
+export type CreateTestRecordRequestData = {[key: string]: unknown};
+
 export interface CreateTestRecordRequest {
   sampleId: string;
   parameterCode: string;
   standardCode?: string;
-  requirementCode?: string;
+  data?: CreateTestRecordRequestData;
   requirement: string;
   result: string;
   verdict?: string;
@@ -477,12 +476,37 @@ export type DashboardStatsReportCountByStatus = {
   issued: number;
 };
 
+export type DashboardStatsQualifiedRateByMaterial = {
+  concrete: MaterialQualifiedRate;
+  rebar: MaterialQualifiedRate;
+  sand: MaterialQualifiedRate;
+};
+
+export type DashboardStatsReportOutputByStatus = {
+  generated: number;
+  pending: number;
+  issued: number;
+};
+
+export type DashboardStatsFunnelByStage = {
+  pending_collect: number;
+  received: number;
+  testing: number;
+  reporting: number;
+  reviewing: number;
+  issued: number;
+};
+
 export interface DashboardStats {
   contractCount: number;
   receiptCount: number;
   sampleCount: number;
   reportCountByStatus: DashboardStatsReportCountByStatus;
   pendingTaskCount: number;
+  todayTestCount: number;
+  qualifiedRateByMaterial: DashboardStatsQualifiedRateByMaterial;
+  reportOutputByStatus: DashboardStatsReportOutputByStatus;
+  funnelByStage: DashboardStatsFunnelByStage;
 }
 
 export type ErrorResponseDetails = {[key: string]: unknown};
@@ -726,6 +750,12 @@ export interface LoginResponse {
   tenants: MyTenant[];
 }
 
+export interface MaterialQualifiedRate {
+  total: number;
+  pass: number;
+  rate: number;
+}
+
 export interface MenuNode {
   id: string;
   label: string;
@@ -778,27 +808,29 @@ export interface ObjectStandardLink {
   remark?: string;
 }
 
+/**
+ * 表单结构定义（Schema）：{ title?, fields[], computed?, params? }。
+ */
 export type ParamInterfaceConfig = {[key: string]: unknown};
 
 export interface ParamInterface {
   code: string;
   name?: string;
-  componentPath: string;
   description?: string;
-  isOfficial?: boolean;
-  sortOrder: number;
+  /** 表单结构版本，结构迭代升级用，服务端管理，缺省 1。 */
+  version: number;
+  /** 表单结构定义（Schema）：{ title?, fields[], computed?, params? }。 */
   config?: ParamInterfaceConfig;
   createdAt: string;
   updatedAt: string;
 }
 
-export type ParamInterfaceLinkConfig = {[key: string]: unknown};
-
 export interface ParamInterfaceLink {
   inspectionParameterCode: string;
   paramInterfaceCode: string;
   reportNameCode?: string;
-  config?: ParamInterfaceLinkConfig;
+  /** 绑定的检测依据 code，可空=不限依据。 */
+  inspectionStandardCode?: string;
 }
 
 export interface PermissionSet {
@@ -1030,13 +1062,19 @@ export interface TechnicalRequirement {
   updatedAt: string;
 }
 
+/**
+ * 动态表单采集数据（key-value 原值 + 计算产物快照），缺省 {}。
+ */
+export type TestRecordData = {[key: string]: unknown};
+
 export interface TestRecord {
   id: string;
   tenantId: string;
   sampleId: string;
   parameterCode: string;
   standardCode?: string;
-  requirementCode?: string;
+  /** 动态表单采集数据（key-value 原值 + 计算产物快照），缺省 {}。 */
+  data: TestRecordData;
   requirement: string;
   result: string;
   verdict?: string;
@@ -1194,11 +1232,15 @@ export type UpdateParamInterfaceRequestConfig = {[key: string]: unknown};
 
 export interface UpdateParamInterfaceRequest {
   name?: string;
-  componentPath?: string;
   description?: string;
-  isOfficial?: boolean;
-  sortOrder?: number;
+  version?: number;
   config?: UpdateParamInterfaceRequestConfig;
+}
+
+export type UpdateSampleExtRequestExt = {[key: string]: string};
+
+export interface UpdateSampleExtRequest {
+  ext: UpdateSampleExtRequestExt;
 }
 
 export interface UpdateSampleReceiptRequest {
@@ -1281,11 +1323,13 @@ export interface UpdateTechnicalRequirementRequest {
   sortOrder?: number;
 }
 
+export type UpdateTestRecordRequestData = {[key: string]: unknown};
+
 export interface UpdateTestRecordRequest {
   sampleId?: string;
   parameterCode?: string;
   standardCode?: string;
-  requirementCode?: string;
+  data?: UpdateTestRecordRequestData;
   requirement?: string;
   result?: string;
   verdict?: string;
@@ -1316,7 +1360,9 @@ keyword?: string;
 
 export type CatalogListBrands200 = {
   items: InspectionBrand[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1330,7 +1376,9 @@ keyword?: string;
 
 export type CatalogListGrades200 = {
   items: InspectionGrade[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1344,7 +1392,9 @@ keyword?: string;
 
 export type CatalogListModels200 = {
   items: InspectionModel[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1358,7 +1408,9 @@ keyword?: string;
 
 export type CatalogListSpecs200 = {
   items: InspectionSpec[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1372,7 +1424,9 @@ status?: ContractStatus;
 
 export type ContractsListContracts200 = {
   items: Contract[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1389,7 +1443,9 @@ inspectionParameterCode?: string;
 
 export type InspectionDictionaryListObjectParameterLinks200 = {
   items: ObjectParameterLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1407,7 +1463,9 @@ role?: InspectionStandardRole;
 
 export type InspectionDictionaryListObjectStandardLinks200 = {
   items: ObjectStandardLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1418,7 +1476,9 @@ inspectionSpecialtyCode?: string;
 
 export type InspectionDictionaryListSpecialtyObjectLinks200 = {
   items: SpecialtyObjectLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1430,7 +1490,9 @@ inspectionParameterCode?: string;
 
 export type InspectionDictionaryListStandardParameterLinks200 = {
   items: StandardParameterLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1444,7 +1506,9 @@ keyword?: string;
 
 export type InspectionDictionaryListObjects200 = {
   items: InspectionObject[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1458,7 +1522,9 @@ sourceType?: InspectionParameterSourceType;
 
 export type InspectionDictionaryListParameters200 = {
   items: InspectionParameter[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1471,7 +1537,9 @@ keyword?: string;
 
 export type InspectionDictionaryListSpecialties200 = {
   items: InspectionSpecialty[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1485,7 +1553,9 @@ status?: InspectionStandardStatus;
 
 export type InspectionDictionaryListStandards200 = {
   items: InspectionStandard[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1498,7 +1568,9 @@ keyword?: string;
 
 export type ParamInterfacesListParamInterfaces200 = {
   items: ParamInterface[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1515,7 +1587,9 @@ paramInterfaceCode?: string;
 
 export type ParamInterfacesListParamInterfaceLinks200 = {
   items: ParamInterfaceLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1526,24 +1600,14 @@ pageSize?: number;
 keyword?: string;
 contractId?: string;
 flowStatus?: FlowStatus;
+filter?: string;
 };
 
 export type ReceiptsListReceipts200 = {
   items: SampleReceipt[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
-  pageSize: number;
-  total: number;
-};
-
-export type ReportFlowListFlowQueueParams = {
-stage: FlowStatus;
-page?: number;
-pageSize?: number;
-};
-
-export type ReportFlowListFlowQueue200 = {
-  items: SampleReceipt[];
-  page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1556,7 +1620,9 @@ keyword?: string;
 
 export type ReportNamesListReportNames200 = {
   items: InspectionReportName[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1573,7 +1639,9 @@ reportNameCode?: string;
 
 export type ReportNamesListObjectReportNameLinks200 = {
   items: ObjectReportNameLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1590,7 +1658,9 @@ inspectionParameterCode?: string;
 
 export type ReportNamesListReportNameParameterLinks200 = {
   items: ReportNameParameterLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1608,7 +1678,9 @@ role?: InspectionStandardRole;
 
 export type ReportNamesListReportNameStandardLinks200 = {
   items: ReportNameStandardLink[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1622,7 +1694,9 @@ keyword?: string;
 
 export type SamplesListSamples200 = {
   items: Sample[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };
@@ -1649,7 +1723,9 @@ parameterCode?: string;
 
 export type TestRecordsListTestRecords200 = {
   items: TestRecord[];
+  /** 当前实现仅回显，不切片：参照实现返回全量，无分页语义。 */
   page: number;
+  /** 当前实现仅回显，不切片。 */
   pageSize: number;
   total: number;
 };

@@ -150,14 +150,30 @@ interface AssembleInput {
   org: OrgInfo | null;
 }
 
-/** IP-0055 test record.result 解析后的形状（见 ConcreteCompressCard.emit 的 JSON）。
- *  解析失败/为空 → falls back to 把 raw 视为单值字符串。 */
+/** IP-0055 参数卡写进 TestRecord.data 的形状（见 ConcreteCompressCard.emit）。
+ *  data 缺键 → 返回 null（调用方过渡回退 result）。 */
 interface ConcreteCompressJson {
   loads: number[];
   strengths: (number | null)[];
   representative?: number;
 }
 
+/** ADR-0056 主路径：从 rec.data 直取（data 已是对象，免 JSON.parse）。 */
+function concreteCompressFromData(
+  data: Record<string, unknown> | undefined,
+): ConcreteCompressJson | null {
+  if (!data) return null;
+  const { loads, strengths, representative } = data;
+  if (!Array.isArray(loads) || !Array.isArray(strengths)) return null;
+  return {
+    loads: (loads as unknown[]).map((v) => (typeof v === "number" ? v : Number(v) || 0)),
+    strengths: strengths as (number | null)[],
+    representative: typeof representative === "number" ? representative : undefined,
+  };
+}
+
+/** 迁移债（ADR-0056 过渡）：老记录的 result 还是 JSON 串——data 缺键时回退解析它。
+ *  全量数据迁移后应删除本函数，直读 rec.data。 */
 function parseConcreteCompressJson(raw: string | undefined): ConcreteCompressJson | null {
   if (!raw) return null;
   const trimmed = raw.trim();
@@ -194,9 +210,13 @@ export function assembleConcreteReport(input: AssembleInput): ConcreteReportData
     const rec = records.find(
       (r) => r.sampleId === s.id && r.parameterCode === CONCRECE_STRENGTH_PARAM,
     );
-    const parsed = parseConcreteCompressJson(rec?.result);
+    // ADR-0056：主路径 data 直取；迁移债：data 缺键回退 result 老格式（JSON 串/纯文本）
+    const parsed =
+      concreteCompressFromData(rec?.data as Record<string, unknown> | undefined) ??
+      parseConcreteCompressJson(rec?.result);
     // 3 个试件强度各填 1 个独立字段（docx 段内 3 个独立 cell 各 1 值，套打对齐）
     const ks = parsed?.strengths ?? [];
+    // 回退串：data/result 都没解析出结构时，result（现为摘要文本/老原值）原样进格
     const fallback = rec?.result ?? "";
     return {
       ybbh: s.sampleCode ?? "",
@@ -278,7 +298,7 @@ export interface ParameterItem {
   dw: string; // 单位
   jd: string; // 判定
   jcyj: string; // 检测依据/标准（per-row，为空表示无 per-param 检测标准）
-  /** 每个试件的单个强度值（强度类参数：抗折 3 个 / 抗压 6 个），来自 TestRecord.result JSON。 */
+  /** 每个试件的单个强度值（强度类参数：抗折 3 个 / 抗压 6 个），来自 TestRecord.data.strengths。 */
   strengths?: number[];
 }
 
@@ -303,10 +323,11 @@ function buildCommon(input: AssembleInput): CommonReportFields {
 }
 
 /**
- * 报告结果单元格展示值：
- * - 计算型卡片（水泥抗折/抗压、混凝土抗压）把结果存成 JSON（{loads,strengths,mean|representative}），
- *   报告参数轴需展示其代表值(mean/representative)而非整段 JSON。
- * - 普通纯文本结果原样返回；空/未录入返回 undefined 交由 mock 回退。
+ * 报告结果单元格展示值（jcz）：
+ * - ADR-0056 后 rec.result 语义收敛为「最终代表值/摘要文本」——主路径就是原样展示；
+ * - 迁移债：老记录的 result 仍是 JSON 串（{loads,strengths,mean|representative}），
+ *   这里兜底抽 mean/representative，避免把整段 JSON 打进报告；全量迁移后可化简为直用 result。
+ * - 空/未录入返回 undefined 交由 mock 回退。
  */
 function pickResultDisplay(raw: string | undefined): string | undefined {
   if (raw === undefined || raw === "") return undefined;
@@ -322,8 +343,13 @@ function pickResultDisplay(raw: string | undefined): string | undefined {
   return raw;
 }
 
-/** 从强度类 TestRecord.result（{loads,strengths,...} JSON）解析单个强度值数组；非强度结果返回 undefined。 */
-function parseStrengthsFromResult(raw: string | undefined): number[] | undefined {
+/** 强度类参数取单个强度值数组（模板 {qd*_0..N} 单格填充）：
+ *  ADR-0056 主路径 rec.data.strengths 直取；迁移债：data 缺键回退解析 result 老 JSON 串。
+ *  非强度结果返回 undefined。 */
+function recordStrengths(rec: TestRecord | undefined): number[] | undefined {
+  const fromData = rec?.data?.strengths;
+  if (Array.isArray(fromData)) return fromData as number[];
+  const raw = rec?.result;
   if (!raw || !raw.trimStart().startsWith("{")) return undefined;
   try {
     const o = JSON.parse(raw) as { strengths?: unknown };
@@ -362,14 +388,15 @@ export function assembleReport(
       mc: PARAM_NAME.get(pc) ?? pc,
       jz: rec?.requirement ?? req.jz,
       jzByGrade: requirementsByGrade(pc),
+      // jcz：rec.result 已收敛为摘要文本（ADR-0056），原样展示；pickResultDisplay 仅兜底老 JSON 串
       jcz: pickResultDisplay(rec?.result) ?? m.jcz,
       dw: m.dw,
       jd: rec?.verdict ?? m.jd,
       // per-row 检测依据 = 该参数记录选定的检测标准；无则留空（—）。
       // 不再用技术要求文案（requirementFor.jz）兜底——那是「技术要求」列，不是「检测依据」。
       jcyj: rec?.standardCode ?? "",
-      // 强度类参数：解析 result JSON 里的单个强度值数组（供模板 {qd*_0..N} 单格填充）。
-      strengths: parseStrengthsFromResult(rec?.result),
+      // 强度类参数：rec.data.strengths 直取（供模板 {qd*_0..N} 单格填充）。
+      strengths: recordStrengths(rec),
     };
   });
 
@@ -533,25 +560,28 @@ function resolveSource(
     const r = rows?.[idx];
     return r ? String((r as unknown as Record<string, string>)[field] ?? "") : "";
   }
-  // record:<code>:<jsonPath> —— 从 TestRecord.result JSON 解析任意字段；
-  // 路径语法：a.b.c[0].d（点号属性 + 方括号下标），供「卡存多试件 JSON，模板按试件×次试验取数」用。
+  // record:<code>:<jsonPath> —— 从 TestRecord.data 直取任意字段（ADR-0056 主路径）；
+  // 路径语法不变：a.b.c[0].d（点号属性 + 方括号下标），供「卡存多试件 JSON，模板按试件×次试验取数」用。
+  // 迁移债：data 缺键时回退解析 result 老 JSON 串；全量迁移后可删回退分支。
   if (src.startsWith("record:")) {
     const parts = src.split(":"); // ['record', code, path]
     const code = parts[1] ?? "";
     const path = parts.slice(2).join(":"); // path 可含冒号外的字符；通常不带 ':'
     const rec = records?.find((r) => r.parameterCode === code);
-    if (!rec?.result) return "";
+    if (!rec) return "";
+    const fromData = rec.data ? walkJsonPath(rec.data, path) : undefined;
+    if (fromData !== undefined && fromData !== null) return String(fromData);
     try {
-      const obj = JSON.parse(rec.result) as unknown;
-      const v = walkJsonPath(obj, path);
+      const v = walkJsonPath(JSON.parse(rec.result) as unknown, path);
       return v === undefined || v === null ? "" : String(v);
     } catch {
       return "";
     }
   }
-  // srecord:<sampleIndex>:<code>:<jsonPath> —— 按样品序号取该样品的 TestRecord.result JSON。
+  // srecord:<sampleIndex>:<code>:<jsonPath> —— 按样品序号取该样品的 TestRecord.data 字段（ADR-0056）。
   // `record:` 用 records.find(parameterCode) 只命中第一条记录，跨样品时全部落到首样品；
   // 抗渗（RN-105-2）等多样品分块模板需要逐样品取数。
+  // 迁移债：data 缺键时回退解析 result 老 JSON 串。
   if (src.startsWith("srecord:")) {
     const parts = src.split(":"); // ['srecord', index, code, path]
     const idx = Number(parts[1] ?? "-1");
@@ -560,7 +590,9 @@ function resolveSource(
     const sid = samples[idx]?.id;
     if (!sid) return "";
     const rec = records?.find((r) => r.sampleId === sid && r.parameterCode === code);
-    if (!rec?.result) return "";
+    if (!rec) return "";
+    const fromData = rec.data ? walkJsonPath(rec.data, path) : undefined;
+    if (fromData !== undefined && fromData !== null) return String(fromData);
     try {
       const v = walkJsonPath(JSON.parse(rec.result) as unknown, path);
       return v === undefined || v === null ? "" : String(v);

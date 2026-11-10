@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { computeConcretePermeability } from "@/features/data-entry/models/ConcretePermeabilityCard";
-import { resolveParamInterfaceModel } from "@/features/data-entry/models/registry";
+import { computeConcretePermeability } from "@/features/data-entry/models/concrete";
+import { parseFormSchema } from "@/features/data-entry/models/schema";
 
 /**
- * REQ-2026-013：参数界面增加混凝土抗渗性能卡。
+ * REQ-2026-013 / ADR-0056：抗渗等级算法提炼进 models/concrete.ts 纯函数模块，
+ * 渲染由 schema 驱动的 DynamicFormRenderer 承接（旧卡组件已退役）。
  * computeConcretePermeability 按 GB/T 50082-2009 取第 3 个渗水试件的压力为抗渗等级。
  */
 
@@ -106,9 +107,9 @@ describe("computeConcretePermeability 抗渗等级（GB/T 50082-2009）", () => 
     expect(r.gradeLabel).toBe("P9");
   });
 
-  it("AC-9: 未知模型 key 回退 → resolveParamInterfaceModel 返回默认四格卡", () => {
-    const Model = resolveParamInterfaceModel("non-existent-key");
-    // 默认四格卡组件名为 DefaultParamCard（以匿名 default export 验证：组件应当可被识别为函数）
-    expect(typeof Model).toBe("function");
+  it("AC-9: 非法/缺失 schema → parseFormSchema 返回 null（渲染器回退通用采集卡）", () => {
+    expect(parseFormSchema(undefined)).toBeNull();
+    expect(parseFormSchema({ fields: [] })).toBeNull();
+    expect(parseFormSchema("junk")).toBeNull();
   });
 });

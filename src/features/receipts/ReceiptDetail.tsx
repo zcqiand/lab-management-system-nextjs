@@ -22,8 +22,8 @@ import { receiptsGetReceipt } from "@/api/endpoints/receipts/receipts";
 import { samplesListSamples } from "@/api/endpoints/samples/samples";
 import { technicalRequirementsListTechnicalRequirements } from "@/api/endpoints/technical-requirements/technical-requirements";
 import { testRecordsListTestRecords } from "@/api/endpoints/test-records/test-records";
+import { DynamicFormRenderer } from "@/features/data-entry/DynamicFormRenderer";
 import { resolveInterfaceByParam } from "@/features/data-entry/models/resolveInterfaceByParam";
-import { resolveParamInterfaceModel } from "@/features/data-entry/models/registry";
 import generatedParameters from "@/data/generated/inspection-parameter.json";
 
 interface ExtField {
@@ -37,7 +37,8 @@ interface TestRecord {
   tenantId: string;
   sampleId: string;
   parameterCode: string;
-  requirementCode?: string;
+  /** 原始采集值 + 计算产物（ADR-0056：契约 TestRecord.data 必填；旧记录缺省时渲染器按空对象容忍） */
+  data: Record<string, unknown>;
   requirement: string;
   result: string;
   verdict?: string;
@@ -312,7 +313,6 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
                   }
                   if (!p) return null;
                   const ifce = interfaceByParam[rec.parameterCode];
-                  const Model = resolveParamInterfaceModel(ifce?.componentPath);
                   // 按参数范围过滤候选项（和录入弹窗一致：每参数一份）
                   const basisOptions = stdParams
                     .filter((sp) => sp.inspectionParameterCode === rec.parameterCode)
@@ -325,8 +325,8 @@ export function ReceiptDetail({ receiptId, categoryCode }: ReceiptDetailProps) {
                   );
                   return (
                     <div key={rec.id}>
-                      {/* 详情页只读：onChange 设为 no-op，模型卡用 rec/standards/techReqs 渲染只读视图 */}
-                      <Model
+                      {/* 详情页只读：onChange 设为 no-op，渲染器用 rec/standards/techReqs 渲染只读视图 */}
+                      <DynamicFormRenderer
                         parameter={p}
                         record={rec}
                         sampleId={activeSample.id}

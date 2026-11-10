@@ -1,12 +1,12 @@
 // M06.F08 参数界面：GET/PUT/DELETE /api/param-interfaces/{code}（契约路径，REQ-2026-001；
-// PUT 为 PATCH 语义；DELETE 内置（isOfficial）不可删 400——REF 语义）
+// PUT 为 PATCH 语义。ADR-0056：isOfficial/sortOrder 随契约退役，DELETE 不再有内置保护门）
 
 import { NextRequest, NextResponse } from "next/server";
 import { requireTenant } from "@/lib/auth/require-tenant";
 import { fixturesSingleton } from "@/lib/fixtures-runtime";
 
 const inspectionParamInterfaces = fixturesSingleton.inspectionParamInterfaces;
-import { notFound, badRequest, noContent, NOW } from "@/lib/api-helpers";
+import { notFound, noContent, NOW } from "@/lib/api-helpers";
 
 function findRow(code: string): Record<string, unknown> | undefined {
   return (inspectionParamInterfaces as unknown as Record<string, unknown>[]).find(
@@ -39,7 +39,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { code: str
   const arr = inspectionParamInterfaces as unknown as Record<string, unknown>[];
   const i = arr.findIndex((r) => r["code"] === params.code);
   if (i < 0) return notFound("参数界面不存在");
-  if (arr[i]!["isOfficial"]) return badRequest("内置模型不可删除");
   arr.splice(i, 1);
   return noContent();
 }

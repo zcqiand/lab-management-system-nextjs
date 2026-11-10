@@ -12,8 +12,9 @@
 
 export interface ParamInterfaceRow {
   code: string;
-  componentPath: string;
-  sortOrder: number;
+  /** 表单结构版本，结构迭代升级用，服务端管理，缺省 1（ADR-0056） */
+  version: number;
+  /** 表单结构定义（Schema）：{ title?, fields[], computed?, params? }（ADR-0056） */
   config?: Record<string, unknown>;
 }
 
@@ -27,9 +28,8 @@ export interface ParamInterfaceLink {
    */
   reportNameCode?: string;
   /**
-   * 链接级配置覆盖：与 ParamInterfaceRow.config 合并；同 key 优先用本字段。
-   * 用途：同一录入卡在 不同报告作用域 下可微调（如 particle-gradation 在砂报告用 7 筛孔，
-   *       在碎石报告用 12 筛孔 + gravel:true）。
+   * 检测依据作用域（可选，ADR-0056 追加裁定）：仅当检测依据 === inspectionStandardCode 时生效；
+   * 缺省 = 不限依据（兜底）。config 字段已随契约退役（link 不再承载配置覆盖）。
    */
-  config?: Record<string, unknown>;
+  inspectionStandardCode?: string;
 }

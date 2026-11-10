@@ -183,7 +183,8 @@ export interface TestRecord {
   sampleId: string;
   parameterCode: string;
   standardCode?: string;
-  requirementCode?: string;
+  /** 动态表单采集数据（key-value 原值 + 计算产物快照），缺省 {}（ADR-0056） */
+  data: Record<string, unknown>;
   requirement: string;
   result: string;
   verdict?: string;
@@ -358,10 +359,12 @@ export interface InspectionReportName {
 export interface InspectionParamInterface {
   code: string;
   name?: string;
-  componentPath: string;
   description?: string;
   isOfficial?: boolean;
   sortOrder: number;
+  /** 表单结构版本，结构迭代升级用，服务端管理，缺省 1（ADR-0056） */
+  version: number;
+  /** 表单结构定义（Schema）：{ title?, fields[], computed?, params? }（ADR-0056） */
   config?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;

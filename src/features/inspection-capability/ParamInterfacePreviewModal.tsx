@@ -1,20 +1,19 @@
 "use client";
-// REF 同名组件移植（无 API 调用，仅 registry 引用改 @/ 别名）。
-import { resolveParamInterfaceModel } from "@/features/data-entry/models/registry";
+// REF 同名组件移植（ADR-0056：registry/componentPath 退役，预览改为渲染 DynamicFormRenderer 只读视图）。
+import { DynamicFormRenderer } from "@/features/data-entry/DynamicFormRenderer";
 import { buildPreviewProps, type PreviewInterfaceRow } from "./previewSampleMock";
 
 /**
- * 参数界面预览弹窗（M06.F08.I06）：按行的 componentPath 渲染注册的录入卡组件，
- * 只读 + mock 单样品 + 1 条技术要求。让维护者在配置参数界面时直接看到录入卡长什么样。
+ * 参数界面预览弹窗（M06.F08.I06）：按行的 config schema 渲染动态表单渲染器，
+ * 只读 + mock 单样品 + 1 条技术要求。让维护者在配置参数界面时直接看到表单长什么样。
  */
 export function ParamInterfacePreviewModal({
   row,
   onClose,
 }: {
-  row: PreviewInterfaceRow & { componentPath?: string };
+  row: PreviewInterfaceRow;
   onClose: () => void;
 }) {
-  const Model = resolveParamInterfaceModel(row.componentPath);
   const props = buildPreviewProps(row);
   return (
     <div
@@ -29,7 +28,7 @@ export function ParamInterfacePreviewModal({
           <h3 className="text-lg font-semibold">
             预览 — {row.name ?? "参数界面"}
             <span className="ml-2 font-mono text-xs text-gray-500">
-              {row.componentPath ?? "default"}
+              v{row.version ?? 1}
             </span>
           </h3>
           <button
@@ -45,7 +44,7 @@ export function ParamInterfacePreviewModal({
           只读预览（mock 单样品 + 示例技术要求）；实际录入以数据录入页为准。
         </p>
         <div className="pointer-events-none">
-          <Model {...props} />
+          <DynamicFormRenderer {...props} />
         </div>
         <div className="flex justify-end pt-2">
           <button

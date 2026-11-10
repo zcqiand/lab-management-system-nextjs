@@ -4,6 +4,49 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Changed — 动态表单改造（ADR-0056 首仓回放，2026-11-10 人批 + 批中补充裁定）
+
+**契约/DB 面（随 shared ADR-0056）**
+
+- src/db/schema.ts 重 pull（component_path/is_official/sort_order/requirement_code/
+  links.config 退役；version/data/links.inspection_standard_code 上位）；7 处纯
+  CHECK 回调 `(table) =>` → `() =>`（pull 产物清理，非表结构改动）。
+- orval 生成物重出（ParamInterface/TestRecord/ParamInterfaceLink 新形状）；vendor/msw
+  gen:handlers 重出 + 手维护 shim/db schema/seeds/handlers-extra 同步（vendor orval
+  input 路径仍断，本批以临时拷贝绕过，真修另批）。
+
+**前端渲染链（component_path 退役落地）**
+
+- 新 `DynamicFormRenderer` + `models/schema.ts`（FormSchema，8 种字段类型）+
+  `models/algorithms.ts`（算法注册表 17 键，`computed.variant ?? algorithm` 派发——
+  variant 是本仓扩展，DB CHECK 把 algorithm 钉死 7 枚举）。
+- **11 张硬编码卡 + MODEL_REGISTRY 退役**（13 文件删除）；纯算法函数
+  （cement-strength/rebar-mechanics/rebar-welding/concrete/gradation/soil）保留为
+  算法域。提炼映射：水泥卡→gb17671_compress/flexural、混凝土抗压→compressive_strength、
+  抗渗→permeability_grade（GB/T 50082-2009）、级配→gradation、钢筋力学→steel_tensile/
+  elongation/yield_ratio、焊接→welding_tensile/bend、土工→compaction_peak/compaction_degree。
+- DataEntryPage/ReceiptDetail/ParamInterfacePreviewModal 改走 DynamicFormRenderer；
+  resolveInterfaceByParam 重写为三级作用域特异性（inspectionStandardCode 精确命中 >
+  reportNameCode > 通用兜底，无 sortOrder）。
+- 渲染器 onChange 上报 `{data, result: JSON.stringify(data), verdict, requirement}`——
+  data=采集原值+计算产物（=旧卡 result JSON 形状，报告链两路取数皆通）；
+  result 过渡期继续承载 JSON 形（data 为 SSOT，见报告链过渡债）。
+
+**报告模板链（result JSON 解析 → rec.data 直取）**
+
+- reportTemplateData 6 处取数源迁 rec.data（免 JSON.parse）；`record:`/`srecord:`
+  模板 path 语法不变；迁移期 result 老 JSON 串兜底（已加测试锁定回退路径）。
+- reportTemplateSeed MockResult 增 data；ReportPreviewModal 纯透传零改动。
+
+**后端路由 + 测试基建**
+
+- param-interfaces POST：code 必填 + config 对象校验（数组拒 400）+ version ?? 1；
+  [code] DELETE 去「内置不可删」isOfficial 门；links 路由去 config、加
+  inspectionStandardCode（GET 过滤 + POST 写入）。
+- tests/helpers/seed.ts / types 镜像 / src/data/generated 同步；新增
+  tests/api/param-interfaces-route.test.ts（先红后绿 3 fnTest）。
+- 全量 vitest 78 文件 530 测试绿（+1 skip 既有）；tsc 全仓绿。
+
 ### Changed — DB 六裁定回放（ADR-0055，shared re-baseline 后首仓回放，2026-11-10）
 
 **src/db/schema.ts（pull 产物，入 git）**

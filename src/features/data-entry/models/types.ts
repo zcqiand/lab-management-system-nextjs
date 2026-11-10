@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import type {
   InspectionParameter,
   InspectionStandard,
@@ -10,7 +9,7 @@ import type {
 /**
  * 契约 TechnicalRequirement 不含 id，但 lab 后端 list 响应会附加派生 id
  * （fixtures-runtime 的 techReqId：`tr-<obj>-<param>-<std>`）。
- * 数据录入/详情页的「技术要求」选择器与 TestRecord.requirementCode 依赖该字段，
+ * 数据录入/详情页的「技术要求」选择器依赖该字段（requirement 以文本上报，ADR-0056），
  * 故在此对契约镜像做本地扩展（不改 shared 契约，ADR-0029）。
  */
 export type TechnicalRequirementRow = TechnicalRequirement & { id: string };
@@ -31,19 +30,20 @@ export interface CrossRecordInput {
   specStandardYield?: number;
 }
 
-/** 所有参数界面模型组件的统一契约。组件只渲染 + 上报改动，不直接 fetch / 不落库。 */
+/** 动态表单渲染器（ADR-0056）的统一契约。组件只渲染 + 上报改动，不直接 fetch / 不落库。 */
 export interface ParamModelProps {
   parameter: InspectionParameter;
   record: TestRecord | undefined;
-  /** 当前选中的样品 id——模型卡用此区分不同样品的本地状态（如混凝土抗压的 loads）。 */
+  /** 当前选中的样品 id——区分不同样品的本地状态（跨样品串台防护）。 */
   sampleId: string;
   standards: InspectionStandard[];
   stdParams: InspectionStandardParameter[];
   techReqs: TechnicalRequirementRow[];
+  /** 表单结构 schema（ParamInterface.config）；缺失/解析失败 → 通用采集卡回退。 */
   config: Record<string, unknown> | undefined;
   /**
-   * 该参数的计算方法（M06.F05，按项目+参数+检测依据）。仅取 specimenCount 驱动「做几组数据」。
-   * 缺省时卡片回退 config.specimenCount 或内置默认值。
+   * 该参数的计算方法（M06.F05，按项目+参数+检测依据）。仅取 specimenCount
+   * 兜底字段未写 count 的序列长度。
    */
   calcRule?: { specimenCount: number };
   /** 比值卡（强屈比/超强比）的跨记录联立入参；非比值卡忽略。 */
@@ -57,5 +57,3 @@ export interface ParamModelProps {
    */
   readOnly?: boolean;
 }
-
-export type ParamModelComponent = (props: ParamModelProps) => ReactElement;

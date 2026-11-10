@@ -1,8 +1,9 @@
 // M06.F08 参数↔界面 link/unlink（契约路径，REQ-2026-001；字段名对齐契约
 // ParamInterfaceLink：inspectionParameterCode + paramInterfaceCode）。
-// GET    /api/param-interfaces/links?inspectionParameterCode=&paramInterfaceCode=&reportNameCode=
+// GET    /api/param-interfaces/links?inspectionParameterCode=&paramInterfaceCode=&reportNameCode=&inspectionStandardCode=
 //        → {items,page,pageSize,total}
-// POST   → 201（重复三元组 400）
+// POST   → 201（重复三元组 400）。ADR-0056 追加裁定：link 去 config，
+//        增 inspectionStandardCode（绑定检测依据，可空=不限）。
 // DELETE → 204（@body 语义；query 兼容过渡期）
 
 import { NextRequest, NextResponse } from "next/server";
@@ -19,10 +20,13 @@ export async function GET(req: NextRequest) {
   const code = url.get("inspectionParameterCode");
   const pic = url.get("paramInterfaceCode");
   const rn = url.get("reportNameCode");
+  const std = url.get("inspectionStandardCode");
   let items = inspectionParamInterfaceLinks as unknown as Record<string, unknown>[];
   if (code) items = items.filter((l) => l["inspectionParameterCode"] === code);
   if (pic) items = items.filter((l) => l["paramInterfaceCode"] === pic);
   if (rn) items = items.filter((l) => (l["reportNameCode"] ?? undefined) === rn);
+  if (std)
+    items = items.filter((l) => (l["inspectionStandardCode"] ?? undefined) === std);
   return NextResponse.json(
     pageOf(items, num(url.get("page"), 1), num(url.get("pageSize"), items.length)),
   );
@@ -47,7 +51,8 @@ export async function POST(req: NextRequest) {
     inspectionParameterCode: body["inspectionParameterCode"],
     paramInterfaceCode: body["paramInterfaceCode"],
     reportNameCode: body["reportNameCode"],
-    config: body["config"],
+    // ADR-0056 追加裁定：config 退役，绑定检测依据走 inspectionStandardCode
+    inspectionStandardCode: body["inspectionStandardCode"],
     createdAt: now,
     updatedAt: now,
   };

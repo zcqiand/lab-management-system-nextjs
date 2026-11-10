@@ -65,15 +65,25 @@ describe("test-records API (M03.F03.I08 / I09)", () => {
           body: JSON.stringify({
             sampleId: "SAMPLE-SEED-001",
             parameterCode: "PARAM-TEST-TEMP",
+            // ADR-0056：动态表单采集原值随 body.data 进（requirementCode 已删）
+            data: { loads: [100, 101, 102], note: "三点试件" },
             requirement: "≥42.5",
             result: "48.2",
           }),
         }),
       );
       expect(res.status).toBe(201);
-      const created = (await res.json()) as { id: string; sampleId: string };
+      const created = (await res.json()) as {
+        id: string;
+        sampleId: string;
+        data: Record<string, unknown>;
+        requirementCode?: string;
+      };
       expect(created.id).toMatch(/^TR-/);
       expect(created.sampleId).toBe("SAMPLE-SEED-001");
+      // ADR-0056：data 原值回显；requirementCode 已随契约删除（不落不回显）
+      expect(created.data).toEqual({ loads: [100, 101, 102], note: "三点试件" });
+      expect(created.requirementCode).toBeUndefined();
 
       const after = await GET(
         req(`http://test/api/test-records?sampleId=SAMPLE-SEED-001`),

@@ -38,7 +38,7 @@ import type {
   InspectionStandardParameter,
   TechnicalRequirementRow as InspectionTechnicalRequirement,
 } from "./models/types";
-import { resolveParamInterfaceModel } from "./models/registry";
+import { DynamicFormRenderer } from "./DynamicFormRenderer";
 import { resolveInterfaceByParam } from "./models/resolveInterfaceByParam";
 import { strengthsFromRecordResult } from "./models/rebar-mechanics";
 
@@ -65,27 +65,6 @@ function EntryRowAction({
 
 type Verdict = "合格" | "不合格" | "符合" | "不符合";
 
-/** 把技术要求结构渲染成可读文本，如「≥ 400 MPa」「28 ~ 32 MPa」。 */
-function requirementLabel(r: InspectionTechnicalRequirement): string {
-  const unit = r.unit ? ` ${r.unit}` : "";
-  if (
-    (r.valueType === "range" || r.comparison === "range") &&
-    r.minValue != null &&
-    r.maxValue != null
-  ) {
-    return `${r.minValue} ~ ${r.maxValue}${unit}`;
-  }
-  if (r.comparison === "≥" && r.minValue != null) return `≥ ${r.minValue}${unit}`;
-  if (r.comparison === "≤" && r.maxValue != null) return `≤ ${r.maxValue}${unit}`;
-  if (r.targetValue)
-    return `${r.comparison === "=" || r.comparison === "eq" ? "= " : ""}${r.targetValue}${unit}`;
-  if (r.expression) return r.expression;
-  const parts = [r.comparison, r.minValue ?? r.maxValue ?? r.targetValue]
-    .filter(Boolean)
-    .join(" ");
-  return parts ? `${parts}${unit}` : r.remark || "—";
-}
-
 export function EntryModal({
   receipt,
   onClose,
@@ -106,7 +85,9 @@ export function EntryModal({
   const [inputs, setInputs] = useState<Record<string, string>>({}); // key=`${sid}#${code}` -> 输入
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({}); // key=`${sid}#${code}` -> 改判
   const [bases, setBases] = useState<Record<string, string>>({}); // key=`${sid}#${code}` -> 检测依据 standardCode
-  const [reqCodes, setReqCodes] = useState<Record<string, string>>({}); // key=`${sid}#${code}` -> 技术要求 id
+  // ADR-0056：requirementCode 已随契约退役——渲染器直接上报 requirement 文本与 data 原值
+  const [reqTexts, setReqTexts] = useState<Record<string, string>>({}); // key=`${sid}#${code}` -> 技术要求文本
+  const [dataBufs, setDataBufs] = useState<Record<string, Record<string, unknown>>>({}); // key=`${sid}#${code}` -> 动态表单采集原值
   const [standards, setStandards] = useState<InspectionStandard[]>([]);
   const [stdParams, setStdParams] = useState<InspectionStandardParameter[]>([]);
   const [techReqs, setTechReqs] = useState<InspectionTechnicalRequirement[]>([]);
@@ -215,9 +196,8 @@ export function EntryModal({
     .filter((r) => r.sampleId === selectedId)
     .forEach((r) => recordByParam.set(r.parameterCode, r));
 
-  // 检测依据 / 技术要求 候选项的查表索引
+  // 检测依据候选的查表索引
   const standardByCode = new Map(standards.map((s) => [s.code, s]));
-  const reqByCode = new Map(techReqs.map((r) => [r.id, r]));
 
   // 参数 → 计算方法（取 specimenCount 驱动录入卡组数）。
   // 优先取 reportNameCode 匹配当前收样的规则；未匹配上回退到全局规则（reportNameCode 为空）。
@@ -239,9 +219,19 @@ export function EntryModal({
   }
 
   // 强屈比(IP-0559)/超强比(IP-0560) 跨记录联立：同样品 IP-0087 抗拉 + IP-0086 屈服 + 标准屈服值。
+  // ADR-0056：优先读 rec.data.strengths（新记录），旧记录回退 result JSON 反解析。
+  const strengthsOf = (r: TestRecord | undefined): number[] => {
+    const fromData = r?.data?.["strengths"];
+    if (Array.isArray(fromData)) {
+      return fromData.filter(
+        (v): v is number => typeof v === "number" && Number.isFinite(v),
+      );
+    }
+    return strengthsFromRecordResult(r?.result);
+  };
   const crossRecord = {
-    tensileStrengths: strengthsFromRecordResult(recordByParam.get("IP-0087")?.result),
-    yieldStrengths: strengthsFromRecordResult(recordByParam.get("IP-0086")?.result),
+    tensileStrengths: strengthsOf(recordByParam.get("IP-0087")),
+    yieldStrengths: strengthsOf(recordByParam.get("IP-0086")),
     specStandardYield: techReqs.find(
       (r) =>
         r.inspectionParameterCode === "IP-0086" &&
@@ -251,13 +241,13 @@ export function EntryModal({
   };
   const RATIO_PARAMS = new Set(["IP-0559", "IP-0560"]);
 
-  // 参数 → 界面组件派发表：未绑定的参数不在此表，由 registry fallback 到 DefaultParamCard。
+  // 参数 → 界面 schema 派发表（ADR-0056）：未绑定的参数由 DynamicFormRenderer 走通用采集卡回退。
   const interfaceByParam = useMemo(
     () => resolveInterfaceByParam(interfaces, links, receipt.categoryCode),
     [interfaces, links, receipt.categoryCode],
   );
 
-  // 落库单个检测参数（依据 + 技术要求 + 结果 + 单项评定）。无既有记录且无任何输入时跳过，避免空记录。
+  // 落库单个检测参数（依据 + 技术要求 + data 原值 + 结果 + 单项评定）。无既有记录且无任何输入时跳过，避免空记录。
   const persistParam = async (sid: string, paramCode: string) => {
     if (!selectedSample || selectedSample.id !== sid) return;
     const k = `${sid}#${paramCode}`;
@@ -265,26 +255,27 @@ export function EntryModal({
     const input = inputs[k] ?? existing?.result ?? "";
     const v = verdicts[k];
     const basisSel = bases[k];
-    const reqSel = reqCodes[k];
-    if (!existing && input === "" && !v && !basisSel && !reqSel) return;
-    // 契约 CreateTestRecordRequest.requirement 必填；后端对缺失值 coerce 为 ""，
-    // 这里显式给 ""（或既有记录值）保持线上行为。
+    const dataSel = dataBufs[k] ?? existing?.data ?? {};
+    const reqText = reqTexts[k] ?? existing?.requirement ?? "";
+    if (
+      !existing &&
+      input === "" &&
+      !v &&
+      !basisSel &&
+      !reqText &&
+      Object.keys(dataSel).length === 0
+    )
+      return;
+    // 契约 CreateTestRecordRequest.requirement 必填；requirementCode 已退役（ADR-0056），
+    // 技术要求只落显示文本。
     const payload = {
       sampleId: sid,
       parameterCode: paramCode,
       result: input,
-      requirement: existing?.requirement ?? "",
+      data: dataSel,
+      requirement: reqText,
       ...(v ? { verdict: v } : {}),
       ...(basisSel ? { standardCode: basisSel } : {}),
-      ...(reqSel
-        ? {
-            requirementCode: reqSel,
-            requirement: (() => {
-              const found = reqByCode.get(reqSel);
-              return found ? requirementLabel(found) : (existing?.requirement ?? "");
-            })(),
-          }
-        : {}),
     };
     let saved: TestRecord;
     if (existing) {
@@ -315,19 +306,24 @@ export function EntryModal({
       delete next[k];
       return next;
     });
-    setReqCodes((prev) => {
+    setReqTexts((prev) => {
+      const next = { ...prev };
+      delete next[k];
+      return next;
+    });
+    setDataBufs((prev) => {
       const next = { ...prev };
       delete next[k];
       return next;
     });
   };
 
-  // 模型卡上报的改动分派到 (sampleId, paramCode) 联合键 dirty 缓冲：
-  // result/verdict/standardCode/requirementCode。
+  // 渲染器上报的改动分派到 (sampleId, paramCode) 联合键 dirty 缓冲：
+  // result / verdict / standardCode / requirement（文本）/ data（采集原值）。
   // 联合键是必需的——单按 paramCode 会在切换样品时把上一份输入错误归到当前样品的 saveAll。
-  // 默认卡 select 已带 code；requirement 文本由 persistParam 据 reqByCode 反查兜底。
   // 关联参数镜像：断后伸长率 IP-0150 与最大力总伸长率 IP-0097 是同一测量的两个口径，
-  // 用户在 IP-0150 卡上录入 → 同步写到 IP-0097 的 dirty 缓冲 → saveAll 时一起落库。
+  // 用户在 IP-0150 卡上录入 → 整卡（result+data+requirement）同步写到 IP-0097 的 dirty
+  // 缓冲 → saveAll 时一起落库。
   const MIRROR_PARAMS: Record<string, string> = {
     IP_0150: "IP-0097", // 断后伸长率 → 最大力总伸长率
   };
@@ -345,15 +341,27 @@ export function EntryModal({
       const v = patch.standardCode;
       setBases((prev) => ({ ...prev, [k]: v }));
     }
-    if (patch.requirementCode !== undefined) {
-      const v = patch.requirementCode;
-      setReqCodes((prev) => ({ ...prev, [k]: v }));
+    if (patch.requirement !== undefined) {
+      const v = patch.requirement;
+      setReqTexts((prev) => ({ ...prev, [k]: v }));
     }
-    // 镜像：把 result 同步到关联参数
+    if (patch.data !== undefined) {
+      const v = patch.data;
+      setDataBufs((prev) => ({ ...prev, [k]: v }));
+    }
+    // 镜像：整卡同步到关联参数
     const mirror = MIRROR_PARAMS[paramCode.replace(/-/g, "_")];
-    if (mirror && patch.result !== undefined) {
+    if (mirror) {
       const mk = `${sid}#${mirror}`;
-      setInputs((prev) => ({ ...prev, [mk]: patch.result as string }));
+      if (patch.result !== undefined) {
+        setInputs((prev) => ({ ...prev, [mk]: patch.result as string }));
+      }
+      if (patch.data !== undefined) {
+        setDataBufs((prev) => ({ ...prev, [mk]: patch.data as Record<string, unknown> }));
+      }
+      if (patch.requirement !== undefined) {
+        setReqTexts((prev) => ({ ...prev, [mk]: patch.requirement as string }));
+      }
     }
   };
 
@@ -372,7 +380,8 @@ export function EntryModal({
           inputs[k] !== undefined ||
           verdicts[k] !== undefined ||
           bases[k] !== undefined ||
-          reqCodes[k] !== undefined
+          reqTexts[k] !== undefined ||
+          dataBufs[k] !== undefined
         );
       });
       await Promise.all(dirty.map((p) => persistParam(sid, p.code)));
@@ -404,7 +413,10 @@ export function EntryModal({
       setBases((prev) =>
         Object.fromEntries(Object.entries(prev).filter(([k]) => !k.startsWith(prefix))),
       );
-      setReqCodes((prev) =>
+      setReqTexts((prev) =>
+        Object.fromEntries(Object.entries(prev).filter(([k]) => !k.startsWith(prefix))),
+      );
+      setDataBufs((prev) =>
         Object.fromEntries(Object.entries(prev).filter(([k]) => !k.startsWith(prefix))),
       );
       if (selectedId === deleteTarget.id) setSelectedId("");
@@ -552,7 +564,6 @@ export function EntryModal({
                   {parameters.map((p) => {
                     const rec = recordByParam.get(p.code);
                     const ifce = interfaceByParam[p.code];
-                    const Model = resolveParamInterfaceModel(ifce?.componentPath);
                     const basisOptions = stdParams
                       .filter((sp) => sp.inspectionParameterCode === p.code)
                       .map((sp) => standardByCode.get(sp.inspectionStandardCode))
@@ -562,7 +573,7 @@ export function EntryModal({
                     );
                     return (
                       <div key={p.code}>
-                        <Model
+                        <DynamicFormRenderer
                           parameter={p}
                           record={rec}
                           sampleId={selectedSample.id}

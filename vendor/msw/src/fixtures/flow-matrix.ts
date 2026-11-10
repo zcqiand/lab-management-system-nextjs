@@ -229,7 +229,7 @@ export function buildFlowMatrix(deps: FlowMatrixDeps): {
             sampleId,
             parameterCode: firstParam,
             standardCode: firstStd,
-            requirementCode: "",
+            data: {}, // ADR-0056：动态表单采集原值（requirementCode 已随契约删除）
             requirement: `${paramName(firstParam)} 符合${firstStd}要求`,
             // data_entry 单据录入中（结果留空）；review 起已有结论
             result: stageIdx === DATA_ENTRY_IDX ? "" : "符合",

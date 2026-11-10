@@ -80,12 +80,7 @@ describe("assembleReport", () => {
     expect(out.rows.length).toBe(15);
   });
 
-  it("试件轴：IP-0055 result JSON 解析后每个样品 1 行，kyqd0/1/2 各 1 试件 + dbz 共享", () => {
-    const recResult = JSON.stringify({
-      loads: [120, 135, 150],
-      strengths: [5.33, 6.0, 6.67],
-      representative: 6.0,
-    });
+  it("试件轴：IP-0055 rec.data 直取后每个样品 1 行，kyqd0/1/2 各 1 试件 + dbz 共享", () => {
     const out = assembleReport({
       receipt: receipt("RN-105-1"),
       samples: [sample("s1")],
@@ -95,11 +90,17 @@ describe("assembleReport", () => {
           sampleId: "s1",
           parameterCode: "IP-0055",
           requirement: "",
-          result: recResult,
+          // ADR-0056：原值+计算产物进 data（与参数卡写进 data 的 JSON 形状一致）
+          data: {
+            loads: [120, 135, 150],
+            strengths: [5.33, 6.0, 6.67],
+            representative: 6.0,
+          },
+          result: "6", // 摘要文本
           verdict: "合格",
           createdAt: "",
           updatedAt: "",
-        } as TestRecord,
+        } as unknown as TestRecord,
       ],
       org: null,
     });
@@ -124,13 +125,14 @@ describe("assembleReport", () => {
   });
 
   it("试件轴：2 个样品 → 2 行 + 13 行 padding（每样品占 1 段）", () => {
-    const rec = (result: string, sid: string) =>
+    const rec = (data: Record<string, unknown>, sid: string) =>
       ({
         id: `tr-${sid}`,
         sampleId: sid,
         parameterCode: "IP-0055",
         requirement: "",
-        result,
+        data,
+        result: String(data.representative ?? ""), // 摘要文本
         verdict: "合格",
         createdAt: "",
         updatedAt: "",
@@ -140,19 +142,19 @@ describe("assembleReport", () => {
       samples: [sample("s1"), sample("s2")],
       records: [
         rec(
-          JSON.stringify({
+          {
             loads: [120, 135, 150],
             strengths: [5.33, 6.0, 6.67],
             representative: 6.0,
-          }),
+          },
           "s1",
         ),
         rec(
-          JSON.stringify({
+          {
             loads: [100, 110, 120],
             strengths: [4.44, 4.89, 5.33],
             representative: 4.89,
-          }),
+          },
           "s2",
         ),
       ],
@@ -175,7 +177,7 @@ describe("assembleReport", () => {
     expect(out.rows[14]!.dbz).toBe("");
   });
 
-  it("试件轴：result 不是 JSON 时回退原样（不抛错）", () => {
+  it("试件轴：data 缺键时过渡回退 result（老字符串原样，不抛错）", () => {
     const out = assembleReport({
       receipt: receipt("RN-105-1"),
       samples: [sample("s1")],
@@ -185,6 +187,7 @@ describe("assembleReport", () => {
           sampleId: "s1",
           parameterCode: "IP-0055",
           requirement: "",
+          data: {}, // 迁移期：data 空对象（缺键）→ 回退 result
           result: "老字符串值",
           verdict: "合格",
           createdAt: "",
@@ -201,6 +204,36 @@ describe("assembleReport", () => {
     expect(out.rows[0]!.kyqd2).toBe("老字符串值");
     expect(out.rows[0]!.dbz).toBe("老字符串值");
     expect(out.rows[1]!.kyqd0).toBe("");
+  });
+
+  it("试件轴：data 缺键但 result 为老 JSON 串 → 过渡期从 result JSON 解析（迁移债）", () => {
+    const out = assembleReport({
+      receipt: receipt("RN-105-1"),
+      samples: [sample("s1")],
+      records: [
+        {
+          id: "tr-1",
+          sampleId: "s1",
+          parameterCode: "IP-0055",
+          requirement: "",
+          data: {}, // 迁移期：data 空 → 主路径落空，回退 result 老格式
+          result: JSON.stringify({
+            loads: [120, 135, 150],
+            strengths: [5.33, 6.0, 6.67],
+            representative: 6.0,
+          }),
+          verdict: "合格",
+          createdAt: "",
+          updatedAt: "",
+        } as TestRecord,
+      ],
+      org: null,
+    });
+    if (!("rows" in out)) throw new Error("应为试件轴");
+    expect(out.rows[0]!.kyqd0).toBe("5.33");
+    expect(out.rows[0]!.kyqd1).toBe("6");
+    expect(out.rows[0]!.kyqd2).toBe("6.67");
+    expect(out.rows[0]!.dbz).toBe("6");
   });
 });
 
@@ -266,23 +299,24 @@ describe("flattenForDocx", () => {
     expect(a.r16_jcz).toBe(b.r16_jcz);
   });
 
-  it("强度类参数：单个强度值 {qd*_N} 从 result JSON 逐格填充；技术要求 {r*_jz} 取要求文案", () => {
+  it("强度类参数：单个强度值 {qd*_N} 从 rec.data 直取逐格填充；技术要求 {r*_jz} 取要求文案", () => {
     const strengthRec = {
       id: "t1",
       sampleId: "s1",
       parameterCode: "IP-0556", // 3 天抗压强度（qd3y）
       requirement: "≥ 17",
-      result: JSON.stringify({
+      data: {
         loads: [33, 34, 35, 33.5, 34.5, 35.5],
         strengths: [20.6, 21.3, 21.9, 20.9, 21.6, 22.2],
         kept: [true, true, true, true, true, true],
         mean: 21.4,
         invalid: false,
-      }),
+      },
+      result: "21.4", // 摘要文本
       verdict: "合格",
       createdAt: "",
       updatedAt: "",
-    } as TestRecord;
+    } as unknown as TestRecord;
     const out = assembleReport({
       receipt: receipt("RN-101"),
       samples: [sample("s1")],
@@ -303,42 +337,44 @@ describe("flattenForDocx", () => {
     expect(flat.qd3z_0).toBe("—");
   });
 
-  it("record:<code>:<jsonPath> 语法：从 TestRecord.result JSON 解析任意字段（REQ-2026-015 钢筋焊接 4 试件 × 3 次试验取数）", () => {
+  it("record:<code>:<jsonPath> 语法：从 TestRecord.data 直取任意字段（REQ-2026-015 钢筋焊接 4 试件 × 3 次试验取数）", () => {
     // 用一个 ad-hoc manifest（不走真实模板文件）验证 source resolver。
-    // 这里直接借 101 模板的 grid 走默认流程；record 解析是按 record.result JSON，与 manifest tag 无关。
+    // 这里直接借 101 模板的 grid 走默认流程；record 解析是按 rec.data 对象，与 manifest tag 无关。
     const tensileRec = {
       id: "t-tensile",
       sampleId: "s1",
       parameterCode: "IP-0087",
       requirement: "",
-      result: JSON.stringify({
+      data: {
         diameter: 25,
         techReqLabel: "≥ 540 MPa",
         loads: [270, 268, 272],
         strengths: [550, 546, 554.1],
         fractureDistances: [50, 55, 45],
         fractureCharacteristics: ["母材断裂", "母材断裂", "焊缝断裂"],
-      }),
+      },
+      result: "550", // 摘要文本
       verdict: "",
       createdAt: "",
       updatedAt: "",
-    } as TestRecord;
-    // 用 RN-102-3（102_钢筋焊接接头检测报告）走 grid，manifest 里的 record: 源应解析出扁平 JSON 字段。
-    // 抗拉卡（IP-0087）扁平：diameter/techReqLabel/strengths[0..2]/fractureDistances/fractureCharacteristics 都在 record 顶层；
+    } as unknown as TestRecord;
+    // 用 RN-102-3（102_钢筋焊接接头检测报告）走 grid，manifest 里的 record: 源应解析出扁平 data 字段。
+    // 抗拉卡（IP-0087）扁平：diameter/techReqLabel/strengths[0..2]/fractureDistances/fractureCharacteristics 都在 data 顶层；
     // 弯曲卡（IP-0155）走 specimens[] 数组（沿用旧布局）。
     const bendRec = {
       id: "t-bend",
       sampleId: "s1",
       parameterCode: "IP-0155",
       requirement: "",
-      result: JSON.stringify({
+      data: {
         angles: [90, 90, 90],
         results: ["合格", "合格", "合格"],
-      }),
+      },
+      result: "合格",
       verdict: "",
       createdAt: "",
       updatedAt: "",
-    } as TestRecord;
+    } as unknown as TestRecord;
     const out = assembleReport({
       receipt: receipt("RN-102-3"),
       samples: [sample("s1")],

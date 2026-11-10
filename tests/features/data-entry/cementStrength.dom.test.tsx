@@ -9,13 +9,16 @@ import {
   autoVerdict,
   parseStrengthRecord,
 } from "@/features/data-entry/models/cement-strength";
-import { CementFlexuralCard } from "@/features/data-entry/models/CementFlexuralCard";
-import { CementCompressCard } from "@/features/data-entry/models/CementCompressCard";
+import { DynamicFormRenderer } from "@/features/data-entry/DynamicFormRenderer";
 import type { ParamModelProps } from "@/features/data-entry/models/types";
 import type { InspectionParameter } from "@/api/endpoints/model";
 import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from "@/features/data-entry/models/types";
 
-/** REQ-2026-014：水泥胶砂强度参数界面（抗折/抗压），GB/T 17671 公式 + ±10% 剔除 + 均值自动判。 */
+/**
+ * REQ-2026-014 / ADR-0056：水泥胶砂强度（抗折/抗压）——纯算法提炼进
+ * models/cement-strength.ts，渲染由 schema 驱动的 DynamicFormRenderer 承接
+ * （variant gb17671_compress / gb17671_flexural）。
+ */
 
 describe("cementStrength 换算公式（GB/T 17671，40×40×160mm）", () => {
   it("抗折 Rf=1.5·F·L/b³：2kN → 4.7 MPa（系数 2.34375/kN）", () => {
@@ -165,65 +168,97 @@ const verifiedReq: InspectionTechnicalRequirement = {
   updatedAt: "",
 };
 
-describe("CementCompressCard 渲染与评定", () => {
+/** schema 形状与 src/seeds/inspection_param_interfaces.json 的 cement-compress / cement-flexural 同构。 */
+const compressSchema = {
+  fields: [{ field: "loads", type: "number_series", label: "破坏荷载 (kN)", count: 6 }],
+  computed: [
+    {
+      field: "strengths",
+      algorithm: "compressive_strength",
+      variant: "gb17671_compress",
+      from: ["loads"],
+      label: "抗压强度 (MPa)",
+    },
+  ],
+  params: { area: 1600 },
+};
+
+const flexuralSchema = {
+  fields: [{ field: "loads", type: "number_series", label: "破坏荷载 (kN)", count: 3 }],
+  computed: [
+    {
+      field: "strengths",
+      algorithm: "flexural_strength",
+      variant: "gb17671_flexural",
+      from: ["loads"],
+      label: "抗折强度 (MPa)",
+    },
+  ],
+};
+
+describe("水泥抗压（gb17671_compress）渲染与评定", () => {
   beforeEach(() => cleanup());
 
   it("渲染 6 个破坏荷载输入框", () => {
-    const { container } = render(<CementCompressCard {...makeProps()} />);
-    expect(
-      container.querySelectorAll('input[type="number"][placeholder="破坏荷载 (kN)"]')
-        .length,
-    ).toBe(6);
+    render(<DynamicFormRenderer {...makeProps({ config: compressSchema })} />);
+    expect(screen.getAllByLabelText(/试件 \d+ 破坏荷载/)).toHaveLength(6);
   });
 
   it("有技术要求：录入均值达标 → 自动判合格并 onChange", () => {
     const onChange = vi.fn();
     const { container } = render(
-      <CementCompressCard {...makeProps({ techReqs: [verifiedReq], onChange })} />,
+      <DynamicFormRenderer
+        {...makeProps({ techReqs: [verifiedReq], onChange, config: compressSchema })}
+      />,
     );
-    const inputs = container.querySelectorAll<HTMLInputElement>(
-      'input[type="number"][placeholder="破坏荷载 (kN)"]',
-    );
+    const inputs = screen.getAllByLabelText(/试件 \d+ 破坏荷载/);
     inputs.forEach((el) => fireEvent.change(el, { target: { value: "80" } })); // → 50 MPa ≥ 17
-    const last = onChange.mock.calls.at(-1)![0];
+    const last = onChange.mock.calls.at(-1)![0] as { verdict?: string };
     expect(last.verdict).toBe("合格");
-    expect(last.requirementCode).toBe("req-42.5");
-    expect(screen.getByText("合格")).toBeInTheDocument();
+    // computed 显示行「{label}：{display}」（label 与值分跨两个节点，取容器文本断言）
+    const disp = container.querySelector("div.text-xs.text-gray-600");
+    expect(disp?.textContent).toContain("抗压强度 (MPa)：50");
   });
 
   it("无技术要求：回退手选单项评定", () => {
-    render(<CementCompressCard {...makeProps({ techReqs: [] })} />);
-    expect(screen.getByText("单项评定")).toBeInTheDocument();
+    render(
+      <DynamicFormRenderer {...makeProps({ techReqs: [], config: compressSchema })} />,
+    );
+    expect(screen.getByLabelText("单项评定")).toBeInTheDocument();
   });
 
   it("readOnly：输入吞掉 onChange", () => {
     const onChange = vi.fn();
-    const { container } = render(
-      <CementCompressCard
-        {...makeProps({ techReqs: [verifiedReq], onChange, readOnly: true })}
+    render(
+      <DynamicFormRenderer
+        {...makeProps({
+          techReqs: [verifiedReq],
+          onChange,
+          readOnly: true,
+          config: compressSchema,
+        })}
       />,
     );
-    const input = container.querySelector<HTMLInputElement>(
-      'input[type="number"][placeholder="破坏荷载 (kN)"]',
-    )!;
+    const input = screen.getAllByLabelText(/试件 \d+ 破坏荷载/)[0]!;
     fireEvent.change(input, { target: { value: "80" } });
     expect(onChange).not.toHaveBeenCalled();
   });
 });
 
-describe("CementFlexuralCard 渲染", () => {
+describe("水泥抗折（gb17671_flexural）渲染", () => {
   beforeEach(() => cleanup());
 
   it("渲染 3 个破坏荷载输入框 + 抗折强度列", () => {
     const { container } = render(
-      <CementFlexuralCard
-        {...makeProps({ parameter: param("IP-0555", "3 天抗折强度") })}
+      <DynamicFormRenderer
+        {...makeProps({
+          parameter: param("IP-0555", "3 天抗折强度"),
+          config: flexuralSchema,
+        })}
       />,
     );
-    expect(
-      container.querySelectorAll('input[type="number"][placeholder="破坏荷载 (kN)"]')
-        .length,
-    ).toBe(3);
-    expect(screen.getByText("抗折强度 (MPa)")).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/试件 \d+ 破坏荷载/)).toHaveLength(3);
+    const disp = container.querySelector("div.text-xs.text-gray-600");
+    expect(disp?.textContent).toContain("抗折强度 (MPa)");
   });
 });

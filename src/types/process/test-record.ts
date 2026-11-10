@@ -5,7 +5,8 @@ export interface TestRecord {
   sampleId: string;
   parameterCode: string;
   standardCode?: string;
-  requirementCode?: string;
+  /** 动态表单采集数据（key-value 原值 + 计算产物快照），缺省 {}（ADR-0056） */
+  data: Record<string, unknown>;
   /** 技术要求显示文本，如「≥ 400 MPa」 */
   requirement: string;
   /** 检测结果 */

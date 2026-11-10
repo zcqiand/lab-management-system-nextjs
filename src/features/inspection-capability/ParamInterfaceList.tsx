@@ -33,10 +33,8 @@ type TabKey = "basic" | "parameters";
 const emptyForm = {
   code: "",
   name: "",
-  componentPath: "",
   config: "",
   description: "",
-  sortOrder: "0",
 };
 
 const TAB_LABELS: Record<TabKey, string> = {
@@ -125,10 +123,8 @@ export function ParamInterfaceList() {
     setForm({
       code: row.code,
       name: row.name ?? "",
-      componentPath: row.componentPath ?? "",
       config: JSON.stringify(row.config ?? "", null, 2),
       description: row.description ?? "",
-      sortOrder: String(row.sortOrder ?? 0),
     });
     setActiveTab("basic");
     setError(null);
@@ -152,20 +148,16 @@ export function ParamInterfaceList() {
         // config 是自由 JSON，字符串键对象按契约形状透传。
         const payload: UpdateParamInterfaceRequest = {
           name: form.name || undefined,
-          componentPath: form.componentPath ?? "",
           config: configParsed as UpdateParamInterfaceRequest["config"],
           description: form.description || undefined,
-          sortOrder: Number(form.sortOrder) || 0,
         };
         await paramInterfacesUpdateParamInterface(editId, payload);
       } else {
         const payload: CreateParamInterfaceRequest = {
           code: form.code ?? "",
           name: form.name || undefined,
-          componentPath: form.componentPath ?? "",
           config: (configParsed ?? undefined) as CreateParamInterfaceRequest["config"],
           description: form.description || undefined,
-          sortOrder: Number(form.sortOrder) || 0,
         };
         await paramInterfacesCreateParamInterface(payload);
       }
@@ -224,7 +216,6 @@ export function ParamInterfaceList() {
             <tr>
               <th className="px-4 py-2 text-left">编码</th>
               <th className="px-4 py-2 text-left">界面名称</th>
-              <th className="px-4 py-2 text-left">组件路径</th>
               <th className="px-4 py-2 text-left">关联参数</th>
               <th className="px-4 py-2 text-left">操作</th>
             </tr>
@@ -232,14 +223,14 @@ export function ParamInterfaceList() {
           <tbody>
             {loading && rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
                   加载中...
                 </td>
               </tr>
             )}
             {!loading && rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
                   暂无数据
                 </td>
               </tr>
@@ -252,9 +243,6 @@ export function ParamInterfaceList() {
                 <tr key={r.code} className="border-t hover:bg-gray-50 align-top">
                   <td className="px-4 py-2 font-mono text-xs">{r.code}</td>
                   <td className="px-4 py-2 whitespace-nowrap">{r.name}</td>
-                  <td className="px-4 py-2 font-mono text-xs text-gray-700">
-                    {r.componentPath ?? "-"}
-                  </td>
                   <td className="px-4 py-2 text-xs text-gray-700">
                     <AggregateList items={params} emptyText="-" />
                   </td>
@@ -392,17 +380,6 @@ export function ParamInterfaceList() {
                   />
                 </label>
                 <label className="block text-sm">
-                  <span className="text-xs text-gray-600">
-                    组件路径（registry key，如 default / concrete-compress）
-                  </span>
-                  <input
-                    aria-label="组件路径"
-                    value={form.componentPath}
-                    onChange={(e) => setForm({ ...form, componentPath: e.target.value })}
-                    className="mt-1 w-full border rounded px-2 py-1.5 font-mono text-xs"
-                  />
-                </label>
-                <label className="block text-sm">
                   <span className="text-xs text-gray-600">config（JSON，空合法）</span>
                   <textarea
                     aria-label="config"
@@ -418,16 +395,6 @@ export function ParamInterfaceList() {
                     aria-label="描述"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="mt-1 w-full border rounded px-2 py-1.5"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="text-xs text-gray-600">排序</span>
-                  <input
-                    aria-label="排序"
-                    type="number"
-                    value={form.sortOrder}
-                    onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
                     className="mt-1 w-full border rounded px-2 py-1.5"
                   />
                 </label>

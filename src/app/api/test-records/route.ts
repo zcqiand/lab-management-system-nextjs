@@ -39,6 +39,8 @@ export async function POST(req: Request) {
     id: `TR-${Date.now().toString(36)}`,
     sampleId: String(body.sampleId ?? ""),
     parameterCode: String(body.parameterCode ?? ""),
+    // ADR-0056：动态表单采集原值，缺省 {}（requirementCode 已随契约删除）
+    data: (body.data ?? {}) as Record<string, unknown>,
     requirement: String(body.requirement ?? ""),
     result: String(body.result ?? ""),
     createdAt: NOW(),

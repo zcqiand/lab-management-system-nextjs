@@ -207,20 +207,24 @@ describe("M06.F07 报告名称维护面", () => {
 });
 
 describe("M06.F08 参数界面维护面", () => {
-  fnTest(["M06.F08.I01"], "列表渲染标题 + 表头 5 列（fixtures 穿透）", async () => {
-    render(<ParamInterfaceList />);
-    await flush();
-    expect(screen.getByText("参数界面")).toBeTruthy();
-    expect(screen.getByRole("columnheader", { name: "编码" })).toBeTruthy();
-    expect(screen.getByRole("columnheader", { name: "组件路径" })).toBeTruthy();
-    await waitFor(() => {
-      expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
-    });
-  });
+  fnTest(
+    ["M06.F08.I01"],
+    "列表渲染标题 + 表头 4 列（fixtures 穿透；组件路径列随 ADR-0056 退役）",
+    async () => {
+      render(<ParamInterfaceList />);
+      await flush();
+      expect(screen.getByText("参数界面")).toBeTruthy();
+      expect(screen.getByRole("columnheader", { name: "编码" })).toBeTruthy();
+      expect(screen.queryByRole("columnheader", { name: "组件路径" })).toBeNull();
+      await waitFor(() => {
+        expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
+      });
+    },
+  );
 
   fnTest(
     ["M06.F08.I02"],
-    "新建按钮开弹窗：code/name/componentPath/config 字段齐备",
+    "新建按钮开弹窗：code/name/config 字段齐备（componentPath/sortOrder 已退役）",
     async () => {
       render(<ParamInterfaceList />);
       await flush();

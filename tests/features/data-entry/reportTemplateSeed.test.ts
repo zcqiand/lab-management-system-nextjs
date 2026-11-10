@@ -6,8 +6,11 @@ import {
 } from "@/features/data-entry/reportTemplateSeed";
 
 describe("reportTemplateSeed", () => {
-  it("同 parameterCode 确定性输出", () => {
-    expect(mockResult("IP-0001")).toEqual(mockResult("IP-0001"));
+  it("同 parameterCode 确定性输出（含 data 快照）", () => {
+    const a = mockResult("IP-0001");
+    const b = mockResult("IP-0001");
+    expect(a).toEqual(b);
+    expect(a.data).toEqual(b.data);
   });
 
   it("不同 parameterCode 产生不同检测值", () => {
@@ -79,17 +82,26 @@ describe("reportTemplateSeed", () => {
     expect(v).toBeLessThanOrEqual(300);
   });
 
-  it("requirement 参数覆盖内部技术要求文案但不影响数值", () => {
+  it("requirement 参数覆盖内部技术要求文案但不影响数值与 data", () => {
     const plain = mockResult("IP-0086");
     const overridden = mockResult("IP-0086", "客户特别要求 ≥420");
     // 数值仍按真技术要求（≥400）确定性生成
     expect(overridden.jcz).toBe(plain.jcz);
     expect(overridden.dw).toBe(plain.dw);
     expect(overridden.jd).toBe("合格");
+    // ADR-0056：data 快照同样不受 requirement 影响
+    expect(overridden.data).toEqual(plain.data);
   });
 
-  it('未知 code（name 查不到）走 fallback：jcz="—" dw="" jd="合格"', () => {
+  it("强度类 mock 的 data 快照照强度卡 JSON 键形状（strengths/representative）", () => {
+    const m = mockResult("IP-0086"); // 屈服强度 → MPa
+    const arr = (m.data.strengths as number[]) ?? [];
+    expect(arr.length).toBeGreaterThan(0);
+    expect(arr[0]).toBe(Number(m.jcz));
+  });
+
+  it('未知 code（name 查不到）走 fallback：jcz="—" dw="" jd="合格" data={}', () => {
     const m = mockResult("IP-9999-strong");
-    expect(m).toEqual({ jcz: "—", dw: "", jd: "合格" });
+    expect(m).toEqual({ jcz: "—", dw: "", jd: "合格", data: {} });
   });
 });

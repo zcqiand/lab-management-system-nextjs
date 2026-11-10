@@ -691,6 +691,8 @@ export const testRecordsExtraHandlers = [
       id: newId("TR"),
       sampleId: String(body.sampleId ?? ""),
       parameterCode: String(body.parameterCode ?? ""),
+      // ADR-0056：动态表单采集原值，缺省 {}（requirementCode 已随契约删除）
+      data: (body.data ?? {}) as Record<string, unknown>,
       requirement: String(body.requirement ?? ""),
       result: String(body.result ?? ""),
       createdAt: NOW(),
@@ -1179,6 +1181,21 @@ export const m06ExtraHandlers = [
     if (i >= 0) inspectionParamInterfaceLinks.splice(i, 1);
     return new HttpResponse(null, { status: 204 });
   }),
+  // 参数界面 POST 定制（ADR-0056）：version 缺省 1（契约必返字段，服务端管理），
+  // 其余字段透传；componentPath 已随契约删除，无必填校验。
+  // 注册顺序在 dictCrud 之前——msw first-match-wins，POST 走本 handler。
+  http.post(`${BASE}/param-interfaces`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const now = NOW();
+    const entry = {
+      createdAt: now,
+      updatedAt: now,
+      ...body,
+      version: (body["version"] as number | undefined) ?? 1,
+    } as never;
+    inspectionParamInterfaces.push(entry);
+    return HttpResponse.json(entry, { status: 201 });
+  }),
   ...dictCrud(`${BASE}/param-interfaces`, inspectionParamInterfaces as unknown as { code: string }[], getInspectionParamInterface as (c: string) => { code: string } | undefined, "InspectionParamInterface", true),
   http.get(`${BASE}/param-interfaces/:code`, ({ params }) => {
     const p = getInspectionParamInterface(String(params.code));
@@ -1203,7 +1220,11 @@ export const m06ExtraHandlers = [
       inspectionParameterCode: String(b["inspectionParameterCode"]),
       paramInterfaceCode: String(b["paramInterfaceCode"]),
       reportNameCode: b["reportNameCode"] === undefined ? undefined : String(b["reportNameCode"]),
-      config: b["config"] as (typeof inspectionParamInterfaceLinks)[number]["config"],
+      // ADR-0056 追加裁定：link 去 config，绑定检测依据走 inspectionStandardCode
+      inspectionStandardCode:
+        b["inspectionStandardCode"] === undefined
+          ? undefined
+          : String(b["inspectionStandardCode"]),
       createdAt: now,
       updatedAt: now,
     } as (typeof inspectionParamInterfaceLinks)[number];

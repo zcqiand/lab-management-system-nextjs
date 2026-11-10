@@ -4,7 +4,8 @@ import { seedData, tablesOf } from "../../helpers/seed";
 const { receiptTable, sampleTable, testRecordTable, orgInfoTable } = tablesOf();
 import { assembleReport, flattenForDocx } from "@/features/data-entry/reportTemplateData";
 import { resolveInterfaceByParam } from "@/features/data-entry/models/resolveInterfaceByParam";
-import { MODEL_REGISTRY } from "@/features/data-entry/models/registry";
+import { parseFormSchema } from "@/features/data-entry/models/schema";
+import { REGISTRY } from "@/features/data-entry/models/algorithms";
 import reportNames from "@/data/generated/inspection-report-name.json";
 import rnParams from "@/data/generated/inspection-report-name-parameter.json";
 import inspectionParamInterfaces from "@/data/generated/inspection-param-interface.json";
@@ -89,12 +90,19 @@ describe("录入卡 → 报告模板 取数链路", () => {
 
   fnTest(
     ["M06.F08.I04"],
-    "每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
+    "每个界面的 schema 都能被 parseFormSchema 解析，computed 派发键都在算法注册表内",
     () => {
-      const missing = (inspectionParamInterfaces as ParamInterfaceRow[])
-        .map((p) => p.componentPath)
-        .filter((cp) => !(cp in MODEL_REGISTRY));
-      expect(missing).toEqual([]);
+      const problems: string[] = [];
+      for (const p of inspectionParamInterfaces as ParamInterfaceRow[]) {
+        const schema = parseFormSchema(p.config);
+        // 无 computed 的界面（default）→ null = 通用采集卡回退，合法
+        if (schema === null) continue;
+        for (const c of schema.computed) {
+          const key = c.variant ?? c.algorithm;
+          if (!(key in REGISTRY)) problems.push(`${p.code}: ${key}`);
+        }
+      }
+      expect(problems).toEqual([]);
     },
   );
 
@@ -169,27 +177,36 @@ describe("录入卡 → 报告模板 取数链路", () => {
     expect(rows[0]!.dbz).not.toBe("");
   });
 
-  fnTest(["M06.F08.I04"], "模板 record:/srecord: 引用的参数都绑定了非默认录入卡", () => {
-    const interfaces = inspectionParamInterfaces as ParamInterfaceRow[];
-    const links = inspectionParamInterfaceLinks as ParamInterfaceLink[];
-    // 结构化取数（record:/srecord:）只有在参数绑了会输出 JSON 的卡时才成立；
-    // 回退到 DefaultParamCard 就是纯文本，模板路径必然取空。
-    const cases: Array<[string, string]> = [
-      ["RN-103-1", "IP-0577"],
-      ["RN-103-2", "IP-0577"],
-      ["RN-103-3", "IP-0577"],
-      ["RN-103-4", "IP-0577"],
-      ["RN-105-2", "IP-0190"],
-      ["RN-109-1", "IP-0226"],
-      ["RN-109-2", "IP-0456"],
-      ["RN-109-3", "IP-0456"],
-      ["RN-102-3", "IP-0087"],
-      ["RN-102-2", "IP-0087"],
-    ];
-    for (const [rn, param] of cases) {
-      const map = resolveInterfaceByParam(interfaces, links, rn);
-      expect(map[param], `${rn} / ${param} 未绑定参数界面`).toBeDefined();
-      expect(map[param]!.componentPath).not.toBe("default");
-    }
-  });
+  fnTest(
+    ["M06.F08.I04"],
+    "模板 record:/srecord: 引用的参数都绑定了带 computed 的 schema",
+    () => {
+      const interfaces = inspectionParamInterfaces as ParamInterfaceRow[];
+      const links = inspectionParamInterfaceLinks as ParamInterfaceLink[];
+      // 结构化取数（record:/srecord:）只有在参数绑了会输出 JSON 的 schema 时才成立；
+      // 回退到通用采集卡就是纯文本，模板路径必然取空。
+      const cases: Array<[string, string]> = [
+        ["RN-103-1", "IP-0577"],
+        ["RN-103-2", "IP-0577"],
+        ["RN-103-3", "IP-0577"],
+        ["RN-103-4", "IP-0577"],
+        ["RN-105-2", "IP-0190"],
+        ["RN-109-1", "IP-0226"],
+        ["RN-109-2", "IP-0456"],
+        ["RN-109-3", "IP-0456"],
+        ["RN-102-3", "IP-0087"],
+        ["RN-102-2", "IP-0087"],
+      ];
+      for (const [rn, param] of cases) {
+        const map = resolveInterfaceByParam(interfaces, links, rn);
+        expect(map[param], `${rn} / ${param} 未绑定参数界面`).toBeDefined();
+        const schema = parseFormSchema(map[param]!.config);
+        expect(schema, `${rn} / ${param} schema 不可解析`).not.toBeNull();
+        expect(
+          schema!.computed.length,
+          `${rn} / ${param} 无 computed（通用卡回退）`,
+        ).toBeGreaterThan(0);
+      }
+    },
+  );
 });

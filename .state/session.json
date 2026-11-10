@@ -1,13 +1,17 @@
 {
   "schema": 1,
   "project": "lab-management-system-nextjs",
-  "current_task": "DB 六裁定回放收官（ADR-0055 首仓回放）——pull schema + 查询层/测试/seeds 全落账，双 gate 全绿",
+  "current_task": "动态表单改造（ADR-0056 首仓回放）——schema 渲染 + 算法域承接 + live 排障收官，gate 全绿",
   "done": [
-    "src/db/schema.ts pull 重出（六裁定全量换血；7 处纯 CHECK 回调去 table 参数）",
-    "db-queries.ts：catalogCfg 去 tenantCol（catalog 全局共享，401 边界不变）+ DictCfg.junctionDirect 机制（objects 专项过滤走 junction 值匹配，六裁定 #5）+ 4 处时间列空串兜底退役（timestamptz 化连带）",
-    "src/seeds 双源同步（两个 JSON 以本仓 prettier 规范形为准写回 shared，parity 字节等双向成立）",
-    "tests/api/dict-pg.test.ts 语义重写（objects 直挂列/brands 租户对照退役，catalog 全局共享语义）+ receipts-pg.test.ts 合同种子显式补 tenant_id",
-    "全量 vitest 80 文件 536 测试全绿；gate L0-L5 exit 0"
+    "src/db/schema.ts 重 pull（三表新结构）；orval 端点模型重生成（paramInterface/paramInterfaceLink/testRecord）",
+    "前端渲染链：DynamicFormRenderer（schema 解析 gate + GenericParamCard 兜底）+ models/schema.ts 8 字段类型 + algorithms.ts 17 键 registry（variant ?? algorithm 派发）；11 张内嵌卡 + registry 退役，算法域新增 concrete/gradation/soil/requirement",
+    "resolveInterfaceByParam 重写：三级作用域特异性（inspectionStandardCode > reportNameCode > 兜底），去 sortOrder",
+    "报告模板链 reportTemplateData 六处改 rec.data 直读（result JSON 兜底过渡债，测试锁定）；record:/srecord: 路径语法不变",
+    "后端路由：POST param-interfaces（config 必须对象/版本缺省 1/[code] 删内置守卫退役）+ links（inspectionStandardCode 过滤/写入）+ test-records（data 落 {}）",
+    "vendor/msw 全同步（seeds/schema/handlers orval 重生成/handlers-extra/flow-matrix）；node_modules @lab/management-system-msw 陈旧副本 + .next 编译缓存不追踪 node_modules 变更 = live 旧形状根因，rm -rf .next 重启解决（挂账：下次 vendor 再变需重装或清 .next）",
+    "全量 vitest 78 文件 530 绿（+1 skip 既有）；tsc 全仓绿；gate 全绿（prettier 4 文件漂移已修）",
+    "live 验证：5201 重启（默认 msw 模式），param-interfaces 18/18 schema 化、test-records 带 data、links 带 inspectionStandardCode，/data-entry 200",
+    "fnTest 新增 M06.F08.I01 三条（POST 契约语义回放）；CHANGELOG ADR-0056 段落"
   ],
   "next": [
     "兄弟仓回放队列（shared CHANGELOG [Unreleased] 七步清单）：aspnetcore/springboot/rails/react/vue/fastapi/laravel/go/ktor/django 按家族批次排队",
@@ -20,5 +24,6 @@
   ],
   "active_branch": "master",
   "last_session_at": "2026-11-10",
-  "last_session_summary": "DB 六裁定回放收官：pull schema 重出 + catalog 全局共享/junctionDirect + 时间空串兜底退役 + dict/receipts-pg 测试回放 + seeds 双源同步，536 测试与 gate L0-L5 全绿"
+  "last_session_summary": "DB 六裁定回放收官：pull schema 重出 + catalog 全局共享/junctionDirect + 时间空串兜底退役 + dict/receipts-pg 测试回放 + seeds 双源同步，536 测试与 gate L0-L5 全绿",
+  "history": []
 }

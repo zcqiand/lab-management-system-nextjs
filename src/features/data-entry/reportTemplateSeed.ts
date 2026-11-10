@@ -78,12 +78,16 @@ const DEFAULT_RANGE = { min: 1, max: 100 } as const;
 const PERCENT_FALLBACK_RANGE = { min: 0.5, max: 8 } as const;
 
 /** 未知 code（参数名查不到）的固定 fallback。 */
-const UNKNOWN_RESULT: MockResult = { jcz: "—", dw: "", jd: "合格" };
+const UNKNOWN_RESULT: MockResult = { jcz: "—", dw: "", jd: "合格", data: {} };
 
 export interface MockResult {
   jcz: string;
   dw: string;
   jd: string;
+  /** ADR-0056：与 TestRecord.data 同形的动态表单快照（演示兜底用）。
+   *  强度类参数照参数卡现有 JSON 键（strengths/representative），不发明新键名；
+   *  非强度类参数无卡片键可循 → 空对象（摘要即 jcz 本身）。 */
+  data: Record<string, unknown>;
 }
 
 export function inferUnit(name: string): string {
@@ -220,7 +224,13 @@ export function mockResult(parameterCode: string, requirement?: string): MockRes
   }
 
   const d = decimals(rangeMin, rangeMax);
-  // 引用 requirement 以保留参数语义（留给后续 assembleReport 使用）
+  // 引用 requirement 以保留参数语义（留给后续 assembleReport 使用）；不影响数值与 data
   void requirement;
-  return { jcz: value.toFixed(d), dw, jd: "合格" };
+  const shown = value.toFixed(d);
+  const v = Number(shown);
+  // ADR-0056：data 快照照参数卡现有 JSON 键形状——强度类（MPa）用 ConcreteCompress 卡
+  // 已在用的 strengths/representative；其余参数卡片键因参而异、mock 无从对齐 → 空对象。
+  const data: Record<string, unknown> =
+    dw === "MPa" ? { strengths: [v], representative: v } : {};
+  return { jcz: shown, dw, jd: "合格", data };
 }

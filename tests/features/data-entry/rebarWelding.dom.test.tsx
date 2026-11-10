@@ -10,13 +10,17 @@ import {
   EMPTY_TENSILE,
   type TensileSpecimen,
 } from "@/features/data-entry/models/rebar-welding";
-import { RebarWeldingTensileCard } from "@/features/data-entry/models/RebarWeldingTensileCard";
-import { RebarWeldingBendCard } from "@/features/data-entry/models/RebarWeldingBendCard";
+import { DynamicFormRenderer } from "@/features/data-entry/DynamicFormRenderer";
 import type { ParamModelProps } from "@/features/data-entry/models/types";
 import type { InspectionParameter } from "@/api/endpoints/model";
 import type { TechnicalRequirementRow as InspectionTechnicalRequirement } from "@/features/data-entry/models/types";
 
-/** REQ-2026-015：钢筋焊接接头参数界面（抗拉强度 1 样品 = 3 试件 / 弯曲性能 4 试件 × 3 次），JGJ/T 27-2014 公式。 */
+/**
+ * REQ-2026-015 / ADR-0056：钢筋焊接接头（抗拉 3 试件 / 弯曲 3 试件）——纯算法
+ * 留在 models/rebar-welding.ts，渲染由 schema 驱动的 DynamicFormRenderer 承接
+ * （variant welding_tensile / welding_bend）。schema 与
+ * src/seeds/inspection_param_interfaces.json 同构。
+ */
 
 const PARAM: InspectionParameter = {
   code: "IP-0087",
@@ -176,50 +180,107 @@ describe("parseBendRecord 反解析（扁平结构：1 样品 = 3 试件）", ()
   });
 });
 
-describe("RebarWeldingTensileCard UI（1 样品 = 3 试件，扁平，规格 Φ22 硬编码）", () => {
+const TENSILE_SCHEMA = {
+  fields: [
+    {
+      field: "loads",
+      type: "number_series",
+      label: "最大荷重 (kN)",
+      count: 3,
+      unit: "kN",
+    },
+    {
+      field: "fractureDistances",
+      type: "number_series",
+      label: "断口距 (mm)",
+      count: 3,
+      unit: "mm",
+    },
+    { field: "fractureFeatures", type: "input_series", label: "断裂特征", count: 3 },
+  ],
+  computed: [
+    {
+      field: "strengths",
+      algorithm: "steel_tensile",
+      variant: "welding_tensile",
+      from: ["loads"],
+      label: "抗拉强度 (MPa)",
+    },
+  ],
+  params: { diameter: 22 },
+};
+
+const BEND_SCHEMA = {
+  fields: [
+    {
+      field: "angles",
+      type: "number_series",
+      label: "弯曲角度 (°)",
+      count: 3,
+      defaultValue: 90,
+    },
+    {
+      field: "results",
+      type: "select_series",
+      label: "弯曲结果",
+      count: 3,
+      defaultValue: "合格",
+      options: ["合格", "不合格"],
+    },
+  ],
+  computed: [
+    {
+      field: "verdictDraft",
+      algorithm: "manual",
+      variant: "welding_bend",
+      from: ["results"],
+      label: "弯曲性能评定",
+    },
+  ],
+};
+
+describe("焊接抗拉 UI（welding_tensile，1 样品 = 3 试件，规格 Φ22 进 params）", () => {
   beforeEach(() => cleanup()); // 防上一测试 DOM 残留干扰
-  it("空 record → 显示规格 Φ22 硬编码 + 1 共享技术要求 + 3 行输入（无 d 输入框，无「试件 #N」分组）", () => {
-    render(<RebarWeldingTensileCard {...makeProps()} />);
-    // 规格 Φ22 硬编码：UI 上显示但不录入
-    expect(screen.getByText("规格 Φ22")).toBeTruthy();
-    expect(screen.getByLabelText("公称直径（硬编码）")).toBeTruthy();
-    // 没有「直径」输入框（d 已硬编码，不再录入）
-    expect(screen.queryByPlaceholderText("直径")).toBeNull();
-    expect(screen.queryByLabelText("公称直径")).toBeNull();
-    // 共享技术要求 1 个
+  it("空 record → 1 共享技术要求 + 3 行输入（最大荷重 / 断口距 / 断裂特征）", () => {
+    render(<DynamicFormRenderer {...makeProps({ config: TENSILE_SCHEMA })} />);
     expect(screen.getAllByLabelText("技术要求", { selector: "select" })).toHaveLength(1);
-    // 最大荷重 / 断口距 / 断裂特征 各 3 个（3 试件）
     expect(screen.getAllByLabelText(/最大荷重/)).toHaveLength(TRIAL_COUNT);
     expect(screen.getAllByLabelText(/断口距/)).toHaveLength(TRIAL_COUNT);
     expect(screen.getAllByLabelText(/断裂特征/)).toHaveLength(TRIAL_COUNT);
   });
 
-  it("输入 F=270kN（d 硬编码 Φ22）→ 抗拉强度列显示 710.3 MPa", () => {
-    render(<RebarWeldingTensileCard {...makeProps()} />);
-    fireEvent.change(screen.getAllByLabelText(/最大荷重/)[0]!, {
-      target: { value: "270" },
-    });
-    // 抗拉强度列在 <td class="py-1 text-gray-700"> 里，精确锁定避免与「均值：710.3」混淆
-    const strengthCells = document.querySelectorAll("td.py-1.text-gray-700");
-    expect(strengthCells[0]?.textContent).toBe("710.3");
+  it("输入 F=270kN ×3（Φ22 硬编码在 params）→ 抗拉强度均值 710.3 + onChange 上报 strengths", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <DynamicFormRenderer {...makeProps({ config: TENSILE_SCHEMA, onChange })} />,
+    );
+    const loadInputs = screen.getAllByLabelText(/最大荷重/);
+    loadInputs.forEach((el) => fireEvent.change(el, { target: { value: "270" } }));
+    // d=22, F=270 → Rm = 710.3；均值同值；显示行「{label}：{display}」分跨两节点，取容器文本断言
+    const disp = container.querySelector("div.text-xs.text-gray-600");
+    expect(disp?.textContent).toContain("抗拉强度 (MPa)：710.3");
+    const last = onChange.mock.calls.at(-1)![0] as {
+      data: { strengths?: number[]; mean?: number };
+    };
+    expect(last.data.strengths).toEqual([710.3, 710.3, 710.3]);
+    expect(last.data.mean).toBe(710.3);
   });
 
   it("均值 ≥ 技术要求 → 自动判 合格", () => {
-    render(<RebarWeldingTensileCard {...makeProps()} />);
-    fireEvent.change(screen.getAllByLabelText("技术要求", { selector: "select" })[0]!, {
-      target: { value: REQ.id },
-    });
+    render(<DynamicFormRenderer {...makeProps({ config: TENSILE_SCHEMA })} />);
     const loadInputs = screen.getAllByLabelText(/最大荷重/);
     // d=22, F=270 → Rm≈710 MPa；技术要求 ≥540 → 合格
-    fireEvent.change(loadInputs[0]!, { target: { value: "270" } });
-    fireEvent.change(loadInputs[1]!, { target: { value: "270" } });
-    fireEvent.change(loadInputs[2]!, { target: { value: "270" } });
+    loadInputs.forEach((el) => fireEvent.change(el, { target: { value: "270" } }));
     expect(screen.getAllByText("合格").length).toBeGreaterThan(0);
   });
 
   it("readOnly → onChange 不被调用（输入吞掉）", () => {
     const onChange = vi.fn();
-    render(<RebarWeldingTensileCard {...makeProps({ readOnly: true, onChange })} />);
+    render(
+      <DynamicFormRenderer
+        {...makeProps({ config: TENSILE_SCHEMA, readOnly: true, onChange })}
+      />,
+    );
     fireEvent.change(screen.getAllByLabelText(/最大荷重/)[0]!, {
       target: { value: "270" },
     });
@@ -227,23 +288,41 @@ describe("RebarWeldingTensileCard UI（1 样品 = 3 试件，扁平，规格 Φ2
   });
 });
 
-describe("RebarWeldingBendCard UI（1 样品 = 3 试件，扁平）", () => {
+describe("焊接弯曲 UI（welding_bend，1 样品 = 3 试件）", () => {
   beforeEach(() => cleanup());
-  it("空 record → 3 行（每行 1 角度 + 1 结果，无「试件 #N」分组）", () => {
-    render(<RebarWeldingBendCard {...makeProps({ parameter: BEND_PARAM })} />);
+  it("空 record → 3 行（每行 1 角度 + 1 结果，角度/结果取 defaultValue）", () => {
+    render(
+      <DynamicFormRenderer
+        {...makeProps({ parameter: BEND_PARAM, config: BEND_SCHEMA })}
+      />,
+    );
     expect(screen.getAllByLabelText(/弯曲角度/)).toHaveLength(TRIAL_COUNT);
     expect(screen.getAllByLabelText(/弯曲结果/)).toHaveLength(TRIAL_COUNT);
+    const angles = screen.getAllByLabelText(/弯曲角度/) as HTMLInputElement[];
+    expect(angles.every((el) => el.value === "90")).toBe(true);
+    const results = screen.getAllByLabelText(/弯曲结果/) as HTMLSelectElement[];
+    expect(results.every((el) => el.value === "合格")).toBe(true);
   });
 
   it("3 件全合格 → 整体 合格", () => {
-    render(<RebarWeldingBendCard {...makeProps({ parameter: BEND_PARAM })} />);
-    expect(screen.getAllByText("合格").length).toBeGreaterThan(0);
+    const { container } = render(
+      <DynamicFormRenderer
+        {...makeProps({ parameter: BEND_PARAM, config: BEND_SCHEMA })}
+      />,
+    );
+    const disp = container.querySelector("div.text-xs.text-gray-600");
+    expect(disp?.textContent).toContain("弯曲性能评定：合格");
   });
 
   it("任一件不合格 → 整体 不合格", () => {
-    render(<RebarWeldingBendCard {...makeProps({ parameter: BEND_PARAM })} />);
+    const { container } = render(
+      <DynamicFormRenderer
+        {...makeProps({ parameter: BEND_PARAM, config: BEND_SCHEMA })}
+      />,
+    );
     const selects = screen.getAllByLabelText(/弯曲结果/) as HTMLSelectElement[];
     fireEvent.change(selects[1]!, { target: { value: "不合格" } });
-    expect(screen.getAllByText("不合格").length).toBeGreaterThan(0);
+    const disp = container.querySelector("div.text-xs.text-gray-600");
+    expect(disp?.textContent).toContain("弯曲性能评定：不合格");
   });
 });

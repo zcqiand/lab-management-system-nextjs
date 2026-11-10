@@ -95,7 +95,7 @@
         "output\\lab-management-system-contract-test\\tests\\summary.test.ts:1977 (annot)",
         "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:1119 (annot)",
         "output\\lab-management-system-contract-test\\tests\\technical-requirements.test.ts:1996 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:664 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:810 (annot)",
         "output\\lab-management-system-contract-test\\tests\\test-records.test.ts:2104 (annot)"
       ],
       "entry": [
@@ -132,12 +132,12 @@
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:7980 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:3332 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:3710 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1110 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:1248 (annot)",
         "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:3716 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:2944 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2321 (annot)",
         "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:2468 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2177 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2333 (annot)"
       ],
       "entry": [
         "src/app/api/auth/menus/route.ts"
@@ -270,12 +270,12 @@
         "output\\lab-management-system-contract-test\\tests\\contracts.test.ts:8707 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog.test.ts:3496 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary.test.ts:2942 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2285 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2465 (annot)",
         "output\\lab-management-system-contract-test\\tests\\report-names-write.test.ts:4374 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts-write.test.ts:3538 (annot)",
         "output\\lab-management-system-contract-test\\tests\\samples-write.test.ts:2964 (annot)",
         "output\\lab-management-system-contract-test\\tests\\technical-requirements-write.test.ts:3165 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2812 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:2978 (annot)"
       ],
       "entry": [
         "src/api/legacy-client.ts"
@@ -783,7 +783,7 @@
       ],
       "tests": [
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/concretePermeabilityReachability.dom.test.tsx::EntryModal 打开 RC-2024-0712-02 渲染 concrete-permeability 卡（含「抗渗等级」label）",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntryModelDispatch.dom.test.tsx::按参数界面关联派发模型",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntryModelDispatch.dom.test.tsx::按参数界面 schema 派发渲染",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 保存后切回 S1 看不到 dirty 值（已落库清掉）",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySampleSwitchIsolation.dom.test.tsx::S1 输入破坏荷载 1 试件后切到 S2，S2 不被脏写",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/dataEntrySeedMigration.dom.test.tsx::RC-2024-0705-01-S1 显示 IP-0055 抗压强度参数卡（不再\"无可录入的检测参数\"）",
@@ -798,10 +798,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/samples/sampleStore.dom.test.ts::updateSample 成功后 list 中对应项更新"
       ],
       "entry": [
-        "src/features/data-entry/DataEntryPage.tsx",
-        "src/features/data-entry/models/ParticleGradationCard.tsx",
-        "src/features/data-entry/models/SoilCompactionCard.tsx",
-        "src/features/data-entry/models/SoilCompactionDegreeCard.tsx"
+        "src/features/data-entry/DataEntryPage.tsx"
       ]
     },
     "M03.F03.I04": {
@@ -1529,10 +1526,10 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：新建按钮开弹窗（检测项目/名称/备注表单）",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:4260 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:4367 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:2959 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3139 (annot)",
         "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:3566 (annot)",
         "output\\lab-management-system-contract-test\\tests\\sample-receipts.test.ts:3250 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:3427 (annot)"
+        "output\\lab-management-system-contract-test\\tests\\test-records-write.test.ts:3593 (annot)"
       ],
       "entry": []
     },
@@ -1546,7 +1543,7 @@
       "tests": [
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5030 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:5553 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3581 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:3761 (annot)",
         "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:4662 (annot)"
       ],
       "entry": []
@@ -1564,7 +1561,7 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/dicts/categoryDictPages.dom.test.tsx::型号维护：行内删除按钮开确认弹窗",
         "output\\lab-management-system-contract-test\\tests\\inspection-catalog-write.test.ts:5695 (annot)",
         "output\\lab-management-system-contract-test\\tests\\inspection-dictionary-write.test.ts:6223 (annot)",
-        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:4519 (annot)",
+        "output\\lab-management-system-contract-test\\tests\\param-interfaces-write.test.ts:4699 (annot)",
         "output\\lab-management-system-contract-test\\tests\\report-names.test.ts:5800 (annot)"
       ],
       "entry": []
@@ -2686,7 +2683,10 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 5 列（fixtures 穿透）"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/param-interfaces-route.test.ts::POST config 非对象（数组）→ 400 BAD_REQUEST",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/param-interfaces-route.test.ts::POST 无 componentPath → 201（componentPath 已随契约删除，不再必填）",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/api/param-interfaces-route.test.ts::POST 缺 version → 落服务端缺省 1",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::列表渲染标题 + 表头 4 列（fixtures 穿透；组件路径列随 ADR-0056 退役）"
       ],
       "entry": [
         "src/features/inspection-capability/ParamInterfaceList.tsx"
@@ -2702,7 +2702,7 @@
         "docs\\design\\design-function-map.md"
       ],
       "tests": [
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/componentPath/config 字段齐备"
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/inspection-capability/maintenance.dom.test.tsx::新建按钮开弹窗：code/name/config 字段齐备（componentPath/sortOrder 已退役）"
       ],
       "entry": [
         "src/features/inspection-capability/ParamInterfaceList.tsx"
@@ -2734,8 +2734,8 @@
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::参数界面关联的 paramInterfaceCode 全部存在于 inspection-param-interface.json",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::土工击实报告取到 5 组数据与峰值",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::抗渗报告三个样品块分别取到各自样品的数据",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了非默认录入卡",
-        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个界面的 componentPath 都能在 MODEL_REGISTRY 解析到组件",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::模板 record:/srecord: 引用的参数都绑定了带 computed 的 schema",
+        "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::每个界面的 schema 都能被 parseFormSchema 解析，computed 派发键都在算法注册表内",
         "D:/qiand-life/1-projects/xr-code-suite/output/lab-management-system-nextjs/tests/features/data-entry/entryToReportChain.test.ts::颗粒级配落库形状带累计筛余与细度模数"
       ],
       "entry": [

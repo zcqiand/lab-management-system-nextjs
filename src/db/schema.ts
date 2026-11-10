@@ -4,425 +4,17 @@ import {
   text,
   boolean,
   integer,
-  jsonb,
   timestamp,
   index,
-  foreignKey,
   uniqueIndex,
+  foreignKey,
+  jsonb,
   serial,
   bigint,
   primaryKey,
   numeric,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-
-export const inspectionParamInterfaces = pgTable(
-  "inspection_param_interfaces",
-  {
-    code: text().primaryKey().notNull(),
-    name: text(),
-    componentPath: text("component_path").notNull(),
-    description: text(),
-    isOfficial: boolean("is_official"),
-    sortOrder: integer("sort_order").default(0).notNull(),
-    config: jsonb(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-  },
-  () => {
-    return {
-      inspectionParamInterfacesCreatedAtNotNull: check(
-        "inspection_param_interfaces_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      inspectionParamInterfacesCodeNotNull: check(
-        "inspection_param_interfaces_code_not_null",
-        sql`NOT NULL code`,
-      ),
-      inspectionParamInterfacesComponentPathNotNull: check(
-        "inspection_param_interfaces_component_path_not_null",
-        sql`NOT NULL component_path`,
-      ),
-      inspectionParamInterfacesSortOrderNotNull: check(
-        "inspection_param_interfaces_sort_order_not_null",
-        sql`NOT NULL sort_order`,
-      ),
-      inspectionParamInterfacesUpdatedAtNotNull: check(
-        "inspection_param_interfaces_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-    };
-  },
-);
-
-export const inspectionSpecs = pgTable(
-  "inspection_specs",
-  {
-    code: text().primaryKey().notNull(),
-    inspectionObjectCode: text("inspection_object_code"),
-    name: text().notNull(),
-    remark: text(),
-    sortOrder: integer("sort_order").default(0).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-  },
-  (table) => {
-    return {
-      idxInspectionSpecsObject: index("idx_inspection_specs_object").using(
-        "btree",
-        table.inspectionObjectCode.asc().nullsLast().op("text_ops"),
-      ),
-      specsObjectFk: foreignKey({
-        columns: [table.inspectionObjectCode],
-        foreignColumns: [inspectionObjects.code],
-        name: "specs_object_fk",
-      }).onDelete("set null"),
-      inspectionSpecsCodeNotNull: check(
-        "inspection_specs_code_not_null",
-        sql`NOT NULL code`,
-      ),
-      inspectionSpecsNameNotNull: check(
-        "inspection_specs_name_not_null",
-        sql`NOT NULL name`,
-      ),
-      inspectionSpecsSortOrderNotNull: check(
-        "inspection_specs_sort_order_not_null",
-        sql`NOT NULL sort_order`,
-      ),
-      inspectionSpecsCreatedAtNotNull: check(
-        "inspection_specs_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      inspectionSpecsUpdatedAtNotNull: check(
-        "inspection_specs_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-    };
-  },
-);
-
-export const sampleReceipts = pgTable(
-  "sample_receipts",
-  {
-    id: text().primaryKey().notNull(),
-    contractId: text("contract_id").notNull(),
-    commissionCode: text("commission_code").notNull(),
-    commissionDate: text("commission_date").notNull(),
-    commissionRegisterCode: text("commission_register_code"),
-    commissionRegisterDate: text("commission_register_date"),
-    categoryCode: text("category_code").notNull(),
-    projectName: text("project_name"),
-    clientUnit: text("client_unit"),
-    buildingUnit: text("building_unit"),
-    supervisorUnit: text("supervisor_unit"),
-    constructionUnit: text("construction_unit"),
-    witnessUnit: text("witness_unit"),
-    samplingLocation: text("sampling_location"),
-    witness: text(),
-    witnessPhone: text("witness_phone"),
-    inspector: text(),
-    inspectorPhone: text("inspector_phone"),
-    receivedBy: text("received_by").notNull(),
-    sampleSource: text("sample_source").notNull(),
-    testCategory: text("test_category").notNull(),
-    testEnvironment: text("test_environment"),
-    mainEquipment: text("main_equipment"),
-    testOperator: text("test_operator"),
-    testStartDate: text("test_start_date"),
-    testEndDate: text("test_end_date"),
-    originalRecordNo: text("original_record_no"),
-    remark: text(),
-    judgmentBasis: jsonb("judgment_basis"),
-    testingBasis: jsonb("testing_basis"),
-    testParameters: jsonb("test_parameters"),
-    ext: jsonb().default({}).notNull(),
-    flowStatus: text("flow_status").default("receiving").notNull(),
-    flowHistory: jsonb("flow_history").default([]).notNull(),
-    lastSubmittedBy: text("last_submitted_by"),
-    assigneeId: text("assignee_id"),
-    assigneeName: text("assignee_name"),
-    plannedTestDate: text("planned_test_date"),
-    reportCode: text("report_code"),
-    reportDate: text("report_date"),
-    conclusion: text(),
-    result: text(),
-    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    tenantId: text("tenant_id").notNull(),
-  },
-  (table) => {
-    return {
-      idxReceiptsTenant: index("idx_receipts_tenant").using(
-        "btree",
-        table.tenantId.asc().nullsLast().op("text_ops"),
-      ),
-      idxReceiptsTenantCommission: uniqueIndex("idx_receipts_tenant_commission").using(
-        "btree",
-        table.tenantId.asc().nullsLast().op("text_ops"),
-        table.commissionCode.asc().nullsLast().op("text_ops"),
-      ),
-      idxSampleReceiptsCategory: index("idx_sample_receipts_category").using(
-        "btree",
-        table.categoryCode.asc().nullsLast().op("text_ops"),
-      ),
-      idxSampleReceiptsContract: index("idx_sample_receipts_contract").using(
-        "btree",
-        table.contractId.asc().nullsLast().op("text_ops"),
-      ),
-      idxSampleReceiptsFlowStatus: index("idx_sample_receipts_flow_status").using(
-        "btree",
-        table.flowStatus.asc().nullsLast().op("text_ops"),
-      ),
-      sampleReceiptsContractFk: foreignKey({
-        columns: [table.contractId],
-        foreignColumns: [contracts.id],
-        name: "sample_receipts_contract_fk",
-      }).onDelete("restrict"),
-      receiptsCategoryFk: foreignKey({
-        columns: [table.categoryCode],
-        foreignColumns: [inspectionReportNames.code],
-        name: "receipts_category_fk",
-      }).onDelete("restrict"),
-      sampleReceiptsCreatedAtNotNull: check(
-        "sample_receipts_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      sampleReceiptsUpdatedAtNotNull: check(
-        "sample_receipts_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-      sampleReceiptsTenantIdNotNull: check(
-        "sample_receipts_tenant_id_not_null",
-        sql`NOT NULL tenant_id`,
-      ),
-      ckReceiptsFlowStatus: check(
-        "ck_receipts_flow_status",
-        sql`flow_status = ANY (ARRAY['receiving'::text, 'task_assignment'::text, 'data_entry'::text, 'review'::text, 'approval'::text, 'issuance'::text, 'archived'::text, 'completed'::text])`,
-      ),
-      sampleReceiptsIdNotNull: check("sample_receipts_id_not_null", sql`NOT NULL id`),
-      sampleReceiptsContractIdNotNull: check(
-        "sample_receipts_contract_id_not_null",
-        sql`NOT NULL contract_id`,
-      ),
-      sampleReceiptsCommissionCodeNotNull: check(
-        "sample_receipts_commission_code_not_null",
-        sql`NOT NULL commission_code`,
-      ),
-      sampleReceiptsCommissionDateNotNull: check(
-        "sample_receipts_commission_date_not_null",
-        sql`NOT NULL commission_date`,
-      ),
-      sampleReceiptsCategoryCodeNotNull: check(
-        "sample_receipts_category_code_not_null",
-        sql`NOT NULL category_code`,
-      ),
-      sampleReceiptsReceivedByNotNull: check(
-        "sample_receipts_received_by_not_null",
-        sql`NOT NULL received_by`,
-      ),
-      sampleReceiptsSampleSourceNotNull: check(
-        "sample_receipts_sample_source_not_null",
-        sql`NOT NULL sample_source`,
-      ),
-      sampleReceiptsTestCategoryNotNull: check(
-        "sample_receipts_test_category_not_null",
-        sql`NOT NULL test_category`,
-      ),
-      sampleReceiptsExtNotNull: check("sample_receipts_ext_not_null", sql`NOT NULL ext`),
-      sampleReceiptsFlowStatusNotNull: check(
-        "sample_receipts_flow_status_not_null",
-        sql`NOT NULL flow_status`,
-      ),
-      sampleReceiptsFlowHistoryNotNull: check(
-        "sample_receipts_flow_history_not_null",
-        sql`NOT NULL flow_history`,
-      ),
-    };
-  },
-);
-
-export const samples = pgTable(
-  "samples",
-  {
-    id: text().primaryKey().notNull(),
-    receiptId: text("receipt_id").notNull(),
-    sampleCode: text("sample_code").notNull(),
-    sampleName: text("sample_name"),
-    model: text(),
-    specification: text(),
-    grade: text(),
-    brand: text(),
-    manufacturer: text(),
-    structuralPart: text("structural_part"),
-    representQuantity: text("represent_quantity"),
-    sampleQuantity: text("sample_quantity"),
-    batchNumber: text("batch_number"),
-    supplyUnit: text("supply_unit"),
-    arrivalDate: text("arrival_date"),
-    samplingDate: text("sampling_date"),
-    curingCondition: text("curing_condition"),
-    age: text(),
-    ext: jsonb().default({}).notNull(),
-    remark: text(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    tenantId: text("tenant_id").notNull(),
-  },
-  (table) => {
-    return {
-      idxSamplesReceipt: index("idx_samples_receipt").using(
-        "btree",
-        table.receiptId.asc().nullsLast().op("text_ops"),
-      ),
-      idxSamplesTenantCode: uniqueIndex("idx_samples_tenant_code").using(
-        "btree",
-        table.tenantId.asc().nullsLast().op("text_ops"),
-        table.sampleCode.asc().nullsLast().op("text_ops"),
-      ),
-      samplesReceiptFk: foreignKey({
-        columns: [table.receiptId],
-        foreignColumns: [sampleReceipts.id],
-        name: "samples_receipt_fk",
-      }).onDelete("cascade"),
-      samplesModelFk: foreignKey({
-        columns: [table.model],
-        foreignColumns: [inspectionModels.code],
-        name: "samples_model_fk",
-      }).onDelete("set null"),
-      samplesSpecFk: foreignKey({
-        columns: [table.specification],
-        foreignColumns: [inspectionSpecs.code],
-        name: "samples_spec_fk",
-      }).onDelete("set null"),
-      samplesGradeFk: foreignKey({
-        columns: [table.grade],
-        foreignColumns: [inspectionGrades.code],
-        name: "samples_grade_fk",
-      }).onDelete("set null"),
-      samplesBrandFk: foreignKey({
-        columns: [table.brand],
-        foreignColumns: [inspectionBrands.code],
-        name: "samples_brand_fk",
-      }).onDelete("set null"),
-      samplesIdNotNull: check("samples_id_not_null", sql`NOT NULL id`),
-      samplesReceiptIdNotNull: check(
-        "samples_receipt_id_not_null",
-        sql`NOT NULL receipt_id`,
-      ),
-      samplesSampleCodeNotNull: check(
-        "samples_sample_code_not_null",
-        sql`NOT NULL sample_code`,
-      ),
-      samplesExtNotNull: check("samples_ext_not_null", sql`NOT NULL ext`),
-      samplesCreatedAtNotNull: check(
-        "samples_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      samplesUpdatedAtNotNull: check(
-        "samples_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-      samplesTenantIdNotNull: check(
-        "samples_tenant_id_not_null",
-        sql`NOT NULL tenant_id`,
-      ),
-    };
-  },
-);
-
-export const testRecords = pgTable(
-  "test_records",
-  {
-    id: text().primaryKey().notNull(),
-    sampleId: text("sample_id").notNull(),
-    parameterCode: text("parameter_code").notNull(),
-    standardCode: text("standard_code"),
-    requirementCode: text("requirement_code"),
-    requirement: text().notNull(),
-    result: text().notNull(),
-    verdict: text(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    tenantId: text("tenant_id").notNull(),
-  },
-  (table) => {
-    return {
-      idxTestRecordsSample: index("idx_test_records_sample").using(
-        "btree",
-        table.sampleId.asc().nullsLast().op("text_ops"),
-      ),
-      idxTestRecordsTenant: index("idx_test_records_tenant").using(
-        "btree",
-        table.tenantId.asc().nullsLast().op("text_ops"),
-      ),
-      testRecordsSampleFk: foreignKey({
-        columns: [table.sampleId],
-        foreignColumns: [samples.id],
-        name: "test_records_sample_fk",
-      }).onDelete("cascade"),
-      testrecParamFk: foreignKey({
-        columns: [table.parameterCode],
-        foreignColumns: [inspectionParameters.code],
-        name: "testrec_param_fk",
-      }).onDelete("restrict"),
-      testrecStandardFk: foreignKey({
-        columns: [table.standardCode],
-        foreignColumns: [inspectionStandards.code],
-        name: "testrec_standard_fk",
-      }).onDelete("set null"),
-      testRecordsIdNotNull: check("test_records_id_not_null", sql`NOT NULL id`),
-      testRecordsSampleIdNotNull: check(
-        "test_records_sample_id_not_null",
-        sql`NOT NULL sample_id`,
-      ),
-      testRecordsParameterCodeNotNull: check(
-        "test_records_parameter_code_not_null",
-        sql`NOT NULL parameter_code`,
-      ),
-      testRecordsRequirementNotNull: check(
-        "test_records_requirement_not_null",
-        sql`NOT NULL requirement`,
-      ),
-      testRecordsResultNotNull: check(
-        "test_records_result_not_null",
-        sql`NOT NULL result`,
-      ),
-      testRecordsCreatedAtNotNull: check(
-        "test_records_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      testRecordsUpdatedAtNotNull: check(
-        "test_records_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-      testRecordsTenantIdNotNull: check(
-        "test_records_tenant_id_not_null",
-        sql`NOT NULL tenant_id`,
-      ),
-    };
-  },
-);
 
 export const inspectionSpecialties = pgTable(
   "inspection_specialties",
@@ -964,6 +556,389 @@ export const drizzleMigrations = pgTable(
   },
 );
 
+export const inspectionSpecs = pgTable(
+  "inspection_specs",
+  {
+    code: text().primaryKey().notNull(),
+    inspectionObjectCode: text("inspection_object_code"),
+    name: text().notNull(),
+    remark: text(),
+    sortOrder: integer("sort_order").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      idxInspectionSpecsObject: index("idx_inspection_specs_object").using(
+        "btree",
+        table.inspectionObjectCode.asc().nullsLast().op("text_ops"),
+      ),
+      specsObjectFk: foreignKey({
+        columns: [table.inspectionObjectCode],
+        foreignColumns: [inspectionObjects.code],
+        name: "specs_object_fk",
+      }).onDelete("set null"),
+      inspectionSpecsCodeNotNull: check(
+        "inspection_specs_code_not_null",
+        sql`NOT NULL code`,
+      ),
+      inspectionSpecsNameNotNull: check(
+        "inspection_specs_name_not_null",
+        sql`NOT NULL name`,
+      ),
+      inspectionSpecsSortOrderNotNull: check(
+        "inspection_specs_sort_order_not_null",
+        sql`NOT NULL sort_order`,
+      ),
+      inspectionSpecsCreatedAtNotNull: check(
+        "inspection_specs_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      inspectionSpecsUpdatedAtNotNull: check(
+        "inspection_specs_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+    };
+  },
+);
+
+export const sampleReceipts = pgTable(
+  "sample_receipts",
+  {
+    id: text().primaryKey().notNull(),
+    contractId: text("contract_id").notNull(),
+    commissionCode: text("commission_code").notNull(),
+    commissionDate: text("commission_date").notNull(),
+    commissionRegisterCode: text("commission_register_code"),
+    commissionRegisterDate: text("commission_register_date"),
+    categoryCode: text("category_code").notNull(),
+    projectName: text("project_name"),
+    clientUnit: text("client_unit"),
+    buildingUnit: text("building_unit"),
+    supervisorUnit: text("supervisor_unit"),
+    constructionUnit: text("construction_unit"),
+    witnessUnit: text("witness_unit"),
+    samplingLocation: text("sampling_location"),
+    witness: text(),
+    witnessPhone: text("witness_phone"),
+    inspector: text(),
+    inspectorPhone: text("inspector_phone"),
+    receivedBy: text("received_by").notNull(),
+    sampleSource: text("sample_source").notNull(),
+    testCategory: text("test_category").notNull(),
+    testEnvironment: text("test_environment"),
+    mainEquipment: text("main_equipment"),
+    testOperator: text("test_operator"),
+    testStartDate: text("test_start_date"),
+    testEndDate: text("test_end_date"),
+    originalRecordNo: text("original_record_no"),
+    remark: text(),
+    judgmentBasis: jsonb("judgment_basis"),
+    testingBasis: jsonb("testing_basis"),
+    testParameters: jsonb("test_parameters"),
+    ext: jsonb().default({}).notNull(),
+    flowStatus: text("flow_status").default("receiving").notNull(),
+    flowHistory: jsonb("flow_history").default([]).notNull(),
+    lastSubmittedBy: text("last_submitted_by"),
+    assigneeId: text("assignee_id"),
+    assigneeName: text("assignee_name"),
+    plannedTestDate: text("planned_test_date"),
+    reportCode: text("report_code"),
+    reportDate: text("report_date"),
+    conclusion: text(),
+    result: text(),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    tenantId: text("tenant_id").notNull(),
+  },
+  (table) => {
+    return {
+      idxReceiptsTenant: index("idx_receipts_tenant").using(
+        "btree",
+        table.tenantId.asc().nullsLast().op("text_ops"),
+      ),
+      idxReceiptsTenantCommission: uniqueIndex("idx_receipts_tenant_commission").using(
+        "btree",
+        table.tenantId.asc().nullsLast().op("text_ops"),
+        table.commissionCode.asc().nullsLast().op("text_ops"),
+      ),
+      idxSampleReceiptsCategory: index("idx_sample_receipts_category").using(
+        "btree",
+        table.categoryCode.asc().nullsLast().op("text_ops"),
+      ),
+      idxSampleReceiptsContract: index("idx_sample_receipts_contract").using(
+        "btree",
+        table.contractId.asc().nullsLast().op("text_ops"),
+      ),
+      idxSampleReceiptsFlowStatus: index("idx_sample_receipts_flow_status").using(
+        "btree",
+        table.flowStatus.asc().nullsLast().op("text_ops"),
+      ),
+      sampleReceiptsContractFk: foreignKey({
+        columns: [table.contractId],
+        foreignColumns: [contracts.id],
+        name: "sample_receipts_contract_fk",
+      }).onDelete("restrict"),
+      receiptsCategoryFk: foreignKey({
+        columns: [table.categoryCode],
+        foreignColumns: [inspectionReportNames.code],
+        name: "receipts_category_fk",
+      }).onDelete("restrict"),
+      ckReceiptsFlowStatus: check(
+        "ck_receipts_flow_status",
+        sql`flow_status = ANY (ARRAY['receiving'::text, 'task_assignment'::text, 'data_entry'::text, 'review'::text, 'approval'::text, 'issuance'::text, 'archived'::text, 'completed'::text])`,
+      ),
+      sampleReceiptsIdNotNull: check("sample_receipts_id_not_null", sql`NOT NULL id`),
+      sampleReceiptsContractIdNotNull: check(
+        "sample_receipts_contract_id_not_null",
+        sql`NOT NULL contract_id`,
+      ),
+      sampleReceiptsCommissionCodeNotNull: check(
+        "sample_receipts_commission_code_not_null",
+        sql`NOT NULL commission_code`,
+      ),
+      sampleReceiptsCommissionDateNotNull: check(
+        "sample_receipts_commission_date_not_null",
+        sql`NOT NULL commission_date`,
+      ),
+      sampleReceiptsCategoryCodeNotNull: check(
+        "sample_receipts_category_code_not_null",
+        sql`NOT NULL category_code`,
+      ),
+      sampleReceiptsReceivedByNotNull: check(
+        "sample_receipts_received_by_not_null",
+        sql`NOT NULL received_by`,
+      ),
+      sampleReceiptsSampleSourceNotNull: check(
+        "sample_receipts_sample_source_not_null",
+        sql`NOT NULL sample_source`,
+      ),
+      sampleReceiptsTestCategoryNotNull: check(
+        "sample_receipts_test_category_not_null",
+        sql`NOT NULL test_category`,
+      ),
+      sampleReceiptsExtNotNull: check("sample_receipts_ext_not_null", sql`NOT NULL ext`),
+      sampleReceiptsFlowStatusNotNull: check(
+        "sample_receipts_flow_status_not_null",
+        sql`NOT NULL flow_status`,
+      ),
+      sampleReceiptsFlowHistoryNotNull: check(
+        "sample_receipts_flow_history_not_null",
+        sql`NOT NULL flow_history`,
+      ),
+      sampleReceiptsCreatedAtNotNull: check(
+        "sample_receipts_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      sampleReceiptsUpdatedAtNotNull: check(
+        "sample_receipts_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+      sampleReceiptsTenantIdNotNull: check(
+        "sample_receipts_tenant_id_not_null",
+        sql`NOT NULL tenant_id`,
+      ),
+    };
+  },
+);
+
+export const samples = pgTable(
+  "samples",
+  {
+    id: text().primaryKey().notNull(),
+    receiptId: text("receipt_id").notNull(),
+    sampleCode: text("sample_code").notNull(),
+    sampleName: text("sample_name"),
+    model: text(),
+    specification: text(),
+    grade: text(),
+    brand: text(),
+    manufacturer: text(),
+    structuralPart: text("structural_part"),
+    representQuantity: text("represent_quantity"),
+    sampleQuantity: text("sample_quantity"),
+    batchNumber: text("batch_number"),
+    supplyUnit: text("supply_unit"),
+    arrivalDate: text("arrival_date"),
+    samplingDate: text("sampling_date"),
+    curingCondition: text("curing_condition"),
+    age: text(),
+    ext: jsonb().default({}).notNull(),
+    remark: text(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    tenantId: text("tenant_id").notNull(),
+  },
+  (table) => {
+    return {
+      idxSamplesReceipt: index("idx_samples_receipt").using(
+        "btree",
+        table.receiptId.asc().nullsLast().op("text_ops"),
+      ),
+      idxSamplesTenantCode: uniqueIndex("idx_samples_tenant_code").using(
+        "btree",
+        table.tenantId.asc().nullsLast().op("text_ops"),
+        table.sampleCode.asc().nullsLast().op("text_ops"),
+      ),
+      samplesReceiptFk: foreignKey({
+        columns: [table.receiptId],
+        foreignColumns: [sampleReceipts.id],
+        name: "samples_receipt_fk",
+      }).onDelete("cascade"),
+      samplesIdNotNull: check("samples_id_not_null", sql`NOT NULL id`),
+      samplesReceiptIdNotNull: check(
+        "samples_receipt_id_not_null",
+        sql`NOT NULL receipt_id`,
+      ),
+      samplesSampleCodeNotNull: check(
+        "samples_sample_code_not_null",
+        sql`NOT NULL sample_code`,
+      ),
+      samplesExtNotNull: check("samples_ext_not_null", sql`NOT NULL ext`),
+      samplesCreatedAtNotNull: check(
+        "samples_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      samplesUpdatedAtNotNull: check(
+        "samples_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+      samplesTenantIdNotNull: check(
+        "samples_tenant_id_not_null",
+        sql`NOT NULL tenant_id`,
+      ),
+    };
+  },
+);
+
+export const inspectionParamInterfaces = pgTable(
+  "inspection_param_interfaces",
+  {
+    code: text().primaryKey().notNull(),
+    name: text(),
+    description: text(),
+    config: jsonb(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    version: integer().default(1).notNull(),
+  },
+  () => {
+    return {
+      inspectionParamInterfacesVersionNotNull: check(
+        "inspection_param_interfaces_version_not_null",
+        sql`NOT NULL version`,
+      ),
+      inspectionParamInterfacesCodeNotNull: check(
+        "inspection_param_interfaces_code_not_null",
+        sql`NOT NULL code`,
+      ),
+      inspectionParamInterfacesCreatedAtNotNull: check(
+        "inspection_param_interfaces_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      inspectionParamInterfacesUpdatedAtNotNull: check(
+        "inspection_param_interfaces_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+    };
+  },
+);
+
+export const testRecords = pgTable(
+  "test_records",
+  {
+    id: text().primaryKey().notNull(),
+    sampleId: text("sample_id").notNull(),
+    parameterCode: text("parameter_code").notNull(),
+    standardCode: text("standard_code"),
+    requirement: text().notNull(),
+    result: text().notNull(),
+    verdict: text(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    tenantId: text("tenant_id").notNull(),
+    data: jsonb().default({}).notNull(),
+  },
+  (table) => {
+    return {
+      idxTestRecordsSample: index("idx_test_records_sample").using(
+        "btree",
+        table.sampleId.asc().nullsLast().op("text_ops"),
+      ),
+      idxTestRecordsTenant: index("idx_test_records_tenant").using(
+        "btree",
+        table.tenantId.asc().nullsLast().op("text_ops"),
+      ),
+      testRecordsSampleFk: foreignKey({
+        columns: [table.sampleId],
+        foreignColumns: [samples.id],
+        name: "test_records_sample_fk",
+      }).onDelete("cascade"),
+      testrecParamFk: foreignKey({
+        columns: [table.parameterCode],
+        foreignColumns: [inspectionParameters.code],
+        name: "testrec_param_fk",
+      }).onDelete("restrict"),
+      testrecStandardFk: foreignKey({
+        columns: [table.standardCode],
+        foreignColumns: [inspectionStandards.code],
+        name: "testrec_standard_fk",
+      }).onDelete("set null"),
+      testRecordsDataNotNull: check("test_records_data_not_null", sql`NOT NULL data`),
+      testRecordsIdNotNull: check("test_records_id_not_null", sql`NOT NULL id`),
+      testRecordsSampleIdNotNull: check(
+        "test_records_sample_id_not_null",
+        sql`NOT NULL sample_id`,
+      ),
+      testRecordsParameterCodeNotNull: check(
+        "test_records_parameter_code_not_null",
+        sql`NOT NULL parameter_code`,
+      ),
+      testRecordsRequirementNotNull: check(
+        "test_records_requirement_not_null",
+        sql`NOT NULL requirement`,
+      ),
+      testRecordsResultNotNull: check(
+        "test_records_result_not_null",
+        sql`NOT NULL result`,
+      ),
+      testRecordsCreatedAtNotNull: check(
+        "test_records_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      testRecordsUpdatedAtNotNull: check(
+        "test_records_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+      testRecordsTenantIdNotNull: check(
+        "test_records_tenant_id_not_null",
+        sql`NOT NULL tenant_id`,
+      ),
+    };
+  },
+);
+
 export const inspectionStandardParameters = pgTable(
   "inspection_standard_parameters",
   {
@@ -1233,65 +1208,6 @@ export const inspectionObjectStandards = pgTable(
   },
 );
 
-export const inspectionParamInterfaceLinks = pgTable(
-  "inspection_param_interface_links",
-  {
-    inspectionParameterCode: text("inspection_parameter_code").notNull(),
-    paramInterfaceCode: text("param_interface_code").notNull(),
-    reportNameCode: text("report_name_code"),
-    config: jsonb(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-  },
-  (table) => {
-    return {
-      idxPilParam: index("idx_pil_param").using(
-        "btree",
-        table.inspectionParameterCode.asc().nullsLast().op("text_ops"),
-      ),
-      pilParamFk: foreignKey({
-        columns: [table.inspectionParameterCode],
-        foreignColumns: [inspectionParameters.code],
-        name: "pil_param_fk",
-      }).onDelete("cascade"),
-      pilInterfaceFk: foreignKey({
-        columns: [table.paramInterfaceCode],
-        foreignColumns: [inspectionParamInterfaces.code],
-        name: "pil_interface_fk",
-      }).onDelete("cascade"),
-      pilReportFk: foreignKey({
-        columns: [table.reportNameCode],
-        foreignColumns: [inspectionReportNames.code],
-        name: "pil_report_fk",
-      }).onDelete("set null"),
-      paramInterfaceLinksPkey: primaryKey({
-        columns: [table.inspectionParameterCode, table.paramInterfaceCode],
-        name: "param_interface_links_pkey",
-      }),
-      inspectionParamInterfaceLInspectionParameterCodeNotNull: check(
-        "inspection_param_interface_l_inspection_parameter_code_not_null",
-        sql`NOT NULL inspection_parameter_code`,
-      ),
-      inspectionParamInterfaceLinksParamInterfaceCodeNotNull: check(
-        "inspection_param_interface_links_param_interface_code_not_null",
-        sql`NOT NULL param_interface_code`,
-      ),
-      inspectionParamInterfaceLinksCreatedAtNotNull: check(
-        "inspection_param_interface_links_created_at_not_null",
-        sql`NOT NULL created_at`,
-      ),
-      inspectionParamInterfaceLinksUpdatedAtNotNull: check(
-        "inspection_param_interface_links_updated_at_not_null",
-        sql`NOT NULL updated_at`,
-      ),
-    };
-  },
-);
-
 export const inspectionReportNameStandards = pgTable(
   "inspection_report_name_standards",
   {
@@ -1348,6 +1264,70 @@ export const inspectionReportNameStandards = pgTable(
       ),
       inspectionReportNameStandardsUpdatedAtNotNull: check(
         "inspection_report_name_standards_updated_at_not_null",
+        sql`NOT NULL updated_at`,
+      ),
+    };
+  },
+);
+
+export const inspectionParamInterfaceLinks = pgTable(
+  "inspection_param_interface_links",
+  {
+    inspectionParameterCode: text("inspection_parameter_code").notNull(),
+    paramInterfaceCode: text("param_interface_code").notNull(),
+    reportNameCode: text("report_name_code"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    inspectionStandardCode: text("inspection_standard_code"),
+  },
+  (table) => {
+    return {
+      idxPilParam: index("idx_pil_param").using(
+        "btree",
+        table.inspectionParameterCode.asc().nullsLast().op("text_ops"),
+      ),
+      pilStandardFk: foreignKey({
+        columns: [table.inspectionStandardCode],
+        foreignColumns: [inspectionStandards.code],
+        name: "pil_standard_fk",
+      }).onDelete("set null"),
+      pilParamFk: foreignKey({
+        columns: [table.inspectionParameterCode],
+        foreignColumns: [inspectionParameters.code],
+        name: "pil_param_fk",
+      }).onDelete("cascade"),
+      pilInterfaceFk: foreignKey({
+        columns: [table.paramInterfaceCode],
+        foreignColumns: [inspectionParamInterfaces.code],
+        name: "pil_interface_fk",
+      }).onDelete("cascade"),
+      pilReportFk: foreignKey({
+        columns: [table.reportNameCode],
+        foreignColumns: [inspectionReportNames.code],
+        name: "pil_report_fk",
+      }).onDelete("set null"),
+      paramInterfaceLinksPkey: primaryKey({
+        columns: [table.inspectionParameterCode, table.paramInterfaceCode],
+        name: "param_interface_links_pkey",
+      }),
+      inspectionParamInterfaceLInspectionParameterCodeNotNull: check(
+        "inspection_param_interface_l_inspection_parameter_code_not_null",
+        sql`NOT NULL inspection_parameter_code`,
+      ),
+      inspectionParamInterfaceLinksParamInterfaceCodeNotNull: check(
+        "inspection_param_interface_links_param_interface_code_not_null",
+        sql`NOT NULL param_interface_code`,
+      ),
+      inspectionParamInterfaceLinksCreatedAtNotNull: check(
+        "inspection_param_interface_links_created_at_not_null",
+        sql`NOT NULL created_at`,
+      ),
+      inspectionParamInterfaceLinksUpdatedAtNotNull: check(
+        "inspection_param_interface_links_updated_at_not_null",
         sql`NOT NULL updated_at`,
       ),
     };

@@ -90,8 +90,6 @@ import type {
   ReceiptsListReceipts200,
   ReceiptsListReceiptsParams,
   RefreshTokenRequest,
-  ReportFlowListFlowQueue200,
-  ReportFlowListFlowQueueParams,
   ReportNameParameterLink,
   ReportNameStandardLink,
   ReportNamesListObjectReportNameLinks200,
@@ -131,6 +129,7 @@ import type {
   UpdateInspectionSpecialtyRequest,
   UpdateInspectionStandardRequest,
   UpdateParamInterfaceRequest,
+  UpdateSampleExtRequest,
   UpdateSampleReceiptRequest,
   UpdateSampleRequest,
   UpdateTechnicalRequirementRequest,
@@ -182,6 +181,15 @@ export const authGetMenus = <TData = AxiosResponse<MenuNode[]>>(
     );
   }
 
+export const authNativeLogin = <TData = AxiosResponse<LoginResponse>>(
+    loginRequest: LoginRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/auth/native-login`,
+      loginRequest,options
+    );
+  }
+
 export const authGetPermissions = <TData = AxiosResponse<PermissionSet>>(
      options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -199,6 +207,14 @@ export const authRefresh = <TData = AxiosResponse<LoginResponse>>(
     );
   }
 
+/**
+ *   SSO 跳转端点（RFC 6749 §4.1.1 授权码流）。返回跳板 URL 而非 302：客户端取
+  authorizeUrl 做 top-level navigation。
+
+  state 由前端生成并原样透传，回跳时前端比对，防 CSRF；redirect_uri 须在后端
+  白名单内（https 域名之外，原生客户端允许自定义 scheme），白名单配置随部署
+  env，不入契约；client_secret 仅后端持有，不出现在本契约。
+ */
 export const authSsoAuthorize = <TData = AxiosResponse<SsoRedirect>>(
     params: AuthSsoAuthorizeParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -275,6 +291,9 @@ export const calculationMethodsDeleteCalculationMethod = <TData = AxiosResponse<
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const catalogListBrands = <TData = AxiosResponse<CatalogListBrands200>>(
     params?: CatalogListBrandsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -312,6 +331,9 @@ export const catalogDeleteBrand = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const catalogListGrades = <TData = AxiosResponse<CatalogListGrades200>>(
     params?: CatalogListGradesParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -349,6 +371,9 @@ export const catalogDeleteGrade = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const catalogListModels = <TData = AxiosResponse<CatalogListModels200>>(
     params?: CatalogListModelsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -386,6 +411,9 @@ export const catalogDeleteModel = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const catalogListSpecs = <TData = AxiosResponse<CatalogListSpecs200>>(
     params?: CatalogListSpecsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -423,6 +451,9 @@ export const catalogDeleteSpec = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const contractsListContracts = <TData = AxiosResponse<ContractsListContracts200>>(
     params?: ContractsListContractsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -580,6 +611,9 @@ export const inspectionDictionaryListStandardParameterLinks = <TData = AxiosResp
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const inspectionDictionaryListObjects = <TData = AxiosResponse<InspectionDictionaryListObjects200>>(
     params?: InspectionDictionaryListObjectsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -617,6 +651,9 @@ export const inspectionDictionaryDeleteObject = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const inspectionDictionaryListParameters = <TData = AxiosResponse<InspectionDictionaryListParameters200>>(
     params?: InspectionDictionaryListParametersParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -654,6 +691,9 @@ export const inspectionDictionaryDeleteParameter = <TData = AxiosResponse<void>>
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const inspectionDictionaryListSpecialties = <TData = AxiosResponse<InspectionDictionaryListSpecialties200>>(
     params?: InspectionDictionaryListSpecialtiesParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -691,6 +731,9 @@ export const inspectionDictionaryDeleteSpecialty = <TData = AxiosResponse<void>>
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const inspectionDictionaryListStandards = <TData = AxiosResponse<InspectionDictionaryListStandards200>>(
     params?: InspectionDictionaryListStandardsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -728,6 +771,9 @@ export const inspectionDictionaryDeleteStandard = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const paramInterfacesListParamInterfaces = <TData = AxiosResponse<ParamInterfacesListParamInterfaces200>>(
     params?: ParamInterfacesListParamInterfacesParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -801,6 +847,9 @@ export const paramInterfacesDeleteParamInterface = <TData = AxiosResponse<void>>
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const receiptsListReceipts = <TData = AxiosResponse<ReceiptsListReceipts200>>(
     params?: ReceiptsListReceiptsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -820,22 +869,66 @@ export const receiptsCreateReceipt = <TData = AxiosResponse<SampleReceipt>>(
     );
   }
 
-export const reportFlowSubmitFlowAction = <TData = AxiosResponse<FlowActionResult[]>>(
+export const receiptsActFlowApprove = <TData = AxiosResponse<FlowActionResult[]>>(
     flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
  ): Promise<TData> => {
     return axios.post(
-      `/api/receipts/flow`,
+      `/api/receipts/approve/act`,
       flowActionRequest,options
     );
   }
 
-export const reportFlowListFlowQueue = <TData = AxiosResponse<ReportFlowListFlowQueue200>>(
-    params: ReportFlowListFlowQueueParams, options?: AxiosRequestConfig
+export const receiptsActFlowArchived = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.get(
-      `/api/receipts/flow/queue`,{
-    ...options,
-        params: {...params, ...options?.params},}
+    return axios.post(
+      `/api/receipts/archived/act`,
+      flowActionRequest,options
+    );
+  }
+
+export const receiptsActFlowAssigning = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/receipts/assigning/act`,
+      flowActionRequest,options
+    );
+  }
+
+export const receiptsActFlowDataEntry = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/receipts/data-entry/act`,
+      flowActionRequest,options
+    );
+  }
+
+export const receiptsActFlowIssuance = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/receipts/issuance/act`,
+      flowActionRequest,options
+    );
+  }
+
+export const receiptsActFlowReceiving = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/receipts/receiving/act`,
+      flowActionRequest,options
+    );
+  }
+
+export const receiptsActFlowReview = <TData = AxiosResponse<FlowActionResult[]>>(
+    flowActionRequest: FlowActionRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/receipts/review/act`,
+      flowActionRequest,options
     );
   }
 
@@ -883,6 +976,9 @@ export const receiptsAssignTask = <TData = AxiosResponse<SampleReceipt>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const reportNamesListReportNames = <TData = AxiosResponse<ReportNamesListReportNames200>>(
     params?: ReportNamesListReportNamesParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -1012,6 +1108,9 @@ export const reportNamesDeleteReportName = <TData = AxiosResponse<void>>(
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const samplesListSamples = <TData = AxiosResponse<SamplesListSamples200>>(
     params?: SamplesListSamplesParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -1054,6 +1153,16 @@ export const samplesDeleteSample = <TData = AxiosResponse<void>>(
  ): Promise<TData> => {
     return axios.delete(
       `/api/samples/${id}`,options
+    );
+  }
+
+export const samplesUpdateSampleExt = <TData = AxiosResponse<Sample>>(
+    id: string,
+    updateSampleExtRequest: UpdateSampleExtRequest, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.put(
+      `/api/samples/${id}/ext`,
+      updateSampleExtRequest,options
     );
   }
 
@@ -1126,6 +1235,9 @@ export const technicalRequirementsDeleteTechnicalRequirement = <TData = AxiosRes
     );
   }
 
+/**
+ * 分页：当前实现仅回显不切片，参照实现返回全量，无分页语义（pageSize 同）。
+ */
 export const testRecordsListTestRecords = <TData = AxiosResponse<TestRecordsListTestRecords200>>(
     params?: TestRecordsListTestRecordsParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
@@ -1186,6 +1298,7 @@ export type AuthLoginResult = AxiosResponse<LoginResponse>
 export type AuthLogoutResult = AxiosResponse<void>
 export type AuthGetCurrentUserResult = AxiosResponse<CurrentUserSession>
 export type AuthGetMenusResult = AxiosResponse<MenuNode[]>
+export type AuthNativeLoginResult = AxiosResponse<LoginResponse>
 export type AuthGetPermissionsResult = AxiosResponse<PermissionSet>
 export type AuthRefreshResult = AxiosResponse<LoginResponse>
 export type AuthSsoAuthorizeResult = AxiosResponse<SsoRedirect>
@@ -1255,8 +1368,13 @@ export type ParamInterfacesUpdateParamInterfaceResult = AxiosResponse<ParamInter
 export type ParamInterfacesDeleteParamInterfaceResult = AxiosResponse<void>
 export type ReceiptsListReceiptsResult = AxiosResponse<ReceiptsListReceipts200>
 export type ReceiptsCreateReceiptResult = AxiosResponse<SampleReceipt>
-export type ReportFlowSubmitFlowActionResult = AxiosResponse<FlowActionResult[]>
-export type ReportFlowListFlowQueueResult = AxiosResponse<ReportFlowListFlowQueue200>
+export type ReceiptsActFlowApproveResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowArchivedResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowAssigningResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowDataEntryResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowIssuanceResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowReceivingResult = AxiosResponse<FlowActionResult[]>
+export type ReceiptsActFlowReviewResult = AxiosResponse<FlowActionResult[]>
 export type ReceiptsGetReceiptResult = AxiosResponse<SampleReceipt>
 export type ReceiptsUpdateReceiptResult = AxiosResponse<SampleReceipt>
 export type ReceiptsDeleteReceiptResult = AxiosResponse<void>
@@ -1281,6 +1399,7 @@ export type SamplesCreateSampleResult = AxiosResponse<Sample>
 export type SamplesGetSampleResult = AxiosResponse<Sample>
 export type SamplesUpdateSampleResult = AxiosResponse<Sample>
 export type SamplesDeleteSampleResult = AxiosResponse<void>
+export type SamplesUpdateSampleExtResult = AxiosResponse<Sample>
 export type SummaryGetReportSummaryResult = AxiosResponse<SummaryData>
 export type SummaryGetDashboardStatsResult = AxiosResponse<DashboardStats>
 export type TechnicalRequirementsListTechnicalRequirementsResult = AxiosResponse<TechnicalRequirement[]>

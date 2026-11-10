@@ -853,11 +853,9 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
     // 这里对同一 inspectionParamInterfaces / inspectionParamInterfaceLinks fixtures 原地实现 REF 语义。
     http.post("*/api/param-interfaces", async ({ request }) => {
       const body = (await request.json()) as Record<string, unknown>;
-      if (!body["code"] || !body["name"] || !body["componentPath"])
-        return HttpResponse.json(
-          { message: "code/name/componentPath 必填" },
-          { status: 400 },
-        );
+      // ADR-0056：componentPath 已随契约删除（不再必填）；version 服务端缺省 1
+      if (!body["code"] || !body["name"])
+        return HttpResponse.json({ message: "code/name 必填" }, { status: 400 });
       if (
         (inspectionParamInterfaces as unknown as Array<{ code?: string }>).some(
           (r) => r.code === body["code"],
@@ -868,10 +866,10 @@ export function installShapeAdapters(server: { use: (...h: unknown[]) => void })
       const row = {
         code: body["code"],
         name: body["name"],
-        componentPath: body["componentPath"],
         config: body["config"] ?? null,
         description: body["description"] ?? "",
         sortOrder: body["sortOrder"] ?? 999999,
+        version: (body["version"] as number | undefined) ?? 1,
         isOfficial: false,
         createdAt: now,
         updatedAt: now,
@@ -1092,11 +1090,9 @@ export function seedParamInterfaces(_server?: unknown): void {
   const piRows = paramInterfacesJson as Array<{
     code: string;
     name: string;
-    componentPath: string;
     config?: Record<string, unknown> | null;
     description?: string;
-    sortOrder: number;
-    isOfficial?: boolean;
+    version?: number;
   }>;
   inspectionParamInterfaces.length = 0;
   for (const r of piRows) {
@@ -1104,11 +1100,9 @@ export function seedParamInterfaces(_server?: unknown): void {
       id: `pi-${r.code}`,
       code: r.code,
       name: r.name,
-      componentPath: r.componentPath,
       config: r.config ?? null,
       description: r.description,
-      sortOrder: r.sortOrder,
-      isOfficial: r.isOfficial,
+      version: r.version ?? 1,
       createdAt: now,
       updatedAt: now,
       tenantId: TENANT,
@@ -1479,6 +1473,8 @@ function seedTestRecordsForSample(sid: string, i: number, categoryCode: string):
       id: `ti-${sid}${suffix}-${parameterCode}`,
       sampleId: sid,
       parameterCode,
+      // ADR-0056：动态表单采集原值（requirementCode 已随契约删除）
+      data: {},
       requirement,
       result,
       verdict,
