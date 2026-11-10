@@ -43,14 +43,39 @@ export interface SchemaField {
   /** * _series 的条数 */
   count?: number;
   unit?: string;
-  /** table 专用 */
+  /** table 专用（legacy 列数形态） */
   rows?: number;
-  columns?: number;
+  /** table 列：数字=legacy 列数（columnOptions 形态）；数组=结构化列（见 SchemaTableColumn） */
+  columns?: number | SchemaTableColumn[];
   columnLabel?: string;
   /** table 列头（如筛孔名）；缺省用 params.columnOptions* */
   columnOptions?: string[];
   cellType?: "number" | "text";
   rowExtras?: SchemaRowExtra[];
+  /** 越限红显（结构化列形态）：column 命中 rule 时该格标红；0/未填不标 */
+  highlight?: SchemaTableHighlight;
+}
+
+/**
+ * table 结构化列（ADR-0056 渲染器扩展，2026-11-10 人裁）：复刻旧 Rebar 卡的
+ * 「手输 + 行内逐行计算 + 静态标准列」效果。input=数字输入；
+ * computed=逐行派发算法注册表（variant ?? algorithm，与 SchemaComputed 同域）；
+ * static=纯文本展示（如 ≤400）。数据形状：data[field] = { <col.field>: number[] }，
+ * 按列数组存——报表模板 record:<code>:<colField> 路径可直取。
+ */
+export interface SchemaTableColumn {
+  field: string;
+  label: string;
+  mode: "input" | "computed" | "static";
+  /** computed 列：算法派发键（与 SchemaComputed.variant/algorithm 同域） */
+  algorithm?: string;
+  /** static 列：固定文本 */
+  text?: string;
+}
+
+export interface SchemaTableHighlight {
+  column: string;
+  rule: { op: "lt" | "gt" | "lte" | "gte" | "eq"; value: number };
 }
 
 export interface SchemaComputed {

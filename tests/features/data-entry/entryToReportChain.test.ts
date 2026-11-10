@@ -202,10 +202,15 @@ describe("录入卡 → 报告模板 取数链路", () => {
         expect(map[param], `${rn} / ${param} 未绑定参数界面`).toBeDefined();
         const schema = parseFormSchema(map[param]!.config);
         expect(schema, `${rn} / ${param} schema 不可解析`).not.toBeNull();
-        expect(
-          schema!.computed.length,
-          `${rn} / ${param} 无 computed（通用卡回退）`,
-        ).toBeGreaterThan(0);
+        // 「会输出 JSON」两种形状都算数：顶层 computed（算法域）或
+        // 结构化表格的 computed 列（2026-11-10 扩展，如钢筋力学 strengthTable）。
+        const hasComputed =
+          schema!.computed.length > 0 ||
+          schema!.fields.some(
+            (f) =>
+              Array.isArray(f.columns) && f.columns.some((c) => c.mode === "computed"),
+          );
+        expect(hasComputed, `${rn} / ${param} 无 computed（通用卡回退）`).toBe(true);
       }
     },
   );

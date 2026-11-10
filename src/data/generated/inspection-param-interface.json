@@ -256,25 +256,46 @@
   {
     "code": "rebar-mech-connection-tensile",
     "name": "机械连接抗拉强度",
-    "description": "钢筋机械连接接头抗拉强度（JGJ 107）：3 试件 最大力(kN)+公称直径 → 抗拉强度；每试件记录断裂位置（母材/接头/热影响区/其他）。",
-    "version": 1,
+    "description": "钢筋机械连接接头抗拉强度（JGJ 107）：3 试件 结构化表格 最大力(kN)+公称直径 → 抗拉强度逐行算；标准要求静态列 ≥540（GB 1499.2-2024 技术要求），越限（<540）标红；每试件断裂位置仍为独立 select_series。",
+    "version": 2,
     "config": {
       "fields": [
         {
-          "field": "loads",
-          "type": "number_series",
-          "label": "最大力 (kN)",
-          "required": true,
-          "count": 3,
-          "unit": "kN"
-        },
-        {
-          "field": "diameters",
-          "type": "number_series",
-          "label": "公称直径 (mm)",
-          "required": true,
-          "count": 3,
-          "unit": "mm"
+          "field": "strengthTable",
+          "type": "table",
+          "label": "抗拉强度测定",
+          "rows": 3,
+          "columns": [
+            {
+              "field": "loads",
+              "label": "最大力 (kN)",
+              "mode": "input"
+            },
+            {
+              "field": "diameters",
+              "label": "公称直径 (mm)",
+              "mode": "input"
+            },
+            {
+              "field": "strengths",
+              "label": "抗拉强度 (MPa)",
+              "mode": "computed",
+              "algorithm": "steel_tensile"
+            },
+            {
+              "field": "req",
+              "label": "标准要求",
+              "mode": "static",
+              "text": "≥540"
+            }
+          ],
+          "highlight": {
+            "column": "strengths",
+            "rule": {
+              "op": "lt",
+              "value": 540
+            }
+          }
         },
         {
           "field": "fractureLocations",
@@ -282,14 +303,6 @@
           "label": "断裂位置",
           "count": 3,
           "options": ["母材断裂", "断于接头", "热影响区断裂", "其他"]
-        }
-      ],
-      "computed": [
-        {
-          "field": "strengths",
-          "algorithm": "steel_tensile",
-          "from": ["loads", "diameters"],
-          "label": "抗拉强度 (MPa)"
         }
       ]
     },
@@ -299,33 +312,46 @@
   {
     "code": "rebar-mech-connection-yield",
     "name": "机械连接屈服强度",
-    "description": "钢筋机械连接接头屈服强度（JGJ 107）：3 试件 屈服力(kN)+公称直径 → 屈服强度；屈服不涉及断裂位置，故无 connectionMode。",
-    "version": 1,
+    "description": "钢筋机械连接接头屈服强度（JGJ 107）：3 试件 结构化表格 屈服荷载(kN)+公称直径 → 屈服强度逐行算；标准要求静态列 ≥400（GB 1499.2-2024 技术要求），越限（<400）标红。",
+    "version": 2,
     "config": {
       "fields": [
         {
-          "field": "loads",
-          "type": "number_series",
-          "label": "屈服力 (kN)",
-          "required": true,
-          "count": 3,
-          "unit": "kN"
-        },
-        {
-          "field": "diameters",
-          "type": "number_series",
-          "label": "公称直径 (mm)",
-          "required": true,
-          "count": 3,
-          "unit": "mm"
-        }
-      ],
-      "computed": [
-        {
-          "field": "strengths",
-          "algorithm": "steel_tensile",
-          "from": ["loads", "diameters"],
-          "label": "屈服强度 (MPa)"
+          "field": "strengthTable",
+          "type": "table",
+          "label": "屈服强度测定",
+          "rows": 3,
+          "columns": [
+            {
+              "field": "loads",
+              "label": "屈服荷载 (kN)",
+              "mode": "input"
+            },
+            {
+              "field": "diameters",
+              "label": "公称直径 (mm)",
+              "mode": "input"
+            },
+            {
+              "field": "strengths",
+              "label": "屈服强度 (MPa)",
+              "mode": "computed",
+              "algorithm": "steel_tensile"
+            },
+            {
+              "field": "req",
+              "label": "标准要求",
+              "mode": "static",
+              "text": "≥400"
+            }
+          ],
+          "highlight": {
+            "column": "strengths",
+            "rule": {
+              "op": "lt",
+              "value": 400
+            }
+          }
         }
       ]
     },
@@ -371,33 +397,46 @@
   {
     "code": "rebar-mech-tensile",
     "name": "钢筋力学性能抗拉强度",
-    "description": "钢筋力学性能抗拉强度（GB/T 228.1）：2 组 最大力(kN)+公称直径 → 抗拉强度 Rm=4000·F/(π·d²)；无断口距/断裂特征。组数取 calcRule.specimenCount。",
-    "version": 1,
+    "description": "钢筋力学性能抗拉强度（GB/T 228.1）：2 组 结构化表格 最大力(kN)+公称直径 → 抗拉强度 Rm=4000·F/(π·d²) 逐行算；标准要求静态列 ≥540（GB 1499.2-2024 技术要求），越限（<540）标红；无断口距/断裂特征。组数取 calcRule.specimenCount。",
+    "version": 2,
     "config": {
       "fields": [
         {
-          "field": "loads",
-          "type": "number_series",
-          "label": "最大力 (kN)",
-          "required": true,
-          "count": 2,
-          "unit": "kN"
-        },
-        {
-          "field": "diameters",
-          "type": "number_series",
-          "label": "公称直径 (mm)",
-          "required": true,
-          "count": 2,
-          "unit": "mm"
-        }
-      ],
-      "computed": [
-        {
-          "field": "strengths",
-          "algorithm": "steel_tensile",
-          "from": ["loads", "diameters"],
-          "label": "抗拉强度 (MPa)"
+          "field": "strengthTable",
+          "type": "table",
+          "label": "抗拉强度测定",
+          "rows": 2,
+          "columns": [
+            {
+              "field": "loads",
+              "label": "最大力 (kN)",
+              "mode": "input"
+            },
+            {
+              "field": "diameters",
+              "label": "公称直径 (mm)",
+              "mode": "input"
+            },
+            {
+              "field": "strengths",
+              "label": "抗拉强度 (MPa)",
+              "mode": "computed",
+              "algorithm": "steel_tensile"
+            },
+            {
+              "field": "req",
+              "label": "标准要求",
+              "mode": "static",
+              "text": "≥540"
+            }
+          ],
+          "highlight": {
+            "column": "strengths",
+            "rule": {
+              "op": "lt",
+              "value": 540
+            }
+          }
         }
       ]
     },
@@ -407,33 +446,46 @@
   {
     "code": "rebar-mech-yield",
     "name": "钢筋力学性能屈服强度",
-    "description": "钢筋力学性能屈服强度（GB/T 228.1）：2 组 屈服力(kN)+公称直径 → 屈服强度。",
-    "version": 1,
+    "description": "钢筋力学性能屈服强度（GB/T 228.1）：2 组 结构化表格 屈服荷载(kN)+公称直径 → 屈服强度逐行算；标准要求静态列 ≥400（GB 1499.2-2024 技术要求），越限（<400）标红。",
+    "version": 2,
     "config": {
       "fields": [
         {
-          "field": "loads",
-          "type": "number_series",
-          "label": "屈服力 (kN)",
-          "required": true,
-          "count": 2,
-          "unit": "kN"
-        },
-        {
-          "field": "diameters",
-          "type": "number_series",
-          "label": "公称直径 (mm)",
-          "required": true,
-          "count": 2,
-          "unit": "mm"
-        }
-      ],
-      "computed": [
-        {
-          "field": "strengths",
-          "algorithm": "steel_tensile",
-          "from": ["loads", "diameters"],
-          "label": "屈服强度 (MPa)"
+          "field": "strengthTable",
+          "type": "table",
+          "label": "屈服强度测定",
+          "rows": 2,
+          "columns": [
+            {
+              "field": "loads",
+              "label": "屈服荷载 (kN)",
+              "mode": "input"
+            },
+            {
+              "field": "diameters",
+              "label": "公称直径 (mm)",
+              "mode": "input"
+            },
+            {
+              "field": "strengths",
+              "label": "屈服强度 (MPa)",
+              "mode": "computed",
+              "algorithm": "steel_tensile"
+            },
+            {
+              "field": "req",
+              "label": "标准要求",
+              "mode": "static",
+              "text": "≥400"
+            }
+          ],
+          "highlight": {
+            "column": "strengths",
+            "rule": {
+              "op": "lt",
+              "value": 400
+            }
+          }
         }
       ]
     },
@@ -470,7 +522,7 @@
   {
     "code": "rebar-welding-bend",
     "name": "钢筋焊接接头弯曲性能",
-    "description": "4 试件 × 3 次试验：弯曲角度 + 合格/不合格；输出模板 wq0/wq·/wq1（wq· 中点位是模板字面量）",
+    "description": "3 试件：弯曲角度 + 合格/不合格；输出模板 wq0/wq·/wq1（wq· 中点位是模板字面量）",
     "version": 1,
     "config": {
       "fields": [
@@ -590,7 +642,7 @@
   {
     "code": "soil-compaction-degree-ring",
     "name": "土工压实度（环刀法）",
-    "description": "逐试样录入：湿密度 + 平均含水率 → 干密度 → 压实度；环刀法逐行显示最大干密度列",
+    "description": "逐试样录入：编号/部位/层次/设计压实度 + 湿密度 + 平均含水率 → 干密度 → 压实度；环刀法逐行显示最大干密度列",
     "version": 1,
     "config": {
       "fields": [
@@ -662,7 +714,7 @@
   {
     "code": "soil-compaction-degree-sand",
     "name": "土工压实度（灌砂法）",
-    "description": "逐试样录入：湿密度 + 含水率 → 干密度 → 压实度（对最大干密度）；灌砂法不显示最大干密度列",
+    "description": "逐试样录入：编号/部位/层次/设计压实度 + 湿密度 + 含水率 → 干密度 → 压实度（对最大干密度）；灌砂法不显示最大干密度列",
     "version": 1,
     "config": {
       "fields": [

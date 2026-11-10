@@ -597,9 +597,30 @@ export function initValuesFromSchema(
         break;
       }
       case "table": {
-        // 专属：级配 rows[i].retainedPct / totalBefore / totalAfter → cells+extras
+        // 结构化列形态（input/computed/static）：data[field] = { <col>: number[] }
+        if (Array.isArray(f.columns)) {
+          const rows = f.rows ?? 2;
+          const src = (
+            typeof bag[f.field] === "object" && bag[f.field] !== null
+              ? (bag[f.field] as DataBag)
+              : {}
+          ) as DataBag;
+          const outBag: DataBag = {};
+          for (const c of f.columns) {
+            const prev = Array.isArray(src[c.field]) ? (src[c.field] as unknown[]) : [];
+            const arr = Array.from({ length: rows }, (_, i) =>
+              typeof prev[i] === "number" && Number.isFinite(prev[i]) ? prev[i] : 0,
+            );
+            outBag[c.field] = arr;
+          }
+          out[f.field] = outBag;
+          break;
+        }
+        // legacy：级配 rows[i].retainedPct / totalBefore / totalAfter → cells+extras
         const colCount =
-          f.columnOptions?.length ?? sieveColumns(schema.params).length ?? f.columns ?? 7;
+          f.columnOptions?.length ??
+          sieveColumns(schema.params).length ??
+          (typeof f.columns === "number" ? f.columns : 7);
         const srcRows = rowsList ?? [];
         out[f.field] = Array.from({ length: f.rows ?? 2 }, (_, ri) => {
           const r = (srcRows[ri] ?? {}) as DataBag;

@@ -462,6 +462,168 @@ function SchemaForm({
         );
       }
       case "table": {
+        // 结构化列形态（SchemaTableColumn[]）：手输列 + 逐行计算列 + 静态列 + 越限红显
+        if (Array.isArray(f.columns)) {
+          const sCols = f.columns;
+          const rows = f.rows ?? 2;
+          const bag = (
+            typeof values[f.field] === "object" && values[f.field] !== null
+              ? { ...(values[f.field] as Record<string, number[]>) }
+              : {}
+          ) as Record<string, number[]>;
+          for (const c of sCols) {
+            if (c.mode === "static") continue;
+            const arr = Array.isArray(bag[c.field]) ? [...bag[c.field]!] : [];
+            while (arr.length < rows) arr.push(0);
+            bag[c.field] = arr;
+          }
+          const hl = f.highlight;
+          const hlFail = (colField: string, v: number): boolean => {
+            if (!hl || hl.column !== colField || !(v > 0)) return false;
+            const { op, value } = hl.rule;
+            switch (op) {
+              case "lt":
+                return v < value;
+              case "gt":
+                return v > value;
+              case "lte":
+                return v <= value;
+              case "gte":
+                return v >= value;
+              case "eq":
+                return v === value;
+              default:
+                return false;
+            }
+          };
+          const setStructuredCell = (colField: string, ri: number, v: number) => {
+            const nextBag: Record<string, number[]> = {
+              ...bag,
+              [colField]: (bag[colField] ?? Array(rows).fill(0)).map((x, i) =>
+                i === ri ? v : x,
+              ),
+            };
+            // computed 列逐行重算：把该行各 input 列值喂给算法注册表（单元素序列）
+            for (const cc of sCols) {
+              if (cc.mode !== "computed") continue;
+              const rowVals: Record<string, unknown> = {};
+              for (const ic of sCols) {
+                if (ic.mode === "input")
+                  rowVals[ic.field] = [nextBag[ic.field]?.[ri] ?? 0];
+              }
+              const out = runAlgorithm(
+                {
+                  field: cc.field,
+                  algorithm: cc.algorithm ?? "manual",
+                  from: sCols.filter((c) => c.mode === "input").map((c) => c.field),
+                  label: cc.label,
+                },
+                {
+                  values: rowVals,
+                  params: schema.params,
+                  specimenCount: 1,
+                  techReq: undefined,
+                  techReqId: "",
+                  techReqLabel: "",
+                  crossRecord: undefined,
+                },
+              );
+              const rv = out.data[cc.field];
+              const arr = Array.isArray(nextBag[cc.field])
+                ? [...nextBag[cc.field]!]
+                : Array<number>(rows).fill(0);
+              arr[ri] = Array.isArray(rv)
+                ? typeof rv[ri] === "number"
+                  ? (rv[ri] as number)
+                  : 0
+                : typeof rv === "number"
+                  ? rv
+                  : 0;
+              nextBag[cc.field] = arr;
+            }
+            updateValue(f.field, nextBag);
+          };
+          return (
+            <div key={f.field} className="text-xs space-y-2">
+              <div className="text-gray-500">
+                {f.label}
+                {f.required ? <span className="text-red-500"> *</span> : null}
+              </div>
+              <table className="w-full text-xs border-collapse">
+                <thead className="text-gray-500">
+                  <tr>
+                    <th className="border border-gray-300 px-2 py-1 text-center">序号</th>
+                    {sCols.map((c) => (
+                      <th
+                        key={c.field}
+                        className="border border-gray-300 px-2 py-1 text-center whitespace-nowrap"
+                      >
+                        {c.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: rows }, (_, ri) => (
+                    <tr key={ri}>
+                      <td className="border border-gray-300 px-2 py-1 text-center font-medium">
+                        {ri + 1}
+                      </td>
+                      {sCols.map((c) => {
+                        if (c.mode === "static")
+                          return (
+                            <td
+                              key={c.field}
+                              className="border border-gray-300 px-2 py-1 text-center text-gray-700"
+                            >
+                              {c.text ?? ""}
+                            </td>
+                          );
+                        if (c.mode === "computed") {
+                          const v = bag[c.field]?.[ri] ?? 0;
+                          return (
+                            <td
+                              key={c.field}
+                              className={`border border-gray-300 px-2 py-1 text-center ${
+                                hlFail(c.field, v)
+                                  ? "text-red-600 font-medium"
+                                  : "text-gray-700"
+                              }`}
+                            >
+                              {v > 0 ? v.toFixed(1) : "-"}
+                            </td>
+                          );
+                        }
+                        return (
+                          <td
+                            key={c.field}
+                            className="border border-gray-300 px-1 py-1 text-center"
+                          >
+                            <input
+                              type="number"
+                              step="0.1"
+                              aria-label={`第 ${ri + 1} 行 ${c.label}`}
+                              value={numToInput(bag[c.field]?.[ri] ?? 0)}
+                              onChange={(e) =>
+                                setStructuredCell(
+                                  c.field,
+                                  ri,
+                                  e.target.value === "" ? 0 : Number(e.target.value),
+                                )
+                              }
+                              readOnly={readOnly}
+                              className="w-20 border rounded px-1 py-0.5 text-center read-only:bg-gray-50 read-only:text-gray-500"
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
         const cols = f.columnOptions ?? sieveColumns(schema.params);
         const rows = tableRowsOf(raw, f.rows ?? 2, cols.length);
         const extras = f.rowExtras ?? [];

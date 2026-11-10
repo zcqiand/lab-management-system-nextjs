@@ -4,6 +4,32 @@
 
 ## [Unreleased] — 2026-11-07
 
+### Changed — 动态表单结构化表格列（2026-11-10 人裁「落这个批」）
+
+- **现场**：钢筋力学性能屈服强度界面要复刻旧 Rebar 卡的行内表格效果——
+  序号｜屈服荷载(手输)｜屈服强度(逐行算)｜标准要求(静态)｜越限标红；8 种字段类型
+  表达不了「列级 mode」。
+- **渲染器扩展**：`SchemaTableColumn {field,label,mode:input|computed|static,
+  algorithm?,text?}` + `SchemaField.columns` 数字|对象数组 union + `highlight
+  {column,rule{op,value}}`；数据形状 `data[field]={[col.field]:number[]}`（按列
+  数组存，报表模板 `record:参数:列键` 路径可直取）；computed 列逐行派发
+  `variant ?? algorithm`（与 SchemaComputed 同域）。
+- **种子**：四个钢筋力学接口（yield/tensile + connection 两变体）转结构化表格，
+  阈值全部有 tech_req 种子背书不编数（IP-0086 屈服 ≥400 / IP-0087 抗拉 ≥540，
+  GB 1499.2-2024）；connection-tensile 断裂位置保留独立 select_series。
+- **种子漂移收口**：nextjs src/seeds 在 ADR-0056 回放时只改了消费仓（variant
+  派发键/字段细化/代表值 label）没回灌 shared SSOT——本批以 nextjs HEAD 为基准
+  叠加四个结构化 config 回灌 shared，三镜像（shared ↔ src/seeds ↔ generated/
+  vendor）byte-identical 对齐。
+- entryToReportChain M06.F08.I04 谓词扩：结构化表格 computed 列同算「会输出
+  JSON 的 schema」。
+- 新 dom 测试 tableStructuredColumns ×5（解析保形/四列头/逐行算/越限红显/只读）；
+  TDD 先红后绿；全量 vitest 537 绿 + tsc + prettier + gate 双仓 exit 0；lab_dev
+  重灌后 4 接口 config 已是 strengthTable 形状。
+- 运维指纹复验：node_modules/@lab/management-system-msw（file: 拷贝）npm install
+  不重拷（lock 未变）——改 vendor 种子须 `rm -rf node_modules/@lab/... && npm
+  install`，且 .next 不追踪 vendor 变化须一并 rm -rf .next。
+
 ### Fixed — seed:db 三处 ADR-0055/0056 漏网 + lab_dev 重灌 schema 化种子（2026-11-10）
 
 - **现场**：ADR-0056 只 migrate 了表结构没灌种子（批记「数据零动」），lab_dev 库里
